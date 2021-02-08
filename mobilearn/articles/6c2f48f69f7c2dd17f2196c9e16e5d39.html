@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Распределения случайных величин</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<div class="lemma">
+    <b>Определение 28. </b>
+    <i class="incide">Распределением</i>
+    <img align="absmiddle" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+         width="10"> называется <img align="absmiddle" height="20"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img608.gif"
+                                     width="130"> на множестве  <img align="bottom" height="14"
+                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                                                     width="15">.
+</div>
+<div class="text">
+    Можно представлять себе распределение случайной величины <img align="absmiddle" height="19"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                                                  width="10"> как
+    соответствие между множествами <img align="absmiddle" height="20"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img562.gif"
+                                        width="79"> и вероятностями
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img574.gif"
+         width="70">.
+    <p>Распределения случайных величин суть основные объекты изучения в теории
+        вероятностей. Мы не будем, как правило, интересоваться тем, из какого множества
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+             width="15">
+        действует функция <img align="absmiddle" height="19"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                               width="10">
+        и каким именно элементарным исходам сопоставляет свои возможные значения.
+        Нас чаще будет интересовать то, на множестве <i class="incide">какой вероятности</i>
+        эти значения принимаются. Приведём несколько примеров совершенно разных
+        случайных величин, имеющих одно и то же распределение (<i class="incide">одинаково
+            распределённых</i>).</p>
+</div>
+<div class="example">
+    <b>Пример. </b>
+    <p>
+        <b>1.</b> Один раз бросается правильная монета. Пространство
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+             width="15">
+        состоит из двух элементарных исходов &#151; <i>герб</i> и <i>решка</i>. В качестве
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебры
+        рассмотрим
+        множество всех подмножеств <img align="bottom" height="14"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                        width="15">.
+        Вероятность зададим как в классической схеме.
+        Зададим две случайные величины <img align="absmiddle" height="19"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                            width="10"> и <img align="absmiddle" height="18"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif"
+                                                               width="12"> так:
+        положим </p>
+    <p><img align="absmiddle" height="20"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif" width="34">=1, если <img
+            align="absmiddle" height="16"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> = <i>герб</i>, и
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif" width="34">=0, если <img
+                align="absmiddle" height="16"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif"
+                width="13"> = <i>решка</i>;</p>
+    <p>
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33">=0, если <img
+            align="absmiddle" height="16"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> = <i>герб</i>, и
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33">=1, если <img
+            align="absmiddle" height="16"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> = <i>решка</i>.
+    </p>
+    <p>Очевидно, для любого множества <img align="absmiddle" height="17"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img612.gif"
+                                           width="52"> вероятности принадлежать <img align="bottom"
+                                                                                     height="14"
+                                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                                     width="17"> для
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> и <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12"> одинаковы.
+        Тем не менее ни для одного элементарного
+        исхода <img align="absmiddle" height="16"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> значения
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif" width="34"> и <img
+                align="absmiddle" height="19"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33"> не
+        совпадают. Т.е. <img align="absmiddle" height="19"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                             width="10"> и <img align="absmiddle" height="18"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif"
+                                                width="12"> <i class="incide">одинаково
+            распределены</i>, но не
+        одинаковы (как функции).
+    </p>
+    <p>
+        <b>2.</b>
+        Точка наудачу бросается на отрезок [0, 1]. В этом случае <img align="bottom" height="14"
+                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                                                      width="15">
+        есть отрезок [0, 1] с сигма-алгеброй борелевских подмножеств <img align="bottom" height="14"
+                                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                                                          width="15">
+        и мерой Лебега. Предлагаю читателю убедиться, что две
+        совершенно разные функции: <img align="absmiddle" height="20"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img589.gif"
+                                        width="68"> и <img align="absmiddle" height="23"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590b.gif"
+                                                           width="85"> (расстояния до упавшей точки
+        от левого и от правого концов
+        отрезка соответственно) обладают одинаковыми вероятностями
+        принимать значения внутри любых борелевских множеств <img align="bottom" height="14"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                  width="17"> (вероятности, равные
+        мере Лебега пересечения множеств <img align="bottom" height="14"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                              width="17"> и [0, 1]). Таким образом, эти случайные
+        величины
+        снова одинаково распределены, но не одинаковы: их значения
+        совпадают лишь при одном элементарном исходе <img align="absmiddle" height="16"
+                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif"
+                                                          width="13"> = 0.5 (
+        <small class="quest">нарисовать графики функций
+            <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif" width="34"> и <img
+                    align="absmiddle" height="19"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33">
+        </small>
+        ).
+    </p>
+    <p>
+        <b>3.</b> На том же самом отрезке [0, 1] построим две функции:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif" width="34">=0 при всех
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13">; <img
+            align="absmiddle" height="19"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33">=0 при всех
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13">, кроме <img
+            align="absmiddle" height="16"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> = 0.5, а в точке
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13"> = 0.5 положим
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590a.gif" width="33">= &#151;17.
+    </p>
+    <p>Поскольку мера Лебега точки (она же &#151; вероятность)
+        равна нулю, распределения величин <img align="absmiddle" height="19"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                               width="10"> и <img align="absmiddle" height="18"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif"
+                                                                  width="12"> одинаковы. Теперь <img
+                align="absmiddle" height="19"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> и <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12"> снова не
+        совпадают как функции, но отличаются их
+        значения лишь на множестве <i class="incide">нулевой вероятности</i> (только в точке 0.5). В
+        этом случае говорят,
+        что <img align="absmiddle" height="19"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> и <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12"> совпадают
+        <i class="incide">&#171;почти наверное&#187;</i>:
+        <img align="absmiddle" height="22"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img610a.gif" width="107">.
+    </p>
+</div>
+<div class="text"><p>Опишем различные типы распределений случайных величин.
+    Вся вероятностная масса может быть сосредоточена в нескольких точках прямой,
+    может быть &#171;размазана&#187; по некоторому интервалу или по всей прямой.
+    В зависимости от типа множества, на котором сосредоточена вся единичная вероятностная масса,
+    распределения делят на дискретные, абсолютно непрерывные, сингулярные и их смеси.
+</p></div>
+<div class="lemma">
+    <b>Определение 29. </b>
+    Cлучайная величина <img align="absmiddle" height="19"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10">
+    имеет <i class="incide">дискретное</i>
+    распределение, если существует конечный или счётный набор чисел
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img609.gif"
+         width="92"> такой, что
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img610.gif" width="132">
+    </p>
+</div>
+<div class="text">
+    Итак, случайная величина <img align="absmiddle" height="19"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                  width="10"> имеет дискретное распределение,
+    если она принимает не более чем счётное число значений.
+    Значения эти иначе называют <i class="incide">атомами</i>: <img align="absmiddle" height="19"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                                                    width="10"> имеет атом в точке
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img181.gif"
+         width="12">, если <img align="absmiddle" height="20"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img611.gif"
+                                width="100">.
+    <p>Если случайная величина <img align="absmiddle" height="19"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                    width="10"> имеет дискретное распределение,
+        то для любого <img align="absmiddle" height="17"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img612.gif" width="52">
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="44"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img613.gif" width="198">
+    </p>
+    <p>Дискретное распределение удобно задавать следующей
+        таблицей, в которой <img align="absmiddle" height="20"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img614.gif"
+                                 width="110">:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="59"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img615.gif" width="242">
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 30. </b>
+    Cлучайная величина <img align="absmiddle" height="19"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10">
+    имеет <i class="incide">абсолютно непрерывное</i>
+    распределение, если существует неотрицательная функция <img align="absmiddle" height="21"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img616.gif"
+                                                                width="41"> такая, что
+    для любого борелевского множества <img align="bottom" height="14"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                           width="17"> имеет место равенство:
+    <p class="CENTER"><img align="absmiddle" height="54"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img617.gif" width="171">
+    </p>
+    <p>Функцию <img align="absmiddle" height="21"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img616.gif" width="41">
+        называют <i class="incide">плотностью распределения</i> случайной величины <img
+                align="absmiddle" height="19"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10">. </p>
+</div>
+<div class="remark">
+    <b>Замечание 11. </b>
+    Интеграл выше есть интеграл Лебега, а не Римана. Вполне достаточно, если
+    читатель, не знакомый с интегралом Лебега,
+    будет представлять его себе просто как площадь под графиком подынтегральной функции
+    над множеством <img align="bottom" height="14"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17">. При
+    этом площадь над множеством <img align="bottom" height="14"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                     width="17">, имеющим нулевую меру Лебега,
+    равна нулю. Заметим, что любая функция, отличающаяся от функции <img align="absmiddle"
+                                                                         height="21"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img616.gif"
+                                                                         width="41"> лишь в конечном
+    или счётном числе точек (или на множестве нулевой меры Лебега),
+    будет являться плотностью того же распределения, так как интеграл
+    не изменится от изменения подынтегральной функции на множестве меры нуль.
+</div>
+<div class="teor">
+    <b>Теорема 17. </b>
+    Плотность распределения обладает свойствами:
+    <p><b> (f1)</b>   <img align="absmiddle" height="21"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img618.gif" width="73">
+        для любого <img align="bottom" height="14"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img181.gif" width="12">;
+            
+        <b>(f2)</b>   <img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img619.gif" width="111">.
+    </p>
+</div>
+<div class="proof">
+    <b>Доказательство. </b>
+    <b>(f1)</b> выполнено по определению плотности, <b>(f2)</b> также следует из определения:
+    <p class="CENTER"><img align="absmiddle" height="52"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img620.gif" width="200">
+    </p>
+    <p class="qed">QED</p>
+</div>
+<div class="text">Эти два свойства полностью характеризуют класс плотностей:</div>
+<div class="teor">
+    <b>Теорема 18. </b>
+    Если функция <img align="absmiddle" height="19"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif" width="13">
+    обладает свойствами <b>(f1)</b> и <b>(f2)</b>,
+    то существует вероятностное пространство и случайная величина <img align="absmiddle" height="19"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                                                       width="10"> на нём, для
+    которой <img align="absmiddle" height="19"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif" width="13"> является
+    плотностью распределения.
+</div>
+<div class="proof">
+    <b>Доказательство. </b>
+    Пусть <img align="absmiddle" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15"> есть область,
+    заключенная между осью абсцисс
+    и графиком функции <img align="absmiddle" height="19"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif" width="13">.
+    Площадь области <img align="absmiddle" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">
+    равна единице по свойству <b>(f2)</b>.
+    Пусть <img align="bottom" height="15"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> &#151;
+    множество <img align="absmiddle" height="14"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">, а <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img323.gif"
+        width="13"> &#151;
+    (площадь) на множествах из <img align="bottom" height="15"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                    width="14">.
+    И пусть случайная величина <img align="absmiddle" height="19"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                    width="10"> есть абсцисса точки, наудачу брошенной
+    в эту область.
+    <p class="center"><img align="absmiddle" height="160"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/plotn.gif" width="365">
+    </p>
+    Тогда для любого <img align="absmiddle" height="20"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img562.gif" width="79">
+    выполнено:
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="57"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img621.gif" width="492"></td>
+            <td align="right" width="30">(10)</td>
+        </tr>
+    </table>
+    <p>Здесь область <img align="absmiddle" height="18"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img622.gif" width="28">
+        есть криволинейная трапеция под графиком плотности, с основанием <img align="bottom"
+                                                                              height="14"
+                                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                              width="17">.
+        По определению, равенство означает, что функция <img align="absmiddle" height="19"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif"
+                                                             width="13"> является плотностью
+        распределения
+        случайной величины <img align="absmiddle" height="19"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                width="10">. </p>
+    <p class="qed">QED</p>
+</div>
+<div class="corollary">
+    <b>Свойство 7. </b>
+    Если случайная величина <img align="absmiddle" height="19"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                 width="10"> имеет абсолютно непрерывное
+    распределение, то <img align="absmiddle" height="20"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img623.gif" width="100">
+    для любого <img align="absmiddle" height="15"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img624.gif" width="46">.
+</div>
+<div class="proof">
+    <b>Доказательство. </b> Доказательство сразу следует из
+    и ,
+    так как интеграл по области интегрирования,
+    состоящей из одной точки, равен нулю.<p class="qed">QED</p>
+</div>
+<div class="text">Можно выделить ещё один особый класс
+    распределений, сосредоточенных, в отличие от абсолютно непрерывных распределений, на множестве
+    нулевой
+    меры Лебега, но не имеющих, в отличие от дискретных, атома ни в одной точке этого множества.
+</div>
+<div class="lemma">
+    <b>Определение 31. </b>
+    Говорят, что случайная величина <img align="absmiddle" height="19"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                         width="10"> имеет <i class="incide">сингулярное</i>
+    распределение, если существует борелевское множество <img align="bottom" height="14"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                              width="17">
+    с нулевой лебеговой мерой <img align="absmiddle" height="20"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img625.gif"
+                                   width="71"> такое,
+    что <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img626.gif" width="102">, но при этом
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img623.gif"
+         width="100"> для любой точки <img align="absmiddle" height="15"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img627.gif"
+                                           width="48">.
+</div>
+<div class="text">Можно отметить следующее свойство сингулярных распределений. Множество <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+        width="17">, на котором сосредоточено всё распределение, не может состоять из конечного или
+    счётного числа точек. Действительно,
+    если <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+              width="17"> , <img align="absmiddle" height="20"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img628.gif"
+                                 width="186">, где суммирование ведётся
+    по всем <img align="absmiddle" height="17"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img629.gif" width="53">. Последняя
+    сумма равна нулю как сумма счётного числа нулей,
+    что противоречит предположению <img align="absmiddle" height="20"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img626.gif"
+                                        width="102">.
+    <p>Таким образом, любое сингулярное распределение сосредоточено на несчётном множестве
+        с нулевой мерой Лебега. Примером такого множества может служить <i class="incide">канторовское
+            совершенное
+            множество</i>, а примером такого распределения &#151; <i class="incide">лестница
+            Кантора</i> (
+        <small class="quest">выяснить, что это такое!</small>
+        ).
+    </p>
+    <p>Наконец, распределение может быть выпуклой линейной комбинацией
+        дискретного, абсолютно непрерывного и сингулярного распределений.
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 32. </b>
+    Говорят, что случайная величина <img align="absmiddle" height="19"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                         width="10"> имеет <i class="incide">смешанное</i>
+    распределение, если найдутся такие случайные величины
+    <img align="absmiddle" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img630.gif"
+         width="18">, <img align="absmiddle" height="19"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img631.gif" width="18">
+    и <img align="absmiddle" height="19"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img632.gif" width="18"> &#151; с
+    дискретным, абсолютно
+    непрерывным и сингулярным распределениями соответственно (или такие три распределения), и
+    числа <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img633.gif" width="125">, <img
+        align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img634.gif"
+        width="126">, что для любого <img align="absmiddle" height="20"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img562.gif"
+                                          width="79"> имеет место равенство:
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img635.gif" width="410">
+    </p>
+</div>
+<div class="text">
+    По заданным на одном вероятностном пространстве случайным величинам
+    <img align="absmiddle" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img630.gif"
+         width="18">, <img align="absmiddle" height="19"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img631.gif" width="18">,
+    <img align="absmiddle" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img632.gif"
+         width="18"> и числам <img align="absmiddle" height="18"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img634.gif"
+                                   width="126"> можно построить случайную
+    величину со смешанным распределением так: пусть <img align="absmiddle" height="18"
+                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img636.gif"
+                                                         width="12"> &#151; случайная
+    величина с дискретным распределением на том же вероятностном пространстве такая,
+    что <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img637.gif" width="109"> для <img
+        align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img638.gif"
+        width="77">, и при любом <img align="bottom" height="14"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                      width="12"> и любом <img align="absmiddle" height="20"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img562.gif"
+                                                               width="79">
+    события <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img639.gif" width="62"> и <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img640.gif"
+        width="71"> независимы.
+    <p>Построим случайную величину <img align="absmiddle" height="19"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                        width="10"> так:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img641.gif" width="98">, если <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img642.gif" width="69">, где <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img638.gif" width="77">.
+        Её распределение найдём по :
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="29"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img643.gif" width="509">
+    </p>
+    <p>В силу событий под знаком каждой из вероятностей,
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img635.gif" width="410">
+    </p>
+</div>
+<div class="text">Никаких других видов распределений, кроме перечисленных
+    выше, не существует (доказано Лебегом <img align="absmiddle" height="15"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/biggrin.gif"
+                                               width="15">).
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p>
+</p>
+</body>
+
+</body>
+</html>

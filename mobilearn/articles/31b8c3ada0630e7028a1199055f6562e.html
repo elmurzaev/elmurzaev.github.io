@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.8. Оператор выполнения подготовленного оператора</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;execute statement&gt; ::=
+   EXECUTE &lt;SQL statement name&gt;
+ (&lt;result using clause&gt;]
+ (&lt;parameter using clause&gt;]
+&lt;result using clause&gt; ::= &lt;using clause&gt;
+&lt;parameter using clause&gt; ::= &lt;using clause&gt;</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        Оператор EXECUTE может быть применен к любому ранее подготовленному оператору SQL, кроме
+        &lt;dynamic select statement&gt;. Если это оператор &lt;dynamic single row select statement&gt;,
+        то оператор EXECUTE должен содержать раздел &lt;result using class&gt; с ключевым словом
+        INTO. В любом случае число фактических параметров, задаваемых через разделы using, должно
+        соответствовать числу формальных параметров, определенных в подготовленном операторе SQL.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

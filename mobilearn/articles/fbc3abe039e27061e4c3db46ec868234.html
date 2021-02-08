@@ -1,0 +1,2942 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Связи (ассоциации) Active Record</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="svyazi-active-record"> Связи Active Record</h2>
+    <p>Это руководство раскрывает особенности связей Active Record.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>Как объявлять связи между моделями Active Record
+        </li>
+        <li>Как понимать различные типы связей Active Record
+        </li>
+        <li>Как использовать методы, добавленные в ваши модели при создании связей
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="zachem-nuzhny-svyazi"> Зачем нужны связи?</h3>
+    <p>Зачем нам нужны связи между моделями? Затем, что они позволяют сделать код для обычных
+        операций проще и легче. Например, рассмотрим простое приложение на Rails, которое включает
+        модель для покупателей и модель для заказов. Каждый покупатель может иметь много заказов.
+        Без связей объявление модели будет выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+end
+class Order &lt; ActiveRecord::Base
+end
+</pre>
+    </div>
+    <p>Теперь, допустим, мы хотим добавить новый заказ для существующего покупателя. Нам нужно
+        сделать так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order = Order.create(order_date: Time.now, customer_id: @customer.id)
+</pre>
+    </div>
+    <p>Или, допустим, удалим покупателя и убедимся, что все его заказы также будут удалены:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@orders = Order.where(customer_id: @customer.id)
+@orders.each do |order|
+  order.destroy
+end
+@customer.destroy
+</pre>
+    </div>
+    <p>Со связями Active Record можно упростить эти и другие операции, декларативно сказав Rails,
+        что имеется соединение между двумя моделями. Вот пересмотренный код для создания покупателей
+        и заказов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, dependent: :destroy
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+</pre>
+    </div>
+    <p>С этими изменениями создание нового заказа для определенного покупателя проще:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order = @customer.orders.create(order_date: Time.now)
+</pre>
+    </div>
+    <p>Удаление покупателя и всех его заказов <em>намного</em> проще:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer.destroy
+</pre>
+    </div>
+    <p>Чтобы узнать больше о различных типах связей, читайте следующий раздел руководства. Затем
+        следуют некоторые полезные советы по работе со связями, а затем полное описание методов и
+        опций для связей в Rails.</p>
+    <h3 class="inside_page_header" id="tipy-svyazey"> Типы связей</h3>
+    <p>В Rails <em>связи</em> - это соединения между двумя моделями Active Record. Связи
+        реализовываются с использованием макро-вызовов (macro-style calls), и таким образом вы
+        можете декларативно добавлять возможности для своих моделей. Например, объявляя, что одна
+        модель принадлежит (<code>belongs_to</code>) другой, вы указываете Rails сохранять
+        информацию о первичном-внешнем ключах между экземплярами двух моделей, а также получаете
+        несколько полезных методов, добавленных в модель. Rails поддерживает шесть типов связей:</p>
+    <ul>
+        <li>
+            <code>belongs_to</code>
+        </li>
+        <li>
+            <code>has_one</code>
+        </li>
+        <li>
+            <code>has_many</code>
+        </li>
+        <li>
+            <code>has_many :through</code>
+        </li>
+        <li>
+            <code>has_one :through</code>
+        </li>
+        <li>
+            <code>has_and_belongs_to_many</code>
+        </li>
+    </ul>
+    <p>После прочтения всего этого руководства, вы научитесь объявлять и использовать различные
+        формы связей. Но сначала следует быстро ознакомиться с ситуациями, когда применим каждый тип
+        связи.</p>
+    <h4 class="inside_page_header" id="svyaz-belongs_to"> Связь <code>belongs_to</code>
+    </h4>
+    <p>Связь <code>belongs_to</code> устанавливает соединение один-к-одному с другой моделью, когда
+        один экземпляр объявляющей модели "принадлежит" одному экземпляру другой модели. Например,
+        если в приложении есть покупатели и заказы, и один заказ может быть связан только с одним
+        покупателем, нужно объявить модель order следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для связи belongs_to" class="img-polaroid"
+            src="http://rusrails.ru/images/belongs_to.png" title=""></p>
+    <div class="note"><p>связи <code>belongs_to</code> <em>обязаны</em> использовать единственное
+        число. Если использовать множественное число в вышеприведенном примере для связи<code>customer</code>
+        в модели <code>Order</code>, вам будет сообщено "uninitialized constant Order::Customers".
+        Это так, потому что Rails автоматически получает имя класса из имени связи. Если в имени
+        связи неправильно использовано число, то получаемый класс также будет неправильного числа.
+    </p></div>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateOrders &lt; ActiveRecord::Migration
+  def change
+    create_table :customers do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :orders do |t|
+      t.belongs_to :customer, index: true
+      t.datetime :order_date
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="svyaz-has_one"> Связь <code>has_one</code>
+    </h4>
+    <p>Связь <code>has_one</code> также устанавливает соединение один-к-одному с другой моделью, но
+        в несколько ином смысле (и с другими последствиями). Эта связь показывает, что каждый
+        экземпляр модели содержит или обладает одним экземпляром другой модели. Например, если
+        каждый поставщик имеет только один аккаунт, можете объявить модель supplier подобно этому:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для связи has_one" class="img-polaroid"
+            src="http://rusrails.ru/images/has_one.png" title=""></p>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateSuppliers &lt; ActiveRecord::Migration
+  def change
+    create_table :suppliers do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :accounts do |t|
+      t.belongs_to :supplier, index: true
+      t.string :account_number
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>В зависимости от применения, возможно потребуется создать индекс уникальности и/или
+        ограничение внешнего ключа на указанный столбец таблицы accounts. В этом случае определение
+        столбца может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_table :accounts do |t|
+  t.belongs_to :supplier, index: true, unique: true, foreign_key: true
+  # ...
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="svyaz-has_many"> Связь <code>has_many</code>
+    </h4>
+    <p>Связь <code>has_many</code> указывает на соединение один-ко-многим с другой моделью. Эта
+        связь часто бывает на "другой стороне" связи <code>belongs_to</code>. Эта связь указывает на
+        то, что каждый экземпляр модели имеет ноль или более экземпляров другой модели. Например, в
+        приложении, содержащем покупателей и заказы, модель customer может быть объявлена следующим
+        образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <div class="note"><p>Имя другой модели указывается во множественном числе при объявлении связи
+        <code>has_many</code>.</p></div>
+    <p><img alt="Диаграмма для связи has_many" class="img-polaroid"
+            src="http://rusrails.ru/images/has_many.png" title=""></p>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateCustomers &lt; ActiveRecord::Migration
+  def change
+    create_table :customers do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :orders do |t|
+      t.belongs_to :customer, index: true
+      t.datetime :order_date
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="the-has-many-through-association"> Связь <code>has_many
+        :through</code>
+    </h4>
+    <p>Связь <code>has_many :through</code> часто используется для настройки соединения
+        многие-ко-многим с другой моделью. Эта связь указывает, что объявляющая модель может
+        соответствовать нулю или более экземплярам другой модели <em>через</em> третью модель.
+        Например, рассмотрим поликлинику, где пациентам (patients) дают направления (appointments) к
+        врачам (physicians). Соответствующие объявления связей будут выглядеть следующим образом:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Physician &lt; ActiveRecord::Base
+  has_many :appointments
+  has_many :patients, through: :appointments
+end
+class Appointment &lt; ActiveRecord::Base
+  belongs_to :physician
+  belongs_to :patient
+end
+class Patient &lt; ActiveRecord::Base
+  has_many :appointments
+  has_many :physicians, through: :appointments
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для связи has_many :through" class="img-polaroid"
+            src="http://rusrails.ru/images/has_many_through.png" title=""></p>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateAppointments &lt; ActiveRecord::Migration
+  def change
+    create_table :physicians do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :patients do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :appointments do |t|
+      t.belongs_to :physician, index: true
+      t.belongs_to :patient, index: true
+      t.datetime :appointment_date
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Коллекция соединительных моделей может управляться с помощью API. Например, если вы
+        присвоите:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+physician.patients = patients
+</pre>
+    </div>
+    <p>будет создана новая соединительная модель для вновь связанных объектов, и если некоторые из
+        них закончатся, их строки будут удалены.</p>
+    <div class="warning"><p>Автоматическое удаление соединительных моделей прямое, ни один из
+        колбэков на уничтожение не включается.</p></div>
+    <p>Связь <code>has_many :through</code> также полезна для настройки "ярлыков" через вложенные
+        связи <code>has_many</code>. Например, если документ имеет много секций, а секция имеет
+        много параграфов, иногда хочется получить просто коллекцию всех параграфов в документе. Это
+        можно настроить следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Document &lt; ActiveRecord::Base
+  has_many :sections
+  has_many :paragraphs, through: :sections
+end
+class Section &lt; ActiveRecord::Base
+  belongs_to :document
+  has_many :paragraphs
+end
+class Paragraph &lt; ActiveRecord::Base
+  belongs_to :section
+end
+</pre>
+    </div>
+    <p>С определенным <code>through: :sections</code> Rails теперь понимает:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@document.paragraphs
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="the-has-one-through-association"> Связь <code>has_one
+        :through</code>
+    </h4>
+    <p>Связь <code>has_one :through</code> настраивает соединение один-к-одному с другой моделью.
+        Эта связь показывает, что объявляющая модель может быть связана с одним экземпляром другой
+        модели <em>через</em> третью модель. Например, если каждый поставщик имеет один аккаунт, и
+        каждый аккаунт связан с одной историей аккаунта, тогда модели могут выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account
+  has_one :account_history, through: :account
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :supplier
+  has_one :account_history
+end
+class AccountHistory &lt; ActiveRecord::Base
+  belongs_to :account
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для связи has_one :through" class="img-polaroid"
+            src="http://rusrails.ru/images/has_one_through.png" title=""></p>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateAccountHistories &lt; ActiveRecord::Migration
+  def change
+    create_table :suppliers do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :accounts do |t|
+      t.belongs_to :supplier, index: true
+      t.string :account_number
+      t.timestamps null: false
+    end
+    create_table :account_histories do |t|
+      t.belongs_to :account, index: true
+      t.integer :credit_rating
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="svyaz-has_and_belongs_to_many"> Связь <code>has_and_belongs_to_many</code>
+    </h4>
+    <p>Связь <code>has_and_belongs_to_many</code> создает прямое соединение многие-ко-многим с
+        другой моделью, без промежуточной модели. Например, если ваше приложение включает узлы
+        (assemblies) и детали (parts), где каждый узел имеет много деталей, и каждая деталь
+        встречается во многих узлах, модели можно объявить таким образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Assembly &lt; ActiveRecord::Base
+  has_and_belongs_to_many :parts
+end
+class Part &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для связи has_and_belongs_to_many" class="img-polaroid"
+            src="http://rusrails.ru/images/habtm.png" title=""></p>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateAssembliesAndParts &lt; ActiveRecord::Migration
+  def change
+    create_table :assemblies do |t|
+      t.string :name
+      t.timestamps null: false
+    end
+    create_table :parts do |t|
+      t.string :part_number
+      t.timestamps null: false
+    end
+    create_table :assemblies_parts, id: false do |t|
+      t.belongs_to :assembly, index: true
+      t.belongs_to :part, index: true
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vybor-mezhdu-belongs_to-i-has_one"> Выбор между <code>belongs_to</code>
+        и <code>has_one</code>
+    </h4>
+    <p>Если хотите настроить отношение один-к-одному между двумя моделями, необходимо добавить
+        <code>belongs_to</code> к одной и <code>has_one</code> к другой. Как узнать что к какой?</p>
+    <p>Различие в том, где помещен внешний ключ (он должен быть в таблице для класса, объявляющего
+        связь <code>belongs_to</code>), но вы также должны думать о реальном значении данных.
+        Отношение <code>has_one</code> говорит, что что-то принадлежит вам - то есть что что-то
+        указывает на вас. Например, больше смысла в том, что поставщик владеет аккаунтом, чем в том,
+        что аккаунт владеет поставщиком. Это означает, что правильные отношения подобны этому:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :supplier
+end
+</pre>
+    </div>
+    <p>Соответствующая миграция может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateSuppliers &lt; ActiveRecord::Migration
+  def change
+    create_table :suppliers do |t|
+      t.string  :name
+      t.timestamps null: false
+    end
+    create_table :accounts do |t|
+      t.integer :supplier_id
+      t.string  :account_number
+      t.timestamps null: false
+    end
+    add_index :accounts, :supplier_id
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Использование <code>t.integer :supplier_id</code> указывает имя внешнего
+        ключа очевидно и явно. В современных версиях Rails можно абстрагироваться от деталей
+        реализации используя <code>t.references :supplier</code>.</p></div>
+    <h4 class="inside_page_header" id="vybor-mezhdu-has_many-through-i-has_and_belongs_to_many">
+        Выбор между <code>has_many :through</code> и <code>has_and_belongs_to_many</code>
+    </h4>
+    <p>Rails предлагает два разных способа объявления отношения многие-ко-многим между моделями.
+        Простейший способ - использовать <code>has_and_belongs_to_many</code>, который позволяет
+        создать связь напрямую:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Assembly &lt; ActiveRecord::Base
+  has_and_belongs_to_many :parts
+end
+class Part &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies
+end
+</pre>
+    </div>
+    <p>Второй способ объявить отношение многие-ко-многим - использование <code>has_many
+        :through</code>. Это осуществляет связь не напрямую, а через соединяющую модель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Assembly &lt; ActiveRecord::Base
+  has_many :manifests
+  has_many :parts, through: :manifests
+end
+class Manifest &lt; ActiveRecord::Base
+  belongs_to :assembly
+  belongs_to :part
+end
+class Part &lt; ActiveRecord::Base
+  has_many :manifests
+  has_many :assemblies, through: :manifests
+end
+</pre>
+    </div>
+    <p>Простейший признак того, что нужно настраивать отношение <code>has_many :through</code> -
+        если необходимо работать с моделью отношений как с независимым объектом. Если вам не нужно
+        ничего делать с моделью отношений, проще настроить связь
+        <code>has_and_belongs_to_many</code> (хотя нужно не забыть создать соединяющую таблицу в
+        базе данных).</p>
+    <p>Вы должны использовать <code>has_many :through</code>, если нужны валидации, колбэки или
+        дополнительные атрибуты для соединительной модели.</p>
+    <h4 class="inside_page_header" id="polymorphic-associations"> Полиморфные связи</h4>
+    <p><em>Полиморфные связи</em> - это немного более "навороченный" вид связей. С полиморфными
+        связями модель может принадлежать более чем одной модели, на одиночной связи. Например,
+        имеется модель изображения, которая принадлежит или модели работника, или модели продукта.
+        Вот как это объявляется:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Picture &lt; ActiveRecord::Base
+  belongs_to :imageable, polymorphic: true
+end
+class Employee &lt; ActiveRecord::Base
+  has_many :pictures, as: :imageable
+end
+class Product &lt; ActiveRecord::Base
+  has_many :pictures, as: :imageable
+end
+</pre>
+    </div>
+    <p>Можете считать полиморфное объявление <code>belongs_to</code> как настройку интерфейса,
+        который может использовать любая другая модель. Из экземпляра модели <code>Employee</code>
+        можно получить коллекцию изображений: <code>@employee.pictures</code>.</p>
+    <p>Подобным образом можно получить <code>@product.pictures</code>.</p>
+    <p>Если имеется экземпляр модели <code>Picture</code>, можно получить его родителя посредством
+        <code>@picture.imageable</code>. Чтобы это работало, необходимо объявить столбец внешнего
+        ключа и столбец типа в модели, объявляющей полиморфный интерфейс:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreatePictures &lt; ActiveRecord::Migration
+  def change
+    create_table :pictures do |t|
+      t.string  :name
+      t.integer :imageable_id
+      t.string  :imageable_type
+      t.timestamps null: false
+    end
+    add_index :pictures, [:imageable_type, :imageable_id]
+  end
+end
+</pre>
+    </div>
+    <p>Эта миграция может быть упрощена при использовании формы <code>t.references</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreatePictures &lt; ActiveRecord::Migration
+  def change
+    create_table :pictures do |t|
+      t.string :name
+      t.references :imageable, polymorphic: true, index: true
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p><img alt="Диаграмма для полиморфной связи" class="img-polaroid"
+            src="http://rusrails.ru/images/polymorphic.png" title=""></p>
+    <h4 class="inside_page_header" id="prisoedinenie-k-sebe"> Присоединение к себе</h4>
+    <p>При разработке модели данных иногда находится модель, которая может иметь отношение сама к
+        себе. Например, мы хотим хранить всех работников в одной модели базы данных, но нам нужно
+        отслеживать отношения начальник-подчиненный. Эта ситуация может быть смоделирована с помощью
+        связей, присоединяемых к себе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Employee &lt; ActiveRecord::Base
+  has_many :subordinates, class_name: "Employee",
+                          foreign_key: "manager_id"
+  belongs_to :manager, class_name: "Employee"
+end
+</pre>
+    </div>
+    <p>С такой настройкой, вы можете получить <code>@employee.subordinates</code> и <code>@employee.manager</code>.
+    </p>
+    <p>В миграциях/схеме следует добавить столбец ссылки модели на саму себя.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateEmployees &lt; ActiveRecord::Migration
+  def change
+    create_table :employees do |t|
+      t.references :manager, index: true
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="poleznye-sovety-i-preduprezhdeniya"> Полезные советы и
+        предупреждения</h3>
+    <p>Вот некоторые вещи, которые необходимо знать для эффективного использования связей Active
+        Record в вашем приложении на Rails:</p>
+    <ul>
+        <li>Управление кэшированием
+        </li>
+        <li>Предотвращение коллизий имен
+        </li>
+        <li>Обновление схемы
+        </li>
+        <li>Управление областью видимости связей
+        </li>
+        <li>Двусторонние связи
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="upravlenie-keshirovaniem"> Управление кэшированием</h4>
+    <p>Все методы связи построены вокруг кэширования, которое хранит результаты последних запросов
+        доступными для будущих операций. Кэш является общим для разных методов. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+customer.orders                 # получаем заказы из базы данных
+customer.orders.size            # используем кэшированную копию заказов
+customer.orders.empty?          # используем кэшированную копию заказов
+</pre>
+    </div>
+    <p>Но что если вы хотите перезагрузить кэш, так как данные могли быть изменены другой частью
+        приложения? Всего лишь передайте <code>true</code> в вызов связи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+customer.orders                 # получаем заказы из базы данных
+customer.orders.size            # используем кэшированную копию заказов
+customer.orders(true).empty?    # отказываемся от кэшированной копии заказов
+                                # и снова обращаемся к базе данных
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="predotvraschenie-kolliziy-imen"> Предотвращение коллизий
+        имен</h4>
+    <p>Вы не свободны в выборе любого имени для своих связей. Поскольку создание связи добавляет
+        метод с таким именем в модель, будет плохой идеей дать связи имя, уже используемое как метод
+        экземпляра <code>ActiveRecord::Base</code>. Метод связи тогда переопределит базовый метод, и
+        что-нибудь перестанет работать. Например, <code>attributes</code> или
+        <code>connection</code> плохие имена для связей.</p>
+    <h4 class="inside_page_header" id="obnovlenie-shemy"> Обновление схемы</h4>
+    <p>Связи очень полезные, но не волшебные. Вы ответственны за содержание вашей схемы базы данных
+        в соответствии со связями. На практике это означает две вещи, в зависимости от того, какой
+        тип связей создаете. Для связей <code>belongs_to</code> нужно создать внешние ключи, а для
+        связей <code>has_and_belongs_to_many</code> нужно создать подходящую соединительную таблицу.
+    </p>
+    <h5 class="inside_page_header" id="sozdanie-vneshnih-klyuchey-dlya-svyazey-belongs_to"> Создание
+        внешних ключей для связей <code>belongs_to</code>
+    </h5>
+    <p>Когда объявляете связь <code>belongs_to</code>, нужно создать внешние ключи, при
+        необходимости. Например, рассмотрим эту модель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+</pre>
+    </div>
+    <p>Это объявление нуждается в создании подходящего внешнего ключа в таблице orders:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateOrders &lt; ActiveRecord::Migration
+  def change
+    create_table :orders do |t|
+      t.datetime :order_date
+      t.string   :order_number
+      t.integer  :customer_id
+    end
+    add_index :orders, :customer_id
+  end
+end
+</pre>
+    </div>
+    <p>Если создаете связь после того, как уже создали модель, лежащую в основе, необходимо не
+        забыть создать миграцию <code>add_column</code> для предоставления необходимого внешнего
+        ключа.</p>
+    <h5 class="inside_page_header"
+        id="sozdanie-soedinitelnyh-tablits-dlya-svyazey-has_and_belongs_to_many"> Создание
+        соединительных таблиц для связей <code>has_and_belongs_to_many</code>
+    </h5>
+    <p>Если вы создали связь <code>has_and_belongs_to_many</code>, необходимо обязательно создать
+        соединительную таблицу. Если имя соединительной таблицы явно не указано с использованием
+        опции <code>:join_table</code>, Active Record создает имя, используя алфавитный порядок имен
+        классов. Поэтому соединение между моделями customer и order по умолчанию даст значение имени
+        таблицы "customers_orders", так как "c" идет перед "o" в алфавитном порядке.</p>
+    <div class="warning"><p>Приоритет между именами модели рассчитывается с использованием оператора
+        <code>&lt;=&gt;</code> для <code>String</code>. Это означает, что если строки имеют разную
+        длину и в своей короткой части они равны, тогда более длинная строка рассматривается как
+        большая, по сравнению с короткой. Например, кто-то ожидает, что таблицы "paper_boxes" и
+        "papers" создадут соединительную таблицу "papers_paper_boxes" поскольку имя "paper_boxes"
+        длиннее, но фактически будет сгенерирована таблица с именем "paper_boxes_papers" (поскольку
+        знак подчеркивания "_" лексикографически <em>меньше</em>, чем "s" в обычной кодировке).</p>
+    </div>
+    <p>Какое бы ни было имя, вы должны вручную сгенерировать соединительную таблицу в
+        соответствующей миграции. Например, рассмотрим эти связи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Assembly &lt; ActiveRecord::Base
+  has_and_belongs_to_many :parts
+end
+class Part &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies
+end
+</pre>
+    </div>
+    <p>Теперь нужно написать миграцию для создания таблицы <code>assemblies_parts</code>. Эта
+        таблица должна быть создана без первичного ключа:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateAssembliesPartsJoinTable &lt; ActiveRecord::Migration
+  def change
+    create_table :assemblies_parts, id: false do |t|
+      t.integer :assembly_id
+      t.integer :part_id
+    end
+    add_index :assemblies_parts, :assembly_id
+    add_index :assemblies_parts, :part_id
+  end
+end
+</pre>
+    </div>
+    <p>Мы передаем <code>id: false</code> в <code>create_table</code>, так как эта таблица не
+        представляет модель. Это необходимо, чтобы связь работала правильно. Если вы видите странное
+        поведение в связи <code>has_and_belongs_to_many</code>, например, искаженные ID моделей, или
+        исключения в связи с конфликтом ID, скорее всего вы забыли убрать первичный ключ.</p>
+    <p>Также можно использовать метод <code>create_join_table</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateAssembliesPartsJoinTable &lt; ActiveRecord::Migration
+  def change
+    create_join_table :assemblies, :parts do |t|
+      t.index :assembly_id
+      t.index :part_id
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="upravlenie-oblastyu-vidimosti-svyazey"> Управление областью
+        видимости связей</h4>
+    <p>По умолчанию связи ищут объекты только в пределах области видимости текущего модуля. Это
+        важно, когда вы объявляете модели Active Record внутри модуля. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module MyApplication
+  module Business
+    class Supplier &lt; ActiveRecord::Base
+       has_one :account
+    end
+    class Account &lt; ActiveRecord::Base
+       belongs_to :supplier
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Это будет работать, так как оба класса <code>Supplier</code> и <code>Account</code>
+        определены в пределах одной области видимости. Но нижеследующее не будет работать, потому
+        что <code>Supplier</code> и <code>Account</code> определены в разных областях видимости:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module MyApplication
+  module Business
+    class Supplier &lt; ActiveRecord::Base
+       has_one :account
+    end
+  end
+  module Billing
+    class Account &lt; ActiveRecord::Base
+       belongs_to :supplier
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Для связи модели с моделью в другом пространстве имен, необходимо указать полное имя класса в
+        объявлении связи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module MyApplication
+  module Business
+    class Supplier &lt; ActiveRecord::Base
+       has_one :account,
+        class_name: "MyApplication::Billing::Account"
+    end
+  end
+  module Billing
+    class Account &lt; ActiveRecord::Base
+       belongs_to :supplier,
+        class_name: "MyApplication::Business::Supplier"
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dvustoronnie-svyazi"> Двусторонние связи</h4>
+    <p>Для связей нормально работать в двух направлениях, затребовав объявление в двух различных
+        моделях:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+</pre>
+    </div>
+    <p>По умолчанию, Active Record не знает о зависимости между этими двумя связями. Это может
+        привести к двум несинхронизированным копиям объекта:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+c = Customer.first
+o = c.orders.first
+c.first_name == o.customer.first_name # =&gt; true
+c.first_name = 'Manny'
+c.first_name == o.customer.first_name # =&gt; false
+</pre>
+    </div>
+    <p>Это произошло потому, что <code>c</code> и <code>o.customer</code> это два разных
+        представления в памяти одних и тех же данных, и ни одно из них автоматически не обновляется
+        при изменении другого. Active Record предоставляет опцию <code>:inverse_of</code>, чтобы вы
+        могли его проинформировать об этих зависимостях:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, inverse_of: :customer
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, inverse_of: :orders
+end
+</pre>
+    </div>
+    <p>С этими изменениями Active Record загрузит только одну копию объекта customer, предотвратив
+        несоответствия и сделав приложение более эффективным:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+c = Customer.first
+o = c.orders.first
+c.first_name == o.customer.first_name # =&gt; true
+c.first_name = 'Manny'
+c.first_name == o.customer.first_name # =&gt; true
+</pre>
+    </div>
+    <p>Имеется несколько ограничений в поддержке <code>inverse_of</code>:</p>
+    <ul>
+        <li>Они не работают со связями <code>:through</code>.
+        </li>
+        <li>Они не работают со связями <code>:polymorphic</code>.
+        </li>
+        <li>Они не работают со связями <code>:as</code>.
+        </li>
+        <li>Для связей <code>belongs_to</code> противоположные связи <code>has_many</code>
+            игнорируются.
+        </li>
+    </ul>
+    <p>Каждая связь попытается автоматически найти противоположную связь и установить опцию <code>:inverse_of</code>
+        эвристически (основываясь на имени связи). Поддерживается большинство связей со стандартными
+        именами. Однако, связям, содержащим следующие опции, противоположности не будут установлены
+        автоматически:</p>
+    <ul>
+        <li>
+            <code>:conditions</code>
+        </li>
+        <li>
+            <code>:through</code>
+        </li>
+        <li>
+            <code>:polymorphic</code>
+        </li>
+        <li>
+            <code>:foreign_key</code>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="podrobnaya-informatsiya-po-svyazi-belongs_to"> Подробная
+        информация по связи belongs_to</h3>
+    <p>Связь <code>belongs_to</code> создает соответствие один-к-одному с другой моделью. В терминах
+        базы данных эта связь сообщает, что этот класс содержит внешний ключ. Если внешний ключ
+        содержит другой класс, вместо этого следует использовать <code>has_one</code>.</p>
+    <h4 class="inside_page_header" id="metody-dobavlyaemye-belongs_to"> Методы, добавляемые <code>belongs_to</code>
+    </h4>
+    <p>Когда объявляете связь <code>belongs_to</code>, объявляющий класс автоматически получает пять
+        методов, относящихся к связи:</p>
+    <ul>
+        <li>
+            <code>association(force_reload = false)</code>
+        </li>
+        <li>
+            <code>association=(associate)</code>
+        </li>
+        <li>
+            <code>build_association(attributes = {})</code>
+        </li>
+        <li>
+            <code>create_association(attributes = {})</code>
+        </li>
+        <li>
+            <code>create_association!(attributes = {})</code>
+        </li>
+    </ul>
+    <p>Во всех четырех методах <code>association</code> заменяется символом, переданным как первый
+        аргумент в <code>belongs_to</code>. Например, имеем объявление:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+</pre>
+    </div>
+    <p>Каждый экземпляр модели <code>Order</code> будет иметь эти методы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+customer
+customer=
+build_customer
+create_customer
+create_customer!
+</pre>
+    </div>
+    <div class="note"><p>Когда устанавливаете новую связь <code>has_one</code> или
+        <code>belongs_to</code>, следует использовать префикс <code>build_</code> для построения
+        связи, в отличие от метода <code>association.build</code>, используемый для связей <code>has_many</code>
+        или <code>has_and_belongs_to_many</code>. Чтобы создать связь, используйте префикс <code>create_</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="association-force_reload-false"><code>association(force_reload
+        = false)</code>
+    </h5>
+    <p>Метод <code>association</code> возвращает связанный объект, если он есть. Если объекта нет,
+        возвращает <code>nil</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer = @order.customer
+</pre>
+    </div>
+    <p>Если связанный объект уже был получен из базы данных для этого объекта, возвращается
+        кэшированная версия. Чтобы переопределить это поведение (и заставить прочитать из базы
+        данных), передайте <code>true</code> как аргумент <code>force_reload</code>.</p>
+    <h5 class="inside_page_header" id="association-associate"><code>association=(associate)</code>
+    </h5>
+    <p>Метод <code>association=</code> привязывает связанный объект к этому объекту. Фактически это
+        означает извлечение первичного ключа из связанного объекта и присвоение его значения
+        внешнему ключу.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order.customer = @customer
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="build_association-attributes"><code>build_association(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>build_association</code> возвращает новый объект связанного типа. Этот объект
+        будет экземпляром с переданными атрибутами, будет установлена связь с внешним ключом этого
+        объекта, но связанный объект пока <em>не</em> будет сохранен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer = @order.build_customer(customer_number: 123,
+                                  customer_name: "John Doe")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="create_association-attributes"><code>create_association(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>create_association</code> возвращает новый объект связанного типа. Этот объект
+        будет экземпляром с переданными атрибутами, будет установлена связь с внешним ключом этого
+        объекта, и, если он пройдет валидации, определенные в связанной модели, связанный объект
+        <em>будет</em> сохранен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer = @order.create_customer(customer_number: 123,
+                                   customer_name: "John Doe")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="create_association-attributes"><code>create_association!(attributes
+        = {})</code>
+    </h5>
+    <p>Работает так же, как и вышеприведенный <code>create_association</code>, но вызывает <code>ActiveRecord::RecordInvalid</code>,
+        если запись невалидна.</p>
+    <h4 class="inside_page_header" id="options-for-belongs-to"> Опции для <code>belongs_to</code>
+    </h4>
+    <p>Хотя Rails использует разумные значения по умолчанию, работающие во многих ситуациях, бывают
+        случаи, когда хочется изменить поведение связи <code>belongs_to</code>. Такая настройка
+        легко выполнима с помощью передачи опций и блоков со скоупом при создании связи. Например,
+        эта связь использует две такие опции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, dependent: :destroy,
+    counter_cache: true
+end
+</pre>
+    </div>
+    <p>Связь <code>belongs_to</code> поддерживает эти опции:</p>
+    <ul>
+        <li>
+            <code>:autosave</code>
+        </li>
+        <li>
+            <code>:class_name</code>
+        </li>
+        <li>
+            <code>:counter_cache</code>
+        </li>
+        <li>
+            <code>:dependent</code>
+        </li>
+        <li>
+            <code>:foreign_key</code>
+        </li>
+        <li>
+            <code>:primary_key</code>
+        </li>
+        <li>
+            <code>:inverse_of</code>
+        </li>
+        <li>
+            <code>:polymorphic</code>
+        </li>
+        <li>
+            <code>:touch</code>
+        </li>
+        <li>
+            <code>:validate</code>
+        </li>
+        <li>
+            <code>:optional</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="autosave"><code>:autosave</code>
+    </h5>
+    <p>Если установить опцию <code>:autosave</code> в <code>true</code>, Rails сохранит любые
+        загруженные члены и уничтожит члены, помеченные для уничтожения, всякий раз, когда вы
+        сохраните родительский объект.</p>
+    <h5 class="inside_page_header" id="class_name"><code>:class_name</code>
+    </h5>
+    <p>Если имя другой модели не может быть получено из имени связи, можете использовать опцию
+        <code>:class_name</code> для предоставления имени модели. Например, если заказ принадлежит
+        покупателю, но фактическое имя модели, содержащей покупателей <code>Patron</code>, можете
+        установить это следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, class_name: "Patron"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="counter_cache"><code>:counter_cache</code>
+    </h5>
+    <p>Опция <code>:counter_cache</code> может быть использована, чтобы сделать поиск количества
+        принадлежащих объектов более эффективным. Рассмотрим эти модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <p>С этими объявлениями запрос значения <code>@customer.orders.size</code> требует обращения к
+        базе данных для выполнения запроса <code>COUNT(*)</code>. Чтобы этого избежать, можете
+        добавить кэш счетчика в <em>принадлежащую</em> модель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, counter_cache: true
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <p>С этим объявлением, Rails будет хранить в кэше актуальное значение и затем возвращать это
+        значение в ответ на метод <code>size</code>.</p>
+    <p>Хотя опция <code>:counter_cache</code> определяется в модели, включающей определение <code>belongs_to</code>,
+        фактический столбец должен быть добавлен в <em>связанную</em> (<code>has_many</code>)
+        модель. В вышеописанном случае, необходимо добавить столбец, названный
+        <code>orders_count</code> в модель <code>Customer</code>.</p>
+    <p>Имя столбца по умолчанию можно переопределить, указав произвольное имя столбца в объявлении
+        <code>counter_cache</code> вместо <code>true</code>. Например, для использования <code>count_of_orders</code>
+        вместо <code>orders_count</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, counter_cache: :count_of_orders
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <div class="note"><p>Опцию :counter_cache необходимо указывать только на стороне <code>belongs_to</code>
+        связи.</p></div>
+    <p>Столбцы кэша счетчика добавляются в список атрибутов модели только для чтения посредством
+        <code>attr_readonly</code>.</p>
+    <h5 class="inside_page_header" id="dependent"><code>:dependent</code>
+    </h5>
+    <p>Если установить опцию <code>:dependent</code> как:</p>
+    <ul>
+        <li>
+            <code>:destroy</code>, то, когда объект уничтожен, метод <code>destroy</code> будет
+            вызван на его связанных объектах.
+        </li>
+        <li>
+            <code>:delete</code>, то, когда объект уничтожен, все его связанные объекты будут
+            удалены непосредственно из базы данных без вызова их методов <code>destroy</code>.
+        </li>
+    </ul>
+    <div class="warning"><p>Не следует определять эту опцию в связи <code>belongs_to</code>, которая
+        соединена со связью <code>has_many</code> в другом классе. Это приведет к "битым" связям в
+        записях вашей базы данных.</p></div>
+    <h5 class="inside_page_header" id="foreign_key"><code>:foreign_key</code>
+    </h5>
+    <p>По соглашению Rails предполагает, что столбец, используемый для хранения внешнего ключа в
+        этой модели, имеет имя модели с добавленным суффиксом <code>_id</code>. Опция <code>:foreign_key</code>
+        позволяет установить имя внешнего ключа явно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, class_name: "Patron",
+                        foreign_key: "patron_id"
+end
+</pre>
+    </div>
+    <div class="info"><p>В любом случае, Rails не создаст столбцы внешнего ключа за вас. Вам
+        необходимо явно определить их в своих миграциях.</p></div>
+    <h6 class="inside_page_header" id="primary_key"><code>:primary_key</code>
+    </h6>
+    <p>По соглашению Rails предполагает, что для первичного ключа используется столбец
+        <code>id</code> в таблице. Опция <code>:primary_key</code> позволяет указать иной столбец.
+    </p>
+    <p>Например, имеется таблица <code>users</code> с <code>guid</code> в качестве первичного ключа.
+        Если мы хотим отдельную таблицу <code>todos</code>, содержащую внешний ключ
+        <code>user_id</code> из столбца <code>guid</code>, для этого можно использовать <code>primary_key</code>
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  self.primary_key = 'guid' # primary key is guid and not id
+end
+class Todo &lt; ActiveRecord::Base
+  belongs_to :user, primary_key: 'guid'
+end
+</pre>
+    </div>
+    <p>При выполнении <code>@user.todos.create</code>, у записи <code>@todo</code> будет значение
+        <code>user_id</code> таким же, как значение <code>guid</code> у <code>@user</code>.</p>
+    <h5 class="inside_page_header" id="inverse_of"><code>:inverse_of</code>
+    </h5>
+    <p>Опция <code>:inverse_of</code> определяет имя связи <code>has_many</code> или
+        <code>has_one</code>, являющейся противоположностью для этой связи. Не работает в комбинации
+        с опциями <code>:polymorphic</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, inverse_of: :customer
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, inverse_of: :orders
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="polymorphic"><code>:polymorphic</code>
+    </h5>
+    <p>Передача <code>true</code> для опции <code>:polymorphic</code> показывает, что это
+        полиморфная связь. Полиморфные связи подробно рассматривались .</p>
+    <h5 class="inside_page_header" id="touch"><code>:touch</code>
+    </h5>
+    <p>Если установите опцию <code>:touch</code> в <code>true</code>, то временные метки <code>updated_at</code>
+        или <code>updated_on</code> на связанном объекте будут установлены в текущее время всякий
+        раз, когда этот объект будет сохранен или уничтожен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, touch: true
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <p>В этом случае, сохранение или уничтожение заказа обновит временную метку на связанном
+        покупателе. Также можно определить конкретный атрибут временной метки для обновления:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, touch: :orders_updated_at
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="validate"><code>:validate</code>
+    </h5>
+    <p>Если установите опцию <code>:validate</code> в <code>true</code>, тогда связанные объекты
+        будут проходить валидацию всякий раз, когда вы сохраняете этот объект. По умолчанию она
+        равна <code>false</code>: связанные объекты не проходят валидацию, когда этот объект
+        сохраняется.</p>
+    <h6 class="inside_page_header" id="optional"><code>:optional</code>
+    </h6>
+    <p>Если установить <code>:optional</code> в <code>true</code>, тогда наличие связанных объектов
+        не будет валидироваться. По умолчанию установлено в <code>false</code>.</p>
+    <h4 class="inside_page_header" id="skoupy-dlya-belongs_to"> Скоупы для <code>belongs_to</code>
+    </h4>
+    <p>Иногда хочется настроить запрос, используемый <code>belongs_to</code>. Такая настройка может
+        быть достигнута с помощью блока скоупа. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, -&gt; { where active: true },
+                        dependent: :destroy
+end
+</pre>
+    </div>
+    <p>Внутри блока скоупа можно использовать любые стандартные . Далее обсудим следующие из
+        них:</p>
+    <ul>
+        <li>
+            <code>where</code>
+        </li>
+        <li>
+            <code>includes</code>
+        </li>
+        <li>
+            <code>readonly</code>
+        </li>
+        <li>
+            <code>select</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="where"><code>where</code>
+    </h5>
+    <p>Метод <code>where</code> позволяет определить условия, которым должен отвечать связанный
+        объект.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer, -&gt; { where active: true }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="includes"><code>includes</code>
+    </h5>
+    <p>Метод <code>includes</code> можно использовать для определения связей второго порядка,
+        которые должны быть лениво загружены при использовании этой связи. Например, рассмотрим эти
+        модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+  has_many :line_items
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <p>Если вы часто получаете покупателей непосредственно из элементов заказа (<code>@line_item.order.customer</code>),
+        то можно улучшить эффективность кода, включив покупателей в связь между заказом и его
+        элементами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order, -&gt; { includes :customer }
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+  has_many :line_items
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <div class="note"><p>Нет необходимости в использовании <code>includes</code> для ближайших
+        связей - то есть, если есть <code>Order belongs_to :customer</code>, то customer
+        автоматически лениво загружается при необходимости.</p></div>
+    <h5 class="inside_page_header" id="readonly"><code>readonly</code>
+    </h5>
+    <p>При использовании <code>readonly</code>, связанный объект будет только для чтения при
+        получении через связь.</p>
+    <h5 class="inside_page_header" id="select"><code>select</code>
+    </h5>
+    <p>Метод <code>select</code> позволяет переопределить SQL выражение <code>SELECT</code>,
+        используемое для получения данных о связанном объекте. По умолчанию Rails получает все
+        столбцы.</p>
+    <div class="info"><p>При использовании метода <code>select</code> на связи
+        <code>belongs_to</code>, следует также установить опцию <code>:foreign_key</code> для
+        гарантии правильных результатов.</p></div>
+    <h4 class="inside_page_header" id="suschestvuyut-li-svyazannye-ob-ekty"> Существуют ли связанные
+        объекты?</h4>
+    <p>Можно увидеть, существует ли какой-либо связанный объект, при использовании метода <code>association.nil?</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+if @order.customer.nil?
+  @msg = "No customer found for this order"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kogda-sohranyayutsya-ob-ekty"> Когда сохраняются
+        объекты?</h4>
+    <p>Присвоение связи <code>belongs_to</code> не приводит к автоматическому сохранению ни самого
+        объекта, ни связанного объекта.</p>
+    <h3 class="inside_page_header" id="podrobnaya-informatsiya-po-svyazi-has_one"> Подробная
+        информация по связи has_one</h3>
+    <p>Связь <code>has_one</code> создает соответствие один-к-одному с другой моделью. В терминах
+        базы данных эта связь сообщает, что другой класс содержит внешний ключ. Если этот класс
+        содержит внешний ключ, следует использовать <code>belongs_to</code>.</p>
+    <h4 class="inside_page_header" id="metody-dobavlyaemye-has_one"> Методы, добавляемые <code>has_one</code>
+    </h4>
+    <p>Когда объявляете связь <code>has_one</code>, объявляющий класс автоматически получает пять
+        методов, относящихся к связи:</p>
+    <ul>
+        <li>
+            <code>association(force_reload = false)</code>
+        </li>
+        <li>
+            <code>association=(associate)</code>
+        </li>
+        <li>
+            <code>build_association(attributes = {})</code>
+        </li>
+        <li>
+            <code>create_association(attributes = {})</code>
+        </li>
+        <li>
+            <code>create_association!(attributes = {})</code>
+        </li>
+    </ul>
+    <p>Во всех этих методах <code>association</code> заменяется на символ, переданный как первый
+        аргумент в <code>has_one</code>. Например, имеем объявление:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account
+end
+</pre>
+    </div>
+    <p>Каждый экземпляр модели <code>Supplier</code> будет иметь эти методы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+account
+account=
+build_account
+create_account
+create_account!
+</pre>
+    </div>
+    <div class="note"><p>При установлении новой связи <code>has_one</code> или
+        <code>belongs_to</code>, следует использовать префикс <code>build_</code> для построения
+        связи, в отличие от метода <code>association.build</code>, используемого для связей <code>has_many</code>
+        или <code>has_and_belongs_to_many</code>. Чтобы создать связь, используйте префикс <code>create_</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="association-force_reload-false"><code>association(force_reload
+        = false)</code>
+    </h5>
+    <p>Метод <code>association</code> возвращает связанный объект, если таковой имеется. Если
+        связанный объект не найден, возвращает <code>nil</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@account = @supplier.account
+</pre>
+    </div>
+    <p>Если связанный объект уже был получен из базы данных для этого объекта, возвращается
+        кэшированная версия. Чтобы переопределить это поведение (и заставить прочитать из базы
+        данных), передайте <code>true</code> как аргумент <code>force_reload</code>.</p>
+    <h5 class="inside_page_header" id="association-associate"><code>association=(associate)</code>
+    </h5>
+    <p>Метод <code>association=</code> привязывает связанный объект к этому объекту. Фактически это
+        означает извлечение первичного ключа этого объекта и присвоение его значения внешнему ключу
+        связанного объекта.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@supplier.account = @account
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="build_association-attributes"><code>build_association(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>build_association</code> возвращает новый объект связанного типа. Этот объект
+        будет экземпляром с переданными атрибутами, и будет установлена связь через внешний ключ, но
+        связанный объект пока <em>не</em> будет сохранен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@account = @supplier.build_account(terms: "Net 30")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="create_association-attributes"><code>create_association(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>create_association</code> возвращает новый объект связанного типа. Этот объект
+        будет экземпляром с переданными атрибутами, будет установлена связь через внешний ключ, и,
+        если он пройдет валидации, определенные в связанной модели, связанный объект <em>будет</em>
+        сохранен</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@account = @supplier.create_account(terms: "Net 30")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="create_association-attributes"><code>create_association!(attributes
+        = {})</code>
+    </h5>
+    <p>Работает так же, как и вышеприведенный <code>create_association</code>, но вызывает <code>ActiveRecord::RecordInvalid</code>,
+        если запись невалидна.</p>
+    <h4 class="inside_page_header" id="optsii-dlya-has_one"> Опции для <code>has_one</code>
+    </h4>
+    <p>Хотя Rails использует разумные значения по умолчанию, работающие во многих ситуациях, бывают
+        случаи, когда хочется изменить поведение связи <code>has_one</code>. Такая настройка легко
+        выполнима с помощью передачи опции при создании связи. Например, эта связь использует две
+        такие опции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, class_name: "Billing", dependent: :nullify
+end
+</pre>
+    </div>
+    <p>Связь <code>has_one</code> поддерживает эти опции:</p>
+    <ul>
+        <li>
+            <code>:as</code>
+        </li>
+        <li>
+            <code>:autosave</code>
+        </li>
+        <li>
+            <code>:class_name</code>
+        </li>
+        <li>
+            <code>:dependent</code>
+        </li>
+        <li>
+            <code>:foreign_key</code>
+        </li>
+        <li>
+            <code>:inverse_of</code>
+        </li>
+        <li>
+            <code>:primary_key</code>
+        </li>
+        <li>
+            <code>:source</code>
+        </li>
+        <li>
+            <code>:source_type</code>
+        </li>
+        <li>
+            <code>:through</code>
+        </li>
+        <li>
+            <code>:validate</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="as"><code>:as</code>
+    </h5>
+    <p>Установка опции <code>:as</code> показывает, что это полиморфная связь. Полиморфные связи
+        подробно рассматривались .</p>
+    <h5 class="inside_page_header" id="autosave"><code>:autosave</code>
+    </h5>
+    <p>Если установить опцию <code>:autosave</code> в <code>true</code>, это сохранит любые
+        загруженные члены и уничтожит члены, помеченные для уничтожения, всякий раз, когда вы
+        сохраните родительский объект.</p>
+    <h5 class="inside_page_header" id="class_name"><code>:class_name</code>
+    </h5>
+    <p>Если имя другой модели не может быть образовано из имени связи, можете использовать опцию
+        <code>:class_name</code> для предоставления имени модели. Например, если поставщик имеет
+        аккаунт, но фактическое имя модели, содержащей аккаунты, это <code>Billing</code>, можете
+        установить это следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, class_name: "Billing"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="dependent"><code>:dependent</code>
+    </h5>
+    <p>Управляет тем, что произойдет со связанным объектом, когда его владелец будет уничтожен:</p>
+    <ul>
+        <li>
+            <code>:destroy</code> приведет к тому, что связанный объект также будет уничтожен
+        </li>
+        <li>
+            <code>:delete</code> приведет к тому, что связанный объект будет удален из базы данных
+            напрямую (таким образом не будут выполнены колбэки)
+        </li>
+        <li>
+            <code>:nullify</code> приведет к тому, что внешний ключ будет установлен
+            <code>NULL</code>. Колбэки не запускаются.
+        </li>
+        <li>
+            <code>:restrict_with_exception</code> приведет к вызову исключения, если есть связанный
+            объект
+        </li>
+        <li>
+            <code>:restrict_with_error</code> приведет к ошибке, добавляемой к владельцу, если есть
+            связанный объект
+        </li>
+    </ul>
+    <p>Нельзя устанавливать или уставлять опцию <code>:nullify</code> для связей, имеющих
+        ограничение <code>NOT NULL</code>. Если не установить <code>dependent</code> для уничтожения
+        таких связей, вы не сможете изменить связанный объект, акт как внешнему ключу изначально
+        связанного объекта будет назначено недопустимое значение <code>NULL</code>.</p>
+    <h5 class="inside_page_header" id="foreign_key"><code>:foreign_key</code>
+    </h5>
+    <p>По соглашению Rails предполагает, что столбец, используемый для хранения внешнего ключа в
+        этой модели, имеет имя модели с добавленным суффиксом <code>_id</code>. Опция <code>:foreign_key</code>
+        позволяет установить имя внешнего ключа явно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, foreign_key: "supp_id"
+end
+</pre>
+    </div>
+    <div class="info"><p>В любом случае, Rails не создаст столбцы внешнего ключа за вас. Вам
+        необходимо явно определить их в своих миграциях.</p></div>
+    <h5 class="inside_page_header" id="inverse_of"><code>:inverse_of</code>
+    </h5>
+    <p>Опция <code>:inverse_of</code> определяет имя связи <code>belongs_to</code>, являющейся
+        обратной для этой связи. Не работает в комбинации с опциями <code>:through</code> или <code>:as</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, inverse_of: :supplier
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :supplier, inverse_of: :account
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="primary_key"><code>:primary_key</code>
+    </h5>
+    <p>По соглашению, Rails предполагает, что столбец, используемый для хранения первичного ключа,
+        это <code>id</code>. Вы можете переопределить это и явно определить первичный ключ с помощью
+        опции <code>:primary_key</code>.</p>
+    <h5 class="inside_page_header" id="source"><code>:source</code>
+    </h5>
+    <p>Опция <code>:source</code> определяет имя источника связи для связи <code>has_one
+        :through</code>.</p>
+    <h5 class="inside_page_header" id="source_type"><code>:source_type</code>
+    </h5>
+    <p>Опция <code>:source_type</code> определяет тип источника связи для связи <code>has_one
+        :through</code>, который действует при полиморфной связи.</p>
+    <h5 class="inside_page_header" id="through"><code>:through</code>
+    </h5>
+    <p>Опция <code>:through</code> определяет соединительную модель, через которую выполняется
+        запрос. Связи <code>has_one :through</code> подробно рассматривались .</p>
+    <h5 class="inside_page_header" id="validate"><code>:validate</code>
+    </h5>
+    <p>Если установите опцию <code>:validate</code> в <code>true</code>, тогда связанные объекты
+        будут проходить валидацию всякий раз, когда вы сохраняете этот объект. По умолчанию она
+        равна <code>false</code>: связанные объекты не проходят валидацию, когда этот объект
+        сохраняется.</p>
+    <h4 class="inside_page_header" id="skoupy-dlya-has_one"> Скоупы для <code>has_one</code>
+    </h4>
+    <p>Иногда хочется настроить запрос, используемый <code>has_one</code>. Такая настройка может
+        быть достигнута с помощью блока скоупа. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, -&gt; { where active: true }
+end
+</pre>
+    </div>
+    <p>Внутри блока скоупа можно использовать любые стандартные . Далее обсудим следующие из
+        них:</p>
+    <ul>
+        <li>
+            <code>where</code>
+        </li>
+        <li>
+            <code>includes</code>
+        </li>
+        <li>
+            <code>readonly</code>
+        </li>
+        <li>
+            <code>select</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="where"><code>where</code>
+    </h5>
+    <p>Метод <code>where</code> позволяет определить условия, которым должен отвечать связанный
+        объект.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, -&gt; { where "confirmed = 1" }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="includes"><code>includes</code>
+    </h5>
+    <p>Метод <code>includes</code> позволяет определить связи второго порядка, которые должны быть
+        лениво загружены при использовании этой связи. Например, рассмотрим эти модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :supplier
+  belongs_to :representative
+end
+class Representative &lt; ActiveRecord::Base
+  has_many :accounts
+end
+</pre>
+    </div>
+    <p>Если вы часто получаете representatives непосредственно из suppliers (<code>@supplier.account.representative</code>),
+        то можно улучшить эффективность кода, включив representatives в связь между suppliers и
+        accounts:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_one :account, -&gt; { includes :representative }
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :supplier
+  belongs_to :representative
+end
+class Representative &lt; ActiveRecord::Base
+  has_many :accounts
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="readonly"><code>readonly</code>
+    </h5>
+    <p>При использовании <code>readonly</code>, связанный объект будет только для чтения при
+        получении через связь.</p>
+    <h5 class="inside_page_header" id="select"><code>select</code>
+    </h5>
+    <p>Метод <code>select</code> позволяет переопределить SQL выражение <code>SELECT</code>,
+        используемое для получения данных о связанном объекте. По умолчанию Rails получает все
+        столбцы.</p>
+    <h4 class="inside_page_header" id="suschestvuyut-li-svyazannye-ob-ekty"> Существуют ли связанные
+        объекты?</h4>
+    <p>Можно увидеть, существует ли какой-либо связанный объект, при использовании метода <code>association.nil?</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+if @supplier.account.nil?
+  @msg = "No account found for this supplier"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kogda-sohranyayutsya-ob-ekty"> Когда сохраняются
+        объекты?</h4>
+    <p>Когда вы назначаете объект связью <code>has_one</code>, этот объект автоматически сохраняется
+        (для того, чтобы обновить его внешний ключ). Кроме того, любой заменяемый объект также
+        автоматически сохраняется, поскольку его внешний ключ также изменяется.</p>
+    <p>Если одно из этих сохранений проваливается из-за ошибок валидации, тогда выражение назначения
+        возвращает <code>false</code>, и само назначение отменяется.</p>
+    <p>Если родительский объект (который объявляет связь <code>has_one</code>) является
+        несохраненным (то есть <code>new_record?</code> возвращает <code>true</code>), тогда
+        дочерние объекты не сохраняются. Они сохранятся автоматически, когда сохранится родительский
+        объект.</p>
+    <p>Если вы хотите назначить объект связью <code>has_one</code> без сохранения объекта,
+        используйте метод <code>association.build</code>.</p>
+    <h3 class="inside_page_header" id="podrobnaya-informatsiya-po-svyazi-has_many"> Подробная
+        информация по связи has_many</h3>
+    <p>Связь <code>has_many</code> создает отношение один-ко-многим с другой моделью. В терминах
+        базы данных эта связь говорит, что другой класс будет иметь внешний ключ, относящийся к
+        экземплярам этого класса.</p>
+    <h4 class="inside_page_header" id="dobavlyaemye-metody"> Добавляемые методы</h4>
+    <p>Когда объявляете связь <code>has_many</code>, объявляющий класс автоматически получает 16
+        методов, относящихся к связи:</p>
+    <ul>
+        <li>
+            <code>collection(force_reload = false)</code>
+        </li>
+        <li>
+            <code>collection&lt;&lt;(object, ...)</code>
+        </li>
+        <li>
+            <code>collection.delete(object, ...)</code>
+        </li>
+        <li>
+            <code>collection.destroy(object, ...)</code>
+        </li>
+        <li>
+            <code>collection=(objects)</code>
+        </li>
+        <li>
+            <code>collection_singular_ids</code>
+        </li>
+        <li>
+            <code>collection_singular_ids=(ids)</code>
+        </li>
+        <li>
+            <code>collection.clear</code>
+        </li>
+        <li>
+            <code>collection.empty?</code>
+        </li>
+        <li>
+            <code>collection.size</code>
+        </li>
+        <li>
+            <code>collection.find(...)</code>
+        </li>
+        <li>
+            <code>collection.where(...)</code>
+        </li>
+        <li>
+            <code>collection.exists?(...)</code>
+        </li>
+        <li>
+            <code>collection.build(attributes = {}, ...)</code>
+        </li>
+        <li>
+            <code>collection.create(attributes = {})</code>
+        </li>
+        <li>
+            <code>collection.create!(attributes = {})</code>
+        </li>
+    </ul>
+    <p>Во всех этих методах <code>collection</code> заменяется символом, переданным как первый
+        аргумент в <code>has_many</code>, и <code>collection_singular</code> заменяется версией в
+        единственном числе этого символа. Например, имеем объявление:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+</pre>
+    </div>
+    <p>Каждый экземпляр модели <code>Customer</code> будет иметь эти методы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+orders(force_reload = false)
+orders&lt;&lt;(object, ...)
+orders.delete(object, ...)
+orders.destroy(object, ...)
+orders=(objects)
+order_ids
+order_ids=(ids)
+orders.clear
+orders.empty?
+orders.size
+orders.find(...)
+orders.where(...)
+orders.exists?(...)
+orders.build(attributes = {}, ...)
+orders.create(attributes = {})
+orders.create!(attributes = {})
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-force_reload-false"><code>collection(force_reload
+        = false)</code>
+    </h5>
+    <p>Метод <code>collection</code> возвращает массив всех связанных объектов. Если нет связанных
+        объектов, он возвращает пустой массив.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@orders = @customer.orders
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-lt-lt-object"><code>collection&lt;&lt;(object,
+        ...)</code>
+    </h5>
+    <p>Метод <code>collection&lt;&lt;</code> добавляет один или более объектов в коллекцию,
+        устанавливая их внешние ключи равными первичному ключу вызывающей модели.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer.orders &lt;&lt; @order1
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-delete-object"><code>collection.delete(object,
+        ...)</code>
+    </h5>
+    <p>Метод <code>collection.delete</code> убирает один или более объектов из коллекции, установив
+        их внешние ключи в <code>NULL</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer.orders.delete(@order1)
+</pre>
+    </div>
+    <div class="warning"><p>Объекты будут в дополнение уничтожены, если связаны с <code>dependent:
+        :destroy</code>, и удалены, если они связаны с <code>dependent: :delete_all</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="collection-destroy-object"><code>collection.destroy(object,
+        ...)</code>
+    </h5>
+    <p>Метод <code>collection.destroy</code> убирает один или более объектов из коллекции, выполняя
+        <code>destroy</code> для каждого объекта.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer.orders.destroy(@order1)
+</pre>
+    </div>
+    <div class="warning"><p>Объекты будут <em>всегда</em> удаляться из базы данных, игнорируя опцию
+        <code>:dependent</code>.</p></div>
+    <h5 class="inside_page_header" id="collection-objects"><code>collection=(objects)</code>
+    </h5>
+    <p>Метод <code>collection=</code> делает коллекцию содержащей только представленные объекты,
+        добавляя и удаляя по мере необходимости.</p>
+    <h5 class="inside_page_header" id="collection_singular_ids"><code>collection_singular_ids</code>
+    </h5>
+    <p>Метод <code>collection_singular_ids</code> возвращает массив id объектов в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order_ids = @customer.order_ids
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection_singular_ids-ids"><code>collection_singular_ids=(ids)</code>
+    </h5>
+    <p>Метод <code>collection_singular_ids=</code> делает коллекцию содержащей только объекты,
+        идентифицированные представленными значениями первичного ключа, добавляя и удаляя по мере
+        необходимости.</p>
+    <h5 class="inside_page_header" id="collection-clear"><code>collection.clear</code>
+    </h5>
+    <p>Метод <code>collection.clear</code> убирает каждый объект из коллекции в соответствии со
+        стратегией, определенной опцией <code>dependent</code>. Если опция не указана, он следует
+        стратегии по умолчанию. Стратегия по умолчанию для <code>has_many :through</code> это <code>delete_all</code>,
+        а для связей <code>has_many</code> — установить их внешние ключи в <code>NULL</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@customer.orders.clear
+</pre>
+    </div>
+    <div class="warning"><p>Объекты будут удалены, если они связаны с помощью <code>dependent:
+        :destroy</code>, как и с помощью <code>dependent: :delete_all</code>.</p></div>
+    <h5 class="inside_page_header" id="collection-empty"><code>collection.empty?</code>
+    </h5>
+    <p>Метод <code>collection.empty?</code> возвращает <code>true</code>, если коллекция не содержит
+        каких-либо связанных объектов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;% if @customer.orders.empty? %&gt;
+  No Orders Found
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-size"><code>collection.size</code>
+    </h5>
+    <p>Метод <code>collection.size</code> возвращает количество объектов в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order_count = @customer.orders.size
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-find"><code>collection.find(...)</code>
+    </h5>
+    <p>Метод <code>collection.find</code> ищет объекты в коллекции. Он использует тот же синтаксис и
+        опции, что и <code>ActiveRecord::Base.find</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@open_orders = @customer.orders.find(1)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-where"><code>collection.where(...)</code>
+    </h5>
+    <p>Метод <code>collection.where</code> ищет объекты в коллекции, основываясь на переданных
+        условиях, но объекты загружаются лениво, что означает, что база данных запрашивается только
+        когда происходит доступ к объекту(-там).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@open_orders = @customer.orders.where(open: true) # Пока нет запроса
+@open_order = @open_orders.first # Теперь база данных будет запрошена
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-exists"><code>collection.exists?(...)</code>
+    </h5>
+    <p>Метод <code>collection.exists?</code> проверяет, существует ли в коллекции объект, отвечающий
+        представленным условиям. Он использует тот же синтаксис и опции, что и .</p>
+    <h5 class="inside_page_header" id="collection-build-attributes"><code>collection.build(attributes
+        = {}, ...)</code>
+    </h5>
+    <p>Метод <code>collection.build</code> возвращает один или массив объектов связанного типа.
+        Объект(ы) будут экземплярами с переданными атрибутами, будет создана ссылка через их внешние
+        ключи, но связанные объекты <em>не</em> будут пока сохранены.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order = @customer.orders.build(order_date: Time.now,
+                                order_number: "A12345")
+@orders = @customer.orders.build([
+  { order_date: Time.now, order_number: "A12346" },
+  { order_date: Time.now, order_number: "A12347" }
+])
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-create-attributes"><code>collection.create(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>collection.create</code> возвращает один или массив новых объектов связанного
+        типа. Объект(ы) будут экземплярами с переданными атрибутами, будет создана ссылка через его
+        внешний ключ, и, если он пройдет валидации, определенные в связанной модели, связанный
+        объект <em>будет</em> сохранен</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@order = @customer.orders.create(order_date: Time.now,
+                                 order_number: "A12345")
+@orders = @customer.orders.create([
+  { order_date: Time.now, order_number: "A12346" },
+  { order_date: Time.now, order_number: "A12347" }
+])
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-create-attributes"><code>collection.create!(attributes
+        = {})</code>
+    </h5>
+    <p>Работает так же, как вышеприведенный <code>collection.create</code>, но вызывает <code>ActiveRecord::RecordInvalid</code>,
+        если запись невалидна.</p>
+    <h4 class="inside_page_header" id="optsii-dlya-has_many"> Опции для <code>has_many</code>
+    </h4>
+    <p>Хотя Rails использует разумные значения по умолчанию, работающие во многих ситуациях, бывают
+        случаи, когда хочется изменить поведение связи <code>has_many</code>. Такая настройка легко
+        выполнима с помощью передачи опций при создании связи. Например, эта связь использует две
+        такие опции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, dependent: :delete_all, validate: false
+end
+</pre>
+    </div>
+    <p>Связь <code>has_many</code> поддерживает эти опции:</p>
+    <ul>
+        <li>
+            <code>:as</code>
+        </li>
+        <li>
+            <code>:autosave</code>
+        </li>
+        <li>
+            <code>:class_name</code>
+        </li>
+        <li>
+            <code>:counter_cache</code>
+        </li>
+        <li>
+            <code>:dependent</code>
+        </li>
+        <li>
+            <code>:foreign_key</code>
+        </li>
+        <li>
+            <code>:inverse_of</code>
+        </li>
+        <li>
+            <code>:primary_key</code>
+        </li>
+        <li>
+            <code>:source</code>
+        </li>
+        <li>
+            <code>:source_type</code>
+        </li>
+        <li>
+            <code>:through</code>
+        </li>
+        <li>
+            <code>:validate</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="as"><code>:as</code>
+    </h5>
+    <p>Установка опции <code>:as</code> показывает, что это полиморфная связь. Полиморфные связи
+        подробно рассматривались .</p>
+    <h5 class="inside_page_header" id="autosave"><code>:autosave</code>
+    </h5>
+    <p>Если установить опцию <code>:autosave</code> в <code>true</code>, Rails сохранит любые
+        загруженные члены и уничтожит члены, помеченные для уничтожения, всякий раз, когда вы
+        сохраняете родительский объект.</p>
+    <h5 class="inside_page_header" id="class_name"><code>:class_name</code>
+    </h5>
+    <p>Если имя другой модели не может быть произведено из имени связи, можете использовать опцию
+        <code>:class_name</code> для предоставления имени модели. Например, если покупатель имеет
+        много заказов, но фактическое имя модели, содержащей заказы это <code>Transaction</code>,
+        можете установить это следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, class_name: "Transaction"
+end
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="counter_cache"><code>:counter_cache</code>
+    </h6>
+    <p>Эта опция используется для настройки произвольно названного <code>:counter_cache</code>. Эту
+        опцию нужно использовать только если вы изменили имя вашего <code>:counter_cache</code> у .
+    </p>
+    <h5 class="inside_page_header" id="dependent"><code>:dependent</code>
+    </h5>
+    <p>Управляет тем, что произойдет со связанными объектами, когда его владелец будет
+        уничтожен:</p>
+    <ul>
+        <li>
+            <code>:destroy</code> приведет к тому, что связанные объекты также будут уничтожены
+        </li>
+        <li>
+            <code>:delete_all</code> приведет к тому, что связанные объекты будут удалены из базы
+            данных напрямую (таким образом не будут выполнены колбэки)
+        </li>
+        <li>
+            <code>:nullify</code> приведет к тому, что внешние ключи будет установлен
+            <code>NULL</code>. Колбэки не запускаются.
+        </li>
+        <li>
+            <code>:restrict_with_exception</code> приведет к вызову исключения, если есть
+            какой-нибудь связанный объект
+        </li>
+        <li>
+            <code>:restrict_with_error</code> приведет к ошибке, добавляемой к владельцу, если есть
+            какой-нибудь связанный объект
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="foreign_key"><code>:foreign_key</code>
+    </h5>
+    <p>По соглашению Rails предполагает, что столбец, используемый для хранения внешнего ключа в
+        этой модели, имеет имя модели с добавленным суффиксом <code>_id</code>. Опция <code>:foreign_key</code>
+        позволяет установить имя внешнего ключа явно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, foreign_key: "cust_id"
+end
+</pre>
+    </div>
+    <div class="info"><p>В любом случае, Rails не создаст столбцы внешнего ключа за вас. Вам
+        необходимо явно определить их в своих миграциях.</p></div>
+    <h5 class="inside_page_header" id="inverse_of"><code>:inverse_of</code>
+    </h5>
+    <p>Опция <code>:inverse_of</code> определяет имя связи <code>belongs_to</code>, являющейся
+        обратной для этой связи. Не работает в комбинации с опциями <code>:through</code> или <code>:as</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Supplier &lt; ActiveRecord::Base
+  has_many :orders, inverse_of: :customer
+end
+class Account &lt; ActiveRecord::Base
+  belongs_to :customer, inverse_of: :orders
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="primary_key"><code>:primary_key</code>
+    </h5>
+    <p>По соглашению, Rails предполагает, что столбец, используемый для хранения первичного ключа,
+        это <code>id</code>. Вы можете переопределить это и явно определить первичный ключ с помощью
+        опции <code>:primary_key</code>.</p>
+    <p>Допустим, в таблице <code>users</code> есть <code>id</code> в качестве primary_key, но также
+        имеется столбец <code>guid</code>. Имеется требование, что таблица <code>todos</code> должна
+        содержать значение столбца <code>guid</code>, а не значение <code>id</code>. Это достигается
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_many :todos, primary_key: :guid
+end
+</pre>
+    </div>
+    <p>Теперь, если выполнить <code>@todo = @user.todos.create</code>, то в запись
+        <code>@todo</code> значение <code>user_id</code> будет таким же, как значение
+        <code>guid</code> в <code>@user</code>.</p>
+    <h5 class="inside_page_header" id="source"><code>:source</code>
+    </h5>
+    <p>Опция <code>:source</code> определяет имя источника связи для связи <code>has_many
+        :through</code>. Эту опцию нужно использовать, только если имя источника связи не может быть
+        автоматически выведено из имени связи.</p>
+    <h5 class="inside_page_header" id="source_type"><code>:source_type</code>
+    </h5>
+    <p>Опция <code>:source_type</code> определяет тип источника связи для связи <code>has_many
+        :through</code>, который действует при полиморфной связи.</p>
+    <h5 class="inside_page_header" id="through"><code>:through</code>
+    </h5>
+    <p>Опция <code>:through</code> определяет соединительную модель, через которую выполняется
+        запрос. Связи <code>has_many :through</code> предоставляют способ осуществления отношений
+        многие-ко-многим, как обсуждалось .</p>
+    <h5 class="inside_page_header" id="validate"><code>:validate</code>
+    </h5>
+    <p>Если установите опцию <code>:validate</code> в <code>false</code>, тогда связанные объекты не
+        будут проходить валидацию всякий раз, когда вы сохраняете этот объект. По умолчанию она
+        равна <code>true</code>: связанные объекты проходят валидацию, когда этот объект
+        сохраняется.</p>
+    <h4 class="inside_page_header" id="skoupy-dlya-has_many"> Скоупы для <code>has_many</code>
+    </h4>
+    <p>Иногда хочется настроить запрос, используемый <code>has_many</code>. Такая настройка может
+        быть достигнута с помощью блока скоупа. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, -&gt; { where processed: true }
+end
+</pre>
+    </div>
+    <p>Внутри блока скоупа можно использовать любые стандартные . Далее обсудим следующие из
+        них:</p>
+    <ul>
+        <li>
+            <code>where</code>
+        </li>
+        <li>
+            <code>extending</code>
+        </li>
+        <li>
+            <code>group</code>
+        </li>
+        <li>
+            <code>includes</code>
+        </li>
+        <li>
+            <code>limit</code>
+        </li>
+        <li>
+            <code>offset</code>
+        </li>
+        <li>
+            <code>order</code>
+        </li>
+        <li>
+            <code>readonly</code>
+        </li>
+        <li>
+            <code>select</code>
+        </li>
+        <li>
+            <code>distinct</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="where"><code>where</code>
+    </h5>
+    <p>Метод <code>where</code> позволяет определить условия, которым должен отвечать связанный
+        объект.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :confirmed_orders, -&gt; { where "confirmed = 1" },
+    class_name: "Order"
+end
+</pre>
+    </div>
+    <p>Также можно задать условия хэшем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :confirmed_orders, -&gt; { where confirmed: true },
+                              class_name: "Order"
+end
+</pre>
+    </div>
+    <p>При использовании опции <code>where</code> хэшем, при создание записи через эту связь будет
+        автоматически применен скоуп с использованием хэша. В этом случае при использовании <code>@customer.confirmed_orders.create</code>
+        или <code>@customer.confirmed_orders.build</code> будут созданы заказы, в которых столбец
+        confirmed будет иметь значение <code>true</code>.</p>
+    <h5 class="inside_page_header" id="extending"><code>extending</code>
+    </h5>
+    <p>Метод <code>extending</code> определяет именованный модуль для расширения прокси связи.
+        Расширения связей подробно обсуждаются .</p>
+    <h5 class="inside_page_header" id="group"><code>group</code>
+    </h5>
+    <p>Метод <code>group</code> доставляет имя атрибута, по которому группируется результирующий
+        набор, используя выражение <code>GROUP BY</code> в поисковом SQL.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :line_items, -&gt; { group 'orders.id' },
+                        through: :orders
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="includes"><code>includes</code>
+    </h5>
+    <p>Можете использовать метод <code>includes</code> для определения связей второго порядка,
+        которые должны быть нетерпеливо загружены, когда эта связь используется. Например,
+        рассмотрим эти модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+  has_many :line_items
+end
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+end
+</pre>
+    </div>
+    <p>Если вы часто получаете позиции прямо из покупателей
+        (<code>@customer.orders.line_items</code>), тогда можете сделать свой код более эффективным,
+        включив позиции в связь от покупателей к заказам:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, -&gt; { includes :line_items }
+end
+class Order &lt; ActiveRecord::Base
+  belongs_to :customer
+  has_many :line_items
+end
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="limit"><code>limit</code>
+    </h5>
+    <p>Метод <code>limit</code> позволяет ограничить общее количество объектов, которые будут
+        выбраны через связь.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :recent_orders,
+    -&gt; { order('order_date desc').limit(100) },
+    class_name: "Order"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="offset"><code>offset</code>
+    </h5>
+    <p>Метод <code>offset</code> позволяет определить начальное смещение для выбора объектов через
+        связь. Например, <code>-&gt; { offset(11) }</code> пропустит первые 11 записей.</p>
+    <h5 class="inside_page_header" id="order"><code>order</code>
+    </h5>
+    <p>Метод <code>order</code> предписывает порядок, в котором связанные объекты будут получены (в
+        синтаксисе SQL, используемом в условии <code>ORDER BY</code>).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, -&gt; { order "date_confirmed DESC" }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="readonly"><code>readonly</code>
+    </h5>
+    <p>При использовании метода <code>:readonly</code>, связанные объекты будут доступны только для
+        чтения, когда получены посредством связи.</p>
+    <h5 class="inside_page_header" id="select"><code>select</code>
+    </h5>
+    <p>Метод <code>select</code> позволяет переопределить SQL условие <code>SELECT</code>, которое
+        используется для получения данных о связанном объекте. По умолчанию Rails получает все
+        столбцы.</p>
+    <div class="warning"><p>Если укажете свой собственный <code>select</code>, не забудьте включить
+        столбцы первичного ключа и внешнего ключа в связанной модели. Если так не сделать, Rails
+        выдаст ошибку.</p></div>
+    <h5 class="inside_page_header" id="distinct"><code>distinct</code>
+    </h5>
+    <p>Используйте метод <code>distinct</code>, чтобы убирать дубликаты из коллекции. Это полезно в
+        сочетании с опцией <code>:through</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  has_many :readings
+  has_many :articles, through: :readings
+end
+article   = Article.create(name: 'a1')
+person.articles &lt;&lt; article
+person.articles &lt;&lt; article
+person.articles.inspect # =&gt; [#&lt;Article id: 5, name: "a1"&gt;, #&lt;Article id: 5, name: "a1"&gt;]
+Reading.all.inspect  # =&gt; [#&lt;Reading id: 12, person_id: 5, article_id: 5&gt;, #&lt;Reading id: 13, person_id: 5, article_id: 5&gt;]
+</pre>
+    </div>
+    <p>В вышеописанной задаче два reading, и <code>person.articles</code> выявляет их оба, даже хотя
+        эти записи указывают на одну и ту же статью.</p>
+    <p>Давайте установим <code>:distinct</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  has_many :readings
+  has_many :articles, -&gt; { distinct }, through: :readings
+end
+person = Person.create(name: 'Honda')
+article   = Article.create(name: 'a1')
+person.articles &lt;&lt; article
+person.articles &lt;&lt; article
+person.articles.inspect # =&gt; [#&lt;Article id: 7, name: "a1"&gt;]
+Reading.all.inspect  # =&gt; [#&lt;Reading id: 16, person_id: 7, article_id: 7&gt;, #&lt;Reading id: 17, person_id: 7, article_id: 7&gt;]
+</pre>
+    </div>
+    <p>В вышеописанной задаче все еще два reading. Однако <code>person.articles</code> показывает
+        только одну статью, поскольку коллекция загружает только уникальные записи.</p>
+    <p>Если вы хотите быть уверенными, что после вставки все записи сохраненной связи различны (и,
+        таким образом, убедиться, что при просмотре связи никогда не будет дублирующихся записей),
+        следует добавить уникальный индекс для самой таблицы. Например, если таблица называется
+        <code>person_articles</code>, и вы хотите убедиться, что все публикации уникальны, следует
+        добавить в миграции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+add_index :person_articles, :post, unique: true
+</pre>
+    </div>
+    <p>Отметьте, что проверка уникальности при использовании чего-то, наподобие
+        <code>include?</code>, это субъект гонки условий. Не пытайтесь использовать
+        <code>include?</code> для соблюдения уникальности в связи. Используя вышеприведенный пример
+        со статьёй, нижеследующий код вызовет гонку, поскольку несколько пользователей могут
+        использовать его одновременно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+person.articles &lt;&lt; article unless person.articles.include?(post)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kogda-sohranyayutsya-ob-ekty"> Когда сохраняются
+        объекты?</h4>
+    <p>Когда вы назначаете объект связью <code>has_many</code>, этот объект автоматически
+        сохраняется (для того, чтобы обновить его внешний ключ). Если назначаете несколько объектов
+        в одном выражении, они все будут сохранены.</p>
+    <p>Если одно из этих сохранений проваливается из-за ошибок валидации, тогда выражение назначения
+        возвращает <code>false</code>, и само назначение отменяется.</p>
+    <p>Если родительский объект (который объявляет связь <code>has_many</code>) является
+        несохраненным (то есть <code>new_record?</code> возвращает <code>true</code>) тогда дочерние
+        объекты не сохраняются при добавлении. Все несохраненные члены связи сохранятся
+        автоматически, когда сохранится родительский объект.</p>
+    <p>Если вы хотите назначить объект связью <code>has_many</code> без сохранения объекта,
+        используйте метод <code>collection.build</code>.</p>
+    <h3 class="inside_page_header" id="podrobnaya-informatsiya-po-svyazi-has_and_belongs_to_many">
+        Подробная информация по связи has_and_belongs_to_many</h3>
+    <p>Связь <code>has_and_belongs_to_many</code> создает отношение многие-ко-многим с другой
+        моделью. В терминах базы данных это связывает два класса через промежуточную соединительную
+        таблицу, которая включает внешние ключи, относящиеся к каждому классу.</p>
+    <h4 class="inside_page_header" id="dobavlyaemye-metody"> Добавляемые методы</h4>
+    <p>Когда объявляете связь <code>has_and_belongs_to_many</code>, объявляющий класс автоматически
+        получает 16 методов, относящихся к связи:</p>
+    <ul>
+        <li>
+            <code>collection(force_reload = false)</code>
+        </li>
+        <li>
+            <code>collection&lt;&lt;(object, ...)</code>
+        </li>
+        <li>
+            <code>collection.delete(object, ...)</code>
+        </li>
+        <li>
+            <code>collection.destroy(object, ...)</code>
+        </li>
+        <li>
+            <code>collection=(objects)</code>
+        </li>
+        <li>
+            <code>collection_singular_ids</code>
+        </li>
+        <li>
+            <code>collection_singular_ids=(ids)</code>
+        </li>
+        <li>
+            <code>collection.clear</code>
+        </li>
+        <li>
+            <code>collection.empty?</code>
+        </li>
+        <li>
+            <code>collection.size</code>
+        </li>
+        <li>
+            <code>collection.find(...)</code>
+        </li>
+        <li>
+            <code>collection.where(...)</code>
+        </li>
+        <li>
+            <code>collection.exists?(...)</code>
+        </li>
+        <li>
+            <code>collection.build(attributes = {})</code>
+        </li>
+        <li>
+            <code>collection.create(attributes = {})</code>
+        </li>
+        <li>
+            <code>collection.create!(attributes = {})</code>
+        </li>
+    </ul>
+    <p>Во всех этих методах <code>collection</code> заменяется символом, переданным как первый
+        аргумент в <code>has_and_belongs_to_many</code>, а <code>collection_singular</code>
+        заменяется версией в единственном числе этого символа. Например, имеем объявление:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Part &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies
+end
+</pre>
+    </div>
+    <p>Каждый экземпляр модели <code>Part</code> будет иметь эти методы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assemblies(force_reload = false)
+assemblies&lt;&lt;(object, ...)
+assemblies.delete(object, ...)
+assemblies.destroy(object, ...)
+assemblies=(objects)
+assembly_ids
+assembly_ids=(ids)
+assemblies.clear
+assemblies.empty?
+assemblies.size
+assemblies.find(...)
+assemblies.where(...)
+assemblies.exists?(...)
+assemblies.build(attributes = {}, ...)
+assemblies.create(attributes = {})
+assemblies.create!(attributes = {})
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="dopolnitelnye-metody-stolbtsov"> Дополнительные методы
+        столбцов</h5>
+    <p>Если соединительная таблица для связи <code>has_and_belongs_to_many</code> имеет
+        дополнительные столбцы, кроме двух внешних ключей, эти столбцы будут добавлены как атрибуты
+        к записям, получаемым посредством связи. Записи, возвращаемые с дополнительными атрибутами,
+        будут всегда только для чтения, поскольку Rails не может сохранить значения этих атрибутов.
+    </p>
+    <div class="warning"><p>Использование дополнительных атрибутов в соединительной таблице в связи
+        has_and_belongs_to_many устарело. Если требуется этот тип сложного поведения таблицы,
+        соединяющей две модели в отношениях многие-ко-многим, следует использовать связь <code>has_many
+            :through</code> вместо <code>has_and_belongs_to_many</code>.</p></div>
+    <h5 class="inside_page_header" id="collection-force_reload-false"><code>collection(force_reload
+        = false)</code>
+    </h5>
+    <p>Метод <code>collection</code> возвращает массив всех связанных объектов. Если нет связанных
+        объектов, он возвращает пустой массив.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assemblies = @part.assemblies
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-lt-lt-object"><code>collection&lt;&lt;(object,
+        ...)</code>
+    </h5>
+    <p>Метод <code>collection&lt;&lt;</code> добавляет один или более объектов в коллекцию, создавая
+        записи в соединительной таблице.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@part.assemblies &lt;&lt; @assembly1
+</pre>
+    </div>
+    <div class="note"><p>Этот метод - просто синоним к <code>collection.concat</code> и <code>collection.push</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="collection-delete-object"><code>collection.delete(object,
+        ...)</code>
+    </h5>
+    <p>Метод <code>collection.delete</code> убирает один или более объектов из коллекции, удаляя
+        записи в соединительной таблице. Это не уничтожает объекты.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@part.assemblies.delete(@assembly1)
+</pre>
+    </div>
+    <div class="warning"><p>Это не запустит колбэки на соединительных записях.</p></div>
+    <h6 class="inside_page_header" id="collection-destroy-object"><code>collection.destroy(object,
+        ...)</code>
+    </h6>
+    <p>Метод <code>collection.destroy</code> убирает один или более объектов из коллекции. запуская
+        <code>destroy</code> на каждой записи в соединительной таблице, включая запуск колбэков. Это
+        не уничтожает объекты.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@part.assemblies.destroy(@assembly1)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-objects"><code>collection=(objects)</code>
+    </h5>
+    <p>Метод <code>collection=</code> делает коллекцию содержащей только представленные объекты,
+        добавляя и удаляя по мере необходимости.</p>
+    <h5 class="inside_page_header" id="collection_singular_ids"><code>collection_singular_ids</code>
+    </h5>
+    <p>Метод <code>collection_singular_ids</code> возвращает массив id объектов в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assembly_ids = @part.assembly_ids
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection_singular_ids-ids"><code>collection_singular_ids=(ids)</code>
+    </h5>
+    <p>Метод <code>collection_singular_ids=</code> делает коллекцию содержащей только объекты,
+        идентифицированные представленными значениями первичного ключа, добавляя и удаляя по мере
+        необходимости.</p>
+    <h5 class="inside_page_header" id="collection-clear"><code>collection.clear</code>
+    </h5>
+    <p>Метод <code>collection.clear</code> убирает каждый объект из коллекции, удаляя строки из
+        соединительной таблицы. Это не уничтожает связанные объекты.</p>
+    <h5 class="inside_page_header" id="collection-empty"><code>collection.empty?</code>
+    </h5>
+    <p>Метод <code>collection.empty?</code> возвращает <code>true</code>, если коллекция не содержит
+        каких-либо связанных объектов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;% if @part.assemblies.empty? %&gt;
+  This part is not used in any assemblies
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-size"><code>collection.size</code>
+    </h5>
+    <p>Метод <code>collection.size</code> возвращает количество объектов в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assembly_count = @part.assemblies.size
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-find"><code>collection.find(...)</code>
+    </h5>
+    <p>Метод <code>collection.find</code> ищет объекты в коллекции. Он использует тот же синтаксис и
+        опции, что и <code>ActiveRecord::Base.find</code>. Он также добавляет дополнительное
+        условие, что объект должен быть в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assembly = @part.assemblies.find(1)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-where"><code>collection.where(...)</code>
+    </h5>
+    <p>Метод <code>collection.where</code> ищет объекты в коллекции, основываясь на переданных
+        условиях, но объекты загружаются лениво, что означает, что база данных запрашивается только
+        когда происходит доступ к объекту(-там). Он также добавляет дополнительное условие, что
+        объект должен быть в коллекции.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@new_assemblies = @part.assemblies.where("created_at &gt; ?", 2.days.ago)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-exists"><code>collection.exists?(...)</code>
+    </h5>
+    <p>Метод <code>collection.exists?</code> проверяет, существует ли в коллекции объект, отвечающий
+        представленным условиям. Он использует тот же синтаксис и опции, что и .</p>
+    <h5 class="inside_page_header" id="collection-build-attributes"><code>collection.build(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>collection.build</code> возвращает один или более объектов связанного типа. Эти
+        объекты будут экземплярами с переданными атрибутами, и будет создана связь через
+        соединительную таблицу, но связанный объект пока <em>не</em> будет сохранен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assembly = @part.assemblies.build({assembly_name: "Transmission housing"})
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-create-attributes"><code>collection.create(attributes
+        = {})</code>
+    </h5>
+    <p>Метод <code>collection.create</code> возвращает один или более объектов связанного типа. Эти
+        объекты будут экземплярами с переданными атрибутами, будет создана связь через
+        соединительную таблицу, и, если он пройдет валидации, определенные в связанной модели,
+        связанный объект <em>будет</em> сохранен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@assembly = @part.assemblies.create({assembly_name: "Transmission housing"})
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection-create-attributes"><code>collection.create!(attributes
+        = {})</code>
+    </h5>
+    <p>Работает так же, как вышеприведенный <code>collection.create</code>, но вызывает <code>ActiveRecord::RecordInvalid</code>,
+        если запись невалидна.</p>
+    <h4 class="inside_page_header" id="optsii-dlya-has_and_belongs_to_many"> Опции для <code>has_and_belongs_to_many</code>
+    </h4>
+    <p>Хотя Rails использует разумные значения по умолчанию, работающие во многих ситуациях, бывают
+        случаи, когда хочется изменить поведение связи <code>has_and_belongs_to_many</code>. Такая
+        настройка легко выполнима с помощью передачи опции при создании связи. Например, эта связь
+        использует две такие опции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies, -&gt; { readonly },
+                                       autosave: true
+end
+</pre>
+    </div>
+    <p>Связь <code>has_and_belongs_to_many</code> поддерживает эти опции:</p>
+    <ul>
+        <li>
+            <code>:association_foreign_key</code>
+        </li>
+        <li>
+            <code>:autosave</code>
+        </li>
+        <li>
+            <code>:class_name</code>
+        </li>
+        <li>
+            <code>:foreign_key</code>
+        </li>
+        <li>
+            <code>:join_table</code>
+        </li>
+        <li>
+            <code>:validate</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="association_foreign_key">
+        <code>:association_foreign_key</code>
+    </h5>
+    <p>По соглашению Rails предполагает, что столбец в соединительной таблице, используемый для
+        хранения внешнего ключа, указываемого на другую модель, является именем этой модели с
+        добавленным суффиксом <code>_id</code>. Опция <code>:association_foreign_key</code>
+        позволяет установить имя внешнего ключа явно:</p>
+    <div class="info"><p>Опции <code>:foreign_key</code> и <code>:association_foreign_key</code>
+        полезны при настройке присоединения к себе многие-ко-многим. Например:</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_and_belongs_to_many :friends,
+      class_name: "User",
+      foreign_key: "this_user_id",
+      association_foreign_key: "other_user_id"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="autosave"><code>:autosave</code>
+    </h5>
+    <p>Если установить опцию <code>:autosave</code> в <code>true</code>, Rails сохранит любые
+        загруженные члены и уничтожит члены, помеченные для уничтожения, всякий раз, когда Вы
+        сохраните родительский объект.</p>
+    <h5 class="inside_page_header" id="class_name"><code>:class_name</code>
+    </h5>
+    <p>Если имя другой модели не может быть произведено из имени связи, можете использовать опцию
+        <code>:class_name</code> для предоставления имени модели. Например, если часть имеет много
+        узлов, но фактическое имя модели, содержащей узлы - это <code>Gadget</code>, можете
+        установить это следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies, class_name: "Gadget"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="foreign_key"><code>:foreign_key</code>
+    </h5>
+    <p>По соглашению Rails предполагает, что столбец в соединительной таблице, используемый для
+        хранения внешнего ключа, указываемого на эту модель, имеет имя модели с добавленным
+        суффиксом <code>_id</code>. Опция <code>:foreign_key</code> позволяет установить имя
+        внешнего ключа явно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_and_belongs_to_many :friends,
+      class_name: "User",
+      foreign_key: "this_user_id",
+      association_foreign_key: "other_user_id"
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="join_table"><code>:join_table</code>
+    </h5>
+    <p>Если имя соединительной таблицы по умолчанию, основанное на алфавитном порядке, - это не то,
+        что вам нужно, используйте опцию <code>:join_table</code>, чтобы переопределить его.</p>
+    <h5 class="inside_page_header" id="validate"><code>:validate</code>
+    </h5>
+    <p>Если установите опцию <code>:validate</code> в <code>false</code>, тогда связанные объекты не
+        будут проходить валидацию всякий раз, когда вы сохраняете этот объект. По умолчанию она
+        равна <code>true</code>: связанные объекты проходят валидацию, когда этот объект
+        сохраняется.</p>
+    <h4 class="inside_page_header" id="skoupy-dlya-has_and_belongs_to_many"> Скоупы для <code>has_and_belongs_to_many</code>
+    </h4>
+    <p>Иногда хочется настроить запрос, используемый <code>has_many</code>. Такая настройка может
+        быть достигнута с помощью блока скоупа. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies, -&gt; { where active: true }
+end
+</pre>
+    </div>
+    <p>Внутри блока скоупа можно использовать любые стандартные . Далее обсудим следующие из
+        них:</p>
+    <ul>
+        <li>
+            <code>where</code>
+        </li>
+        <li>
+            <code>extending</code>
+        </li>
+        <li>
+            <code>group</code>
+        </li>
+        <li>
+            <code>includes</code>
+        </li>
+        <li>
+            <code>limit</code>
+        </li>
+        <li>
+            <code>offset</code>
+        </li>
+        <li>
+            <code>order</code>
+        </li>
+        <li>
+            <code>readonly</code>
+        </li>
+        <li>
+            <code>select</code>
+        </li>
+        <li>
+            <code>uniq</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="where"><code>where</code>
+    </h5>
+    <p>Метод <code>where</code> позволяет определить условия, которым должен отвечать связанный
+        объект.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies,
+    -&gt; { where "factory = 'Seattle'" }
+end
+</pre>
+    </div>
+    <p>Также можно задать условия хэшем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies,
+    -&gt; { where factory: 'Seattle' }
+end
+</pre>
+    </div>
+    <p>При использовании опции <code>where</code> хэшем, при создание записи через эту связь будет
+        автоматически применен скоуп с использованием хэша. В этом случае при использовании <code>@parts.assemblies.create</code>
+        или <code>@parts.assemblies.build</code> будут созданы заказы, в которых столбец <code>factory</code>
+        будет иметь значение <code>Seattle</code>.</p>
+    <h5 class="inside_page_header" id="extending"><code>extending</code>
+    </h5>
+    <p>Метод <code>extending</code> определяет именованный модуль для расширения прокси связи.
+        Расширения связей подробно обсуждаются .</p>
+    <h5 class="inside_page_header" id="group"><code>group</code>
+    </h5>
+    <p>Метод <code>group</code> доставляет имя атрибута, по которому группируется результирующий
+        набор, используя выражение <code>GROUP BY</code> в поисковом SQL.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Parts &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies, -&gt; { group "factory" }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="includes"><code>includes</code>
+    </h5>
+    <p>Можете использовать метод <code>includes</code> для определения связей второго порядка,
+        которые должны быть нетерпеливо загружены, когда эта связь используется.</p>
+    <h5 class="inside_page_header" id="limit"><code>limit</code>
+    </h5>
+    <p>Метод <code>limit</code> позволяет ограничить общее количество объектов, которые будут
+        выбраны через связь.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies,
+    -&gt; { order("created_at DESC").limit(50) }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="offset"><code>offset</code>
+    </h5>
+    <p>Метод <code>offset</code> позволяет определить начальное смещение для выбора объектов через
+        связь. Например, <code>-&gt; { offset(11) }</code> пропустит первые 11 записей.</p>
+    <h5 class="inside_page_header" id="order"><code>order</code>
+    </h5>
+    <p>Метод <code>order</code> предписывает порядок, в котором связанные объекты будут получены (в
+        синтаксисе SQL, используемом в условии <code>ORDER BY</code>).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_and_belongs_to_many :assemblies,
+    -&gt; { order "assembly_name ASC" }
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="readonly"><code>readonly</code>
+    </h5>
+    <p>При использовании метода <code>:readonly</code>, связанные объекты будут доступны только для
+        чтения, когда получены посредством связи.</p>
+    <h5 class="inside_page_header" id="select"><code>select</code>
+    </h5>
+    <p>Метод <code>select</code> позволяет переопределить SQL условие <code>SELECT</code>, которое
+        используется для получения данных о связанном объекте. По умолчанию Rails получает все
+        столбцы.</p>
+    <h5 class="inside_page_header" id="uniq"><code>uniq</code>
+    </h5>
+    <p>Используйте метод <code>uniq</code>, чтобы убирать дубликаты из коллекции. Это полезно в
+        сочетании с опцией <code>:through</code>.</p>
+    <h4 class="inside_page_header" id="kogda-sohranyayutsya-ob-ekty"> Когда сохраняются
+        объекты?</h4>
+    <p>Когда вы назначаете объект связью <code>has_and_belongs_to_many</code> этот объект
+        автоматически сохраняется (в порядке обновления соединительной таблицы). Если назначаете
+        несколько объектов в одном выражении, они все будут сохранены.</p>
+    <p>Если одно из этих сохранений проваливается из-за ошибок валидации, тогда выражение назначения
+        возвращает <code>false</code>, a само назначение отменяется.</p>
+    <p>Если родительский объект (который объявляет связь <code>has_and_belongs_to_many</code>)
+        является несохраненным (то есть <code>new_record?</code> возвращает <code>true</code>) тогда
+        дочерние объекты не сохраняются при добавлении. Все несохраненные члены связи сохранятся
+        автоматически, когда сохранится родительский объект.</p>
+    <p>Если вы хотите назначить объект связью <code>has_and_belongs_to_many</code> без сохранения
+        объекта, используйте метод <code>collection.build</code>.</p>
+    <h3 class="inside_page_header" id="association-callbacks-and-extensions"> Подробная информация
+        по колбэкам и расширениям связи</h3>
+    <h4 class="inside_page_header" id="kolbeki-svyazi"> Колбэки связи</h4>
+    <p>Обычно колбэки прицепляются к жизненному циклу объектов Active Record, позволяя вам работать
+        с этими объектами в различных точках. Например, можете использовать колбэк <code>:before_save</code>,
+        чтобы вызвать что-то перед тем, как объект будет сохранен.</p>
+    <p>Колбэки связи похожи на обычные колбэки, но они включаются событиями в жизненном цикле
+        коллекции. Доступны четыре колбэка связи:</p>
+    <ul>
+        <li>
+            <code>before_add</code>
+        </li>
+        <li>
+            <code>after_add</code>
+        </li>
+        <li>
+            <code>before_remove</code>
+        </li>
+        <li>
+            <code>after_remove</code>
+        </li>
+    </ul>
+    <p>Колбэки связи объявляются с помощью добавления опций в объявление связи. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, before_add: :check_credit_limit
+  def check_credit_limit(order)
+    ...
+  end
+end
+</pre>
+    </div>
+    <p>Rails передает добавляемый или удаляемый объект в колбэк.</p>
+    <p>Можете помещать колбэки в очередь на отдельное событие, передав их как массив:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders,
+    before_add: [:check_credit_limit, :calculate_shipping_charges]
+  def check_credit_limit(order)
+    ...
+  end
+  def calculate_shipping_charges(order)
+    ...
+  end
+end
+</pre>
+    </div>
+    <p>Если колбэк <code>before_add</code> вызывает исключение, объект не будет добавлен в
+        коллекцию. Подобным образом, если колбэк <code>before_remove</code> вызывает исключение,
+        объект не убирается из коллекции.</p>
+    <h4 class="inside_page_header" id="rasshireniya-svyazi"> Расширения связи</h4>
+    <p>Вы не ограничены функциональностью, которую Rails автоматически встраивает в выданные по
+        связи объекты. Можете расширять эти объекты через анонимные модули, добавления новых методов
+        поиска, создания и иных методов. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Customer &lt; ActiveRecord::Base
+  has_many :orders do
+    def find_by_order_prefix(order_number)
+      find_by(region_id: order_number[0..2])
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Если имеется расширение, которое должно быть распространено на несколько связей, можете
+        использовать именованный модуль расширения. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module FindRecentExtension
+  def find_recent
+    where("created_at &gt; ?", 5.days.ago)
+  end
+end
+class Customer &lt; ActiveRecord::Base
+  has_many :orders, -&gt; { extending FindRecentExtension }
+end
+class Supplier &lt; ActiveRecord::Base
+  has_many :deliveries, -&gt; { extending FindRecentExtension }
+end
+</pre>
+    </div>
+    <p>Расширения могут ссылаться на внутренние методы выданных по связи объектов, используя
+        следующие три атрибута акцессора <code>proxy_association</code>:</p>
+    <ul>
+        <li>
+            <code>proxy_association.owner</code> возвращает объект, в котором объявлена связь.
+        </li>
+        <li>
+            <code>proxy_association.reflection</code> возвращает объект reflection, описывающий
+            связь.
+        </li>
+        <li>
+            <code>proxy_association.target</code> возвращает связанный объект для
+            <code>belongs_to</code> или <code>has_one</code>, или коллекцию связанных объектов для
+            <code>has_many</code> или <code>has_and_belongs_to_many</code>.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="nasledovanie-s-odnoy-tablitsey-sti"> Наследование с одной
+        таблицей (STI)</h3>
+    <p>Иногда хочется совместно использовать поля и поведения различными моделями. Скажем, у нас
+        есть модели Car, Motorcycle и Bicycle. Мы хотим совместно использовать поля
+        <code>color</code> и <code>price</code> и некоторые методы всеми из них, но иметь некоторое
+        специфичное поведение для каждого, а также различные контроллеры.</p>
+    <p>Rails позволяет сделать это достаточно просто. Сначала нужно сгенерировать базовую модель
+        Vehicle:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails generate model vehicle type:string color:string price:decimal{10.2}
+</pre>
+    </div>
+    <p>Вы заметили, что мы добавили поле "type"? Так как все модели будут сохранены в одну таблицу
+        базы данных, Rails сохранит в этот столбец имя модели, которая сохраняется. В нашем примере
+        это может быть "Car", "Motorcycle" или "Bicycle." STI не работает без поля "type" в
+        таблице.</p>
+    <p>Затем мы сгенерируем три модели, унаследованные от Vehicle. Для этого можно использовать
+        опцию <code>--parent=PARENT</code>, которая сгенерирует модель, унаследованную от указанного
+        родителя и без эквивалентной миграции (так как таблица уже существует).</p>
+    <p>Например, чтобы сгенерировать модель Car:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails generate model car --parent=Vehicle
+</pre>
+    </div>
+    <p>Сгенерированная модель будет выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Car &lt; Vehicle
+end
+</pre>
+    </div>
+    <p>Это означает, что все поведение, добавленное в Vehicle, доступно также для Car, такое как
+        связи, публичные методы и так далее.</p>
+    <p>Создание автомобиля сохранит его в таблице <code>vehicles</code> с "Car" в поле
+        <code>type</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Car.create(color: 'Red', price: 10000)
+</pre>
+    </div>
+    <p>сгенерирует следующий SQL:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+INSERT INTO "vehicles" ("type", "color", "price") VALUES ('Car', 'Red', 10000)
+</pre>
+    </div>
+    <p>Запрос записей автомобилей будет просто искать среди транспортных средств, которые являются
+        автомобилями:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Car.all
+</pre>
+    </div>
+    <p>запустит подобный запрос:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT "vehicles".* FROM "vehicles" WHERE "vehicles"."type" IN ('Car')
+</pre>
+    </div>
+
+</body>
+</html>

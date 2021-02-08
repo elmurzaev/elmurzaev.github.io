@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Работа с JavaScript в Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rabota-s-javascript-v-rails"> Работа с JavaScript в
+        Rails</h2>
+    <p>Это руководство раскрывает встроенный в Rails функционал Ajax/JavaScript (и даже чуть
+        больше), который позволит вам с легкостью создать насыщенные и динамические приложения
+        Ajax!</p>
+    <p>После прочтения этого руководства вы узнаете:</p>
+    <ul>
+        <li>Об основах Ajax.
+        </li>
+        <li>О ненавязчивом JavaScript.
+        </li>
+        <li>Как помогут встроенные хелперы Rails.
+        </li>
+        <li>Как обрабатывать Ajax на стороне сервера.
+        </li>
+        <li>О геме Turbolinks.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="vvedenie-v-ajax"> Введение в Ajax</h3>
+    <p>Чтобы понять Ajax, нужно сперва понять, что обычно делает браузер.</p>
+    <p>Когда вы переходите на <code>http://localhost:3000</code> в своем браузере, браузер (ваш
+        'клиент') осуществляет запрос к серверу. Он парсит отклик, затем получает все связанные
+        файлы ресурсов, такие как файлы JavaScript, таблицы стилей и изображения. Затем он собирает
+        страницу. Если вы нажмете на ссылку, он сделает то же самое: получит страницу, получит файлы
+        ресурсов, сложит их вместе, отобразит результаты. Это называется 'цикл запроса.'</p>
+    <p>JavaScript также может осуществлять запросы к серверу и парсить отклики. У него также есть
+        возможность обновить информацию на странице. Объединив эти две силы, программист JavaScript
+        может изготовить веб-страницу, обновляющую лишь части себя, без необходимости получения
+        полных данных с сервера. Эту мощную технологию мы называем Ajax.</p>
+    <p>Rails поставляется по умолчанию с CoffeeScript, поэтому остальные примеры в этом руководстве
+        будут на CoffeeScript. Все эти уроки, применимы и к чистому JavaScript.</p>
+    <p>К примеру, вот некоторый код CoffeeScript, осуществляющий запрос Ajax с использованием
+        библиотеки jQuery:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$.ajax(url: "/test").done (html) -&gt;
+  $("#results").append html
+</pre>
+    </div>
+    <p>Этот код получает данные из "/test", а затем присоединяет результат к <code>div</code> с id
+        <code>results</code>.</p>
+    <p>Rails предоставляет небольшую встроенную поддержку для создания веб-страниц с помощью такой
+        техники. Вам редко придется писать такой код самим. Оставшаяся часть руководства покажет,
+        как Rails может помочь создавать сайты схожим образом, но в основе лежит эта довольно
+        простая техника.</p>
+    <h3 class="inside_page_header" id="nenavyazchivyy-javascript"> Ненавязчивый JavaScript</h3>
+    <p>Rails использует технику "ненавязчивый JavaScript" для управления присоединением JavaScript к
+        DOM. Обычно он рассматривается как лучшая практика во фронтенд-сообществе, но иногда
+        встречаются статьи, демонстрирующие иные способы.</p>
+    <p>Вот простейший способ написания JavaScript. Его называют 'встроенный JavaScript':</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="#" onclick="this.style.backgroundColor='#990000'"&gt;Paint it red&lt;/a&gt;
+</pre>
+    </div>
+    <p>При нажатии, задний фон ссылки станет красным. Проблема в следующем: что будет, если у нас
+        много JavaScript, который мы хотим запустить по щелчку?</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="#" onclick="this.style.backgroundColor='#009900';this.style.color='#FFFFFF';"&gt;Paint it green&lt;/a&gt;
+</pre>
+    </div>
+    <p>Некрасиво, правда? Можно вытащить определение функции из обработчика щелчка, и перевести его
+        в CoffeeScript:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+paintIt = (element, backgroundColor, textColor) -&gt;
+  element.style.backgroundColor = backgroundColor
+  if textColor?
+    element.style.color = textColor
+</pre>
+    </div>
+    <p>А затем на нашей странице:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="#" onclick="paintIt(this, '#990000')"&gt;Paint it red&lt;/a&gt;
+</pre>
+    </div>
+    <p>Немного лучше, но как насчет нескольких ссылок, для которых нужен тот же эффект?</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="#" onclick="paintIt(this, '#990000')"&gt;Paint it red&lt;/a&gt;
+&lt;a href="#" onclick="paintIt(this, '#009900', '#FFFFFF')"&gt;Paint it green&lt;/a&gt;
+&lt;a href="#" onclick="paintIt(this, '#000099', '#FFFFFF')"&gt;Paint it blue&lt;/a&gt;
+</pre>
+    </div>
+    <p>Совсем не DRY, да? Это можно исправить, используя события. Мы добавим атрибут
+        <code>data-*</code> нашим ссылкам, а затем привяжем обработчик на событие щелчка для каждой
+        ссылки, имеющей этот атрибут:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+paintIt = (element, backgroundColor, textColor) -&gt;
+  element.style.backgroundColor = backgroundColor
+  if textColor?
+    element.style.color = textColor
+$ -&gt;
+  $("a[data-background-color]").click (e) -&gt;
+    e.preventDefault()
+    backgroundColor = $(this).data("background-color")
+    textColor = $(this).data("text-color")
+    paintIt(this, backgroundColor, textColor)
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="#" data-background-color="#990000"&gt;Paint it red&lt;/a&gt;
+&lt;a href="#" data-background-color="#009900" data-text-color="#FFFFFF"&gt;Paint it green&lt;/a&gt;
+&lt;a href="#" data-background-color="#000099" data-text-color="#FFFFFF"&gt;Paint it blue&lt;/a&gt;
+</pre>
+    </div>
+    <p>Это называется 'ненавязчивым' JavaScript, так как мы больше не смешиваем JavaScript с HTML.
+        Мы должным образом разделили ответственность, сделав будущие изменения простыми. Можно с
+        легкостью добавить поведение для любой ссылки, добавив атрибут data. Можно пропустить весь
+        наш JavaScript через минимайзер. Этот JavaScript можно подключить на каждой странице, что
+        означает, что он будет загружен только при загрузке первой страницы, затем будет кэширован
+        для остальных страниц. Множество небольших преимуществ.</p>
+    <p>Команда Rails настойчиво рекомендует вам писать свой CoffeeScript (и JavaScript) в таком
+        стиле, множество библиотек также соответствуют этому паттерну.</p>
+    <h3 class="inside_page_header" id="vstroennye-helpery"> Встроенные хелперы</h3>
+    <p>Rails предоставляет ряд вспомогательных методов для вьюх, написанных на Ruby, помогающих вам
+        создавать HTML. Иногда хочется добавить немного Ajax к этим элементам, и Rails подсобит в
+        таких случаях.</p>
+    <p>Так как JavaScript ненавязчив, "Ajax-хелперы" Rails фактически состоят из двух частей: часть
+        JavaScript и часть Ruby.</p>
+    <p> представляет часть для JavaScript, а хелперы вьюх на обычном Ruby добавляют подходящие теги
+        в DOM. Затем CoffeeScript из rails.js смотрит на определенные атрибуты и добавляет
+        соответствующие обработчики.</p>
+    <h4 class="inside_page_header" id="form_for"> form_for</h4>
+    <p> - это хелпер, помогающий писать формы. <code>form_for</code> принимает опцию
+        <code>:remote</code>. Она работает следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for(@article, remote: true) do |f| %&gt;
+  ...
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Это создаст следующий HTML:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/articles" class="new_article" data-remote="true" id="new_article" method="post"&gt;
+  ...
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Обратите внимание на <code>data-remote="true"</code>. Теперь форма будет подтверждена с
+        помощью Ajax вместо обычного браузерного механизма подтверждения.</p>
+    <p>Впрочем, вы не хотите просто сидеть с заполненной формой. Возможно, вы хотите что-то сделать
+        при успешном подтверждении. Для этого привяжите что-нибудь к событию
+        <code>ajax:success</code>. При неудаче используйте <code>ajax:error</code>. Посмотрите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$(document).ready -&gt;
+  $("#new_article").on("ajax:success", (e, data, status, xhr) -&gt;
+    $("#new_article").append xhr.responseText
+   ).on "ajax:error", (e, xhr, status, error) -&gt;
+    $("#new_article").append "&lt;p&gt;ERROR&lt;/p&gt;"
+</pre>
+    </div>
+    <p>Очевидно, что хочется чего-то большего, но ведь это только начало. О событиях можно узнать
+        подробнее .</p>
+    <h4 class="inside_page_header" id="form_tag"> form_tag</h4>
+    <p> очень похож на <code>form_for</code>. У него есть опция <code>:remote</code>, которую
+        используют так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag('/articles', remote: true) do %&gt;
+  ...
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Это создаст следующий HTML:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/articles" data-remote="true" method="post"&gt;
+  ...
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Все остальное такое же, как и для <code>form_for</code>.</p>
+    <h4 class="inside_page_header" id="link_to"> link_to</h4>
+    <p> - это хелпер, помогающий создавать ссылки. У него есть опция <code>:remote</code>, которую
+        используют следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to "an article", @article, remote: true %&gt;
+</pre>
+    </div>
+    <p>что создаст</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="/articles/1" data-remote="true"&gt;an article&lt;/a&gt;
+</pre>
+    </div>
+    <p>Можно привязаться к тем же событиям Ajax, что и в <code>form_for</code>. Вот пример.
+        Предположим, имеется список публикаций, которые можно удалить одним щелчком. Нужно создать
+        некоторый HTML, например так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to "Delete article", @article, remote: true, method: :delete %&gt;
+</pre>
+    </div>
+    <p>и написать некоторый CoffeeScript:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ -&gt;
+  $("a[data-remote]").on "ajax:success", (e, data, status, xhr) -&gt;
+    alert "The article was deleted."
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="button_to"> button_to</h4>
+    <p> - это хелпер, помогающий создавать кнопки. У него есть опция <code>:remote</code>, которая
+        вызывается так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= button_to "An article", @article, remote: true %&gt;
+</pre>
+    </div>
+    <p>это создаст</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form action="/articles/1" class="button_to" data-remote="true" method="post"&gt;
+  &lt;input type="submit" value="An article" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Поскольку это всего лишь <code>&lt;form&gt;</code>, применима вся информация, что и для
+        <code>form_for</code>.</p>
+    <h3 class="inside_page_header" id="so-storony-servera"> Со стороны сервера</h3>
+    <p>Ajax - это не только сторона клиента, необходимо также поработать на стороне сервера, чтобы
+        добавить его поддержку. Часто людям нравится, когда на их запросы Ajax возвращается JSON, а
+        не HTML. Давайте обсудим, что необходимо для этого сделать.</p>
+    <h4 class="inside_page_header" id="prostoy-primer"> Простой пример</h4>
+    <p>Представьте, что у вас есть ряд пользователей, которых нужно отобразить, и предоставить форму
+        на той же странице для создания нового пользователя. Экшн index вашего контроллера выглядит
+        так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UsersController &lt; ApplicationController
+  def index
+    @users = User.all
+    @user = User.new
+  end
+  # ...
+</pre>
+    </div>
+    <p>Вьюха для index (<code>app/views/users/index.html.erb</code>) содержит:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;b&gt;Users&lt;/b&gt;
+&lt;ul id="users"&gt;
+&lt;%= render @users %&gt;
+&lt;/ul&gt;
+&lt;br&gt;
+&lt;%= form_for(@user, remote: true) do |f| %&gt;
+  &lt;%= f.label :name %&gt;&lt;br&gt;
+  &lt;%= f.text_field :name %&gt;
+  &lt;%= f.submit %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Партиал <code>app/views/users/_user.html.erb</code> содержит следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;li&gt;&lt;%= user.name %&gt;&lt;/li&gt;
+</pre>
+    </div>
+    <p>Верхняя часть индексной страницы отображает пользователей. Нижняя часть представляет форму
+        для создания нового пользователя.</p>
+    <p>Нижняя форма вызовет экшн <code>create</code> в <code>UsersController</code>. Так как у формы
+        опция remote установлена true, запрос будет передан через post к
+        <code>UsersController</code> как запрос Ajax, ожидая JavaScript. Чтобы обслужить этот
+        запрос, экшн <code>create</code> вашего контроллера должен выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  # app/controllers/users_controller.rb
+  # ......
+  def create
+    @user = User.new(params[:user])
+    respond_to do |format|
+      if @user.save
+        format.html { redirect_to @user, notice: 'User was successfully created.' }
+        format.js   {}
+        format.json { render json: @user, status: :created, location: @user }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+</pre>
+    </div>
+    <p>Обратите внимание на format.js в блоке <code>respond_to</code>; это позволяет контроллеру
+        откликаться на ваши запросы Ajax. Далее необходим соответствующий файл вьюхи <code>app/views/users/create.js.erb</code>,
+        создающий фактический код JavaScript, который будет отослан и исполнен на стороне клиента.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+$("&lt;%= escape_javascript(render @user) %&gt;").appendTo("#users");
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="turbolinks"> Turbolinks</h3>
+    <p>Rails 4 поставляется с . Этот гем использует Ajax для ускорения рендеринга страницы в
+        большинстве приложений.</p>
+    <h4 class="inside_page_header" id="kak-rabotaet-turbolinks"> Как работает Turbolinks</h4>
+    <p>Turbolinks добавляет обработчик щелчков на всех <code>&lt;a&gt;</code> на странице. Если ваш
+        браузер поддерживает ,
+        Turbolinks сделает запрос Ajax для страницы, распарсит отклик и заменит полностью <code>&lt;body&gt;</code>
+        страницы на <code>&lt;body&gt;</code> отклика. Затем он использует PushState для изменения
+        URL на правильный, сохраняя семантику для обновления и предоставляя красивые URL.</p>
+    <p>Единственное, что необходимо сделать для включения Turbolinks - это добавить его в свой
+        Gemfile, и поместить <code>//= require turbolinks</code> в свой манифест CoffeeScript,
+        обычно это <code>app/assets/javascripts/application.js</code>.</p>
+    <p>Если хотите отключить Turbolinks для определенных ссылок, добавьте атрибут <code>data-no-turbolink</code>
+        к тегу:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href="..." data-no-turbolink&gt;No turbolinks here&lt;/a&gt;.
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sobytiya-izmeneniya-stranitsy"> События изменения
+        страницы</h4>
+    <p>При написании CoffeeScript, часто необходимо что-то сделать при загрузке страницы. С помощью
+        jQuery вы писали что-то вроде этого:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$(document).ready -&gt;
+  alert "page has loaded!"
+</pre>
+    </div>
+    <p>Однако, поскольку Turbolinks переопределяет обычный процесс загрузки страницы, событие, на
+        которое полагается вышеуказанный код, не произойдет. Если у вас есть подобный код, следует
+        его изменить на следующий:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$(document).on "page:change", -&gt;
+  alert "page has loaded!"
+</pre>
+    </div>
+    <p>Подробности, включая другие возможные события, можно посмотреть .</p>
+    <h3 class="inside_page_header" id="drugie-resursy"> Другие ресурсы</h3>
+    <p>Вот несколько полезных ссылок, которые позволят вам узнать больше:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

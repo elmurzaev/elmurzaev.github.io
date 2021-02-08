@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Случайные величины</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2>
+</h2>
+<div class="text">Мы уже видели, что для многих экспериментов нет никаких
+    различий в подсчёте вероятностей событий, тогда как элементарные
+    исходы в этих экспериментах очень различаются. Но нас и должны интересовать
+    именно вероятности событий, а не структура пространства элементарных исходов.
+    Поэтому пора во всех таких &#171;похожих&#187; экспериментах
+    вместо самых разных элементарных исходов использовать, например, числа.
+    Иначе говоря, каждому поставить в соответствие
+    некоторое вещественное число, и работать только с числами.
+    <p>Пусть задано
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img322.gif" width="67">.
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 26. </b>
+    Функция <img align="absmiddle" height="19"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img561.gif" width="77">
+    называется <i class="incide">случайной величиной</i>,
+    если для любого <img align="absmiddle" height="20"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img562.gif" width="79">
+    множество <img align="absmiddle" height="23"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img563.gif" width="56">
+    является , т.е. принадлежит <img align="absmiddle" height="16"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                     width="12"> <img align="bottom" height="15"
+                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                      width="14">.
+</div>
+<div class="text">
+    Множество <img align="absmiddle" height="23"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img564.gif" width="192">,
+    состоящее из тех элементарных исходов
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif"
+         width="13">, для которых <img align="absmiddle" height="20"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img565.gif"
+                                       width="34"> принадлежит <img align="bottom" height="14"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                    width="17">, называется <i
+        class="incide">полным
+    прообразом</i> множества <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                  width="17">.
+</div>
+<div class="remark">
+    <b>Замечание 9. </b>
+    Вообще, пусть функция <img align="absmiddle" height="19"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif"
+                               width="13"> действует из множества <img align="bottom" height="14"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img150.gif"
+                                                                       width="18"> в множество <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img151.gif"
+        width="16">,  и заданы
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебры <img align="bottom" height="15"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                  width="14"> и <img align="absmiddle" height="18"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img567.gif"
+                                                     width="13"> подмножеств <img align="bottom"
+                                                                                  height="14"
+                                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img150.gif"
+                                                                                  width="18"> и <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img151.gif"
+        width="16"> соответственно. Функция <img align="absmiddle" height="19"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img566.gif"
+                                                 width="13"> называется <i
+        class="incide">измеримой</i>,  если для любого множества
+    <img align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img568.gif"
+         width="48"> его полный прообраз <img align="absmiddle" height="23"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img569.gif"
+                                              width="59"> принадлежит <img align="bottom"
+                                                                           height="15"
+                                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                                           width="14">.
+</div>
+<div class="remark">
+    <b>Замечание 10. </b>
+    Читатель, забивать себе голову абстракциями, связанными
+    с <img align="absmiddle" height="16"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебрами
+    событий и с измеримостью, может смело считать,
+    что , и, следовательно,
+    случайная величина есть <i class="incide">произвольная</i> функция из
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+         width="15"> в <img align="bottom" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif" width="15">.
+    Неприятностей на практике это не влечёт, так что
+    всё дальнейшее в этом параграфе можно пропустить.
+</div>
+<div class="text">Теперь, избавившись от нелюбопытных читателей, попробуем понять, зачем случайной
+    величине нужна измеримость.
+    <p>Если задана случайная величина <img align="absmiddle" height="19"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                           width="10">, нам может потребоваться вычислить
+        вероятности вида <img align="absmiddle" height="20"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img570.gif"
+                              width="210">,
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img571.gif" width="105">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img572.gif" width="80">,
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img573.gif" width="67"> (и вообще
+        самые разные
+        вероятности попадания в борелевские множества на прямой).
+        Это возможно лишь если множества, стоящие под знаком вероятности,
+        являются событиями &#151; ведь
+        есть функция, определённая только на <img align="absmiddle" height="16"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                  width="12">-алгебре событий.
+        Требование измеримости равносильно тому, что для любого борелевского множества
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+             width="17"> определена вероятность <img align="absmiddle" height="20"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img574.gif"
+                                                     width="70">.
+    </p>
+    <p>Можно потребовать в определении чего-нибудь другого.
+        Например, чтобы событием было попадание в любой интервал:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img575.gif" width="172">,
+        или в любой полуинтервал: <img align="absmiddle" height="20"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img576.gif"
+                                       width="146">.
+    </p>
+    <p>Убедимся, например, что эквивалентны определения и :
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 27. </b>
+    Функция <img align="absmiddle" height="19"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img561.gif" width="77"> называется
+    случайной величиной,
+    если для любых вещественных <img align="absmiddle" height="15"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img245.gif"
+                                     width="42"> множество <img align="absmiddle" height="20"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img577.gif"
+                                                                width="139">
+    принадлежит <img align="absmiddle" height="16"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебре
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14">.
+</div>
+<div class="proof">
+    <b>Доказательство </b>
+    эквивалентности определений , .
+    <p>Если <img align="absmiddle" height="19"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> &#151;
+        случайная величина в смысле , то
+        она будет случайной величиной и в смысле ,
+        поскольку любой интервал <img align="absmiddle" height="20"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img244.gif"
+                                      width="40"> является борелевским множеством.
+    </p>
+    <p>Докажем, что верно и обратное.
+        Пусть для любого интервала <img align="absmiddle" height="20"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img244.gif"
+                                        width="40"> выполнено <img align="absmiddle" height="23"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img578.gif"
+                                                                   width="113">.
+        Мы должны доказать, что то же самое верно и для любых борелевских множеств.
+    </p>
+    <p>Соберём в множестве <img align="absmiddle" height="23"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img579.gif"
+                                width="210">
+        все подмножества вещественной прямой, прообразы которых являются
+        событиями. Множество <img align="bottom" height="15"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                  width="16"> уже содержит все интервалы <img align="absmiddle"
+                                                                              height="20"
+                                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img244.gif"
+                                                                              width="40">.
+        Покажем теперь, что множество <img align="absmiddle" height="15"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                           width="16"> является <img align="absmiddle" height="16"
+                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                     width="12">-алгеброй.
+        По определению, <img align="bottom" height="16"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img193.gif"
+                             width="51"> тогда и только тогда, когда множество
+        <img align="absmiddle" height="23"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img564.gif" width="192"> принадлежит
+        <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+             width="14">.
+    </p>
+    <p> <b>1. </b> Убедимся, что <img align="bottom" height="16"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img580.gif"
+                                      width="50">.
+        Но <img align="absmiddle" height="23"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img581.gif" width="123"> и,
+        следовательно, <img align="bottom" height="16"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img580.gif" width="50">.
+    </p>
+    <p> <b>2. </b> Убедимся, что <img align="bottom" height="19"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img201.gif"
+                                      width="51"> для любого <img align="bottom" height="16"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img193.gif"
+                                                                  width="51">. Пусть <img
+            align="absmiddle" height="23"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img582.gif" width="89">. Тогда
+        <img align="absmiddle" height="23"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img583.gif" width="330">, так как <img
+                align="bottom" height="15"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> &#151; <img
+                align="absmiddle" height="16"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра.
+    </p>
+    <p> <b>3. </b> Убедимся, что <img align="absmiddle" height="18"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img584.gif"
+                                      width="138"> для любых
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img585.gif" width="114">.
+        Пусть <img align="absmiddle" height="23"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img586.gif" width="93"> для всех
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img326.gif" width="40">. Но <img
+                align="bottom" height="15"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> &#151; <img
+                align="absmiddle" height="16"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра,
+        поэтому
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img587.gif" width="404">
+    </p>
+    <p>Мы доказали, что <img align="absmiddle" height="15"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                             width="16"> &#151; <img align="absmiddle" height="16"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                     width="12">-алгебра и содержит все интервалы
+        на прямой. Но <img align="absmiddle" height="20"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44">
+        &#151; из <img align="absmiddle" height="16"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебр,
+        содержащих все интервалы на прямой. Следовательно,
+        <img align="absmiddle" height="15"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16"> содержит <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44">: <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img588.gif" width="81">.</p>
+    <p class="qed">QED</p>
+</div>
+<div class="text">Приведём примеры измеримых и неизмеримых функций.</div>
+<div class="example">
+    <b>Пример 25. </b>
+    Подбрасываем кубик. Пусть <img align="absmiddle" height="20"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img64.gif"
+                                   width="147">, и две функции
+    из <img align="absmiddle" height="14"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">
+    в <img align="absmiddle" height="14"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif" width="15">
+    заданы так: <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img589.gif" width="68">, <img
+        align="absmiddle" height="23" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img590.gif"
+        width="78">.
+    Пока не задана <img align="absmiddle" height="16"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14">, нельзя говорить об измеримости. Функция, измеримая относительно какой-то
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебры <img align="bottom" height="15"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                  width="14">,
+    может не быть таковой для другой <img align="bottom" height="15"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                          width="14">.
+    <p>
+        1. Если <img align="bottom" height="15"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> есть
+        множество <i class="incide">всех</i> подмножеств
+        <img align="absmiddle" height="14"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">, то <img
+            align="absmiddle" height="19"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> и <img
+            align="absmiddle" height="18"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12"> являются
+        случайными величинами,
+        поскольку <i class="incide">любое</i> множество элементарных исходов принадлежит <img
+            align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+            width="14">,
+        в том числе и <img align="absmiddle" height="20"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img591.gif" width="115">
+        или
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img592.gif" width="117">.
+        Можно записать соответствие между значениями случайных величин
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10"> и <img
+            align="absmiddle" height="18"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12"> и вероятностями
+        принимать эти значения в виде
+        <i class="incide">&#171;таблицы распределения вероятностей&#187;</i> или, коротко, &#171;таблицы
+        распределения&#187;:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="61"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img593.gif" width="463">
+    </p>
+    <p>Здесь <img align="absmiddle" height="25"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img594.gif" width="463">.
+    </p>
+    <p>
+        2. Пусть <img align="absmiddle" height="16"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+        событий <img align="bottom" height="15"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14">
+        состоит из четырёх множеств:
+    </p>
+    <p class="CENTER">
+        <img align="absmiddle" height="24"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img599.gif" width="225">,</p>
+    <p>т.е. событием является, кроме достоверного и невозможного событий,
+        выпадение чётного или нечётного числа очков.
+        Убедимся, что при такой сравнительно бедной <img align="absmiddle" height="16"
+                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                         width="12">-алгебре ни <img
+                align="absmiddle" height="19"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif" width="10">, ни <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif" width="12">
+        не являются случайными величинами, поскольку они неизмеримы. Возьмём, скажем, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img596.gif" width="66">.
+        Видим, что <img align="absmiddle" height="20"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img597.gif" width="194"> и
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img598.gif" width="196">.
+    </p>
+</div>
+<div class="exer">
+    <b>Упражнение 25. </b>
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>Какие функции измеримы относительно
+            <img align="absmiddle" height="24"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img599.gif" width="225">?
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>Доказать, что <img align="absmiddle" height="19"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                               width="10"> и <img align="absmiddle" height="18"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif"
+                                                  width="12"> не являются случайными величинами,
+            если
+            <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img600.gif" width="89">.
+        </dd>
+        <dt>в)
+        </dt>
+        <dd>Доказать, что относительно тривиальной
+            <img align="absmiddle" height="16"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебры
+            измеримы только функции вида <img align="absmiddle" height="20"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img601.gif"
+                                              width="65"> (постоянные).
+        </dd>
+    </dl>
+</div>
+<div class="example">
+    <b>Пример 26. </b>
+    Пусть <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img602.gif" width="82">, <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img603.gif"
+        width="142"> &#151; сигма-алгебра борелевских подмножеств отрезка
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img173.gif"
+         width="46">,
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img604.gif"
+         width="82"> &#151; мера Лебега на <img align="bottom" height="15"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                width="14"> и <img align="absmiddle" height="14"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                   width="15"> &#151; неизмеримое
+    множество Витали, построенное нами
+    в . Функция
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img605.gif" width="263">
+    </p>
+    <p>не является случайной величиной, поскольку, например, прообраз единицы
+        <img align="absmiddle" height="23"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img606.gif" width="237"> не
+        принадлежит <img align="bottom" height="15"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14">.
+        И вероятность для <img align="absmiddle" height="19"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                               width="10"> попасть в единицу <img align="absmiddle" height="20"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img607.gif"
+                                                                  width="125"> просто не существует.
+    </p>
+</div>
+<div class="text"> Познакомимся с важным понятием &#151; &#171;распределение&#187; случайной
+    величины
+    и опишем различные типы распределений случайных величин.
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p>
+</p>
+</body>
+
+</body>
+</html>

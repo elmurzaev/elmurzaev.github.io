@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>2.3. Ранг матрицы</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Рассмотрим прямоугольную матрицу
+        mхn. Выделим в этой матрице какие-нибудь <span lang="EN-US">k</span> строк и <span
+                lang="EN-US">k</span>
+        столбцов, 1 <span lang="EN-US"><span>&#163;</span></span><span lang="EN-US"> </span><span
+                lang="EN-US">k</span><span lang="EN-US"> </span><span
+                lang="EN-US"><span>&#163;</span></span><span lang="EN-US"> </span><span
+                lang="EN-US">min</span>
+        (<span lang="EN-US">m</span>, <span lang="EN-US">n</span>)<span>.</span> Из элементов,
+        стоящих на пересечении
+        выделенных строк и столбцов, составим определитель <span lang="EN-US">k</span>-го порядка.
+        Все такие определители называются
+        минорами матрицы. Например, для матрицы <span><sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1174"
+                     type="#_x0000_t75" style='width:71.25pt;height:27pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image279.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="36"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image280.gif"
+                                       v:shapes="_x0000_i1174" width="95"></sub><!--[if gte mso 9]>
+            <xml>
+                <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1174"
+                             DrawAspect="Content" ObjectID="_1072191281">
+                </o:OLEObject>
+            </xml><![endif]--></span>можно составить миноры второго порядка <span><sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1175" type="#_x0000_t75" style='width:87.75pt;height:30.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image281.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="41"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image282.gif"
+                                       v:shapes="_x0000_i1175" width="117"></sub><!--[if gte mso 9]>
+            <xml>
+                <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1175"
+                             DrawAspect="Content" ObjectID="_1072191282">
+                </o:OLEObject>
+            </xml><![endif]--></span>и миноры первого порядка 1, 0, -1, 2, 4, 3.</p>
+    <p class="MsoNormal"><b>Определение.</b> Рангом матрицы называется наивысший порядок отличного
+        от нуля минора этой матрицы. Обозначают ранг матрицы <span lang="EN-US">r </span>(<span
+                lang="EN-US">A</span>).</p>
+    <p class="MsoNormal">В приведенном примере ранг
+        матрицы равен двум, так как, например, минор <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1176" type="#_x0000_t75" style='width:34.5pt;height:25.5pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image283.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="34"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image284.gif"
+                                       v:shapes="_x0000_i1176" width="46"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1176"
+                         DrawAspect="Content" ObjectID="_1072191283">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Ранг матрицы удобно вычислять
+        методом элементарных преобразований. К элементарным преобразованиям относят
+        следующие:</p>
+    <p class="MsoNormal"><span>1)<span>     </span></span>перестановки
+        строк (столбцов);</p>
+    <p class="MsoNormal"><span>2)<span>     </span></span>умножение
+        строки (столбца) на число, отличное от нуля;</p>
+    <p class="MsoNormal"><span>3)<span>     </span></span>прибавление
+        к элементам строки (столбца) соответствующих элементов другой строки (столбца),
+        предварительно умноженных на некоторое число.</p>
+    <p class="MsoNormal">Эти преобразования не меняют ранга матрицы, так как
+        известно, что 1) при перестановке строк определитель меняет знак и, если он не
+        был равен нулю, то уже и не станет; 2) при умножении строки определителя на
+        число, не равное нулю, определитель умножается на это число; 3) третье элементарное
+        преобразование вообще не изменяет определитель. Таким образом, производя над
+        матрицей элементарные преобразования, можно получить матрицу, для которой легко
+        вычислить ранг ее и, следовательно, исходной матрицы.</p>
+    <p class="MsoNormal"><b>Пример 14.</b> Найти ранг матрицы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1177" type="#_x0000_t75" style='width:75pt;height:43.5pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image285.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="58"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image286.gif"
+                                   v:shapes="_x0000_i1177" width="100"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1177"
+                         DrawAspect="Content" ObjectID="_1072191284">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b> Поменяем местами строки матрицы, поставив последнюю строку
+        на место первой:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1178" type="#_x0000_t75" style='width:145.5pt;height:47.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image287.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image288.gif"
+                                   v:shapes="_x0000_i1178" width="194"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1178"
+                         DrawAspect="Content" ObjectID="_1072191285">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Умножим первую строку на –3 и
+        прибавим ко второй. При этом на месте элемента 3 получим 0. Затем умножим
+        первую строку на –2 и прибавим к третьей:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1179" type="#_x0000_t75" style='width:180pt;height:48pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image289.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="64"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image290.gif"
+                                   v:shapes="_x0000_i1179" width="240"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1179"
+                         DrawAspect="Content" ObjectID="_1072191286">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Умножим вторую строку
+        получившейся матрицы на –1 и прибавим к последней, тогда</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1180" type="#_x0000_t75" style='width:153.75pt;height:48.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image291.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="65"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image292.gif"
+                                   v:shapes="_x0000_i1180" width="205"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1180"
+                         DrawAspect="Content" ObjectID="_1072191287">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Умножим теперь вторую строку на
+        –5 и прибавим к последней:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1181" type="#_x0000_t75" style='width:9pt;height:17.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image293.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="23"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image031.gif"
+                                   v:shapes="_x0000_i1181" width="12"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1181"
+                         DrawAspect="Content" ObjectID="_1072191288">
+            </o:OLEObject>
+        </xml><![endif]--><sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1182" type="#_x0000_t75"
+                     style='width:99.75pt;height:48.75pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image294.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="65"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image295.gif"
+                                       v:shapes="_x0000_i1182" width="133"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1182"
+                         DrawAspect="Content" ObjectID="_1072191289">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Преобразования матрицы можно
+        прекратить, так как, очевидно, минор <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1183"
+                     type="#_x0000_t75" style='width:47.25pt;height:46.5pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image296.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="62"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image297.gif"
+                                       v:shapes="_x0000_i1183" width="63"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1183"
+                         DrawAspect="Content" ObjectID="_1072191290">
+            </o:OLEObject>
+        </xml><![endif]-->, являющийся определителем треугольного вида, равен
+        произведению элементов главной диагонали, то есть отличен от нуля. Следовательно,
+        <span lang="EN-US">r</span> (<span lang="EN-US">A</span>)=3.</p>
+    <p class="MsoNormal"><b>Пример 15.</b> Вычислить ранг матрицы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1184" type="#_x0000_t75" style='width:9pt;height:17.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image293.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="23"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image031.gif"
+                                   v:shapes="_x0000_i1184" width="12"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1184"
+                         DrawAspect="Content" ObjectID="_1072191291">
+            </o:OLEObject>
+        </xml><![endif]--><span><sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1185" type="#_x0000_t75" style='width:69pt;height:57pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image298.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="76"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image299.gif"
+                                       v:shapes="_x0000_i1185" width="92"></sub><!--[if gte mso 9]>
+            <xml>
+                <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1185"
+                             DrawAspect="Content" ObjectID="_1072191292">
+                </o:OLEObject>
+            </xml><![endif]--></span></p>
+    <p class="MsoNormal"><b>Решение.</b> Производя последовательно элементарные преобразования,
+        будем иметь</p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1186"
+                 type="#_x0000_t75" style='width:199.5pt;height:60.75pt' o:ole=""
+                 fillcolor="window">
+            <v:imagedata src="obj.files/image300.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="81"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image301.gif"
+                                   v:shapes="_x0000_i1186" width="266"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1186"
+                         DrawAspect="Content" ObjectID="_1072191293">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal">Очевидно минор <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1187" type="#_x0000_t75" style='width:37.5pt;height:28.5pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image302.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="38"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image303.gif"
+                                   v:shapes="_x0000_i1187" width="50"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1187"
+                         DrawAspect="Content" ObjectID="_1072191294">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и ранг матрицы равен
+        двум. </p>
+    <p class="MsoNormal"><b>Замечание.</b> Ранг матрицы равен числу ненулевых строк матрицы,
+        полученной после элементарных преобразований исходной матрицы, приводящих ее к
+        такому виду, когда ниже элементов <i>а</i><sub>11</sub>,
+        <i>а</i><sub>22</sub>, <i>а</i><sub>33</sub>, <sup>…</sup>, <i>а</i><sub><span lang="EN-US">nn</span></sub>
+        стоят нули.</p>
+</td>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ads>
+	<enabled>false</enabled>
+	<start-time>3</start-time>
+	<delay>10800000</delay>
+	<message><![CDATA[Чтобы продолжить, пройдите проверку на предмет блокировки рекламы. <br><br>Нажмите на тестовую рекламу снизу:]]></message>
+</ads>
+ 

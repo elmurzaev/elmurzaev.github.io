@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Rails on Rack</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rails-on-rack"> Rails on Rack</h2>
+    <p>Это руководство раскрывает интеграцию Rails и Rack и взаимодействие с другими компонентами
+        Rack.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как использовать промежуточные программы Rack в своих приложениях Rails
+        </li>
+        <li>О стеке внутренних промежуточных программ Action Pack
+        </li>
+        <li>Как определять собственный стек промежуточных программ
+        </li>
+    </ul>
+    <div class="warning"><p>Это руководство предполагает практические знания протокола Rack и такие
+        концепции Rack, как промежуточные программы (middlewares), карты (maps) url и <code>Rack::Builder</code>.
+    </p></div>
+    <h3 class="inside_page_header" id="vvedenie-v-rack"> Введение в Rack</h3>
+    <p>Rack представляет собой минимальный, модульный и адаптивный интерфейс для разработки
+        веб-приложений на Ruby. Оборачивая запросы и отклики HTTP как можно более простым образом,
+        он объединил и очистил API для веб-серверов, веб-фреймворков и промежуточных программ (так
+        называемых middleware) до единственного метода call.</p>
+    <ul>
+        <li>
+        </li>
+    </ul>
+    <p>Объяснение, что такое Rack, на самом деле не является темой этого руководства. Если вы не
+        знакомы с основами Rack, обратитесь к разделу .</p>
+    <h3 class="inside_page_header" id="rails-on-rack"> Rails on Rack</h3>
+    <h4 class="inside_page_header" id="ob-ekt-rack-prilozheniya-rails"> Объект Rack приложения
+        Rails</h4>
+    <p><code>Rails.application</code> это основной объект приложения Rack в приложении Rails. Любой
+        совместимый с Rack веб-сервер должен использовать объект <code>Rails.application</code> для
+        обслуживания приложения Rails. <code>Rails.application</code> ссылается на тот же объект
+        приложения.</p>
+    <h4 class="inside_page_header" id="rails-server"><code>rails server</code>
+    </h4>
+    <p><code>rails server</code> выполняет основную работу по созданию объекта
+        <code>Rack::Server</code> и запуску веб-сервера.</p>
+    <p>Вот как <code>rails server</code> создает экземпляр <code>Rack::Server</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails::Server.new.tap do |server|
+  require APP_PATH
+  Dir.chdir(Rails.application.root)
+  server.start
+end
+</pre>
+    </div>
+    <p><code>Rails::Server</code> унаследован от <code>Rack::Server</code> и вызывает метод <code>Rack::Server#start</code>
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Server &lt; ::Rack::Server
+  def start
+    ...
+    super
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rackup"><code>rackup</code>
+    </h4>
+    <p>Для использования <code>rackup</code> вместо рельсового <code>rails server</code>, следует
+        поместить следующее в <code>config.ru</code> в корневой директории приложения Rails:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Rails.root/config.ru
+require ::File.expand_path('../config/environment', __FILE__)
+run Rails.application
+</pre>
+    </div>
+    <p>И запустить сервер:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rackup config.ru
+</pre>
+    </div>
+    <p>Узнать подробности различных опций <code>rackup</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rackup --help
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="razrabotka-i-avto-peregruzka"> Разработка и
+        авто-перегрузка</h4>
+    <p>Промежуточные программы загружаются один раз и не отслеживаются на предмет изменений.
+        Необходимо перезагрузить сервер, чтобы отразить изменения в запущенном приложении.</p>
+    <h3 class="inside_page_header" id="stek-promezhutochnyh-programm-action-dispatcher"> Стек
+        промежуточных программ Action Dispatcher</h3>
+    <p>Многие внутренние компоненты Action Dispatcher реализованы как промежуточные программы Rack.
+        <code>Rails::Application</code> использует <code>ActionDispatch::MiddlewareStack</code> для
+        объединения различных внутренних и внешних промежуточных программ для формирования
+        полноценного приложения Rails Rack.</p>
+    <div class="note"><p><code>ActionDispatch::MiddlewareStack</code> это эквивалент <code>Rack::Builder</code>
+        в Rails, сделанный с большей гибкостью и приспособленностью к требованиям Rails.</p></div>
+    <h4 class="inside_page_header" id="prosmotr-steka-promezhutochnyh-programm"> Просмотр стека
+        промежуточных программ</h4>
+    <p>В Rails имеется удобный таск rake для просмотра используемого стека промежуточных
+        программ:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake middleware
+</pre>
+    </div>
+    <p>Для нового приложения Rails он может выдать что-то наподобие:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+use Rack::Sendfile
+use ActionDispatch::Static
+use Rack::Lock
+use #&lt;ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x000000029a0838&gt;
+use Rack::Runtime
+use Rack::MethodOverride
+use ActionDispatch::RequestId
+use Rails::Rack::Logger
+use ActionDispatch::ShowExceptions
+use ActionDispatch::DebugExceptions
+use ActionDispatch::RemoteIp
+use ActionDispatch::Reloader
+use ActionDispatch::Callbacks
+use ActiveRecord::Migration::CheckPending
+use ActiveRecord::ConnectionAdapters::ConnectionManagement
+use ActiveRecord::QueryCache
+use ActionDispatch::Cookies
+use ActionDispatch::Session::CookieStore
+use ActionDispatch::Flash
+use ActionDispatch::ParamsParser
+use Rack::Head
+use Rack::ConditionalGet
+use Rack::ETag
+run Rails.application.routes
+</pre>
+    </div>
+    <p>Промежуточные программы по умолчанию, показанные здесь (и некоторые другие) описываются в
+        разделе ниже.</p>
+    <h4 class="inside_page_header" id="nastroyka-steka-promezhutochnyh-programm"> Настройка стека
+        промежуточных программ</h4>
+    <p>Rails предоставляет простой конфигурационных интерфейс <code>config.middleware</code> для
+        добавления, удаления и изменения промежуточных программ в стеке промежуточных программ, из
+        <code>application.rb</code> или конфигурационного файла определенной среды <code>environments/&amp;lt;environment&amp;gt;.rb</code>.
+    </p>
+    <h5 class="inside_page_header" id="dobavlenie-promezhutochnoy-programmy"> Добавление
+        промежуточной программы</h5>
+    <p>Добавить новую промежуточную программу в стек промежуточных программ можно с использованием
+        следующих методов:</p>
+    <ul>
+        <li><p><code>config.middleware.use(new_middleware, args)</code> - Добавляет новую
+            промежуточную программу в конец стека.</p></li>
+        <li><p><code>config.middleware.insert_before(existing_middleware, new_middleware,
+            args)</code> - Добавляет промежуточную программу до определенной существующей
+            промежуточной программы в стеке.</p></li>
+        <li><p><code>config.middleware.insert_after(existing_middleware, new_middleware,
+            args)</code> - Добавляет промежуточную программу после определенной существующей
+            промежуточной программы в стеке.</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+# Добавить Rack::BounceFavicon в конец
+config.middleware.use Rack::BounceFavicon
+# Добавить Lifo::Cache после ActiveRecord::QueryCache.
+# Передать аргумент { page_cache: false } в Lifo::Cache.
+config.middleware.insert_after ActiveRecord::QueryCache, Lifo::Cache, page_cache: false
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="peremena-mestami-promezhutochnyh-programm"> Перемена местами
+        промежуточных программ</h5>
+    <p>Поменять местами существующие промежуточные программы в стеке можно с использованием <code>config.middleware.swap</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+# Поменять местами ActionDispatch::ShowExceptions с Lifo::ShowExceptions
+config.middleware.swap ActionDispatch::ShowExceptions, Lifo::ShowExceptions
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="udalenie-promezhutochnyh-programm"> Удаление промежуточных
+        программ</h5>
+    <p>Добавьте следующие строчки в конфигурацию вашего приложения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+config.middleware.delete "Rack::Lock"
+</pre>
+    </div>
+    <p>Теперь, при просмотре стека промежуточных программ, вы увидите, что <code>Rack::Lock</code>
+        больше не является его частью.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake middleware
+(in /Users/lifo/Rails/blog)
+use ActionDispatch::Static
+use #&lt;ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x00000001c304c8&gt;
+use Rack::Runtime
+...
+run Rails.application.routes
+</pre>
+    </div>
+    <p>Если хотите убрать промежуточные программы, относящиеся к сессии, сделайте следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+config.middleware.delete "ActionDispatch::Cookies"
+config.middleware.delete "ActionDispatch::Session::CookieStore"
+config.middleware.delete "ActionDispatch::Flash"
+</pre>
+    </div>
+    <p>Чтобы убрать промежуточные программы, относящиеся к браузеру,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+config.middleware.delete "Rack::MethodOverride"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="internal-middleware-stack"> Стек внутренних промежуточных
+        программ</h4>
+    <p>Значительная часть функционала Action Controller реализована как промежуточные программы.
+        Следующий перечень объясняет назначение каждой из них:</p>
+    <p><strong><code>Rack::Sendfile</code></strong></p>
+    <ul>
+        <li>Устанавливает заголовки X-Sendfile, специфичные для сервера. Настраивается с помощью
+            опции <code>config.action_dispatch.x_sendfile_header</code>.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Static</code></strong></p>
+    <ul>
+        <li>Используется для раздачи статичных файлов. Отключена, если <code>config.serve_static_assets</code>
+            является true.
+        </li>
+    </ul>
+    <p><strong><code>Rack::Lock</code></strong></p>
+    <ul>
+        <li>Устанавливает флажок <code>env["rack.multithread"]</code> в <code>false</code> и
+            оборачивает приложение в Mutex.
+        </li>
+    </ul>
+    <p><strong><code>ActiveSupport::Cache::Strategy::LocalCache::Middleware</code></strong></p>
+    <ul>
+        <li>Используется для кэширования в памяти. Этот кэш не является тредобезопасным(thread
+            safe).
+        </li>
+    </ul>
+    <p><strong><code>Rack::Runtime</code></strong></p>
+    <ul>
+        <li>Устанавливает заголовок X-Runtime, содержащий время (в секундах), затраченное на
+            выполнение запроса.
+        </li>
+    </ul>
+    <p><strong><code>Rack::MethodOverride</code></strong></p>
+    <ul>
+        <li>Переопределяет метод, если установлен <code>params[:_method]</code>. Эта промежуточная
+            программа поддерживает типы HTTP методов PUT и DELETE.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::RequestId</code></strong></p>
+    <ul>
+        <li>Создает для отклика уникальный заголовок <code>X-Request-Id</code> и включает метод
+            <code>ActionDispatch::Request#request_id</code>.
+        </li>
+    </ul>
+    <p><strong><code>Rails::Rack::Logger</code></strong></p>
+    <ul>
+        <li>Уведомляет логи, что начался запрос. После выполнения запроса, глушит все логи.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::ShowExceptions</code></strong></p>
+    <ul>
+        <li>Ловит все исключения, возвращаемые приложением и вызывает приложение для показа
+            исключений, которое форматирует его для конечного пользователя.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::DebugExceptions</code></strong></p>
+    <ul>
+        <li>Ответственна за логирование исключений и показа отладочной страницы, если запрос
+            локальный.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::RemoteIp</code></strong></p>
+    <ul>
+        <li>Проверяет на атаки с ложных IP.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Reloader</code></strong></p>
+    <ul>
+        <li>Предоставляет колбэки prepare и cleanup, предназначенные для перезагрузки кода во время
+            разработки.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Callbacks</code></strong></p>
+    <ul>
+        <li>Предоставляет колбэки для запуска до и после обработки запроса.
+        </li>
+    </ul>
+    <p><strong><code>ActiveRecord::Migration::CheckPending</code></strong></p>
+    <ul>
+        <li>Проверяет отложенные миграции и вызывает
+            <code>ActiveRecord::PendingMigrationError</code>, если какие-то миграции отложены.
+        </li>
+    </ul>
+    <p><strong><code>ActiveRecord::ConnectionAdapters::ConnectionManagement</code></strong></p>
+    <ul>
+        <li>Очищает активные соединения после каждого запроса, если ключ <code>rack.test</code> в
+            среде запроса не установлен в <code>true</code>.
+        </li>
+    </ul>
+    <p><strong><code>ActiveRecord::QueryCache</code></strong></p>
+    <ul>
+        <li>Включает кэширование запросов Active Record.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Cookies</code></strong></p>
+    <ul>
+        <li>Устанавливает для запроса куки.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Session::CookieStore</code></strong></p>
+    <ul>
+        <li>Ответственна за хранение сессии в куки.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::Flash</code></strong></p>
+    <ul>
+        <li>Настраивает ключи flash. Доступна только если <code>config.action_controller.session_store</code>
+            присвоено значение.
+        </li>
+    </ul>
+    <p><strong><code>ActionDispatch::ParamsParser</code></strong></p>
+    <ul>
+        <li>Парсит параметры запроса в <code>params</code>.
+        </li>
+    </ul>
+    <p><strong><code>Rack::Head</code></strong></p>
+    <ul>
+        <li>Преобразует запросы HEAD в запросы <code>GET</code> и обслуживает их соответствующим
+            образом.
+        </li>
+    </ul>
+    <p><strong><code>Rack::ConditionalGet</code></strong></p>
+    <ul>
+        <li>Добавляет поддержку для "Conditional <code>GET</code>", чтобы сервер ничего не отвечал,
+            если страница не изменилась.
+        </li>
+    </ul>
+    <p><strong><code>Rack::ETag</code></strong></p>
+    <ul>
+        <li>Добавляет заголовок ETag во все строковые header on all String bodies. ETags are used to
+            validate cache.
+        </li>
+    </ul>
+    <div class="info"><p>Можете использовать любые из этих промежуточных программ в своем стеке
+        Rack.</p></div>
+    <h3 class="inside_page_header" id="resources"> Источники</h3>
+    <h4 class="inside_page_header" id="obuchenie-rack"> Обучение Rack</h4>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ponimanie-promezhutochnyh-programm"> Понимание промежуточных
+        программ</h4>
+    <ul>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

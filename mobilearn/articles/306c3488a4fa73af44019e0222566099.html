@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Основы Active Model</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="osnovy-active-model"> Основы Active Model</h2>
+    <p>Это руководство познакомит вас со всем необходимым для начала использования моделей классов.
+        Active Model позволяет Actions Pack хелперам работать с объектами на чистом Ruby.
+        Дополнительно, Active Model может помочь с созданием гибкой, настраиваемой ORM для
+        использования вне фреймворка Rails.</p>
+    <p>После прочтение данного руководства, вы сможете добавить к объектам на чистом Ruby:</p>
+    <ul>
+        <li>Возможность вести себя как модель Active Record.
+        </li>
+        <li>Колбэки и валидации, как в Active Record.
+        </li>
+        <li>Сериализаторы.
+        </li>
+        <li>Интеграцию с фреймворком интернационализации Rails (i18n).
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="vvedenie"> Введение</h3>
+    <p>Библиотека Active Model содержит различные модули, используемые для разработки классов,
+        которым необходимы некоторые особенности, присутствующие в Active Record. Некоторые из этих
+        модулей описаны ниже.</p>
+    <h4 class="inside_page_header" id="metody-atributov"> Методы атрибутов</h4>
+    <p>Модуль <code>ActiveModel::AttributeMethods</code> позволяет добавлять различные суффиксы и
+        префиксы к методам класса. Для использования необходимо определить суффиксы, префиксы, а
+        также к каким методам объекта они будут применяться.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::AttributeMethods
+  attribute_method_prefix 'reset_'
+  attribute_method_suffix '_highest?'
+  define_attribute_methods 'age'
+  attr_accessor :age
+  private
+    def reset_attribute(attribute)
+      send("#{attribute}=", 0)
+    end
+    def attribute_highest?(attribute)
+      send(attribute) &gt; 100
+    end
+end
+person = Person.new
+person.age = 110
+person.age_highest?  # =&gt; true
+person.reset_age     # =&gt; 0
+person.age_highest?  # =&gt; false
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kolbeki"> Колбэки</h4>
+    <p>Модуль <code>ActiveModel::Callbacks</code> дает Active Record возможность использования
+        функций обратного вызова (колбэков). Это позволяет определять колбэки, вызываемые в
+        определенное время. После определения колбэков вы можете обернуть их дополнительным
+        функционалом before, after и around которые позволяют определить момент вызова колбэка до,
+        после, и до и после вызова нужного метода.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  extend ActiveModel::Callbacks
+  define_model_callbacks :update
+  before_update :reset_me
+  def update
+    run_callbacks(:update) do
+      # Этот метод вызывается при вызове у обьекта метода update.
+    end
+  end
+  def reset_me
+    # Этот метод вызывается при вызове у обьекта метода update, выполнение метода reset_me произойдет до вызова update, т.к он определен как колбэк before_update
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="preobrazovaniya"> Преобразования</h4>
+    <p>Если у класса определены методы <code>persisted?</code> и <code>id</code>, то вы можете
+        добавить модуль <code>ActiveModel::Conversion</code> в этот класс и использовать методы
+        преобразования Rails.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Conversion
+  def persisted?
+    false
+  end
+  def id
+    nil
+  end
+end
+person = Person.new
+person.to_model == person  # =&gt; true
+person.to_key              # =&gt; nil
+person.to_param            # =&gt; nil
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dirty"> Dirty</h4>
+    <p>Объект становится грязным после одного или нескольких изменений его атрибутов, и при этом он
+        не сохранен. <code>ActiveModel::Dirty</code> дает возможность проверить объект, был ли он
+        изменен или нет. Дополнительно представлены методы доступа атрибутов. Представим, что
+        имеется класс <code>Person</code> с атрибутами <code>first_name</code> и
+        <code>last_name</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Dirty
+  define_attribute_methods :first_name, :last_name
+  def first_name
+    @first_name
+  end
+  def first_name=(value)
+    first_name_will_change!
+    @first_name = value
+  end
+  def last_name
+    @last_name
+  end
+  def last_name=(value)
+    last_name_will_change!
+    @last_name = value
+  end
+  def save
+    # do save work...
+    changes_applied
+  end
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="zaprashivaem-u-ob-ekta-spisok-vseh-izmenennyh-atributov">
+        Запрашиваем у объекта список всех измененных атрибутов.</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+person = Person.new
+person.changed? # =&gt; false
+person.first_name = "First Name"
+person.first_name # =&gt; "First Name"
+# возвращает true, если был изменен хоть один атрибут
+person.changed? # =&gt; true
+# возвращает список измененных атрибутов
+person.changed # =&gt; ["first_name"]
+# возвращает "хэш" измененных атрибутов с их первоначальными значениями
+person.changed_attributes # =&gt; {"first_name"=&gt;nil}
+# возвращает "хэш" изменений, с именами атрибутов и их значений, массив значений содержит старое и новое значение атрибута.
+person.changes # =&gt; {"first_name"=&gt;[nil, "First Name"]}
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="metody-dostupa-osnovannye-na-atributah"> Методы доступа,
+        основанные на атрибутах</h5>
+    <p>Отслеживает, был ли атрибут изменен или нет.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# attr_name_changed?
+person.first_name # =&gt; "First Name"
+person.first_name_changed? # =&gt; true
+</pre>
+    </div>
+    <p>Отслеживает, какое было предыдущее значение атрибута.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# метод доступа attr_name_was
+person.first_name_was # =&gt; nil
+</pre>
+    </div>
+    <p>Отслеживает старое и новое значение измененного атрибута. Возвращает массив, если изменяли,
+        иначе nil.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# attr_name_change
+person.first_name_change # =&gt; [nil, "First Name"]
+person.last_name_change # =&gt; nil
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="validatsii"> Валидации</h4>
+    <p>Модуль <code>ActiveModel::Validations</code> добавляет возможность проверять объекты класса,
+        как в Active Record.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Validations
+  attr_accessor :name, :email, :token
+  validates :name, presence: true
+  validates_format_of :email, with: /\A([^\s]+)((?:[-a-z0-9]\.)[a-z]{2,})\z/i
+  validates! :token, presence: true
+end
+person = Person.new
+person.token = "2b1f325"
+person.valid?                        # =&gt; false
+person.name = 'vishnu'
+person.email = 'me'
+person.valid?                        # =&gt; false
+person.email = 'me@vishnuatrai.com'
+person.valid?                        # =&gt; true
+person.token = nil
+person.valid?                        # =&gt; raises ActiveModel::StrictValidationFailed
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="imenovanie"> Именование</h4>
+    <p><code>ActiveModel::Naming</code> добавляет ряд методов класса, упрощающие управление
+        именованием и роутингом. Модуль определяет метод класса <code>model_name</code>, который
+        определит несколько акцессоров с помощью методов <code>ActiveSupport::Inflector</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  extend ActiveModel::Naming
+end
+Person.model_name.name                # =&gt; "Person"
+Person.model_name.singular            # =&gt; "person"
+Person.model_name.plural              # =&gt; "people"
+Person.model_name.element             # =&gt; "person"
+Person.model_name.human               # =&gt; "Person"
+Person.model_name.collection          # =&gt; "people"
+Person.model_name.param_key           # =&gt; "person"
+Person.model_name.i18n_key            # =&gt; :person
+Person.model_name.route_key           # =&gt; "people"
+Person.model_name.singular_route_key  # =&gt; "person"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="model"> Модель</h4>
+    <p><code>ActiveModel::Model</code> добавляет классу возможность работать из коробки с Action
+        Pack и Action View.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class EmailContact
+  include ActiveModel::Model
+  attr_accessor :name, :email, :message
+  validates :name, :email, :message, presence: true
+  def deliver
+    if valid?
+      # deliver email
+    end
+  end
+end
+</pre>
+    </div>
+    <p>При включении <code>ActiveModel::Model</code> вы получите несколько возможностей, таких как:
+    </p>
+    <ul>
+        <li>интроспекция имени модели
+        </li>
+        <li>преобразования
+        </li>
+        <li>переводы
+        </li>
+        <li>валидации
+        </li>
+    </ul>
+    <p>Он также дает возможность инициализировать объект с помощью хэша атрибутов, подобно любому
+        объекту Active Record.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+email_contact = EmailContact.new(name: 'David',
+                                 email: 'david@example.com',
+                                 message: 'Hello World')
+email_contact.name       # =&gt; 'David'
+email_contact.email      # =&gt; 'david@example.com'
+email_contact.valid?     # =&gt; true
+email_contact.persisted? # =&gt; false
+</pre>
+    </div>
+    <p>Любой класс, включающий <code>ActiveModel::Model</code>, может быть использован в <code>form_for</code>,
+        <code>render</code> и любом другом методе хелпера Action View, точно так же, как и объекты
+        Active Record.</p>
+    <h4 class="inside_page_header" id="serializatsiya"> Сериализация</h4>
+    <p><code>ActiveModel::Serialization</code> представляет простую сериализацию для вашего объекта.
+        Вам необходимо объявить хэш атрибутов, содержащий атрибуты, которые вы хотите сериализовать.
+        Атрибуты должны быть строками, не символами.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Serialization
+  attr_accessor :name
+  def attributes
+    {'name' =&gt; nil}
+  end
+end
+</pre>
+    </div>
+    <p>Теперь будет доступен сериализованный хэш вашего объекта с помощью
+        <code>serializable_hash</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+person = Person.new
+person.serializable_hash   # =&gt; {"name"=&gt;nil}
+person.name = "Bob"
+person.serializable_hash   # =&gt; {"name"=&gt;"Bob"}
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="activemodel-serializers"> ActiveModel::Serializers</h5>
+    <p>Rails предоставляет два сериализатора: <code>ActiveModel::Serializers::JSON</code> и <code>ActiveModel::Serializers::Xml</code>.
+        Оба из этих модуля автоматически подключают <code>ActiveModel::Serialization</code>.</p>
+    <h6 class="inside_page_header" id="activemodel-serializers-json">
+        ActiveModel::Serializers::JSON</h6>
+    <p>Для использования <code>ActiveModel::Serializers::JSON</code> необходимо только изменить
+        <code>ActiveModel::Serialization</code> на <code>ActiveModel::Serializers::JSON</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Serializers::JSON
+  attr_accessor :name
+  def attributes
+    {'name' =&gt; nil}
+  end
+end
+</pre>
+    </div>
+    <p>С помощью <code>as_json</code> можно получить хэш, представляющий модель.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+person = Person.new
+person.as_json # =&gt; {"name"=&gt;nil}
+person.name = "Bob"
+person.as_json # =&gt; {"name"=&gt;"Bob"}
+</pre>
+    </div>
+    <p>Из строки JSON определяются атрибуты модели. В классе должен быть определен метод <code>attributes=</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Serializers::JSON
+  attr_accessor :name
+  def attributes=(hash)
+    hash.each do |key, value|
+      send("#{key}=", value)
+    end
+  end
+  def attributes
+    {'name' =&gt; nil}
+  end
+end
+</pre>
+    </div>
+    <p>Теперь возможно создавать экземпляры person и устанавливать атрибуты с помощью <code>from_json</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+json = { name: 'Bob' }.to_json
+person = Person.new
+person.from_json(json) # =&gt; #&lt;Person:0x00000100c773f0 @name="Bob"&gt;
+person.name            # =&gt; "Bob"
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="activemodel-serializers-xml">
+        ActiveModel::Serializers::Xml</h6>
+    <p>Для использования <code>ActiveModel::Serializers::Xml</code> необходимо только изменить
+        <code>ActiveModel::Serialization</code> на <code>ActiveModel::Serializers::Xml</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Serializers::Xml
+  attr_accessor :name
+  def attributes
+    {'name' =&gt; nil}
+  end
+end
+</pre>
+    </div>
+    <p>С помощью <code>to_xml</code> можно получить XML, представляющий модель.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+person = Person.new
+person.to_xml # =&gt; "&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;\n&lt;person&gt;\n  &lt;name nil=\"true\"/&gt;\n&lt;/person&gt;\n"
+person.name = "Bob"
+person.to_xml # =&gt; "&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;\n&lt;person&gt;\n  &lt;name&gt;Bob&lt;/name&gt;\n&lt;/person&gt;\n"
+</pre>
+    </div>
+    <p>Из строки XML определяются атрибуты модели. В классе должен быть определен метод <code>attributes=</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Serializers::Xml
+  attr_accessor :name
+  def attributes=(hash)
+    hash.each do |key, value|
+      send("#{key}=", value)
+    end
+  end
+  def attributes
+    {'name' =&gt; nil}
+  end
+end
+</pre>
+    </div>
+    <p>Теперь возможно создавать экземпляры person и устанавливать атрибуты с помощью
+        <code>from_xml</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+xml = { name: 'Bob' }.to_xml
+person = Person.new
+person.from_xml(xml) # =&gt; #&lt;Person:0x00000100c773f0 @name="Bob"&gt;
+person.name          # =&gt; "Bob"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="perevod"> Перевод</h4>
+    <p><code>ActiveModel::Translation</code> представляет интеграцию между вашим объектом и
+        фреймворком интернационализации Rails (i18n).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  extend ActiveModel::Translation
+end
+</pre>
+    </div>
+    <p>С помощью <code>human_attribute_name</code> можно преобразовывать имена атрибутов в более
+        человечный формат. Человечный формат определяется в вашем файле локали.</p>
+    <ul>
+        <li>config/locales/app.pt-BR.yml
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  pt-BR:
+    activemodel:
+      attributes:
+        person:
+          name: 'Nome'
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Person.human_attribute_name('name') # =&gt; "Nome"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="testy-sovmestimosti"> Тесты совместимости</h4>
+    <p><code>ActiveModel::Lint::Tests</code> позволяет проверить, соответствует ли объект Active
+        Model API.</p>
+    <ul>
+        <li>
+            <p>app/models/person.rb</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Model
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>test/models/person_test.rb</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class PersonTest &lt; ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+  def setup
+    @model = Person.new
+  end
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake test
+Run options: --seed 14596
+# Running:
+......
+Finished in 0.024899s, 240.9735 runs/s, 1204.8677 assertions/s.
+6 runs, 30 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Объекту не нужно реализовывать все API, чтобы работать с Action Pack. Этот модуль всего лишь
+        предназначен для предоставления руководства в случае, если вы хотите все особенности из
+        коробки.</p>
+    <h4 class="inside_page_header" id="securepassword"> SecurePassword</h4>
+    <p><code>ActiveModel::SecurePassword</code> представляет способ безопасно хранить любой пароль в
+        зашифрованной форме. При включении этого модуля предоставляется метод класса <code>has_secure_password</code>,
+        определяющий акцессор с именем <code>password</code> с определенными валидациями на нем.</p>
+    <h5 class="inside_page_header" id="trebovaniya"> Требования</h5>
+    <p><code>ActiveModel::SecurePassword</code> зависит от , поэтому включите этот гем в свой
+        Gemfile для корректного использования <code>ActiveModel::SecurePassword</code>. Чтобы он
+        работал, в модели должен быть акцессор с именем <code>password_digest</code>. <code>has_secure_password</code>
+        добавит следующие валидации на акцессор <code>password</code>:</p>
+    <ul>
+        <li>Пароль должен существовать.
+        </li>
+        <li>Пароль должен совпадать с подтверждением.
+        </li>
+        <li>Максимальная длина пароля 72 (требуется <code>bcrypt</code>, от которого зависит
+            ActiveModel::SecurePassword)
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="primery"> Примеры</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::SecurePassword
+  has_secure_password
+  attr_accessor :password_digest
+end
+person = Person.new
+# Когда пароль пустой.
+person.valid? # =&gt; false
+# Когда подтверждение не совпадает с паролем.
+person.password = 'aditya'
+person.password_confirmation = 'nomatch'
+person.valid? # =&gt; false
+# Когда длина пароля превышает 72.
+person.password = person.password_confirmation = 'a' * 100
+person.valid? # =&gt; false
+# Когда проходят все валидации.
+person.password = person.password_confirmation = 'aditya'
+person.valid? # =&gt; true
+</pre>
+    </div>
+
+</body>
+</html>

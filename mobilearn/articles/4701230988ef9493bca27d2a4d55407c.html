@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расчет балок переменного сечения</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 30.</strong> Расчет балок переменного сечения.</p>
+    <p><strong>Подбор сечений балок равного сопротивления.</strong></p>
+    <p align="justify">   Все предыдущие расчеты относились к балкам постоянного сечения. На
+        практике мы имеем часто дело с балками, поперечные размеры которых меняются по длине либо
+        постепенно, либо резко.</p>
+    <p>Ниже рассмотрено несколько примеров подбора сечения и определения деформаций балок
+        переменного профиля.</p>
+    <p align="justify">   Так как изгибающие моменты обычно меняются по длине балки то, подбирая ее
+        сечение по наибольшему изгибающему моменту, мы получаем излишний запас материала во всех
+        сечениях балки, кроме того, которому соответствует <img
+                src="http://www.toehelp.ru/theory/sopromat/image001-29.gif">. Для экономии
+        материала, а также для увеличения в нужных случаях гибкости балок применяют <i>балки равного
+            сопротивления</i>. Под этим названием подразумевают балки, у которых во всех сечениях
+        <i>наибольшее</i> нормальное напряжение одинаково и должно быть равно <i>допускаемому</i>.
+    </p>
+    <p>Условие, определяющее форму такой балки, имеет вид</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image002-29.gif"></p>
+    <p>и</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image003-28.gif"></p>
+    <p align="justify">   Здесь <i>М(х)</i> и <i>W(x)</i> &#151; изгибающий момент и момент
+        сопротивления в любом сечении балки; <i>W(х)</i> для каждого сечения балки должен меняться
+        пропорционально изгибающему моменту.</p>
+    <p align="justify">   Эти условия справедливы и для сечения с наибольшим изгибающим моментом;
+        если обозначить <img src="http://www.toehelp.ru/theory/sopromat/image004-28.gif"> &#151;
+        момент сопротивления балки в сечении с наибольшим изгибающим моментом <img
+                src="http://www.toehelp.ru/theory/sopromat/image005-28.gif">, то можно написать:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image006-28.gif"></p></td>
+            <td><p>(1)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Покажем ход вычислений на примере. Рассмотрим балку пролетом <i>l</i>,
+        защемленную концом <i>А</i> и нагруженную на другом конце силой <i>Р</i> (Рис.1). Выберем
+        сечение этой балки в виде прямоугольника; задачу о надлежащем изменении момента
+        сопротивления можно решать, меняя высоту или ширину балки или тот и другой размер вместе.
+    </p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image007-28.gif"><br><br>
+        <b>Рис.1.</b> Расчетная схема балки равного сопротивления
+    </center>
+    <p> </p>
+    <p align="justify">   Пусть высота балки будет постоянной <img
+            src="http://www.toehelp.ru/theory/sopromat/image008-28.gif">, а ширина
+        переменной&#151;<img src="http://www.toehelp.ru/theory/sopromat/image009-28.gif">. Момент
+        сопротивления в сечении на расстоянии <i>х</i> от свободного конца будет <img
+                src="http://www.toehelp.ru/theory/sopromat/image010-28.gif">, а изгибающий момент
+        <img src="http://www.toehelp.ru/theory/sopromat/image011-28.gif">; момент сопротивления
+        опорного сечения <img src="http://www.toehelp.ru/theory/sopromat/image012-28.gif">, a
+        наибольший изгибающий момент в опорном сечении <img
+                src="http://www.toehelp.ru/theory/sopromat/image013-28.gif">. В расчете имеют
+        значения лишь абсолютные величины <i>М(х)</i> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image014-27.gif"></p>
+    <p>По формуле (1) получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image015-27.gif"></p>
+    <p>откуда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image016-26.gif"></p>
+    <p>т. е. ширина меняется по линейному закону в зависимости от <i>х.</i> При <img
+            src="http://www.toehelp.ru/theory/sopromat/image017-26.gif">ширина равна <img
+            src="http://www.toehelp.ru/theory/sopromat/image018-24.gif">.</p>
+    <p align="justify">   Вид балки в фасаде и плане показан на Рис.1. Такое очертание балки
+        получается, если учитывать ее прочность только по отношению к нормальным напряжениям; ширина
+        <img src="http://www.toehelp.ru/theory/sopromat/image019-24.gif"> в сечении <i>В</i>
+        обращается в нуль.</p>
+    <p align="justify">   Однако необходимо обеспечить прочность и по отношению к касательным
+        напряжениям. Наименьшая ширина балки, требуемая этим условием, определится из уравнения</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image020-24.gif"></p>
+    <p>или, так как <img src="http://www.toehelp.ru/theory/sopromat/image021-24.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image022-24.gif"></p>
+    <p align="justify">   Таким образом, исправленное очертание балки предопределяет минимальный
+        размер ширины и утолщение свободного края консоли.</p>
+    <p> </p>
+    <p><strong>Определение деформаций балок переменного сечения.</strong></p>
+    <p align="justify">   При определении прогибов и углов поворота для балок с переменным сечением
+        надлежит иметь в виду, что жесткость такой балки является функцией от <i>х</i>. Поэтому
+        дифференциальное уравнение изогнутой оси принимает вид</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image023-24.gif"></p>
+    <p>где <i>J(x)</i> &#151; переменный момент инерции сечений балки.</p>
+    <p align="justify">   До интегрирования этого уравнения можно выразить <i>J(x)</i> надлежащей
+        подстановкой через <i>J</i>, т. е. через момент инерции того; сечения, где действует <img
+                src="http://www.toehelp.ru/theory/sopromat/image024-24.gif">; после этого вычисления
+        производятся так же, как и.для балок постоянного сечения.</p>
+    <p align="justify">   Покажем это на примере, разобранном выше. Определим прогиб балки равного
+        сопротивления, защемленной одним концом, нагруженной на другом конце силой <i>Р</i> и
+        имеющей постоянную высоту. Начало координат выберем на свободном конце балки.</p>
+    <p>Тогда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image025-24.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image026-23.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image027-23.gif"></p>
+    <p>Дифференциальное уравнение принимает вид:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image028-23.gif"></p>
+    <p>Интегрируем два раза:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image029-21.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image030-20.gif"></p>
+    <p>Для определения постоянных интегрирования имеем условия: точке <i>А</i> при <img
+            src="http://www.toehelp.ru/theory/sopromat/image031-20.gif"> прогиб <img
+            src="http://www.toehelp.ru/theory/sopromat/image032-19.gif"> и угол поворота <img
+            src="http://www.toehelp.ru/theory/sopromat/image033-19.gif"> или</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image034-19.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image035-19.gif"></p>
+    <p>отсюда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image036-18.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image037-18.gif"></p>
+    <p>Выражения для <i>у</i> и <img src="http://www.toehelp.ru/theory/sopromat/image038-16.gif">
+        принимают вид;</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image039-15.gif"></p>
+    <p>Наибольший прогиб на свободном конце балки <i>В</i> получится при <img
+            src="http://www.toehelp.ru/theory/sopromat/image040-15.gif">: он равен</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image041-15.gif"></p>
+    <p>Если бы мы всю балку сделали постоянного сечения с моментом инерции <i>J</i>, то наибольший
+        прогиб был бы</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image042-15.gif"></p>
+    <p>т. е. в 1<img src="http://www.toehelp.ru/theory/sopromat/image043-15.gif"> раза меньше.</p>
+    <p align="justify">   Таким образом, балки переменного сечения обладают большей гибкостью по
+        сравнению с балками постоянной жесткости при одинаковой с ними прочности. Именно поэтому, а
+        не только ради экономии материала, они и применяются в таких конструкциях, как рессоры.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

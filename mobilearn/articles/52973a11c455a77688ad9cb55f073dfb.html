@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>2.2. Обратная матрица</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Будем называть <i>определителем
+        квадратной матрицы</i></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1151" type="#_x0000_t75"
+                 style='width:110.25pt;height:63pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image233.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image234.gif"
+                                   v:shapes="_x0000_i1151" width="147"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1151"
+                         DrawAspect="Content" ObjectID="_1072191257">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>определитель,
+        составленный из элементов этой матрицы:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1152" type="#_x0000_t75"
+                 style='width:132.75pt;height:63pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image235.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image236.gif"
+                                   v:shapes="_x0000_i1152" width="177"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1152"
+                         DrawAspect="Content" ObjectID="_1072191258">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Определение.</b>
+        Квадратная матрица называется невырожденной (неособенной), если её определитель
+        отличен от нуля, и вырожденной (особенной), если определитель её равен нулю.</p>
+    <p class="MsoNormal">Без доказательства примем, что</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1153" type="#_x0000_t75"
+                 style='width:99.75pt;height:15pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image237.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image238.gif"
+                                   v:shapes="_x0000_i1153" width="133"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1153"
+                         DrawAspect="Content" ObjectID="_1072191259">
+            </o:OLEObject>
+        </xml><![endif]-->, то есть определитель произведения квадратных матриц равен
+        произведению определителей этих матриц.</p>
+    <p class="MsoNormal"><b>Теорема.</b> Если А – невырожденная матрица, то существует и притом
+        единственная матрица А<sup>-1</sup> такая, что</p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1154"
+                 type="#_x0000_t75" style='width:80.25pt;height:15pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image239.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image240.gif"
+                                   v:shapes="_x0000_i1154" width="107"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1154"
+                         DrawAspect="Content" ObjectID="_1072191260">
+            </o:OLEObject>
+        </xml><![endif]-->.</span></p>
+    <p class="MsoNormal">Пусть дана невырожденная матрица</p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1155"
+                 type="#_x0000_t75" style='width:72.75pt;height:42pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image241.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="56"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image242.gif"
+                                   v:shapes="_x0000_i1155" width="97"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1155"
+                         DrawAspect="Content" ObjectID="_1072191261">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span></span>с определителем
+        <span><sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1156" type="#_x0000_t75" style='width:67.5pt;height:42pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image243.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="56"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image244.gif"
+                                       v:shapes="_x0000_i1156" width="90"></sub><!--[if gte mso 9]>
+            <xml>
+                <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1156"
+                             DrawAspect="Content" ObjectID="_1072191262">
+                </o:OLEObject>
+            </xml><![endif]--></span><sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1157"
+                     type="#_x0000_t75" style='width:18pt;height:12.75pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image245.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="17"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image246.gif"
+                                       v:shapes="_x0000_i1157" width="24"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1157"
+                         DrawAspect="Content" ObjectID="_1072191263">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Рассмотрим матрицу </p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1158" type="#_x0000_t75" style='width:80.25pt;height:42.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image247.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="57"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image248.gif"
+                                   v:shapes="_x0000_i1158" width="107"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1158"
+                         DrawAspect="Content" ObjectID="_1072191264">
+            </o:OLEObject>
+        </xml><![endif]--></span>,</p>
+    <p class="MsoNormal">составленную из алгебраических дополнений к элементам
+        матрицы А и называемую присоединенной к матрице А. Отметим, что алгебраические
+        дополнения к элементам квадратной матрицы находят так же, как к элементам ее
+        определителя. В присоединенной матрице алгебраические дополнения элементов
+        строки стоят в столбце с таким же номером.</p>
+    <p class="MsoNormal">Найдем произведение АА*.</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1159" type="#_x0000_t75" style='width:171.75pt;height:43.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image249.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="58"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image250.gif"
+                                   v:shapes="_x0000_i1159" width="229"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1159"
+                         DrawAspect="Content" ObjectID="_1072191265">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1160" type="#_x0000_t75" style='width:249pt;height:42pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image251.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="56"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image252.gif"
+                                   v:shapes="_x0000_i1160" width="332"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1160"
+                         DrawAspect="Content" ObjectID="_1072191266">
+            </o:OLEObject>
+        </xml><![endif]--></span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1161"
+                 type="#_x0000_t75" style='width:54pt;height:44.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image253.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="59"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image254.gif"
+                                   v:shapes="_x0000_i1161" width="72"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1161"
+                         DrawAspect="Content" ObjectID="_1072191267">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoBodyText">так как согласно теореме разложения сумма парных
+        произведений элементов строки на соответствующие им алгебраические дополнения
+        равна определителю, а сумма парных произведений элементов строки на
+        алгебраические дополнения элементов другой строки равна нулю.</p>
+    <p class="MsoNormal">Рассуждая таким же образом, можно
+        показать, что и </p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1162" type="#_x0000_t75" style='width:82.5pt;height:46.5pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image255.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="62"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image256.gif"
+                                   v:shapes="_x0000_i1162" width="110"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1162"
+                         DrawAspect="Content" ObjectID="_1072191268">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Определитель матрицы АА* и А*А равен &#916;&#916;* с одной
+        стороны, а с другой стороны он равен</p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1163" type="#_x0000_t75" style='width:61.5pt;height:45.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image257.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="61"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image258.gif"
+                                   v:shapes="_x0000_i1163" width="82"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1163"
+                         DrawAspect="Content" ObjectID="_1072191269">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal">Тогда имеем &#916;&#916;*=&#916;<sup>3</sup>.
+        Откуда ввиду &#916;&#8800;0 получим &#916;*= &#916;<sup>2</sup>.</p>
+    <p class="MsoNormal">Если теперь все элементы присоединенной
+        матрицы разделить на &#916;, то есть рассмотреть матрицу </p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1164"
+                 type="#_x0000_t75" style='width:103.5pt;height:74.25pt' o:ole=""
+                 fillcolor="window">
+            <v:imagedata src="obj.files/image259.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="99"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image260.gif"
+                                   v:shapes="_x0000_i1164" width="138"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1164"
+                         DrawAspect="Content" ObjectID="_1072191270">
+            </o:OLEObject>
+        </xml><![endif]--></span><span> </span>то очевидно</p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1165" type="#_x0000_t75" style='width:244.5pt;height:75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image261.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="100"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image262.gif"
+                                   v:shapes="_x0000_i1165" width="326"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1165"
+                         DrawAspect="Content" ObjectID="_1072191271">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal">а, значит, <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1166"
+                 type="#_x0000_t75" style='width:102.75pt;height:36pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image263.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="48"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image264.gif"
+                                   v:shapes="_x0000_i1166" width="137"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1166"
+                         DrawAspect="Content" ObjectID="_1072191272">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и соответственно</p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1167" type="#_x0000_t75" style='width:78pt;height:45.75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image265.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="61"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image266.gif"
+                                   v:shapes="_x0000_i1167" width="104"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1167"
+                         DrawAspect="Content" ObjectID="_1072191273">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal">Таким образом, <span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1168" type="#_x0000_t75" style='width:46.5pt;height:33pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image267.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="44"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image268.gif"
+                                   v:shapes="_x0000_i1168" width="62"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1168"
+                         DrawAspect="Content" ObjectID="_1072191274">
+            </o:OLEObject>
+        </xml><![endif]--></span><span> </span>по определению:</p>
+    <p align="right" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1169" type="#_x0000_t75" style='width:187.5pt;height:79.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image269.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="106"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image270.gif"
+                                   v:shapes="_x0000_i1169" width="250"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1169"
+                         DrawAspect="Content" ObjectID="_1072191276">
+            </o:OLEObject>
+        </xml><![endif]--></span>.<span>                    </span>(1.9)</p>
+    <p class="MsoNormal"><b>Пример 13.</b> Найти матрицу, обратную для матрицы </p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1170" type="#_x0000_t75" style='width:69.75pt;height:43.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image271.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="58"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image272.gif"
+                                   v:shapes="_x0000_i1170" width="93"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1170"
+                         DrawAspect="Content" ObjectID="_1072191277">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal"><b>Решение</b>. Вычислим определитель матрицы</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1171" type="#_x0000_t75" style='width:149.25pt;height:46.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image273.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="62"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image274.gif"
+                                   v:shapes="_x0000_i1171" width="199"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1171"
+                         DrawAspect="Content" ObjectID="_1072191278">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Далее найдем алгебраические дополнения элементов матрицы А:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1172" type="#_x0000_t75"
+                 style='width:239.25pt;height:80.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image275.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="107"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image276.gif"
+                                   v:shapes="_x0000_i1172" width="319"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1172"
+                         DrawAspect="Content" ObjectID="_1072191279">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">По формуле (1.9) имеем</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1173" type="#_x0000_t75" style='width:148.5pt;height:59.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image277.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="79"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image278.gif"
+                                   v:shapes="_x0000_i1173" width="198"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1173"
+                         DrawAspect="Content" ObjectID="_1072191280">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">В заключение перечислим свойства
+        операций над матрицами:</p>
+    <p class="MsoNormal"><span>1)<span>       </span></span>А+В
+        = В+А;</p>
+    <p class="MsoNormal"><span>2)<span>       </span></span>А+(В+С)
+        = (А+В)+С;</p>
+    <p class="MsoNormal"><span>3)<span>       </span></span>(&#945;+&#946;)А
+        = &#945;А+&#946;А, где &#945; и &#946; – числа;<br>
+        &#945;(А+В) = &#945;А+ &#945;В; (&#945;&#946;)А = &#945;(&#946;А);</p>
+    <p class="MsoNormal"><span>4)<span>       </span></span>А(ВС)
+        = (АВ)С; А(В+С) = АВ+АС;</p>
+    <p class="MsoNormal"><span>5)<span>       </span></span>А+0
+        = А;</p>
+    <p class="MsoNormal"><span>6)<span>       </span></span>АЕ
+        = ЕА = А.</p>
+</td>
+
+</body>
+</html>

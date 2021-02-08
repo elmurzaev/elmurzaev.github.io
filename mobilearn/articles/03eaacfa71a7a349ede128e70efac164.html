@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Отладка приложений на Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="otladka-prilozheniy-na-rails"> Отладка приложений на
+        Rails</h2>
+    <p>Это руководство представляет технику отладки приложений на Ruby on Rails.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Цель отладки
+        </li>
+        <li>Как отслеживать проблемы и вопросы в вашем приложении, которые не определили ваши тесты
+        </li>
+        <li>Различные способы отладки
+        </li>
+        <li>Как анализировать трассировку
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="helpery-vyuhi-dlya-otladki"> Хелперы вьюхи для отладки</h3>
+    <p>Одной из обычных задач является проверить содержимое переменной. Rails предоставляет три пути
+        как сделать это:</p>
+    <ul>
+        <li>
+            <code>debug</code>
+        </li>
+        <li>
+            <code>to_yaml</code>
+        </li>
+        <li>
+            <code>inspect</code>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="debug"><code>debug</code>
+    </h4>
+    <p>Хелпер <code>debug</code> возвратит тег &lt;pre&gt;, который рендерит объект, с
+        использованием формата YAML. Это создаст читаемые данные из объекта. Например, если у вас
+        такой код во вьюхе:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= debug @article %&gt;
+&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>Вы получите что-то наподобие этого:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+--- !ruby/object Article
+attributes:
+  updated_at: 2008-09-05 22:55:47
+  body: It's a very helpful guide for debugging your Rails app.
+  title: Rails debugging guide
+  published: t
+  id: "1"
+  created_at: 2008-09-05 22:55:47
+attributes_cache: {}
+Title: Rails debugging guide
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="to_yaml"><code>to_yaml</code>
+    </h4>
+    <p>Другой вариант, вызов <code>to_yaml</code> на любом объекте конвертирует его в YAML. Вы
+        можете передать этот сконвертированный объект в хэлпер метод <code>simple_format</code> для
+        форматирования выходных данных. Именно так и работает метод <code>debug</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= simple_format @article.to_yaml %&gt;
+&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>Код выше отрендерит что-то вроде этого:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+--- !ruby/object Article
+attributes:
+updated_at: 2008-09-05 22:55:47
+body: It's a very helpful guide for debugging your Rails app.
+title: Rails debugging guide
+published: t
+id: "1"
+created_at: 2008-09-05 22:55:47
+attributes_cache: {}
+Title: Rails debugging guide
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="inspect"><code>inspect</code>
+    </h4>
+    <p>Другим полезным методом для отображения значений объекта является <code>inspect</code>,
+        особенно при работе с массивами и хэшами. Он напечатает значение объекта как строку.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= [1, 2, 3, 4, 5].inspect %&gt;
+&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>Отрендерит:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+[1, 2, 3, 4, 5]
+Title: Rails debugging guide
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="logger"> Логгер</h3>
+    <p>Также может быть полезным сохранять информацию в файл лога в процессе выполнения. Rails
+        поддерживает отдельный файл лога для каждой среды запуска.</p>
+    <h4 class="inside_page_header" id="chto-takoe-logger"> Что такое Логгер?</h4>
+    <p>Rails использует класс <code>ActiveSupport::Logger</code> для записи информации в лог. Другие
+        логгеры, такие как <code>Log4R</code>, могут так же стать заменой.</p>
+    <p>Альтернативный логгер можно определить в <code>environment.rb</code> или любом другом файле
+        среды, например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.logger = Logger.new(STDOUT)
+Rails.logger = Log4r::Logger.new("Application Log")
+</pre>
+    </div>
+    <p>Или в разделе <code>Initializer</code> добавьте <em>одно из</em> следующего</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.logger = Logger.new(STDOUT)
+config.logger = Log4r::Logger.new("Application Log")
+</pre>
+    </div>
+    <div class="info"><p>По умолчанию каждый лог создается в <code>Rails.root/log/</code> с файлом
+        лога, названным по окружению, в котором запущено приложение.</p></div>
+    <h4 class="inside_page_header" id="urovni-loga"> Уровни лога</h4>
+    <p>Когда что-то логируется, оно записывается в соответствующий лог, если уровень лога сообщения
+        равен или выше чем настроенный уровень лога. Если хотите узнать текущий уровень лога,
+        вызовите метод <code>ActiveRecord::Base.logger.level</code>.</p>
+    <p>Доступные уровни лога следующие: <code>:debug</code>, <code>:info</code>, <code>:warn</code>,
+        <code>:error</code>, <code>:fatal</code> и <code>:unknown</code>, соответствующие номерам
+        уровня лога от 0 до 5 соответственно. Чтобы изменить уровень лога по умолчанию, используйте
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.log_level = :warn # В любом инициализаторе среды, или
+ActiveRecord::Base.logger.level = 0 # в любое время
+</pre>
+    </div>
+    <p>Это полезно, когда вы хотите логировать в development или staging, но не хотите захламлять
+        production лог ненужной информацией.</p>
+    <div class="info"><p>По умолчанию, уровень лога Rails - <code>debug</code> во всех средах.</p>
+    </div>
+    <h4 class="inside_page_header" id="otpravka-soobscheniy"> Отправка сообщений</h4>
+    <p>Чтобы писать в текущий лог, используйте метод
+        <code>logger.(debug|info|warn|error|fatal)</code> внутри контроллера, модели или
+        рассыльщика:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+logger.debug "Person attributes hash: #{@person.attributes.inspect}"
+logger.info "Processing the request..."
+logger.fatal "Terminating application, raised unrecoverable error!!!"
+</pre>
+    </div>
+    <p>Вот пример метода, оборудованного дополнительным логированием:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  # ...
+  def create
+    @article = Article.new(params[:article])
+    logger.debug "New article: #{@article.attributes.inspect}"
+    logger.debug "Article should be valid: #{@article.valid?}"
+    if @article.save
+      flash[:notice] =  'Article was successfully created.'
+      logger.debug "The article was saved and now the user is going to be redirected..."
+      redirect_to(@article)
+    else
+      render action: "new"
+    end
+  end
+  # ...
+end
+</pre>
+    </div>
+    <p>Пример лога, сгенерированного при выполнении экшена контроллера:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Processing ArticlesController#create (for 127.0.0.1 at 2008-09-08 11:52:54) [POST]
+  Session ID: BAh7BzoMY3NyZl9pZCIlMDY5MWU1M2I1ZDRjODBlMzkyMWI1OTg2NWQyNzViZjYiCmZsYXNoSUM6J0FjdGl
+vbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA=--b18cd92fba90eacf8137e5f6b3b06c4d724596a4
+  Parameters: {"commit"=&gt;"Create", "article"=&gt;{"title"=&gt;"Debugging Rails",
+ "body"=&gt;"I'm learning how to print in logs!!!", "published"=&gt;"0"},
+ "authenticity_token"=&gt;"2059c1286e93402e389127b1153204e0d1e275dd", "action"=&gt;"create", "controller"=&gt;"articles"}
+New article: {"updated_at"=&gt;nil, "title"=&gt;"Debugging Rails", "body"=&gt;"I'm learning how to print in logs!!!",
+ "published"=&gt;false, "created_at"=&gt;nil}
+Article should be valid: true
+  Article Create (0.000443)   INSERT INTO "articles" ("updated_at", "title", "body", "published",
+ "created_at") VALUES('2008-09-08 14:52:54', 'Debugging Rails',
+ 'I''m learning how to print in logs!!!', 'f', '2008-09-08 14:52:54')
+The article was saved and now the user is going to be redirected...
+Redirected to # Article:0x20af760&gt;
+Completed in 0.01224 (81 reqs/sec) | DB: 0.00044 (3%) | 302 Found [http://localhost/articles]
+</pre>
+    </div>
+    <p>Добавление дополнительного логирования, подобного этому, облегчает поиск неожиданного или
+        необычного поведения в ваших логах. Если добавляете дополнительное логирование, убедитесь в
+        разумном использовании уровней лога, для избежания заполнения ваших рабочих логов ненужными
+        мелочами.</p>
+    <h4 class="inside_page_header" id="tegirovannoe-logirovanie"> Тегированное логирование</h4>
+    <p>При запуске многопользовательских приложений часто полезно фильтровать логи с использованием
+        произвольных правил.
+        <code>TaggedLogging</code> в Active Support помогает это сделать, помечая строчки лога с
+        помощью поддомена, идентификаторов запроса, и тому подобного, помогая отладке таких
+        приложений.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+logger.tagged("BCX") { logger.info "Stuff" }                            # Logs "[BCX] Stuff"
+logger.tagged("BCX", "Jason") { logger.info "Stuff" }                   # Logs "[BCX] [Jason] Stuff"
+logger.tagged("BCX") { logger.tagged("Jason") { logger.info "Stuff" } } # Logs "[BCX] [Jason] Stuff"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vozdeystvie-logov-na-proizvoditelnost"> Воздействие логов на
+        производительность</h4>
+    <p>У логирования всегда будет небольшое воздействие на производительность приложения rails,
+        особенно при логировании на диск. Кроме того, тут есть несколько тонкостей:</p>
+    <p>Использование уровня <code>:debug</code> оказывает гораздо большее влияние на
+        производительность, чем использование уровня <code>:fatal</code>, так как вычисляется и
+        пишется в лог (т.е. на диск) гораздо большее количество строк.</p>
+    <p>Другая потенциальная ловушка - частые вызовы <code>Logger</code> в вашем коде:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+logger.debug "Person attributes hash: #{@person.attributes.inspect}"
+</pre>
+    </div>
+    <p>В этом примере будет воздействие на производительность, даже если допустимый уровень вывода
+        не включает debug. Причина этого в том, что Ruby вычисляет эти строки, включая инициализацию
+        относительно весомого объекта <code>String</code> и интерполяцию переменных. Следовательно,
+        в методы логгера рекомендуется передавать блоки, так как они вычисляются только, если
+        уровень вывода такой же или включен в допустимый (т.е. ленивая загрузка). Переписанный тот
+        же код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+logger.debug {"Person attributes hash: #{@person.attributes.inspect}"}
+</pre>
+    </div>
+    <p>Содержимое блока и, следовательно, интерполяция строки будут вычислены только, если включен
+        уровень debug. Экономия производительности будет реально заметна только при большом
+        количестве логирования, но это все равно хорошая практика применения.</p>
+    <h3 class="inside_page_header" id="otladka-s-pomoschyu-gema-quot-byebug-quot"> Отладка с помощью
+        гема "byebug"</h3>
+    <p>Когда ваш код ведет себя неожиданным образом, можете печатать в логи или консоль, чтобы
+        выявить проблему. К сожалению, иногда бывает, что такой способ отслеживания ошибки не
+        эффективен в поиске причины проблемы. Когда вы фактически нуждаетесь в путешествии вглубь
+        исполняемого кода, отладчик - это ваш лучший напарник.</p>
+    <p>Отладчик также может помочь, если хотите изучить исходный код Rails, но не знаете с чего
+        начать. Просто отладьте любой запрос к своему приложению и используйте это руководство для
+        изучения, как идет движение от написанного вами кода в основной код Rails.</p>
+    <h4 class="inside_page_header" id="ustanovka"> Установка</h4>
+    <p>Вы можете использовать гем <code>byebug</code> для настройки точек останова и прохождения
+        через живой код. Чтобы установить его, просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ gem install byebug
+</pre>
+    </div>
+    <p>Внутри любого приложения на Rails можно вызвать отладчик с помощью метода <code>byebug</code>.
+    </p>
+    <p>Вот пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PeopleController &lt; ApplicationController
+  def new
+    byebug
+    @person = Person.new
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sreda"> Среда</h4>
+    <p>Как только приложение вызывает метод <code>byebug</code>, отладчик будет запущен в среде
+        отладчика в окне терминала, в котором запущен сервер приложения, и будет представлена строка
+        отладчика <code>(byebug)</code>. Перед строкой ввода будет отображен код возле строчки,
+        которая выполняется, и текущая строчка будет помечена '=&gt;', например так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+[1, 10] in /PathTo/project/app/controllers/articles_controller.rb
+    3:
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     byebug
+=&gt;  8:     @articles = Article.find_recent
+    9:
+   10:     respond_to do |format|
+   11:       format.html # index.html.erb
+   12:       format.json { render json: @articles }
+(byebug)
+</pre>
+    </div>
+    <p>Если был получен запрос от браузера, закладка браузера, содержащая запрос, будет висеть, пока
+        отладчик не закончит, и трассировка не закончит обрабатывать весь запрос.</p>
+    <p>Например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+=&gt; Booting WEBrick
+=&gt; Rails 5.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
+=&gt; Notice: server is listening on all interfaces (0.0.0.0). Consider using 127.0.0.1 (--binding option)
+=&gt; Ctrl-C to shutdown server
+[2014-04-11 13:11:47] INFO  WEBrick 1.3.1
+[2014-04-11 13:11:47] INFO  ruby 2.2.2 (2015-04-13) [i686-linux]
+[2014-04-11 13:11:47] INFO  WEBrick::HTTPServer#start: pid=6370 port=3000
+Started GET "/" for 127.0.0.1 at 2014-04-11 13:11:48 +0200
+  ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
+Processing by ArticlesController#index as HTML
+[3, 12] in /PathTo/project/app/controllers/articles_controller.rb
+    3:
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     byebug
+=&gt;  8:     @articles = Article.find_recent
+    9:
+   10:     respond_to do |format|
+   11:       format.html # index.html.erb
+   12:       format.json { render json: @articles }
+(byebug)
+</pre>
+    </div>
+    <p>Настало время изучить ваше приложение. Для начала хорошо бы попросить помощь у отладчика.
+        Напишите: <code>help</code></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) help
+  h[elp][ &lt;cmd&gt;[ &lt;subcmd&gt;]]
+  help                -- prints this help.
+  help &lt;cmd&gt;          -- prints help on command &lt;cmd&gt;.
+  help &lt;cmd&gt; &lt;subcmd&gt; -- prints help on &lt;cmd&gt;'s subcommand &lt;subcmd&gt;.
+</pre>
+    </div>
+    <p>Чтобы просмотреть предыдущие десять строчек, следует написать <code>list-</code> (or
+        <code>l-</code>).</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) l-
+[1, 10] in /PathTo/project/app/controllers/articles_controller.rb
+   1  class ArticlesController &lt; ApplicationController
+   2    before_action :set_article, only: [:show, :edit, :update, :destroy]
+   3
+   4    # GET /articles
+   5    # GET /articles.json
+   6    def index
+   7      byebug
+   8      @articles = Article.find_recent
+   9
+   10      respond_to do |format|
+</pre>
+    </div>
+    <p>Таким образом можно перемещаться внутри файла и просматривать код до и после строчки, где вы
+        добавили вызов <code>byebug</code>. Наконец, чтобы снова просмотреть, где вы в коде, можно
+        написать <code>list=</code></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) list=
+[3, 12] in /PathTo/project/app/controllers/articles_controller.rb
+    3:
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     byebug
+=&gt;  8:     @articles = Article.find_recent
+    9:
+   10:     respond_to do |format|
+   11:       format.html # index.html.erb
+   12:       format.json { render json: @articles }
+(byebug)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kontekst"> Контекст</h4>
+    <p>Когда начинаете отладку своего приложения, вы будете помещены в различные контексты, так как
+        проходите через различные части стека.</p>
+    <p>Отладчик создает контекст, когда достигается точка останова или событие. У контекста есть
+        информация о приостановленной программе, которая позволяет отладчику просматривать кадр
+        стека, значения переменных с точки зрения отлаживаемой программы, и знает место, в котором
+        отлаживаемая программа остановилась.</p>
+    <p>В любое время можете вызвать команду <code>backtrace</code> (или ее псевдоним
+        <code>where</code>), чтобы напечатать трассировку приложения. Это полезно для того, чтобы
+        знать, где вы находитесь. Если вы когда-нибудь задумывались, как вы получили что-то в коде,
+        то <code>backtrace</code> предоставит ответ.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) where
+--&gt; #0  ArticlesController.index
+      at /PathTo/project/test_app/app/controllers/articles_controller.rb:8
+    #1  ActionController::ImplicitRender.send_action(method#String, *args#Array)
+      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/implicit_render.rb:4
+    #2  AbstractController::Base.process_action(action#NilClass, *args#Array)
+      at /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb:189
+    #3  ActionController::Rendering.process_action(action#NilClass, *args#NilClass)
+      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/rendering.rb:10
+...
+</pre>
+    </div>
+    <p>Текущий фрейм помечен <code>--&gt;</code>. В этом трейсе можно перемещаться, куда хотите (это
+        изменит контекст), используя команду <code>frame _n_</code>, где <em>n</em> это номер
+        определенного фрейма. Если так сделать, <code>byebug</code> отобразит новый контекст.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) frame 2
+[184, 193] in /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb
+   184:       # is the intended way to override action dispatching.
+   185:       #
+   186:       # Notice that the first argument is the method to be dispatched
+   187:       # which is *not* necessarily the same as the action name.
+   188:       def process_action(method_name, *args)
+=&gt; 189:         send_action(method_name, *args)
+   190:       end
+   191:
+   192:       # Actually call the method associated with the action. Override
+   193:       # this method if you wish to change how action methods are called,
+(byebug)
+</pre>
+    </div>
+    <p>Доступные переменные те же самые, как если бы вы запускали код строка за строкой. В конце
+        концов, это то, что отлаживается.</p>
+    <p>Также можно использовать команды <code>up [n]</code> (сокращенно <code>u</code>) и <code>down
+        [n]</code> чтобы изменить контекст на <em>n</em> фреймов в стеке вверх или вниз
+        соответственно. <em>n</em> по умолчанию один. Вверх в этом случае обозначает фреймы с
+        большим числом, а вниз — с меньшим числом.</p>
+    <h4 class="inside_page_header" id="tredy-threads"> Треды (threads)</h4>
+    <p>Отладчик может просматривать, останавливать, возобновлять и переключаться между запущенными
+        тредами с использованием команды <code>thread</code> (или сокращенно <code>th</code>). У
+        этой команды есть несколько опций:</p>
+    <ul>
+        <li>
+            <code>thread</code>: показывает текущий тред
+        </li>
+        <li>
+            <code>thread list</code>: используется для отображения всех тредов и их статусов. Символ
+            плюс + и число показывают текущий тред выполнения.
+        </li>
+        <li>
+            <code>thread stop _n_</code>: останавливает тред <em>n</em>.
+        </li>
+        <li>
+            <code>thread resume _n_</code>: возобновляет тред <em>n</em>.
+        </li>
+        <li>
+            <code>thread switch _n_</code>: переключает контекст текущего треда на <em>n</em>.
+        </li>
+    </ul>
+    <p>Эта команда очень полезна, когда вы отлаживаете параллельные треды и нужно убедиться, что в
+        коде нет состояния гонки.</p>
+    <h4 class="inside_page_header" id="prosmotr-peremennyh"> Просмотр переменных</h4>
+    <p>Любое выражение может быть вычислено в текущем контексте. Чтобы вычислить выражение, просто
+        напечатайте его!</p>
+    <p>Следующий пример показывает, как вывести переменные экземпляра, определенные в текущем
+        контексте:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+[3, 12] in /PathTo/project/app/controllers/articles_controller.rb
+    3:
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     byebug
+=&gt;  8:     @articles = Article.find_recent
+    9:
+   10:     respond_to do |format|
+   11:       format.html # index.html.erb
+   12:       format.json { render json: @articles }
+(byebug) instance_variables
+[:@_action_has_layout, :@_routes, :@_headers, :@_status, :@_request,
+ :@_response, :@_env, :@_prefixes, :@_lookup_context, :@_action_name,
+ :@_response_body, :@marked_for_same_origin_verification, :@_config]
+</pre>
+    </div>
+    <p>Как вы могли заметить, отображены все переменные, к которым есть доступ из контроллера. Этот
+        список обновляется динамически по мере выполнения кода.
+        Например, выполним следующую строчку с помощью <code>next</code> (эту команду мы изучим
+        позже).</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) next
+[5, 14] in /PathTo/project/app/controllers/articles_controller.rb
+   5     # GET /articles.json
+   6     def index
+   7       byebug
+   8       @articles = Article.find_recent
+   9
+=&gt; 10       respond_to do |format|
+   11         format.html # index.html.erb
+   12        format.json { render json: @articles }
+   13      end
+   14    end
+   15
+(byebug)
+</pre>
+    </div>
+    <p>И затем снова спросим instance_variables:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) instance_variables
+[:@_action_has_layout, :@_routes, :@_headers, :@_status, :@_request,
+ :@_response, :@_env, :@_prefixes, :@_lookup_context, :@_action_name,
+ :@_response_body, :@marked_for_same_origin_verification, :@_config,
+ :@articles]
+</pre>
+    </div>
+    <p>Теперь <code>@articles</code> включена в переменные экземпляра, поскольку определяющая ее
+        строка была выполнена.</p>
+    <div class="info"><p>Также можно шагнуть в режим <strong>irb</strong> с командой
+        <code>irb</code> (конечно!). Это запустит сессию irb в контексте, который ее вызвал. Но
+        предупреждаем: это экспериментальная особенность.</p></div>
+    <p>Метод <code>var</code> это более удобный способ показать переменные и их значения. Пускай
+        <code>byebug</code> поможет нам с ней.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) help var
+v[ar] cl[ass]                   show class variables of self
+v[ar] const &lt;object&gt;            show constants of object
+v[ar] g[lobal]                  show global variables
+v[ar] i[nstance] &lt;object&gt;       show instance variables of object
+v[ar] l[ocal]                   show local variables
+</pre>
+    </div>
+    <p>Это отличный способ просмотреть значения переменных текущего контекста. Например, чтобы
+        проверить, что у нас нет локально определенных переменных в настоящий момент:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) var local
+(byebug)
+</pre>
+    </div>
+    <p>Также можно просмотреть метод объекта следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) var instance Article.new
+@_start_transaction_state = {}
+@aggregation_cache = {}
+@association_cache = {}
+@attributes = {"id"=&gt;nil, "created_at"=&gt;nil, "updated_at"=&gt;nil}
+@attributes_cache = {}
+@changed_attributes = nil
+...
+</pre>
+    </div>
+    <div class="info"><p>Команды <code>p</code> (print) и <code>pp</code> (pretty print) могут
+        использоваться для вычисления выражений Ruby и отображения значения переменных в консоли.
+    </p></div>
+    <p>Можете также использовать <code>display</code> для запуска просмотра переменных. Это хороший
+        способ трассировки значений переменной на протяжении выполнения.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) display @articles
+1: @articles = nil
+</pre>
+    </div>
+    <p>Переменные в отображаемом перечне будут печататься с их значениями после помещения в стек.
+        Чтобы остановить отображение переменной, используйте <code>undisplay _n_</code>, где
+        <em>n</em> это номер переменной (1 в последнем примере).</p>
+    <h4 class="inside_page_header" id="shag-za-shagom"> Шаг за шагом</h4>
+    <p>Теперь вы знаете, где находитесь в запущенной трассировке, и способны напечатать доступные
+        переменные. Давайте продолжим и ознакомимся с выполнением приложения.</p>
+    <p>Используйте <code>step</code> (сокращенно <code>s</code>) для продолжения запуска вашей
+        программы до следующей логической точки останова и возврата контроля debugger.</p>
+    <p>Также можете использовать <code>_next_</code>, которая похожа на <code>step</code>, но вызовы
+        функции или метода, выполняемые в строке кода, выполняются без остановки.</p>
+    <div class="info"><p>А также можно использовать <code>step n</code> или <code>next n</code> для
+        перемещения на <code>n</code> шагов за раз.</p></div>
+    <p>Разница между <code>next</code> и <code>step</code> в том, что <code>step</code>
+        останавливается на следующей линии выполняемого кода, делая лишь один шаг, в то время как
+        <code>next</code> перемещает на следующую строку без входа внутрь методов.</p>
+    <p>Например, рассмотрим следующую ситуацию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Started GET "/" for 127.0.0.1 at 2014-04-11 13:39:23 +0200
+Processing by ArticlesController#index as HTML
+[1, 8] in /home/davidr/Proyectos/test_app/app/models/article.rb
+   1: class Article &lt; ActiveRecord::Base
+   2:
+   3:   def self.find_recent(limit = 10)
+   4:     byebug
+=&gt; 5:     where('created_at &gt; ?', 1.week.ago).limit(limit)
+   6:   end
+   7:
+   8: end
+(byebug)
+</pre>
+    </div>
+    <p>Если используем <code>next</code>, мы хотим уйти глубже в вызовы метода. Вместо этого, byebug
+        перейдет на следующую строчку в том же контексте. В этом случае это будет последней строчкой
+        метода, поэтому <code>byebug</code> перепрыгнет на следующую строчку предыдущего фрейма.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) next
+Next went up a frame because previous frame finished
+[4, 13] in /PathTo/project/test_app/app/controllers/articles_controller.rb
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     @articles = Article.find_recent
+    8:
+=&gt;  9:     respond_to do |format|
+   10:       format.html # index.html.erb
+   11:       format.json { render json: @articles }
+   12:     end
+   13:   end
+(byebug)
+</pre>
+    </div>
+    <p>Если используем <code>step</code> в той же ситуации, мы буквально шагнем на следующую
+        инструкцию ruby для выполнения. В этом случае, в метод Active Support <code>week</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) step
+[50, 59] in /PathToGems/activesupport-5.0.0/lib/active_support/core_ext/numeric/time.rb
+   50:     ActiveSupport::Duration.new(self * 24.hours, [[:days, self]])
+   51:   end
+   52:   alias :day :days
+   53:
+   54:   def weeks
+=&gt; 55:     ActiveSupport::Duration.new(self * 7.days, [[:days, self * 7]])
+   56:   end
+   57:   alias :week :weeks
+   58:
+   59:   def fortnights
+(byebug)
+</pre>
+    </div>
+    <p>Это один из лучших способов найти ошибки в вашем коде.</p>
+    <h4 class="inside_page_header" id="tochki-ostanova"> Точки останова</h4>
+    <p>Точка останова останавливает ваше приложение, когда достигается определенная точка в
+        программе. В этой линии вызывается оболочка отладчика.</p>
+    <p>Можете добавлять точки останова динамически с помощью команды <code>break</code> (или просто
+        <code>b</code>). Имеются 3 возможных способа ручного добавления точек останова:</p>
+    <ul>
+        <li>
+            <code>break line</code>: устанавливает точку останова в строчке номер <em>line</em> в
+            текущем файле исходника.
+        </li>
+        <li>
+            <code>break file:line [if expression]</code>: устанавливает точку останова в строчке
+            номер <em>line</em> в файле <em>file</em>. Если задано выражение <em>expression</em>,
+            оно должно быть вычислено в <em>true</em>, чтобы запустить отладчик.
+        </li>
+        <li>
+            <code>break class(.|\#)method [if expression]</code>: устанавливает точку останова в
+            методе <em>method</em> (. и # для метода класса и экземпляра соответственно),
+            определенного в классе <em>class</em>. Выражение <em>expression</em> работает так же,
+            как и с file:line.
+        </li>
+    </ul>
+    <p>Например, в предыдущей ситуации</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+[4, 13] in /PathTo/project/app/controllers/articles_controller.rb
+    4:   # GET /articles
+    5:   # GET /articles.json
+    6:   def index
+    7:     @articles = Article.find_recent
+    8:
+=&gt;  9:     respond_to do |format|
+   10:       format.html # index.html.erb
+   11:       format.json { render json: @articles }
+   12:     end
+   13:   end
+(byebug) break 11
+Created breakpoint 1 at /PathTo/project/app/controllers/articles_controller.rb:11
+</pre>
+    </div>
+    <p>Используйте <code>info breakpoints _n_</code> или <code>info break _n_</code> для отображения
+        перечня точек останова. Если укажете номер, отобразится только эта точка останова. В
+        противном случае отобразятся все точки останова.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) info breakpoints
+Num Enb What
+1   y   at /PathTo/project/app/controllers/articles_controller.rb:11
+</pre>
+    </div>
+    <p>Чтобы удалить точки останова: используйте команду <code>delete _n_</code> для устранения
+        точки останова номер <em>n</em>. Если номер не указан, удалятся все точки останова, которые
+        в данный момент активны.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+(byebug) delete 1
+(byebug) info breakpoints
+No breakpoints.
+</pre>
+    </div>
+    <p>Также можно включить или отключить точки останова:</p>
+    <ul>
+        <li>
+            <code>enable breakpoints</code>: позволяет перечню <em>breakpoints</em> или всем им,
+            если перечень не определен, останавливать вашу программу. Это состояние по умолчанию для
+            создаваемых точек останова.
+        </li>
+        <li>
+            <code>disable breakpoints</code>: <em>breakpoints</em> не будут влиять на вашу
+            программу.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="lovlya-isklyucheniy"> Ловля исключений</h4>
+    <p>Команда <code>catch exception-name</code> (или просто <code>cat exception-name</code>) может
+        использоваться для перехвата исключения типа <em>exception-name</em>, когда в противном
+        случае был бы вызван обработчик для него.</p>
+    <p>Чтобы просмотреть все активные точки перехвата, используйте <code>catch</code>.</p>
+    <h4 class="inside_page_header" id="vozobnovlenie-ispolneniya"> Возобновление исполнения</h4>
+    <p>Есть два способа возобновления выполнения приложения, которое было остановлено
+        отладчиком:</p>
+    <ul>
+        <li>
+            <code>continue [line-specification]</code> (или <code>c</code>): возобновляет выполнение
+            программы с адреса, где ваш скрипт был последний раз остановлен; любые точки останова,
+            установленные на этом адресе будут пропущены. Дополнительный аргумент line-specification
+            позволяет вам определить число линий для установки одноразовой точки останова, которая
+            удаляется после того, как эта точка будет достигнута.
+        </li>
+        <li>
+            <code>finish [frame-number]</code> (или <code>fin</code>): выполняет, пока не
+            возвратится выделенный кадр стека. Если номер кадра не задан, приложение будет запущено
+            пока не возвратится текущий выделенный кадр. Текущий выделенный кадр начинается от самых
+            последних, или с 0, если позиционирование кадров (т.е. up, down или frame) не было
+            выполнено. Если задан номер кадра, будет выполняться, пока не вернется указанный кадр.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="redaktirovanie"> Редактирование</h4>
+    <p>Две команды позволяют открыть код из отладчика в редакторе:</p>
+    <ul>
+        <li>
+            <code>edit [file:line]</code>: редактирует файл <em>file</em>, используя редактор,
+            определенный переменной среды EDITOR. Определенная линия <em>line</em> также может быть
+            задана.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="vyhod"> Выход</h4>
+    <p>Чтобы выйти из отладчика, используйте команду <code>quit</code> (сокращенно <code>q</code>),
+        или ее псевдоним <code>exit</code>.</p>
+    <p>Простой выход пытается прекратить все нити в результате. Поэтому ваш сервер будет остановлен
+        и нужно будет стартовать его снова.</p>
+    <h4 class="inside_page_header" id="nastroyki"> Настройки</h4>
+    <p>У <code>byebug</code> имеется несколько доступных опций для настройки его поведения:</p>
+    <ul>
+        <li>
+            <code>set autoreload</code>: Перезагрузить исходный код при изменении (по умолчанию
+            true).
+        </li>
+        <li>
+            <code>set autolist</code>: Запускать команду <code>list</code> на каждой точке останова
+            (по умолчанию true).
+        </li>
+        <li>
+            <code>set listsize _n_</code>: Установить количество строчек кода для отображения по
+            умолчанию <em>n</em>
+            (по умолчанию 10).
+        </li>
+        <li>
+            <code>set forcestep</code>: Убеждаться, что команды <code>next</code> и
+            <code>step</code> всегда переходят на новую строчку.
+        </li>
+    </ul>
+    <p>Можно просмотреть полный перечень, используя <code>help set</code>. Используйте <code>help
+        set _subcommand_</code> для изучения определенной команды <code>set</code>.</p>
+    <div class="info"><p>Эти настройки могут быть сохранены в файле <code>.byebugrc</code> в
+        домашней директории. debugger считывает эти глобальные настройки при запуске. Например:</p>
+    </div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+set forcestep
+set listsize 25
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="otladka-s-pomoschyu-gema-web-console"> Отладка с помощью гема
+        <code>web-console</code></h3>
+    <p>Web Console немного похож на <code>byebug</code>, но запускается в браузере. На любой
+        разрабатываемой вами странице, вы можете запустить консоль в контексте вьюхи или
+        контроллера. Консоль отрендерит содержимое HTML.</p>
+    <h4 class="inside_page_header" id="konsol"> Консоль</h4>
+    <p>Внутри экшена контроллера или вьюхи, вы можете вызвать консоль с помощью метода
+        <code>console</code>.</p>
+    <p>Например, в контроллере:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  def new
+    console
+    @post = Post.new
+  end
+end
+</pre>
+    </div>
+    <p>Или во вьюхе:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% console %&gt;
+&lt;h2&gt;New Post&lt;/h2&gt;
+</pre>
+    </div>
+    <p>Это отрендерит консоль внутри вьюхи. Вам не нужно беспокоится о месте вызова
+        <code>console</code>, это не будет отрисовано на месте команды, а после вашего HTML
+        содержимого.</p>
+    <p>Консоль выполняет чистый Ruby code: вы можете определить или инициализировать собственные
+        классы, создавать новые модели и проверять переменные.</p>
+    <div class="note"><p>Только одна консоль может быть отрисована за один запрос. Иначе <code>web-console</code>
+        вызовет ошибку при выполнении второго <code>console</code>.</p></div>
+    <h4 class="inside_page_header" id="proverka-peremennyh"> Проверка переменных</h4>
+    <p>Вы можете вызвать <code>instance_variables</code> для вывода всех инстанс переменных,
+        доступных в контексте. Если вы хотите получить список всех локальных переменных, вы можете
+        сделать это с помощью <code>local_variables</code>.</p>
+    <h4 class="inside_page_header" id="nastroyki"> Настройки</h4>
+    <ul>
+        <li>
+            <code>config.web_console.whitelisted_ips</code>: Список авторизованных IPv4 или IPv6
+            адресов и сетей (по умолчанию: <code>127.0.0.1/8, ::1</code>).
+        </li>
+        <li>
+            <code>config.web_console.whiny_requests</code>: Выводить сообщение, когда консоль не
+            может быть отрисована (по умолчанию: <code>true</code>).
+        </li>
+    </ul>
+    <p>Поскольку <code>web-console</code> выполняет чистый Ruby код удаленно на сервере, не
+        пытайтесь использовать это в production.</p>
+    <h3 class="inside_page_header" id="otladka-utechki-pamyati"> Отладка утечки памяти</h3>
+    <p>Приложение Ruby (на Rails или нет), может съедать память - или в коде Ruby, или на уровне
+        кода C.</p>
+    <p>В этом разделе вы научитесь находить и исправлять такие утечки, используя инструмент отладки
+        Valgrind.</p>
+    <h4 class="inside_page_header" id="valgrind"> Valgrind</h4>
+    <p> - это приложение для Linux для обнаружения утечек памяти, основанных на C, и гонки
+        условий.</p>
+    <p>Имеются инструменты Valgrind, которые могут автоматически обнаруживать многие баги управления
+        памятью и тредами, и подробно профилировать ваши программы. Например, если расширение C в
+        интерпретаторе вызывает <code>malloc()</code>, но не вызывает должным образом
+        <code>free()</code>, эта память не будет доступна, пока приложение не будет остановлено.</p>
+    <p>Чтобы узнать подробности, как установить Valgrind и использовать его с Ruby, обратитесь к by
+        Evan Weaver.</p>
+    <h3 class="inside_page_header" id="plaginy-dlya-otladki"> Плагины для отладки</h3>
+    <p>Имеются некоторые плагины Rails, помогающие в поиске ошибок и отладке вашего приложения. Вот
+        список полезных плагинов для отладки:</p>
+    <ul>
+        <li>: У каждой страницы Rails есть сноска, дающая информацию о запросе и ссылку на исходный
+            код через TextMate.
+        </li>
+        <li>: Добавляет трассировку запросов в ваши логи.
+        </li>
+        <li>: Этот плагин Rails не только запускает "EXPLAIN" перед каждым из ваших запросов select
+            в development, но и представляет небольшой DIV в отрендеренном результате каждой
+            страницы со сводкой предупреждений по каждому проанализированному запросу.
+        </li>
+        <li>: Предоставляет объект рассыльщика и набор шаблонов по умолчанию для отправки
+            уведомлений по email, когда происходят ошибки в приложении в Rails.
+        </li>
+        <li>: Заменяет стандартную страницу ошибки Rails новой, содержащей больше контекстной
+            информации, такой как исходный код и просмотр переменных.
+        </li>
+        <li>: Расширение для Chrome для разработки на Rails, которое подхватывает изменения в
+            development.log. Всю информацию о запросах к приложению Rails можно смотреть в браузере,
+            в панели Developer Tools. Предоставляет обзор времени db/rendering/total, списка
+            параметров, отрендеренных вьюх и так далее.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="ssylki"> Ссылки</h3>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

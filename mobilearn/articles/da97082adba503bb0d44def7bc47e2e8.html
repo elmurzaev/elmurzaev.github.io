@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Автозагрузка и перезагрузка констант</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="avtozagruzka-i-perezagruzka-konstant"> Автозагрузка и
+        перезагрузка констант</h2>
+    <p>Это руководство документирует, как работает автозагрузка и перезагрузка констант.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>Ключевые аспекты констант в Ruby
+        </li>
+        <li>Что такое <code>autoload_paths</code>
+        </li>
+        <li>Как работает автозагрузка констант
+        </li>
+        <li>Что такое <code>require_dependency</code>
+        </li>
+        <li>Как работает перезагрузка констант
+        </li>
+        <li>Решения для распространенных проблем автозагрузки
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="vvedenie"> Введение</h3>
+    <p>Ruby on Rails позволяет приложениям быть написанными так, как будто их код был предварительно
+        загружен.</p>
+    <p>В обычных классах в программах на Ruby необходимо загружать их зависимости:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'application_controller'
+require 'post'
+class PostsController &lt; ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+</pre>
+    </div>
+    <p>Наши рубишные инстинкты быстро усматривают некоторую избыточность тут: если классы были
+        объявлены в файлах, соответствующих их имени, нельзя ли как-то автоматизировать их загрузку?
+        Можно было бы избавиться от просмотра файла на предмет сломавшихся зависимостей.</p>
+    <p>Более того, <code>Kernel#require</code> загружает файлы единожды, но разработка становится
+        гораздо приятнее, когда для перезагрузки кода не нужно перезагружать сервер. Было бы неплохо
+        иметь возможность использования <code>Kernel#load</code> в development и <code>Kernel#require</code>
+        в production.</p>
+    <p>Разумеется, эти особенности представлены Ruby on Rails, в котором мы просто пишем</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+</pre>
+    </div>
+    <p>Настоящее руководство раскрывает, как это работает.</p>
+    <h3 class="inside_page_header" id="svedeniya-o-konstantah"> Сведения о константах</h3>
+    <p>Хотя константы просты в большинстве языков программирования, они являются большой темой в
+        Ruby.</p>
+    <p>Документирование констант Ruby находится за пределами этого руководства, но тем не менее мы
+        собираемся осветить несколько тем. Понимание следующих разделов играет важную роль в
+        понимании автозагрузки и перезагрузки констант.</p>
+    <h4 class="inside_page_header" id="nesting"> Вложенность</h4>
+    <p>Определения класса и модуля могут быть вложены, чтобы создать пространство имен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module XML
+  class SAXParser
+    # (1)
+  end
+end
+</pre>
+    </div>
+    <p><em>Вложенность</em> в любое заданное место — это коллекция из охваченных вложенных объектов
+        класса и модуля для доступа снаружи. Вложенность в любом заданном месте можно просмотреть с
+        помощью <code>Module.nesting</code>. Например, в предыдущем примере вложенностью (1)
+        является</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[XML::SAXParser, XML]
+</pre>
+    </div>
+    <p>Важно понимать, что вложенность состоит из <em>объектов</em> класса и модуля, она не делает
+        ничего с константами, использованными для доступа к ним, и никак не относится к их именам.
+    </p>
+    <p>Например, хотя это определение похоже на предыдущее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class XML::SAXParser
+  # (2)
+end
+</pre>
+    </div>
+    <p>вложенность (2) отличается:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[XML::SAXParser]
+</pre>
+    </div>
+    <p><code>XML</code> не принадлежит ей.</p>
+    <p>Из этого примера мы видим, что имя класса или модуля, принадлежащего определенной
+        вложенности, не обязательно соотносится с пространством имен в этом месте.</p>
+    <p>Более того, они абсолютно независимы, для примера</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module X
+  module Y
+  end
+end
+module A
+  module B
+  end
+end
+module X::Y
+  module A::B
+    # (3)
+  end
+end
+</pre>
+    </div>
+    <p>Вложенность (3) состоит из двух объектов модуля:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[A::B, X::Y]
+</pre>
+    </div>
+    <p>Таким образом, она не только не заканчивается на <code>A</code>, который даже не принадлежит
+        вложенности, она также содержит <code>X::Y</code>, который независим от <code>A::B</code>.
+    </p>
+    <p>Вложенность — это внутренний стек, поддерживаемый интерпретатором, и он изменяется в
+        соответствии со следующими правилами:</p>
+    <ul>
+        <li><p>Объект класса, следующий за ключевым словом <code>class</code> добавляется, когда
+            выполняется его тело, а затем извлекается.</p></li>
+        <li><p>Объект класса, следующий за ключевым словом <code>module</code> добавляется, когда
+            выполняется его тело, а затем извлекается.</p></li>
+        <li><p>Синглтон-класс, открытый с помощью <code>class &lt;&lt; object</code> добавляется,
+            затем извлекается.</p></li>
+        <li><p>Когда вызывается <code>instance_eval</code> со строковым аргументом, синглтон-класс
+            получателя добавляется во вложенность вычисляемого кода. Когда вызываются <code>class_eval</code>
+            или <code>module_eval</code> со строковым аргументом, получатель добавляется во
+            вложенность вычисляемого кода.</p></li>
+        <li><p>Вложенность в коде верхнего уровня, интерпретируемого <code>Kernel#load</code>,
+            пустая, за исключением случая, когда вызов <code>load</code> получает true в качестве
+            второго аргумента, в случае чего Ruby добавляет вновь созданный анонимный модуль.</p>
+        </li>
+    </ul>
+    <p>Любопытно, что блоки не изменяют стек. В частности, блоки, переданные в
+        <code>Class.new</code> и <code>Module.new</code>, не добавляют определяемые класс или модуль
+        в их вложенность. Это одно из отличий между определением классов или модулей тем или иным
+        способом.</p>
+    <h4 class="inside_page_header" id="opredeleniya-klassa-i-modulya-eto-naznacheniya-konstant">
+        Определения класса и модуля — это назначения констант</h4>
+    <p>Допустим, следующий код создает класс (а не переоткрывает его):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C
+end
+</pre>
+    </div>
+    <p>Ruby создает константу <code>C</code> в <code>Object</code> и сохраняет в эту константу
+        объект класса. Именем экземпляра класса является "C", строка, названная по имени константы.
+    </p>
+    <p>То есть,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Project &lt; ActiveRecord::Base
+end
+</pre>
+    </div>
+    <p>выполняет назначение константе, эквивалентное</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Project = Class.new(ActiveRecord::Base)
+</pre>
+    </div>
+    <p>включая установление имени класса в качестве побочного эффекта:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Project.name # =&gt; "Project"
+</pre>
+    </div>
+    <p>У назначения констант есть специальное правило, благодаря которому это происходит: если
+        назначаемый объект является анонимным классом или модулем, Ruby устанавливает имя объекта по
+        константе.</p>
+    <div class="info"><p>С этого момента то, что будет происходить с константой или экземпляром, не
+        имеет значения. Например, константа может быть удалена, объект класса может быть назначен
+        другой константе, больше не храниться в константе, и так далее. Как только имя установлено,
+        оно не меняется.</p></div>
+    <p>Аналогично, создание модуля с помощью ключевого слова <code>module</code>, как в</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+end
+</pre>
+    </div>
+    <p>выполняет назначение константы, эквивалентное</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Admin = Module.new
+</pre>
+    </div>
+    <p>включая установление имени в качестве побочного эффекта:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Admin.name # =&gt; "Admin"
+</pre>
+    </div>
+    <div class="warning"><p>Контекст выполнения блока, переданного в <code>Class.new</code> или
+        <code>Module.new</code>, не полностью эквивалентен контексту тела определений с помощью
+        ключевых слов <code>class</code> и <code>module</code>. Но обе идиомы приводят к одинаковому
+        назначению константы.</p></div>
+    <p>Таким образом, когда кто-то говорит "класс <code>String</code>", в реальности это означает:
+        объект класса, хранимого в константе с именем "String" в объекте класса, хранимого в
+        константе <code>Object</code>. С другой стороны, <code>String</code> — это обычная константа
+        Ruby, и к ней применяется все, относящееся к константам, например применяемые к ней
+        алгоритмы резолюции.</p>
+    <p>Более того, в контроллере</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+</pre>
+    </div>
+    <p><code>Post</code> — это не синтаксис для класса. Скорее, <code>Post</code> — это обычная
+        константа Ruby. Если все нормально, константа вернет объект, отвечающий на <code>all</code>.
+    </p>
+    <p>Вот почему мы говорим об автозагрузке <em>констант</em>, в Rails есть возможность загрузки
+        констант на лету.</p>
+    <h4 class="inside_page_header" id="konstanty-hranyatsya-v-modulyah"> Константы хранятся в
+        модулях</h4>
+    <p>Константы принадлежат модулям в буквальном смысле. У классов и модулей есть таблица констант;
+        рассматривайте ее, как хэш-таблицу.</p>
+    <p>Давайте проанализируем пример, чтобы в действительности понять, что это означает. Хотя
+        распространенные упрощения языка, наподобие "класс <code>String</code>", удобны, в обучающих
+        целях изложение здесь будет более точным.</p>
+    <p>Рассмотрим следующее определение модуля:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Colors
+  RED = '0xff0000'
+end
+</pre>
+    </div>
+    <p>Во-первых, когда обрабатывается ключевое слово <code>module</code>, интерпретатор создает
+        новую запись в таблице констант объекта класса, хранимого в константе <code>Object</code>.
+        Упомянутая запись связывает имя "Colors" с вновь созданным объектом модуля. Далее
+        интерпретатор устанавливает имя нового объекта модуля равным строке "Colors".</p>
+    <p>Далее, когда интерпретируется тело определения модуля, создается запись в таблице констант
+        объекта модуля, хранящегося в константе <code>Colors</code>. Эта запись связывает имя "RED"
+        со строкой "0xff0000".</p>
+    <p>В частности, <code>Colors::RED</code> никоим образом не относится к любой другой константе
+        <code>RED</code>, которая может находиться в любом другом объекте класса или модуля. Если
+        такие существует, они будут иметь другие записи в их соответствующих таблицах констант.</p>
+    <p>Обратите особенное внимание в предыдущих абзацах на различие между объектами класса и модуля,
+        именами констант и объектами значений, связанными с ними в таблицах констант.</p>
+    <h4 class="inside_page_header" id="resolution-algorithms"> Алгоритмы резолюции</h4>
+    <h5 class="inside_page_header" id="resolution-algorithm-for-relative-constants"> Алгоритмы
+        резолюции для относительных констант</h5>
+    <p>Давайте определим, что в любом месте кода, <em>cref</em> будет обозначать первый элемент
+        вложенности, если она не пустая, а в противном случае <code>Object</code>.</p>
+    <p>Не вдаваясь глубоко в детали, алгоритм резолюции для ссылок на относительные константы
+        выполняется так:</p>
+    <ul>
+        <li><p>Если вложенность не пустая, константа ищется в ее элементах по порядку. Предки этих
+            элементов игнорируются.</p></li>
+        <li><p>Если не найдена, алгоритм проходит по цепочке предков у cref.</p></li>
+        <li><p>Если не найдена и cref — это модуль, константа ищется в <code>Object</code>.</p></li>
+        <li><p>Если не найдена, вызывается <code>const_missing</code> на cref. Реализация по
+            умолчанию для <code>const_missing</code> вызывает <code>NameError</code>, но может быть
+            переопределена.</p></li>
+    </ul>
+    <p>Автозагрузка Rails <strong>не эмулирует этот алгоритм</strong>, но его отправной точкой
+        является имя константы, которую нужно автоматически загрузить, и cref. Подробнее в главе .
+    </p>
+    <h5 class="inside_page_header" id="resolution-algorithm-for-qualified-constants"> Алгоритмы
+        резолюции для ограниченных констант</h5>
+    <p>Ограниченные константы выглядят так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Billing::Invoice
+</pre>
+    </div>
+    <p><code>Billing::Invoice</code> состоит из двух констант: <code>Billing</code> является
+        относительной, и она разрешается с помощью алгоритма из предыдущего раздела.</p>
+    <div class="info"><p>Начинание с двоеточий делает первый сегмент абсолютным, а не относительным:
+        <code>::Billing::Invoice</code>. Это принуждает искать <code>Billing</code> среди констант
+        верхнего уровня.</p></div>
+    <p><code>Invoice</code>, с другой стороны, ограничена <code>Billing</code>, и далее нам нужно
+        разрешить ее. Давайте определим, что <em>parent</em> будет обозначать этот ограничивающий
+        объект класса или модуля, то есть <code>Billing</code> в вышеприведенном примере. Алгоритм
+        для ограниченных констант выполняется так:</p>
+    <ul>
+        <li><p>Константа ищется в parent и его предках.</p></li>
+        <li><p>Если поиск неудачный, в parent вызывается <code>const_missing</code>. Реализация по
+            умолчанию для <code>const_missing</code> вызывает <code>NameError</code>, но может быть
+            переопределена.</p></li>
+    </ul>
+    <p>Как видите, этот алгоритм проще, чем для относительных констант. В частности, вложенность не
+        имеет значения, и нет специального случая для модулей, когда у них или их предков нет
+        константы, <code>Object</code> <strong>не</strong> проверяется.</p>
+    <p>Автозагрузка Rails <strong>не эмулирует этот алгоритм</strong>, но его отправной точкой
+        является имя константы, которую нужно автоматически загрузить, и parent. Подробнее в главе .
+    </p>
+    <h3 class="inside_page_header" id="slovar"> Словарь</h3>
+    <h4 class="inside_page_header" id="roditelskie-prostranstva-imen"> Родительские пространства
+        имен</h4>
+    <p>Для заданной строки с константой мы определяем <em>родительское пространство имен</em>, как
+        строку, полученную в результате удаления самого правого сегмента.</p>
+    <p>Например, родительским пространством имен для строки "A::B::C" является строка "A::B",
+        родительским пространством имен для "A::B" является "A", и родительским пространством имен
+        для "A" является "".</p>
+    <p>Впрочем, интерпретация родительского пространства имен может быть запутанной, если размышлять
+        о классах и модулях. Давайте рассмотрим модуль M с именем "A::B":</p>
+    <ul>
+        <li><p>Родительское пространство имен, "A", может не отражать вложенность в заданной
+            точке.</p></li>
+        <li><p>Константа <code>A</code> может больше не существовать, некий код мог удалить ее из
+            <code>Object</code>.</p></li>
+        <li><p>Если <code>A</code> существует, класс или модуль, который изначально был в
+            <code>A</code>, может больше не быть там. Например, если после того, как константу
+            удалили, произошло новое назначение константы, положившее иной объект в нее.</p></li>
+        <li><p>В этом случае может произойти так, что переназначенная <code>A</code> содержит новый
+            класс или модуль, также названный "A"!</p></li>
+        <li><p>В прошлых сценариях M больше не будет доступен с помощью <code>A::B</code>. но сам
+            объект модуля будет где-то существовать, и его имя по прежнему будет "A::B".</p></li>
+    </ul>
+    <p>Идея родительского пространства имен является сердцевиной алгоритмов автозагрузки и помогает
+        объяснить и интуитивно понять их мотивацию, но, как вы увидели, эта метафора легко
+        ускользает. С учетом крайних случаев, о которых мы только что говорили, всегда принимайте во
+        внимание то, что под "родительским пространством имен" руководство понимает исключительно
+        определенное образование строк.</p>
+    <h4 class="inside_page_header" id="loading-mechanism"> Механизм загрузки</h4>
+    <p>Rails автоматически загружает файлы с помощью <code>Kernel#load</code>, когда <code>config.cache_classes</code>
+        является false, по умолчанию в среде development, а в противном случае с помощью <code>Kernel#require</code>,
+        по умолчанию в среде production.</p>
+    <p><code>Kernel#load</code> позволяет Rails выполнять файлы более, чем однажды, если включена .
+    </p>
+    <p>Это руководство часто использует слово "загрузка", что означает, что интерпретируется данный
+        файл, но фактическим механизмом может быть <code>Kernel#load</code> или
+        <code>Kernel#require</code>, в зависимости от этого флажка.</p>
+    <h3 class="inside_page_header" id="dostupnost-avtozagruzki"> Доступность автозагрузки</h3>
+    <p>Rails всегда способен автоматически загружать свое окружение на лету. Например, команда
+        <code>runner</code> делает автозагрузку:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails runner 'p User.column_names'
+["id", "email", "created_at", "updated_at"]
+</pre>
+    </div>
+    <p>Консоль, тесты, и, конечно, приложение делают автозагрузку.</p>
+    <p>По умолчанию Rails нетерпеливо загружает файлы приложения, когда он запускается в режиме
+        production, поэтому большая часть автозагрузки, происходящая в development, не происходит.
+        Но автозагрузка все еще может произойти в течение нетерпеливой загрузки.</p>
+    <p>Например, дан</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class BeachHouse &lt; House
+end
+</pre>
+    </div>
+    <p>если <code>House</code> все еще неизвестен, когда нетерпеливо загружается <code>app/models/beach_house.rb</code>,
+        Rails его загрузит автоматически.</p>
+    <h3 class="inside_page_header" id="autoload_paths"> autoload_paths</h3>
+    <p>Как вам, наверное, известно, когда <code>require</code> получает относительное имя файла:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'erb'
+</pre>
+    </div>
+    <p>Ruby ищет файл в директориях, перечисленных в <code>$LOAD_PATH</code>. То есть, Ruby
+        перебирает все свои директории и для каждой из них проверяет, имеется ли в ней файл с именем
+        "erb.rb", или "erb.so", или "erb.o", или "erb.dll". Если он находит один из них, то
+        интерпретатор загружает его и заканчивает поиск. В противном случае он снова пытается
+        сделать то же самое для следующей директории в списке. Если список заканчивается, вызывается
+        <code>LoadError</code>.</p>
+    <p>Мы попытаемся подробнее раскрыть, как работает автозагрузка констант, позже, но идея в том,
+        что когда вызвана, но отсутствует константа, наподобие <code>Post</code>, и, к примеру,
+        имеется файл <code>post.rb</code> в <code>app/models</code>, Rails собирается найти его,
+        выполнить его и получить определение <code>Post</code> в качестве побочного эффекта.</p>
+    <p>Отлично, в Rails есть коллекция директорий, подобная <code>$LOAD_PATH</code>, для поиска
+        <code>post.rb</code>. Эта коллекция называется <code>autoload_paths</code>, и, по умолчанию,
+        она содержит:</p>
+    <ul>
+        <li><p>Все поддиректории <code>app</code> в приложении и engine-ах. Например, <code>app/controllers</code>.
+            Нет каких-либо значений по умолчанию, любая произвольная директория, наподобие <code>app/workers</code>,
+            будет автоматически принадлежать <code>autoload_paths</code>.</p></li>
+        <li><p>Любые существующие директории второго уровня с именем <code>app/*/concerns</code> в
+            приложении и engine-ах.</p></li>
+        <li><p>Директория <code>test/mailers/previews</code>.</p></li>
+    </ul>
+    <p>А также эта коллекция настраивается с помощью <code>config.autoload_paths</code>. Например,
+        <code>lib</code> была в списке пару лет назад, но сейчас уже нет. Можно ее добавить, добавив
+        в <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.autoload_paths &lt;&lt; "#{Rails.root}/lib"
+</pre>
+    </div>
+    <p><code>config.autoload_paths</code> недоступна для изменения из конфигурационных файлов,
+        относящихся к окружению.</p>
+    <p>Значение <code>autoload_paths</code> можно просмотреть. В только что созданном приложении она
+        (отредактировано):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
+.../app/assets
+.../app/controllers
+.../app/helpers
+.../app/mailers
+.../app/models
+.../app/controllers/concerns
+.../app/models/concerns
+.../test/mailers/previews
+</pre>
+    </div>
+    <div class="info"><p><code>autoload_paths</code> вычисляется и кэшируется на этапе процесса
+        инициализации. Необходимо перезапустить приложение, чтобы отразить изменения в структуре
+        директорий.</p></div>
+    <h3 class="inside_page_header" id="algoritmy-avtozagruzki"> Алгоритмы автозагрузки</h3>
+    <h4 class="inside_page_header" id="relative-references"> Относительные ссылки</h4>
+    <p>Относительная константная ссылка может появиться в нескольких местах, например, в</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+</pre>
+    </div>
+    <p>все три константные ссылки относительны.</p>
+    <h5 class="inside_page_header" id="konstanty-posle-klyuchevyh-slov-class-i-module"> Константы
+        после ключевых слов <code>class</code> и <code>module</code>
+    </h5>
+    <p>Ruby выполняет поиск констант, следующих за ключевыми словами <code>class</code> или <code>module</code>,
+        так как ему необходимо знать, собирается ли класс или модуль быть созданным или
+        переоткрытым.</p>
+    <p>Если константа в этом месте не определена, она не рассматривается отсутствующей константой,
+        автозагрузка <strong>не</strong> срабатывает.</p>
+    <p>Таким образом, в предыдущем примере, если <code>PostsController</code> не определен на момент
+        интерпретации файла, автозагрузка Rails не сработает, Ruby всего лишь определит контроллер.
+    </p>
+    <h5 class="inside_page_header" id="konstanty-verhnego-urovnya"> Константы верхнего уровня</h5>
+    <p>С другой стороны, если <code>ApplicationController</code> неизвестен, константа
+        рассматривается отсутствующей, и Rails собирается предпринять автозагрузку.</p>
+    <p>Чтобы загрузить <code>ApplicationController</code>, Rails проходит по
+        <code>autoload_paths</code>. Сначала проверяет, существует ли <code>app/assets/application_controller.rb</code>.
+        Если нет, что неудивительно, он продолжает и находит <code>app/controllers/application_controller.rb</code>.
+    </p>
+    <p>Если файл определяет константу <code>ApplicationController</code>, то все хорошо, в противном
+        случае вызывается <code>LoadError</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+unable to autoload constant ApplicationController, expected
+&lt;full path to application_controller.rb&gt; to define it (LoadError)
+</pre>
+    </div>
+    <div class="info"><p>Rails не требует, чтобы значения автозагружаемых констант были объектом
+        класса или модуля. Например, если файл <code>app/models/max_clients.rb</code> определяет
+        <code>MAX_CLIENTS = 100</code>, автозагрузка <code>MAX_CLIENTS</code> также сработает.</p>
+    </div>
+    <h5 class="inside_page_header" id="prostranstva-imen"> Пространства имен</h5>
+    <p>Автозагрузка <code>ApplicationController</code> ищет непосредственно в директориях <code>autoload_paths</code>,
+        так как вложенность в этом месте пустая. Ситуация с <code>Post</code> иная, вложенность в
+        этой строчке является <code>[PostsController]</code>, и в игру вступает поддержка
+        пространств имен.</p>
+    <p>Основная идея в том, что для</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+  class BaseController &lt; ApplicationController
+    @@all_roles = Role.all
+  end
+end
+</pre>
+    </div>
+    <p>чтобы автоматически загрузить <code>Role</code>, мы собираемся по очереди проверить,
+        определен ли он в текущем или родительском пространстве имен. Таким образом, концептуально
+        мы хотим попытаться автоматически загрузить любой из</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Admin::BaseController::Role
+Admin::Role
+Role
+</pre>
+    </div>
+    <p>в этом порядке. Такова идея. Для этого Rails ищет в <code>autoload_paths</code> следующие
+        имена файлов в указанном порядке:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+admin/base_controller/role.rb
+admin/role.rb
+role.rb
+</pre>
+    </div>
+    <p>производя дополнительные поиски модулей в директориях, о которых мы скоро расскажем.</p>
+    <div class="info"><p><code>'Constant::Name'.underscore</code> дает относительный путь без
+        расширения для имени файла, в котором ожидается определение для <code>Constant::Name</code>.
+    </p></div>
+    <p>Давайте посмотрим, как Rails автоматически загружает константу <code>Post</code> в
+        вышеприведенном <code>PostsController</code>, предполагая, что модель <code>Post</code>
+        определена в
+        <code>app/models/post.rb</code>.</p>
+    <p>Сначала он проверяет <code>posts_controller/post.rb</code> в <code>autoload_paths</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+app/assets/posts_controller/post.rb
+app/controllers/posts_controller/post.rb
+app/helpers/posts_controller/post.rb
+...
+test/mailers/previews/posts_controller/post.rb
+</pre>
+    </div>
+    <p>Так как поиск завершился неуспешно, выполняется схожий поиск для директорий, почему — мы
+        узнаем в :</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+app/assets/posts_controller/post
+app/controllers/posts_controller/post
+app/helpers/posts_controller/post
+...
+test/mailers/previews/posts_controller/post
+</pre>
+    </div>
+    <p>Если все эти попытки провалятся, то Rails снова начнет поиск в родительском пространстве
+        имен. В этом случае остается только верхний уровень:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+app/assets/post.rb
+app/controllers/post.rb
+app/helpers/post.rb
+app/mailers/post.rb
+app/models/post.rb
+</pre>
+    </div>
+    <p>Соответствующий файл найдется в <code>app/models/post.rb</code>. Тут поиск остановится и файл
+        загрузится. Если файл в действительности определяет <code>Post</code>, все в порядке, в
+        противном случае будет вызвано <code>LoadError</code>.</p>
+    <h4 class="inside_page_header" id="qualified-references"> Ограниченные ссылки</h4>
+    <p>Когда отсутствует ограниченная константа, Rails не ищет ее в родительских пространствах имен.
+        Но есть нюанс: когда отсутствует константа, Rails неспособен определить, была ли она
+        относительной или ограниченной.</p>
+    <p>Например, рассмотрим</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+  User
+end
+</pre>
+    </div>
+    <p>и</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Admin::User
+</pre>
+    </div>
+    <p>Если отсутствует <code>User</code>, Rails в любом случае знает, что константа с именем "User"
+        отсутствует в модуле с именем "Admin".</p>
+    <p>Если на верхнем уровне имеется <code>User</code>, Ruby вернет его для первого примера, но не
+        для второго. В целом, Rails не эмулирует алгоритмы разрешения констант Ruby, но в этом
+        случае он пытается, используя следующую эвристику:</p>
+    <blockquote>
+        <p>Если ни в одном из родительских пространств имен класса или модуля нет отсутствующей
+            константы, тогда Rails полагает, что ссылка относительная. В противном случае
+            ограниченная.</p>
+    </blockquote>
+    <p>Например, если этот код запускает автозагрузку</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Admin::User
+</pre>
+    </div>
+    <p>и константа <code>User</code> уже присутствует в <code>Object</code>, тогда невозможна такая
+        ситуация</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+  User
+end
+</pre>
+    </div>
+    <p>так как в этом случае Ruby вычислил бы <code>User</code>, и автозагрузка в первом случае не
+        была бы запущена. Поэтому Rails полагает ограниченную ссылку и рассматривает файл <code>admin/user.rb</code>
+        и директорию <code>admin/user</code> в качестве единственных правильных вариантов.</p>
+    <p>На практике это работает достаточно хорошо, пока вложенность соответствует всем родительским
+        пространствам имен, и константы, позволяющие применить правило, известны к этому
+        времени.</p>
+    <p>Однако, автозагрузка происходит по требованию. Есть шанс, что <code>User</code> верхнего
+        уровня еще не был загружен, тогда Rails предполагает по соглашению относительную ссылку.</p>
+    <p>Конфликты имен подобного рода редки на практике, но если происходят, решением является <code>require_dependency</code>,
+        чтобы убедиться, что константа, необходимая для запуска эвристики, определена в
+        конфликтующем месте.</p>
+    <h4 class="inside_page_header" id="automatic-modules"> Автоматические модули</h4>
+    <p>Когда модуль выступает в роли пространства имен, Rails не требует, чтобы приложение
+        определяло для него файл, достаточно соответствующей директории.</p>
+    <p>Допустим, у приложения есть админка, контроллеры которой хранятся в <code>app/controllers/admin</code>.
+        Если модуль <code>Admin</code> пока не загружен на момент обращения к <code>Admin::UsersController</code>,
+        Rails необходимо сперва автоматически загрузить константу <code>Admin</code>.</p>
+    <p>Если в <code>autoload_paths</code> имеется файл с именем <code>admin.rb</code>, Rails
+        загрузило бы его, но если такого файла нет, а найдена директория с именем <code>admin</code>,
+        Rails на лету создаст пустой модуль и назначит его константе <code>Admin</code>.</p>
+    <h4 class="inside_page_header" id="generic-procedure"> Общая процедура</h4>
+    <p>Относительные ссылки считаются отсутствующими в cref места, где они вызваны, а ограниченные
+        ссылки считаются отсутствующими в их parent (определение <em>cref</em> смотрите в в начале
+        этого руководства, а определение <em>parent</em> — в )</p>
+    <p>Процедура автозагрузки константы <code>C</code> в произвольной ситуации следующая:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+if (класс или модуль, в котором отсутствует C, это Object)
+  ns = ''
+else
+  M = (класс или модуль, в котором отсутствует C)
+  if (M анонимный)
+    ns = ''
+  else
+    ns = M.name
+  end
+end
+loop do
+  # Ищем обычный файл.
+  for dir in autoload_paths
+    if (существует файл "#{dir}/#{ns.underscore}/c.rb")
+      load/require "#{dir}/#{ns.underscore}/c.rb"
+      if (теперь определена C)
+        return
+      else
+        raise LoadError
+      end
+    end
+  end
+  # Ищем автоматический модуль.
+  for dir in autoload_paths
+    if (существует директория "#{dir}/#{ns.underscore}/c")
+      if (ns пустая строка)
+        C = (Module.new в Object) and return
+      else
+        C = (Module.new в ns.constantize) and return
+      end
+    end
+  end
+  if (ns пустое)
+    # Мы достигли верхнего уровня и не нашли константу.
+    raise NameError
+  else
+    if (C существует в любом из родительских пространств имен)
+      # Эвристика для ограниченных констант.
+      raise NameError
+    else
+      # Снова пытаемся в родительском пространстве имен.
+      ns = (родительское пространство имен для ns) and retry
+    end
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="require_dependency"> require_dependency</h3>
+    <p>Автозагрузка констант запускается по требованию, а, следовательно, код, использующий
+        определенную константу, может иметь ее уже определенной или может запустить автозагрузку.
+        Это зависит от последовательности выполнения кода и может различаться между запусками.</p>
+    <p>Однако бывает, когда вы хотите убедиться, что определенная константа известна к моменту,
+        когда выполнение достигнет некоторого кода. <code>require_dependency</code> представляет
+        способ загрузки файла с помощью текущего и отслеживания констант, определенном в этом файле
+        так, как будто они были автоматически загружены, чтобы при надобности перезагрузить их.</p>
+    <p><code>require_dependency</code> редко необходим, но имеется ряд сценариев, таких как и .</p>
+    <div class="warning"><p>В отличие от автозагрузки, <code>require_dependency</code> не ожидает,
+        что файл определяет какую-либо определенную константу. Чтобы использование этой особенности
+        не являлось плохой практикой, файлы и константы должны соответствовать друг другу.</p></div>
+    <h3 class="inside_page_header" id="constant-reloading"> Перезагрузка констант</h3>
+    <p>Когда <code>config.cache_classes</code> равно false, Rails способен перезагружать
+        автозагруженные константы.</p>
+    <p>Например, если вы в консоли и отредактировали какой-то файл, код может быть перезагружен с
+        помощью команды <code>reload!</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&gt; reload!
+</pre>
+    </div>
+    <p>Когда запущено приложение, код перезагружается когда изменяется что-то, относящееся к его
+        логике. Для этого Rails мониторит ряд вещей:</p>
+    <ul>
+        <li><p><code>config/routes.rb</code>.</p></li>
+        <li><p>Локали.</p></li>
+        <li><p>Файлы Ruby в <code>autoload_paths</code>.</p></li>
+        <li><p><code>db/schema.rb</code> и <code>db/structure.sql</code>.</p></li>
+    </ul>
+    <p>Если что-то из них изменяется, имеется промежуточная программа, определяющая это и
+        перезагружающая код.</p>
+    <p>Автозагрузка отслеживает автозагруженные константы. Перезагрузка реализована как удаление их
+        из соответствующих классов и модулей с помощью <code>Module#remove_const</code>. Таким
+        образом, когда начнет исполняться код, эти константы снова становятся неизвестными, и файлы
+        загружаются по требованию.</p>
+    <div class="info"><p>Это операция "все или ничего", Rails не пытается перезагрузить только то,
+        что изменилось, так как зависимости между классами могут быть очень изощренными. Вместо
+        этого все удаляется.</p></div>
+    <h3 class="inside_page_header" id="module-autoload-ne-zadeystvovan"> Module#autoload не
+        задействован</h3>
+    <p><code>Module#autoload</code> представляет ленивый способ загрузки констант, который полностью
+        интегрирован с алгоритмами поиска констант в Ruby, API динамических констант, и так далее.
+        Он весьма прозрачный.</p>
+    <p>Rails широко используют его внутренне, чтобы отложить столько работы, сколько возможно в
+        процессе загрузки. Но автозагрузка констант в Rails <strong>не</strong> реализуется с
+        помощью <code>Module#autoload</code>.</p>
+    <p>Одной из возможных реализаций, основанных на <code>Module#autoload</code>, могла бы быть
+        прохождение по дереву приложения и вызов <code>autoload</code>, связывающий имена
+        существующих файлов с именами констант по соглашению.</p>
+    <p>Имеется ряд причин, предотвращающих от использования этой реализации в Rails.</p>
+    <p>Например, <code>Module#autoload</code> способен только загружать файлы с помощью <code>require</code>,
+        поэтому перезагрузка невозможна. Кроме того, он использует собственный <code>require</code>,
+        который не <code>Kernel#require</code>.</p>
+    <p>Далее, он не представляет способ убрать определение в случае удаления файла. Если константа
+        была удалена с помощью <code>Module#remove_const</code>, ее <code>autoload</code> снова не
+        включится. А также он не поддерживает ограниченные имена, поэтому файлы в пространстве имен
+        должны интерпретироваться в процессе прохождения по дереву, чтобы установить собственные
+        вызовы <code>autoload</code>, но эти файлы могут иметь собственные константные ссылки,
+        которые еще не настроены.</p>
+    <p>Реализация с помощью <code>Module#autoload</code> могла бы быть великолепной, но, как видите,
+        как минимум сегодня она не возможна. Автозагрузка констант в Rails реализована с помощью
+        <code>Module#const_missing</code>, и поэтому у нее есть свои соглашения, документированные в
+        этом руководстве.</p>
+    <h3 class="inside_page_header" id="rasprostranennye-sluchai"> Распространенные случаи</h3>
+    <h4 class="inside_page_header" id="vlozhennost-i-ogranichennye-konstanty"> Вложенность и
+        ограниченные константы</h4>
+    <p>Давайте рассмотрим</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+  class UsersController &lt; ApplicationController
+    def index
+      @users = User.all
+    end
+  end
+end
+</pre>
+    </div>
+    <p>и</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Admin::UsersController &lt; ApplicationController
+  def index
+    @users = User.all
+  end
+end
+</pre>
+    </div>
+    <p>Чтобы разрешить <code>User</code>, Ruby проверяет <code>Admin</code> в первом, но не в
+        последнем случае, так как он не принадлежит вложенности (подробнее во и )</p>
+    <p>К сожалению, автозагрузка Rails не знает о вложенности в месте, где отсутствует константа, и
+        не способен сработать так, как Ruby. В частности, <code>Admin::User</code> автоматически
+        загрузится в любом случае.</p>
+    <p>Хотя ограниченные константы с ключевыми словами <code>class</code> и <code>module</code>
+        технически могут работать с автозагрузкой в некоторых случаях, вместо них предпочтительней
+        использовать относительные константы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Admin
+  class UsersController &lt; ApplicationController
+    def index
+      @users = User.all
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="autoloading-and-sti"> Автозагрузка и STI</h4>
+    <p>Наследование с единой таблицей (STI) — это особенность Active Record, позволяющая хранить
+        иерархию моделей в одной отдельной таблице. API таких моделей знает об иерархии и
+        инкапсулирует некоторые общие потребности. Например, имеем следующие классы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/polygon.rb
+class Polygon &lt; ActiveRecord::Base
+end
+# app/models/triangle.rb
+class Triangle &lt; Polygon
+end
+# app/models/rectangle.rb
+class Rectangle &lt; Polygon
+end
+</pre>
+    </div>
+    <p><code>Triangle.create</code> создает запись, представляющую треугольник, и <code>Rectangle.create</code>
+        создает запись, представляющую прямоугольник. Если <code>id</code> — это идентификатор
+        существующей записи, <code>Polygon.find(id)</code> возвратит объект правильного типа.</p>
+    <p>Методы, оперирующие с коллекциями, также в курсе об иерархии. Например,
+        <code>Polygon.all</code> возвратит все записи из таблицы, так как все прямоугольники и
+        треугольники — многоугольники. Active Record берет на себя заботу о возврате экземпляров
+        соответствующего класса в результирующей выборке.</p>
+    <p>Типы автоматически загружаются при необходимости. Например, если <code>Polygon.first</code> —
+        это прямоугольник, и <code>Rectangle</code> не был еще загружен, Active Record автоматически
+        загрузит его, и запись инициализируется корректно.</p>
+    <p>Все хорошо, но если вместо выполнения запросов, основанных на корневом классе, нам необходимо
+        работать на некотором подклассе, становится интереснее.</p>
+    <p>Хотя, работая с <code>Polygon</code>, вам не нужно беспокоится обо всех его потомках, так как
+        все в таблице многоугольники по определению, но при работе с подклассами Active Record
+        необходимо перечислить типы, которые он ищет. Давайте рассмотрим пример.</p>
+    <p><code>Rectangle.all</code> загружает только прямоугольники, добавляя ограничение типа в
+        запрос:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT "polygons".* FROM "polygons"
+WHERE "polygons"."type" IN ("Rectangle")
+</pre>
+    </div>
+    <p>Теперь давайте представим подкласс <code>Rectangle</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/square.rb
+class Square &lt; Rectangle
+end
+</pre>
+    </div>
+    <p>Теперь <code>Rectangle.all</code> должен вернуть прямоугольники <strong>и</strong> квадраты:
+    </p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT "polygons".* FROM "polygons"
+WHERE "polygons"."type" IN ("Rectangle", "Square")
+</pre>
+    </div>
+    <p>Но тут есть нюанс: как Active Record узнает, что класс <code>Square</code> вообще существует?
+    </p>
+    <p>Даже если существует файл <code>app/models/square.rb</code>, определяющий класс
+        <code>Square</code>, если код еще не использовал этот класс, <code>Rectangle.all</code>
+        выполнит запрос</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT "polygons".* FROM "polygons"
+WHERE "polygons"."type" IN ("Rectangle")
+</pre>
+    </div>
+    <p>Это не ошибка, запрос включает все <em>известные</em> потомки <code>Rectangle</code>.</p>
+    <p>Способом убедиться, что это будет работать правильно, независимо от порядка выполнения,
+        является загрузка листьев дерева вручную внизу файла, определяющего корневой класс:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/polygon.rb
+class Polygon &lt; ActiveRecord::Base
+end
+require_dependency ‘square’
+</pre>
+    </div>
+    <p>Таким образом нужно загружать только листья, являющиеся <strong>как минимум внуками</strong>.
+        Прямые подклассы не нужно загружать предварительно. Если иерархия более глубокая,
+        промежуточные классы будут автозагружены рекурсивно снизу, так как их константа появляется в
+        определении класса в качестве суперкласса.</p>
+    <h4 class="inside_page_header" id="avtozagruzka-i-require"> Автозагрузка и <code>require</code>
+    </h4>
+    <p>Для файлов, определяющих константы, которые необходимо автоматически загрузить, нельзя делать
+        <code>require</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'user' # НЕ НАДО ТАК
+class UsersController &lt; ApplicationController
+  ...
+end
+</pre>
+    </div>
+    <p>Тут есть две ловушки в режиме development:</p>
+    <ul>
+        <li><p>Если <code>User</code> автоматически загружен до выполнения <code>require</code>,
+            <code>app/models/user.rb</code> запустится снова, так как <code>load</code> не обновляет
+            <code>$LOADED_FEATURES</code>.</p></li>
+        <li><p>Если <code>require</code> выполнится сначала, Rails не пометит <code>User</code> как
+            автозагруженную константу, и изменения в <code>app/models/user.rb</code> не будут
+            перезагружены.</p></li>
+    </ul>
+    <p>Просто используйте автозагрузку всегда, никогда не смешивайте автозагрузку и
+        <code>require</code>. В крайнем случае, если некоторому файлу абсолютно необходимо загрузить
+        определенный файл, используйте <code>require_dependency</code>, который прекрасно работает с
+        автозагрузкой констант. Хотя это опция крайне редко необходима на практике.</p>
+    <p>Конечно, использование <code>require</code> в автоматически загруженных файлах для загрузки
+        обычных сторонних библиотек — это прекрасно, и Rails способен отличить их константы, так как
+        они не помечены, как автозагруженные.</p>
+    <h4 class="inside_page_header" id="avtozagruzka-i-initsializatory"> Автозагрузка и
+        инициализаторы</h4>
+    <p>Рассмотрим это присваивание в <code>config/initializers/set_auth_service.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+AUTH_SERVICE = if Rails.env.production?
+  RealAuthService
+else
+  MockedAuthService
+end
+</pre>
+    </div>
+    <p>Целью этой настройки может быть то, что приложение использует класс, соответствующий
+        окружению, с помощью <code>AUTH_SERVICE</code>. В режиме development автоматически
+        загружается <code>MockedAuthService</code> при запуске инициализатора. Допустим, мы сделали
+        пару запросов, изменили его реализацию, и снова обратились к приложению. К нашему удивлению,
+        изменения не отразились. Почему?</p>
+    <p>Как , Rails удаляет автозагруженные константы, но <code>AUTH_SERVICE</code> хранит
+        оригинальный объект класса. Устаревший, недоступный с помощью оригинальной константы, но
+        функционирующий.</p>
+    <p>Следующий пример обобщает ситуацию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C
+  def quack
+    'quack!'
+  end
+end
+X = C
+Object.instance_eval { remove_const(:C) }
+X.new.quack # =&gt; quack!
+X.name      # =&gt; C
+C           # =&gt; uninitialized constant C (NameError)
+</pre>
+    </div>
+    <p>В связи с этим, автоматически загружать константы при инициализации приложения является
+        плохой идеей.</p>
+    <p>В вышеприведенном случае можно реализовать динамическую точку доступа:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/auth_service.rb
+class AuthService
+  if Rails.env.production?
+    def self.instance
+      RealAuthService
+    end
+  else
+    def self.instance
+      MockedAuthService
+    end
+  end
+end
+</pre>
+    </div>
+    <p>и использовать в приложении <code>AuthService.instance</code>. <code>AuthService</code> будет
+        автоматически загружен по требованию и будет дружить с автозагрузкой.</p>
+    <h4 class="inside_page_header" id="require_dependency-i-initsializatory"><code>require_dependency</code>
+        и инициализаторы</h4>
+    <p>Как мы уже видели, <code>require_dependency</code> загружает файлы дружественным с
+        автозагрузкой способом. Впрочем, обычно такой вызов не имеет смысла в инициализаторе.</p>
+    <p>Кто-то может додуматься сделать вызовы в инициализаторе, чтобы убедиться, что некоторые
+        константы загружены первоначально, например, как попытку решить .</p>
+    <p>Проблема в том, что в режиме development , если было какое-либо относящееся изменение в
+        файловой системе. Если такое случается, мы находимся в той же самой ситуации с
+        инициализатором, которую хотим избежать!</p>
+    <p>Вызовы <code>require_dependency</code> стратегически должны быть написаны в местах
+        автозагрузки.</p>
+    <h4 class="inside_page_header" id="when-constants-aren-t-missed"> Когда константы не
+        находятся</h4>
+    <h5 class="inside_page_header" id="otnositelnye-ssylki"> Относительные ссылки</h5>
+    <p>Давайте рассмотрим летный симулятор. В приложении есть модель полета по умолчанию</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/flight_model.rb
+class FlightModel
+end
+</pre>
+    </div>
+    <p>которая может быть переопределена для каждого самолета, например</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/bell_x1/flight_model.rb
+module BellX1
+  class FlightModel &lt; FlightModel
+  end
+end
+# app/models/bell_x1/aircraft.rb
+module BellX1
+  class Aircraft
+    def initialize
+      @flight_model = FlightModel.new
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Инициализатор хочет создать <code>BellX1::FlightModel</code> и во вложенности есть <code>BellX1</code>,
+        что выглядит хорошо. Но, если модель полета по умолчанию загружена, а модель для Bell-X1
+        нет, интерпретатор способен разрешить <code>FlightModel</code> верхнего уровня, и
+        автозагрузка для <code>BellX1::FlightModel</code> не сработает.</p>
+    <p>Этот код зависит от последовательности выполнения.</p>
+    <p>Подобный тип двусмысленности часто можно разрешить с помощью ограниченных констант:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module BellX1
+  class Plane
+    def flight_model
+      @flight_model ||= BellX1::FlightModel.new
+    end
+  end
+end
+</pre>
+    </div>
+    <p>А также, решением является <code>require_dependency</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require_dependency 'bell_x1/flight_model'
+module BellX1
+  class Plane
+    def flight_model
+      @flight_model ||= FlightModel.new
+    end
+  end
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="ogranichennye-ssylki"> Ограниченные ссылки</h5>
+    <p>Даны</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/hotel.rb
+class Hotel
+end
+# app/models/image.rb
+class Image
+end
+# app/models/hotel/image.rb
+class Hotel
+  class Image &lt; Image
+  end
+end
+</pre>
+    </div>
+    <p>Выражение <code>Hotel::Image</code> двусмысленное, так как оно зависит от последовательности
+        выполнения.</p>
+    <p>Как , Ruby ищет константу в <code>Hotel</code> и его предках. Если
+        <code>app/models/image.rb</code> был загружен, но <code>app/models/hotel/image.rb</code> не
+        был, Ruby не найдет <code>Image</code> в <code>Hotel</code>, но найдет в <code>Object</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails r 'Image; p Hotel::Image' 2&gt;/dev/null
+Image # НЕ Hotel::Image!
+</pre>
+    </div>
+    <p>Коду, вычисляющему <code>Hotel::Image</code>, нужно убедиться, что <code>app/models/hotel/image.rb</code>
+        был загружен, возможно, с помощью <code>require_dependency</code>.</p>
+    <p>Хотя в таких случаях интерпретатор вызывает предупреждение:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+warning: toplevel constant Image referenced by Hotel::Image
+</pre>
+    </div>
+    <p>Эту удивляющую резолюцию констант можно увидеть на любом ограниченном классе:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+2.1.5 :001 &gt; String::Array
+(irb):1: warning: toplevel constant Array referenced by String::Array
+ =&gt; Array
+</pre>
+    </div>
+    <div class="warning"><p>Чтобы эта проблема проявилась, нужно, чтобы составное пространство имен
+        было классом, так как <code>Object</code> не предок модулей.</p></div>
+    <h4 class="inside_page_header" id="avtozagruzka-v-singlton-klasse"> Автозагрузка в
+        синглтон-классе</h4>
+    <p>Допустим, у нас имеются такие определения класса:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/models/hotel/services.rb
+module Hotel
+  class Services
+  end
+end
+# app/models/hotel/geo_location.rb
+module Hotel
+  class GeoLocation
+    class &lt;&lt; self
+      Services
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Если <code>Hotel::Services</code> известен во время загрузки <code>app/models/hotel/geo_location.rb</code>,
+        <code>Services</code> разрешится Ruby, так как <code>Hotel</code> принадлежит вложенности,
+        когда открыт синглтон-класс <code>Hotel::GeoLocation</code>.</p>
+    <p>Но, если <code>Hotel::Services</code> неизвестен, Rails не сможет автоматически загрузить
+        его, приложение вызовет <code>NameError</code>.</p>
+    <p>Причина в том, что автозагрузка включается для синглтон-класса, который анонимный, и, как ,
+        Rails проверяет только пространство имен верхнего уровня в этом крайнем случае.</p>
+    <p>Простым решением этой проблемы является ограничение константы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Hotel
+  class GeoLocation
+    class &lt;&lt; self
+      Hotel::Services
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="avtozagruzka-v-basicobject"> Автозагрузка в
+        <code>BasicObject</code>
+    </h4>
+    <p>У прямых потомков <code>BasicObject</code> нет <code>Object</code> среди предков, и они не
+        могут разрешить константы верхнего уровня:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C &lt; BasicObject
+  String # NameError: uninitialized constant C::String
+end
+</pre>
+    </div>
+    <p>Когда вызывается автозагрузка, она работает необычно. Давайте рассмотрим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C &lt; BasicObject
+  def user
+    User # НЕВЕРНО
+  end
+end
+</pre>
+    </div>
+    <p>Так как Rails проверяет пространство имен верхнего уровня, <code>User</code> автоматически
+        загрузится только в первый раз, когда вызовется метод <code>user</code>. Исключение
+        получится только когда константа <code>User</code> будет известна в этом месте, в частности,
+        при <em>втором</em> вызове <code>user</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+c = C.new
+c.user # к удивлению произойдет, User
+c.user # NameError: uninitialized constant C::User
+</pre>
+    </div>
+    <p>так как он обнаруживает, что родительское пространство имен уже имеет константу (смотрите
+        .)</p>
+    <p>Как и в чистом Ruby, в теле прямых потомков <code>BasicObject</code> всегда используйте
+        абсолютные пути констант:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C &lt; BasicObject
+  ::String # ПРАВИЛЬНО
+  def user
+    ::User # ПРАВИЛЬНО
+  end
+end
+</pre>
+    </div>
+
+</body>
+</html>

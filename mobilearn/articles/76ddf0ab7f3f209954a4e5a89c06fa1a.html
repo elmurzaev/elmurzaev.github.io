@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Миграции базы данных Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="migratsii-active-record"> Миграции Active Record</h2>
+    <p>Миграции - это особенность Active Record, позволяющая . Вместо того, чтобы записывать
+        изменения схемы на чистом SQL, миграции позволяют использовать простой Ruby DSL для описания
+        изменений в ваших таблицах.</p>
+    <p>После прочтения этого руководства, вы узнаете о:</p>
+    <ul>
+        <li>Генераторах, используемых для их создания
+        </li>
+        <li>Методах Active Record, обеспечивающих взаимодействие с вашей базой данных
+        </li>
+        <li>Задачи Rake, воздействующие на миграции и вашу схему
+        </li>
+        <li>Как миграции связаны со <code>schema.rb</code>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="obzor-migratsiy"> Обзор миграций</h3>
+    <p>Миграции - это удобный способ изменять схему вашей базы данных всё время неизменным и простым
+        образом. Они используют Ruby DSL. Поэтому вам не нужно писать SQL вручную, позволяя вашей
+        схеме быть независимой от базы данных.</p>
+    <p>Каждую миграцию можно рассматривать как новую 'версию' базы данных. Схема изначально ничего
+        не содержит, а каждая миграция изменяет ее, добавляя или убирая таблицы, столбцы или записи.
+        Active Record знает, как обновлять вашу схему со временем, перенося ее из определенной точки
+        в прошлом в последнюю версию. Active Record также обновляет ваш файл
+        <code>db/schema.rb</code>, чтобы он соответствовал текущей структуре вашей базы данных.</p>
+    <p>Вот пример миграции:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.text :description
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Эта миграция добавляет таблицу <code>products</code> со строковым столбцом <code>name</code>
+        и текстовым столбцом <code>description</code>. Первичный ключ, названный <code>id</code>,
+        также будет неявно добавлен по умолчанию, так как это первичный ключ по умолчанию для всех
+        моделей Active Record. Макрос <code>timestamps</code> добавляет два столбца, <code>created_at</code>
+        и <code>updated_at</code>. Эти специальные столбцы автоматически управляются Active Record,
+        если существуют.</p>
+    <p>Отметьте, что мы определили изменение, которое мы хотим, чтобы произошло при движении вперед
+        во времени. До запуска этой миграции таблицы нет. После - таблица будет существовать. Active
+        Record также знает, как обратить эту миграцию: если мы откатываем эту миграцию, он удалит
+        таблицу.</p>
+    <p>В базах данных, поддерживающих транзакции с выражениями, изменяющими схему, миграции
+        оборачиваются в транзакцию. Если база данных это не поддерживает, и миграция проваливается,
+        части, которые прошли успешно, не будут откачены назад. Вам нужно произвести откат
+        вручную.</p>
+    <div class="note"><p>Некоторые запросы не могут быть запущены в транзакции. Если ваш адаптер
+        поддерживает транзакции DDL, можно использовать <code>disable_ddl_transaction!</code> для их
+        отключения для отдельной миграции.</p></div>
+    <p>Если хотите миграцию для чего-то, что Active Record не знает, как обратить, вы можете
+        использовать <code>reversible</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ChangeProductsPrice &lt; ActiveRecord::Migration
+  def change
+    reversible do |dir|
+      change_table :products do |t|
+        dir.up   { t.change :price, :string }
+        dir.down { t.change :price, :integer }
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <p>С другой стороны, можно использовать <code>up</code> и <code>down</code> вместо
+        <code>change</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ChangeProductsPrice &lt; ActiveRecord::Migration
+  def up
+    change_table :products do |t|
+      t.change :price, :string
+    end
+  end
+  def down
+    change_table :products do |t|
+      t.change :price, :integer
+    end
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="sozdanie-migratsii"> Создание миграции</h3>
+    <h4 class="inside_page_header" id="sozdanie-avtonomnoy-migratsii"> Создание автономной
+        миграции</h4>
+    <p>Миграции хранятся как файлы в директории <code>db/migrate</code>, один файл на каждый класс.
+        Имя файла имеет вид <code>YYYYMMDDHHMMSS_create_products.rb</code>, это означает, что
+        временная метка UTC идентифицирует миграцию, затем идет знак подчеркивания, затем идет имя
+        миграции, где слова разделены подчеркиваниями. Имя класса миграции содержит буквенную часть
+        названия файла, но уже в формате CamelCase (т.е. слова пишутся слитно, каждое слово
+        начинается с большой буквы). Например, <code>20080906120000_create_products.rb</code> должен
+        определять класс <code>CreateProducts</code>, а <code>20080906120001_add_details_to_products.rb</code>
+        должен определять <code>AddDetailsToProducts</code>. Rails использует эту метку, чтобы
+        определить, какая миграция должна быть запущена и в каком порядке, так что если вы копируете
+        миграции из другого приложения или генерируете файл сами, будьте более бдительны.</p>
+    <p>Конечно, вычисление временных меток не забавно, поэтому Active Record предоставляет генератор
+        для управления этим:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddPartNumberToProducts
+</pre>
+    </div>
+    <p>Это создаст пустую, но правильно названную миграцию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddPartNumberToProducts &lt; ActiveRecord::Migration
+  def change
+  end
+end
+</pre>
+    </div>
+    <p>Если имя миграции имеет форму "AddXXXToYYY" или "RemoveXXXFromYYY" и далее следует перечень
+        имен столбцов и их типов, то в миграции будут созданы соответствующие выражения <code>add_column</code>
+        и <code>remove_column</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddPartNumberToProducts part_number:string
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddPartNumberToProducts &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :part_number, :string
+  end
+end
+</pre>
+    </div>
+    <p>Если вы хотите добавить индекс на новый столбец, вы можете сделать это так</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddPartNumberToProducts part_number:string:index
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddPartNumberToProducts &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :part_number, :string
+    add_index :products, :part_number
+  end
+end
+</pre>
+    </div>
+    <p>Точно так же, вы можете сгенерировать миграцию для удаления столбца из командной строки:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration RemovePartNumberFromProducts part_number:string
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class RemovePartNumberFromProducts &lt; ActiveRecord::Migration
+  def change
+    remove_column :products, :part_number, :string
+  end
+end
+</pre>
+    </div>
+    <p>Вы не ограничены одним создаваемым столбцом. Например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddDetailsToProducts part_number:string price:decimal
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddDetailsToProducts &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :part_number, :string
+    add_column :products, :price, :decimal
+  end
+end
+</pre>
+    </div>
+    <p>Если имя миграции имеет форму "CreateXXX" и затем следует список имен и типов столбцов, то
+        будет сгенерирована миграция, создающая таблицу XXX с перечисленными столбцами.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration CreateProducts name:string part_number:string
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.string :part_number
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Как всегда, то, что было сгенерировано, является всего лишь стартовой точкой. Вы можете
+        добавлять и убирать строки, как считаете нужным, отредактировав файл <code>db/migrate/YYYYMMDDHHMMSS_add_details_to_products.rb</code>.
+    </p>
+    <p>Также генератор принимает такой тип столбца, как <code>references</code> (или его псевдоним
+        <code>belongs_to</code>). Например</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddUserRefToProducts user:references
+</pre>
+    </div>
+    <p>создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddUserRefToProducts &lt; ActiveRecord::Migration
+  def change
+    add_reference :products, :user, index: true, foreign_key: true
+  end
+end
+</pre>
+    </div>
+    <p>Эта миграция создаст столбец <code>user_id</code> и соответствующий индекс.</p>
+    <p>Существует также генератор, который будет производить объединение таблиц, если <code>JoinTable</code>
+        является частью названия.</p>
+    <p>Например</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration CreateJoinTableCustomerProduct customer product
+</pre>
+    </div>
+    <p>Сгенерирует следующую миграцию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateJoinTableCustomerProduct &lt; ActiveRecord::Migration
+  def change
+    create_join_table :customers, :products do |t|
+      # t.index [:customer_id, :product_id]
+      # t.index [:product_id, :customer_id]
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="generatory-modeli"> Генераторы модели</h4>
+    <p>Генераторы модели и скаффолда создадут миграции, подходящие для создания новой модели.
+        Миграция будет содержать инструкции для создания соответствующей таблицы. Если вы сообщите
+        Rails, какие столбцы вы хотите, то выражения для добавления этих столбцов также будут
+        созданы. Например, запуск:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model Product name:string description:text
+</pre>
+    </div>
+    <p>создаст миграцию, которая выглядит так</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.text :description
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Можно определить сколько угодно пар имя_столбца/тип.</p>
+    <h4 class="inside_page_header" id="peredacha-modifikatorov"> Передача модификаторов</h4>
+    <p>Некоторые часто используемые могут быть переданы непосредственно в командной строке. Они
+        указываются в фигурных скобках и следуют за типом поля:</p>
+    <p>К примеру, запуск:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate migration AddDetailsToProducts 'price:decimal{5,2}' supplier:references{polymorphic}
+</pre>
+    </div>
+    <p>создаст миграцию, которая выглядит как эта:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddDetailsToProducts &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :price, :decimal, precision: 5, scale: 2
+    add_reference :products, :supplier, polymorphic: true, index: true
+  end
+end
+</pre>
+    </div>
+    <div class="info"><p>Чтобы узнать подробности, обратите внимание на выводимые сообщения
+        генератора.</p></div>
+    <h3 class="inside_page_header" id="writing-a-migration"> Написание миграции</h3>
+    <p>Как только вы создали свою миграцию, используя один из генераторов, пришло время
+        поработать!</p>
+    <h4 class="inside_page_header" id="sozdanie-tablitsy"> Создание таблицы</h4>
+    <p>Метод <code>create_table</code> один из самых фундаментальных, но в большинстве случаев, он
+        будет создан для вас генератором модели или скаффолда. Обычное использование такое</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_table :products do |t|
+  t.string :name
+end
+</pre>
+    </div>
+    <p>Это создаст таблицу <code>products</code> со столбцом <code>name</code> (и, как обсуждалось
+        выше, подразумеваемым столбцом <code>id</code>).</p>
+    <p>По умолчанию <code>create_table</code> создаст первичный ключ, названный <code>id</code>. Вы
+        можете изменить имя первичного ключа с помощью опции <code>:primary_key</code> (не забудьте
+        также обновить соответствующую модель), или, если вы вообще не хотите первичный ключ, можно
+        указать опцию <code>id: false</code>. Если нужно передать базе данных специфичные опции, вы
+        можете поместить фрагмент <code>SQL</code> в опцию <code>:options</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_table :products, options: "ENGINE=BLACKHOLE" do |t|
+  t.string :name, null: false
+end
+</pre>
+    </div>
+    <p>добавит <code>ENGINE=BLACKHOLE</code> к SQL выражению, используемому для создания таблицы
+        (при использовании MySQL по умолчанию передается <code>ENGINE=InnoDB</code>).</p>
+    <h4 class="inside_page_header" id="sozdanie-soedinitelnoy-tablitsy"> Создание соединительной
+        таблицы</h4>
+    <p>Миграционный метод <code>create_join_table</code> создает соединительную таблицу HABTM.
+        Обычное использование будет таким:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_join_table :products, :categories
+</pre>
+    </div>
+    <p>что создаст таблицу <code>categories_products</code> с двумя столбцами по имени <code>category_id</code>
+        и <code>product_id</code>. У этих столбцов есть опция <code>:null</code>, установленная в
+        <code>false</code> по умолчанию. Это может быть переопределено опцией
+        <code>:column_options</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_join_table :products, :categories, column_options: {null: true}
+</pre>
+    </div>
+    <p>создаст <code>product_id</code> и <code>category_id</code> с опцией <code>:null</code> как
+        <code>true</code>.</p>
+    <p>Если хотите изменить имя таблицы, используйте опцию <code>:table_name</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_join_table :products, :categories, table_name: :categorization
+</pre>
+    </div>
+    <p>создаст таблицу <code>categorization</code>.</p>
+    <p>По умолчанию <code>create_join_table</code> создаст два столбца без опций, но можно
+        определить эти опции с использованием опции <code>:column_options</code>. Например,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_join_table :products, :categories, column_options: {null: true}
+</pre>
+    </div>
+    <p>создаст <code>product_id</code> и <code>category_id</code> с опцией <code>:null</code> равной
+        <code>true</code>.</p>
+    <p><code>create_join_table</code> также принимает блок, который можно использовать для
+        добавления индексов (которые по умолчанию не создаются) или дополнительных столбцов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+create_join_table :products, :categories do |t|
+  t.index :product_id
+  t.index :category_id
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="izmenenie-tablits"> Изменение таблиц</h4>
+    <p>Близкий родственник <code>create_table</code> это <code>change_table</code>, используемый для
+        изменения существующих таблиц. Он используется подобно <code>create_table</code>, но у
+        объекта, передаваемого в блок, больше методов. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+change_table :products do |t|
+  t.remove :description, :name
+  t.string :part_number
+  t.index :part_number
+  t.rename :upccode, :upc_code
+end
+</pre>
+    </div>
+    <p>удаляет столбцы <code>description</code> и <code>name</code>, создает строковый столбец
+        <code>part_number</code> и добавляет индекс на него. Наконец, он переименовывает столбец
+        <code>upccode</code>.</p>
+    <h4 class="inside_page_header" id="izmenenie-stolbtsov"> Изменение столбцов</h4>
+    <p>Подобно <code>remove_column</code> и <code>add_column</code>, Rails предоставляет
+        миграционный метод <code>change_column</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+change_column :products, :part_number, :text
+</pre>
+    </div>
+    <p>Он меняет тип столбца <code>part_number</code> в таблице <code>products</code> на
+        <code>:text</code>. Отметьте, что команда <code>change_column</code> — необратима.</p>
+    <p>Кроме <code>change_column</code>, методы <code>change_column_null</code> и <code>change_column_default</code>
+        используются чтобы изменить ограничение не-null или значение столбца по умолчанию.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+change_column_null :products, :name, false
+change_column_default :products, :approved, from: true, to: false
+</pre>
+    </div>
+    <p>Это настроит поле <code>:name</code> в products быть <code>NOT NULL</code> столбцом и изменит
+        значение по умолчанию для поля <code>:approved</code> с true на false.</p>
+    <p>Note: Также можно написать предыдущую миграцию <code>change_column_default</code> как <code>change_column_default
+        :products, :approved, false</code>, но, в отличие от предыдущего примера, это сделало бы
+        вашу миграцию необратимой.</p>
+    <h4 class="inside_page_header" id="column-modifiers"> Модификаторы столбца</h4>
+    <p>Модификаторы столбца могут быть применены при создании или изменении столбца:</p>
+    <ul>
+        <li>
+            <code>limit</code> Устанавливает максимальный размер полей <code>string/text/binary/integer</code>.
+        </li>
+        <li>
+            <code>precision</code> Определяет точность для полей <code>decimal</code>, определяющую
+            общее количество цифр в числе.
+        </li>
+        <li>
+            <code>scale</code> Определяет масштаб для полей <code>decimal</code>, определяющий
+            количество цифр после запятой.
+        </li>
+        <li>
+            <code>polymorphic</code> Добавляет столбец <code>type</code> для связей
+            <code>belongs_to</code>.
+        </li>
+        <li>
+            <code>null</code> Позволяет или запрещает значения <code>NULL</code> в столбце.
+        </li>
+        <li>
+            <code>default</code> Позволяет установить значение по умолчанию для столбца. Отметьте,
+            что если вы используете динамическое значение (такое как дату), значение по умолчанию
+            будет вычислено лишь один раз (т.е. на дату, когда миграция будет применена).
+        </li>
+        <li>
+            <code>index</code> Добавляет индекс для столбца.
+        </li>
+        <li>
+            <code>required</code> Добавляет <code>required: true</code> для связей
+            <code>belongs_to</code> и <code>null: false</code> к столбцу в миграции.
+        </li>
+    </ul>
+    <p>Некоторые адаптеры могут поддерживать дополнительные опции; за подробностями обратитесь к
+        документации API конкретных адаптеров.</p>
+    <h4 class="inside_page_header" id="foreign-keys"> Внешние ключи</h4>
+    <p>Хотя это и не требуется, вы можете захотеть добавить ограничения внешнего ключа для .</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+add_foreign_key :articles, :authors
+</pre>
+    </div>
+    <p>Это добавит новый внешний ключ к столбцу <code>author_id</code> таблицы <code>articles</code>.
+        Ключ ссылается на столбец <code>id</code> таблицы <code>authors</code>. Если имена столбцов
+        не могут быть произведены из имен таблиц, можно использовать опции <code>:column</code> и
+        <code>:primary_key</code>.</p>
+    <p>Rails сгенерирует имя для каждого внешнего ключа, начинающееся с <code>fk_rails_</code> плюс
+        10 символов, которые детерминировано генерируются на основе <code>from_table</code> и <code>column</code>.
+        Также есть опция <code>:name</code>, если хотите указать другое имя.</p>
+    <div class="note"><p>Active Record поддерживает внешние ключи только для отдельных столбцов.
+        Чтобы использовать составные внешние ключи, требуются <code>execute</code> и <code>structure.sql</code>.
+        Смотрите </p></div>
+    <p>Убрать внешний ключ также просто:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# позволим Active Record вычислить имя столбца
+remove_foreign_key :accounts, :branches
+# уберем внешний ключ для определенного столбца
+remove_foreign_key :accounts, column: :owner_id
+# уберем внешний ключ по имени
+remove_foreign_key :accounts, name: :special_fk_name
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kogda-helperov-nedostatochno"> Когда хелперов
+        недостаточно</h4>
+    <p>Если хелперов, предоставленных Active Record, недостаточно, можно использовать метод <code>execute</code>
+        для запуска произвольного SQL:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Product.connection.execute("UPDATE products SET price = 'free' WHERE 1=1")
+</pre>
+    </div>
+    <p>Больше подробностей и примеров отдельных методов содержится в документации по API. В
+        частности, документация для (который обеспечивает методы, доступные в методах
+        <code>up</code>, <code>down</code> и <code>change</code>), (который обеспечивает методы,
+        доступные у объекта, переданного методом <code>create_table</code>) и (который обеспечивает
+        методы, доступные у объекта, переданного методом <code>change_table</code>).</p>
+    <h4 class="inside_page_header" id="ispolzovanie-metoda-change"> Использование метода <code>change</code>
+    </h4>
+    <p>Метод <code>change</code> это основной метод написания миграций. Он работает в большинстве
+        случаев, когда Active Record знает, как обратить миграцию автоматически. На текущий момент
+        метод <code>change</code> поддерживает только эти определения миграции:</p>
+    <ul>
+        <li>
+            <code>add_column</code>
+        </li>
+        <li>
+            <code>add_index</code>
+        </li>
+        <li>
+            <code>add_reference</code>
+        </li>
+        <li>
+            <code>add_timestamps</code>
+        </li>
+        <li>
+            <code>create_table</code>
+        </li>
+        <li>
+            <code>create_join_table</code>
+        </li>
+        <li>
+            <code>drop_table</code> (необходимо указать блок)
+        </li>
+        <li>
+            <code>drop_join_table</code> (необходимо указать блок)
+        </li>
+        <li>
+            <code>remove_timestamps</code>
+        </li>
+        <li>
+            <code>add_foreign_key</code>
+        </li>
+        <li>
+            <code>rename_column</code>
+        </li>
+        <li>
+            <code>rename_index</code>
+        </li>
+        <li>
+            <code>remove_reference</code>
+        </li>
+        <li>
+            <code>rename_table</code>
+        </li>
+    </ul>
+    <p><code>change_table</code> так же является обратимым, пока блок не вызывает
+        <code>change</code>, <code>change_default</code> или <code>remove</code>.</p>
+    <p><code>remove_column</code> обратима, если предоставить тип столбца третьим аргументом. Также
+        предоставьте опции оригинально столбца, иначе Rails не сможет в точности пересоздать этот
+        столбец при откате:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+remove_column :posts, :slug, :string, null: false, default: '', index: true
+</pre>
+    </div>
+    <p>Если вы нуждаетесь в использовании иных методов, следует использовать <code>reversible</code>
+        или писать методы <code>up</code> и <code>down</code> вместо метода <code>change</code>.</p>
+    <h4 class="inside_page_header" id="using-reversible"> Использование <code>reversible</code>
+    </h4>
+    <p>Комплексная миграция может включать процессы, которые Active Record не знает как обратить. Вы
+        можете использовать <code>reversible</code>, чтобы указать что делать когда запускается
+        миграция и когда она требует отката. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ExampleMigration &lt; ActiveRecord::Migration
+  def change
+    create_table :distributors do |t|
+      t.string :zipcode
+    end
+    reversible do |dir|
+      dir.up do
+        # добавим ограничение CHECK
+        execute &lt;&lt;-SQL
+          ALTER TABLE distributors
+            ADD CONSTRAINT zipchk
+              CHECK (char_length(zipcode) = 5) NO INHERIT;
+        SQL
+      end
+      dir.down do
+        execute &lt;&lt;-SQL
+          ALTER TABLE distributors
+            DROP CONSTRAINT zipchk
+        SQL
+      end
+    end
+    add_column :users, :home_page_url, :string
+    rename_column :users, :email, :email_address
+  end
+end
+</pre>
+    </div>
+    <p>Использование <code>reversible</code> гарантирует, что инструкции выполнятся в правильном
+        порядке. Если предыдущий пример миграции откатывается, <code>down</code> блок начнёт
+        выполнятся после того как столбец <code>home_page_url</code> будет удалён и перед перед тем
+        как произойдёт удаление таблицы <code>distributors</code>.</p>
+    <p>Иногда миграция будет делать то, что просто необратимо; например, она может уничтожить
+        некоторые данные. В таких случаях, вы можете вызвать <code>ActiveRecord::IrreversibleMigration</code>
+        в вашем <code>down</code> блоке. Если кто-либо попытается отменить вашу миграцию, будет
+        отображена ошибка, что это не может быть выполнено.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-metodov-up-down"> Использование методов
+        <code>up</code>/<code>down</code>
+    </h4>
+    <p>Вы также можете использовать старый стиль миграций используя <code>up</code> и
+        <code>down</code> методы, вместо <code>change</code>.
+        Метод <code>up</code> должен описывать изменения, которые вы хотите внести в вашу схему, а
+        метод <code>down</code> вашей миграции должен обращать изменения, внесенные методом
+        <code>up</code>. Другими словами, схема базы данных должна остаться неизменной после
+        выполнения <code>up</code>, а затем <code>down</code>. Например, если вы создали таблицу в
+        методе <code>up</code>, ее следует удалить в методе <code>down</code>. Разумно производить
+        отмену изменений в полностью противоположном порядке тому, в котором они сделаны в методе
+        <code>up</code>. Например в сравнении с кодом <code>reversible</code> следующий код будет
+        эквивалентным</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ExampleMigration &lt; ActiveRecord::Migration
+  def up
+    create_table :distributors do |t|
+      t.string :zipcode
+    end
+    #добавляем ограничение CHECK
+    execute &lt;&lt;-SQL
+      ALTER TABLE distributors
+        ADD CONSTRAINT zipchk
+        CHECK (char_length(zipcode) = 5);
+    SQL
+    add_column :users, :home_page_url, :string
+    rename_column :users, :email, :email_address
+  end
+  def down
+    rename_column :users, :email_address, :email
+    remove_column :users, :home_page_url
+    execute &lt;&lt;-SQL
+      ALTER TABLE distributors
+        DROP CONSTRAINT zipchk
+    SQL
+    drop_table :distributors
+  end
+end
+</pre>
+    </div>
+    <p>Если ваша миграция не обратима вам следует вызвать
+        <code>ActiveRecord::IrreversibleMigration</code> из вашего метода <code>down</code>. Если
+        кто-либо попытается отменить вашу миграцию, будет отображена ошибка, что это не может быть
+        выполнено.</p>
+    <h4 class="inside_page_header" id="reverting-previous-migrations"> Возвращение к предыдущим
+        миграциям</h4>
+    <p>Вы можете использовать возможность Active Record откатить миграции используя
+        <code>revert</code> метод:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require_relative '2012121212_example_migration'
+class FixupExampleMigration &lt; ActiveRecord::Migration
+  def change
+    revert ExampleMigration
+    create_table(:apples) do |t|
+      t.string :variety
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Метод <code>revert</code> так же может принимает блок. Это может быть полезным для отката
+        выбранной части предыдущих миграций. Для примера, давайте представим что <code>ExampleMigration</code>
+        закоммичена, а позже мы решили, что было бы лучше использовать валидации Active Record,
+        вместо ограничения <code>CHECK</code>, для проверки zipcode.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class DontUseConstraintForZipcodeValidationMigration &lt; ActiveRecord::Migration
+  def change
+    revert do
+      reversible do |dir|
+        dir.up do
+          # добавим ограничение CHECK
+          execute &lt;&lt;-SQL
+            ALTER TABLE distributors
+              ADD CONSTRAINT zipchk
+                CHECK (char_length(zipcode) = 5);
+          SQL
+        end
+        dir.down do
+          execute &lt;&lt;-SQL
+            ALTER TABLE distributors
+              DROP CONSTRAINT zipchk
+          SQL
+        end
+      end
+      # The rest of the migration was ok
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Подобная миграция так же может быть написана без использования <code>revert</code>, но это бы
+        привело к ещё нескольким шагам: изменение порядка(следования) <code>create table</code> и
+        <code>reversible</code>, замена <code>create_table</code> на <code>drop_table</code> и в
+        конечном итоге изменение <code>up</code> <code>down</code> наоборот. Обо всём этом уже
+        позаботился <code>revert</code>.</p>
+    <div class="note"><p>Если хотите добавить ограничения <code>CHECK</code>, как в вышеуказанных
+        примерах, нужно использовать <code>structure.sql</code> в качестве метода экспорта. Смотрите
+        .</p></div>
+    <h3 class="inside_page_header" id="zapusk-migratsiy"> Запуск миграций</h3>
+    <p>Rails предоставляет ряд задач rake для запуска определенных наборов миграций.</p>
+    <p>Самая первая команда Rake, относящаяся к миграциям, которую вы будете использовать, это
+        <code>rake db:migrate</code>. В своей основной форме она всего лишь запускает метод <code>change</code>
+        или <code>up</code> для всех миграций, которые еще не были запущены. Если таких миграций
+        нет, она выходит. Она запустит эти миграции в порядке, основанном на дате миграции.</p>
+    <p>Заметьте, что запуск <code>db:migrate</code> также вызывает задачу
+        <code>db:schema:dump</code>, которая обновляет ваш файл <code>db/schema.rb</code> в
+        соответствии со структурой вашей базы данных.</p>
+    <p>Если вы определите целевую версию, Active Record запустит требуемые миграции (методы up, down
+        или change), пока не достигнет требуемой версии. Версия это числовой префикс у файла
+        миграции. Например, чтобы мигрировать к версии 20080906120000, запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate VERSION=20080906120000
+</pre>
+    </div>
+    <p>Если версия 20080906120000 больше текущей версии (т.е. миграция вперед) это запустит метод
+        <code>change</code> (или <code>up</code>) для всех миграций до и включая 20080906120000, но
+        не запустит какие-либо поздние миграции. Если миграция назад, это запустит метод
+        <code>down</code> для всех миграций до, но не включая, 20080906120000.</p>
+    <h4 class="inside_page_header" id="otkat"> Откат</h4>
+    <p>Обычная задача это откатить последнюю миграцию. Например, вы сделали ошибку и хотите
+        исправить ее. Можно отследить версию предыдущей миграции и произвести миграцию до нее, но
+        можно поступить проще, запустив:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:rollback
+</pre>
+    </div>
+    <p>Это вернёт ситуацию к последней миграции, или обратив метод <code>change</code>, или запустив
+        метод <code>down</code>. Если нужно отменить несколько миграций, можно указать параметр
+        <code>STEP</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:rollback STEP=3
+</pre>
+    </div>
+    <p>произойдёт откат на 3 последних миграции.</p>
+    <p>Задача <code>db:migrate:redo</code> это ярлык для выполнения отката, а затем снова запуска
+        миграции. Так же, как и с задачей <code>db:rollback</code> можно указать параметр
+        <code>STEP</code>, если нужно работать более чем с одной версией, например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate:redo STEP=3
+</pre>
+    </div>
+    <p>Ни одна из этих команд Rake не может сделать ничего такого, чего нельзя было бы сделать с
+        <code>db:migrate</code>. Они просто более удобны, так как вам не нужно явно указывать версию
+        миграции, к которой нужно мигрировать.</p>
+    <h4 class="inside_page_header" id="ustanovka-bazy-dannyh"> Установка базы данных</h4>
+    <p>Задача <code>rake db:setup</code> создаст базу данных, загрузит схему и инициализирует ее с
+        помощью данных seed.</p>
+    <h4 class="inside_page_header" id="sbros-bazy-dannyh"> Сброс базы данных</h4>
+    <p>Задача <code>db:reset</code> удалит базу данных и установит ее заново. Функционально это
+        эквивалентно <code>rake db:drop db:setup</code>.</p>
+    <div class="note"><p>Это не то же самое, что запуск всех миграций. Оно использует только текущее
+        содержимое файла <code>schema.rb</code>. Если миграция не может быть откачена, 'rake
+        db:reset' может не помочь вам. Подробнее об экспорте схемы смотрите раздел .</p></div>
+    <h4 class="inside_page_header" id="zapusk-opredelennyh-migratsiy"> Запуск определенных
+        миграций</h4>
+    <p>Если вам нужно запустить определенную миграцию (up или down), задачи
+        <code>db:migrate:up</code> и <code>db:migrate:down</code> сделают это. Просто определите
+        подходящий вариант и у соответствующей миграции будет вызван метод <code>change</code>,
+        <code>up</code> или <code>down</code>, например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate:up VERSION=20080906120000
+</pre>
+    </div>
+    <p>запустит метод <code>up</code> у миграции 20080906120000. Эта задача сперва проверит, была ли
+        миграция уже выполнена, и ничего делать не будет, если Active Record считает, что она уже
+        была запущена.</p>
+    <h4 class="inside_page_header" id="zapusk-migratsiy-v-razlichnyh-sredah"> Запуск миграций в
+        различных средах</h4>
+    <p>По умолчанию запуск <code>rake db:migrate</code> запустится в окружении
+        <code>development</code>. Для запуска миграций в другом окружении, его можно указать,
+        используя переменную среды <code>RAILS_ENV</code> при запуске команды. Например, для запуска
+        миграций в среде <code>test</code>, следует запустить:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate RAILS_ENV=test
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="izmenenie-vyvoda-rezultata-zapuschennyh-migratsiy"> Изменение
+        вывода результата запущенных миграций</h4>
+    <p>По умолчанию миграции говорят нам только то, что они делают, и сколько времени это заняло.
+        Миграция, создающая таблицу и добавляющая индекс, выдаст что-то наподобие этого:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0028s
+==  CreateProducts: migrated (0.0028s) ========================================
+</pre>
+    </div>
+    <p>Некоторые методы в миграциях позволяют вам все это контролировать:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Метод</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td>suppress_messages</td>
+            <td>Принимает блок как аргумент и запрещает любой вывод, сгенерированный этим блоком.
+            </td>
+        </tr>
+        <tr>
+            <td>say</td>
+            <td>Принимает сообщение как аргумент и выводит его как есть. Может быть передан второй
+                булевый аргумент для указания, нужен отступ или нет.
+            </td>
+        </tr>
+        <tr>
+            <td>say_with_time</td>
+            <td>Выводит текст вместе с продолжительностью выполнения блока. Если блок возвращает
+                число, предполагается, что это количество затронутых строк.
+            </td>
+        </tr>
+    </table>
+    <p>Например, эта миграция:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    suppress_messages do
+      create_table :products do |t|
+        t.string :name
+        t.text :description
+        t.timestamps null: false
+      end
+    end
+    say "Created a table"
+    suppress_messages {add_index :products, :name}
+    say "and an index!", true
+    say_with_time 'Waiting for a while' do
+      sleep 10
+      250
+    end
+  end
+end
+</pre>
+    </div>
+    <p>сгенерирует следующий результат</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+==  CreateProducts: migrating =================================================
+-- Created a table
+   -&gt; and an index!
+-- Waiting for a while
+   -&gt; 10.0013s
+   -&gt; 250 rows
+==  CreateProducts: migrated (10.0054s) =======================================
+</pre>
+    </div>
+    <p>Если хотите, чтобы Active Record ничего не выводил, запуск <code>rake db:migrate
+        VERBOSE=false</code> запретит любой вывод.</p>
+    <h3 class="inside_page_header" id="izmenenie-suschestvuyuschih-migratsiy"> Изменение
+        существующих миграций</h3>
+    <p>Периодически вы будете делать ошибки при написании миграции. Если вы уже запустили миграцию,
+        вы не сможете просто отредактировать миграцию и запустить ее снова: Rails посчитает, что он
+        уже выполнял миграцию, и ничего не сделает при запуске <code>rake db:migrate</code>. Вы
+        должны откатить миграцию (например, с помощью <code>rake db:rollback</code>),
+        отредактировать миграцию и затем запустить <code>rake db:migrate</code> для запуска
+        исправленной версии.</p>
+    <p>В целом, редактирование существующих миграций не хорошая идея. Вы создадите дополнительную
+        работу себе и своим коллегам, и вызовете море головной боли, если существующая версия
+        миграции уже была запущена в production. Вместо этого, следует написать новую миграцию,
+        выполняющую требуемые изменения. Редактирование только что созданной миграции, которая еще
+        не была закоммичена в систему контроля версий (или, хотя бы, не ушла дальше вашей рабочей
+        машины) относительно безвредно.</p>
+    <p>Метод <code>revert</code> может быть очень полезным при написании новой миграции для
+        возвращения предыдущей в целом или какой то части (смотрите </p>
+    <h3 class="inside_page_header" id="schema-dumping-and-you"> Экспорт схемы</h3>
+    <h4 class="inside_page_header" id="dlya-chego-nuzhny-fayly-shemy"> Для чего нужны файлы
+        схемы?</h4>
+    <p>Миграции, какими бы не были они мощными, не являются авторитетным источником для вашей схемы
+        базы данных. Это роль достается или файлу <code>db/schema.rb</code>, или файлу SQL, которые
+        генерирует Active Record при исследовании базы данных. Они разработаны не для
+        редактирования, они всего лишь отражают текущее состояние базы данных.</p>
+    <p>Не нужно (это может привести к ошибке) развертывать новый экземпляр приложения, применяя всю
+        историю миграций. Намного проще и быстрее загрузить в базу данных описание текущей
+        схемы.</p>
+    <p>Например, как создается тестовая база данных: текущая рабочая база данных выгружается (или в
+        <code>db/schema.rb</code>, или в <code>db/structure.sql</code>), а затем загружается в
+        тестовую базу данных.</p>
+    <p>Файлы схемы также полезны, если хотите быстро взглянуть, какие атрибуты есть у объекта Active
+        Record. Эта информация не содержится в коде модели и часто размазана по нескольким
+        миграциям, но собрана воедино в файле схемы. Имеется гем , который автоматически добавляет и
+        обновляет комментарии в начале каждой из моделей, составляющих схему, если хотите такую
+        функциональность.</p>
+    <h4 class="inside_page_header" id="tipy-vygruzok-shemy"> Типы выгрузок схемы</h4>
+    <p>Есть два способа выгрузить схему. Они устанавливаются в <code>config/environment.rb</code> в
+        свойстве <code>config.active_record.schema_format</code>, которое может быть или
+        <code>:sql</code>, или <code>:ruby</code>.</p>
+    <p>Если выбрано <code>:ruby</code>, тогда схема хранится в <code>db/schema.rb</code>. Посмотрев
+        в этот файл, можно увидеть, что он очень похож на одну большую миграцию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveRecord::Schema.define(version: 20080906171750) do
+  create_table "authors", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+  create_table "products", force: true do |t|
+    t.string   "name"
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string "part_number"
+  end
+end
+</pre>
+    </div>
+    <p>Во многих случаях этого достаточно. Этот файл создается с помощью проверки базы данных и
+        описывает свою структуру, используя <code>create_table</code>, <code>add_index</code> и так
+        далее. Так как он не зависит от типа базы данных, он может быть загружен в любую базу
+        данных, поддерживаемую Active Record. Это очень полезно, если Вы распространяете приложение,
+        которое может быть запущено на разных базах данных.</p>
+    <p>Однако, тут есть компромисс: <code>db/schema.rb</code> не может описать специфичные элементы
+        базы данных, такие как триггеры, хранимые процедуры или ограничения <code>CHECK</code>. В то
+        время как в миграции вы можете выполнить произвольное выражение SQL, выгрузчик схемы не
+        может воспроизвести эти выражения из базы данных. Если Вы используете подобные функции,
+        нужно установить формат схемы :sql.</p>
+    <p>Вместо использования выгрузчика схемы Active Records, структура базы данных будет выгружена с
+        помощью инструмента, предназначенного для этой базы данных (с помощью задачи <code>db:structure:dump</code>
+        Rake) в <code>db/structure.sql</code>. Например, для PostgreSQL используется утилита <code>pg_dump</code>.
+        Для MySQL этот файл будет содержать результат <code>SHOW CREATE TABLE</code> для разных
+        таблиц.</p>
+    <p>Загрузка таких схем это просто запуск содержащихся в них выражений SQL. По определению
+        создастся точная копия структуры базы данных. Использование формата <code>:sql</code> схемы,
+        однако, предотвращает загрузку схемы в СУБД иную, чем использовалась при ее создании.</p>
+    <h4 class="inside_page_header" id="vygruzki-shem-i-kontrol-ishodnogo-koda"> Выгрузки схем и
+        контроль исходного кода</h4>
+    <p>Поскольку выгрузки схем это авторитетный источник для вашей схемы базы данных, очень
+        рекомендовано включать их в контроль исходного кода.</p>
+    <p><code>db/schema.rb</code> содержит число текущей версии базы данных. Это обеспечивает
+        возникающие конфликты в случае слияния двух веток, каждая из которых затрагивала схему.
+        Когда такое случится, исправьте конфликты вручную, оставив наибольшее число версии.</p>
+    <h3 class="inside_page_header" id="active-record-and-referential-integrity"> Active Record и
+        ссылочная целостность</h3>
+    <p>Способ Active Record требует, чтобы логика была в моделях, а не в базе данных. По большому
+        счету, функции, такие как триггеры или ограничения, которые переносят часть логики обратно в
+        базу данных, не используются активно.</p>
+    <p>Валидации, такие как <code>validates :foreign_key, uniqueness: true</code>, это один из
+        способов, которым ваши модели могут соблюдать ссылочную целостность. Опция
+        <code>:dependent</code> в связях позволяет моделям автоматически уничтожать дочерние объекты
+        при уничтожении родителя. Подобно всему, что работает на уровне приложения, это не может
+        гарантировать ссылочной целостности, таким образом кто-то может добавить еще и в базе
+        данных.</p>
+    <p>Хотя Active Record не предоставляет каких-либо инструментов для работы напрямую с этими
+        функциями, метод <code>execute</code> может использоваться для запуска произвольного SQL.
+    </p>
+    <h3 class="inside_page_header" id="migratsii-i-sidy"> Миграции и сиды</h3>
+    <p>Кто-то использует миграции для добавления данных в базу данных:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AddInitialProducts &lt; ActiveRecord::Migration
+  def up
+    5.times do |i|
+      Product.create(name: "Product ##{i}", description: "A product.")
+    end
+  end
+  def down
+    Product.delete_all
+  end
+end
+</pre>
+    </div>
+    <p>Однако, в Rails есть особенность 'seeds' которая должна быть использована для заполнения базы
+        данных начальными данными. Это действительно простая особенность: просто заполните <code>db/seeds.rb</code>
+        некоторым кодом Ruby и запустите <code>rake db:seed</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+5.times do |i|
+  Product.create(name: "Product ##{i}", description: "A product.")
+end
+</pre>
+    </div>
+    <p>В основном, это более чистый способ настроить базу данных для пустого приложения.</p>
+
+</body>
+</html>

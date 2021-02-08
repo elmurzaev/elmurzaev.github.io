@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Тестирование приложений на Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rukovodstvo-po-testirovaniyu-prilozheniy-na-rails">
+        Руководство по тестированию приложений на Rails</h2>
+    <p>Это руководство раскрывает встроенные в Rails механизмы для тестирования вашего
+        приложения.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>О терминологии тестирования Rails.
+        </li>
+        <li>Как писать юнит-, функциональные и объединенные тесты для вашего приложения.
+        </li>
+        <li>О других популярных подходах к тестированию и плагинах.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="zachem-pisat-testy-dlya-vashego-prilozheniya-na-rails"> Зачем
+        писать тесты для вашего приложения на Rails?</h3>
+    <p>Rails предлагает писать тесты очень просто. Когда вы создаете свои модели и контроллеры, он
+        начинает создавать скелет тестового кода.</p>
+    <p>Простой запуск тестов Rails позволяет убедиться, что ваш код придерживается нужной
+        функциональности даже после большой переделки кода.</p>
+    <p>Тесты Rails также могут симулировать запросы браузера, таким образом, можно тестировать
+        отклик своего приложения без необходимости тестирования с использованием браузера.</p>
+    <h3 class="inside_page_header" id="vvedenie-v-testirovanie"> Введение в тестирование</h3>
+    <p>Поддержка тестирования встроена в Rails с самого начала. И это не было так: "О! Давайте
+        внесем поддержку запуска тестов, это ново и круто!"</p>
+    <h4 class="inside_page_header" id="nastroyka-rails-dlya-testirovaniya-s-nulya"> Настройка Rails
+        для тестирования с нуля</h4>
+    <p>Rails создает директорию <code>test</code> как только вы создаете проект Rails, используя
+        <code>rails new _application_name_</code>. Если посмотрите список содержимого этой папки, то
+        увидите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ls -F test
+controllers/    helpers/        mailers/        test_helper.rb
+fixtures/       integration/    models/
+</pre>
+    </div>
+    <p>Директория <code>models</code> предназначена содержать тесты для ваших моделей, директория
+        <code>controllers</code> предназначена содержать тесты для ваших контроллеров, и директория
+        <code>integration</code> предназначена содержать тесты, которые включают любое
+        взаимодействие контроллеров. Также есть директория для тестирования рассыльщиков и для
+        тестирования хелперов вьюх.</p>
+    <p>Фикстуры это способ организации тестовых данных; они находятся в директории
+        <code>fixtures</code>.</p>
+    <p>Файл <code>test_helper.rb</code> содержит конфигурацию по умолчанию для ваших тестов.</p>
+    <h4 class="inside_page_header" id="testovaya-sreda-razrabotki"> Тестовая среда разработки</h4>
+    <p>По умолчанию каждое приложение на Rails имеет три среды разработки: development, test и
+        production. База данных для каждой из них настраивается в <code>config/database.yml</code>.
+    </p>
+    <p>Схожим образом можно изменить конфигурацию среды. В этом случае можно изменить тестовую
+        среду, изменяя опции в <code>config/environments/test.rb</code>.</p>
+    <p>+NOTE: Ваши тесты запускаются с <code>RAILS_ENV=test</code>.</p>
+    <h4 class="inside_page_header" id="rails-vstretilsya-s-minitest"> Rails встретился с
+        Minitest</h4>
+    <p>Если помните, мы использовали команду <code>rails generate scaffold</code> в руководстве . Мы
+        создали наш первый ресурс, где, среди прочего, создался незаконченные тесты в папке <code>test</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold article title:string body:text
+...
+create  app/models/article.rb
+create  test/models/article_test.rb
+create  test/fixtures/articles.yml
+...
+</pre>
+    </div>
+    <p>Незаконченный тест по умолчанию в <code>test/models/article_test.rb</code> выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class ArticleTest &lt; ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end
+</pre>
+    </div>
+    <p>Построчное изучение этого файла поможет вам ориентироваться в коде тестирования и
+        терминологии Rails.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+</pre>
+    </div>
+    <p>Требуя этот файл, загружается конфигурация по умолчанию <code>test_helper.rb</code> для
+        запуска наших тестов. Мы будем включать эту строку во все написанные тесты, таким образом,
+        все методы, добавленные в этот файл, будут доступны во всех ваших тестах.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticleTest &lt; ActiveSupport::TestCase
+</pre>
+    </div>
+    <p>Класс <code>ArticleTest</code> определяет <em>тестовый случай (test case)</em>, поскольку он
+        унаследован от <code>ActiveSupport::TestCase</code>. Поэтому <code>ArticleTest</code> имеет
+        все методы, доступные в <code>ActiveSupport::TestCase</code>. Позже в этом руководстве вы
+        увидите некоторые из методов, которые он дает вам.</p>
+    <p>Любой метод, определенный в классе, унаследованном от <code>Minitest::Test</code> (который
+        является суперклассом для <code>ActiveSupport::TestCase</code>), начинающийся с
+        <code>test_</code> (чувствительно к регистру), просто вызывает тест. Таким образом, методы,
+        определенные как <code>test_password</code> и <code>test_valid_password</code>, это
+        правильные имена тестов, и запустятся автоматически при запуске тестового случая.</p>
+    <p>Rails также добавляет метод <code>test</code>, который принимает имя теста и блок. Он создает
+        обычный тест <code>MiniTest::Unit</code> с именем метода, начинающегося с <code>test_</code>,
+        поэтому можно не беспокоиться об именовании методов, а просто писать так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "the truth" do
+  assert true
+end
+</pre>
+    </div>
+    <p>Это является приблизительно тем же, как если бы написали:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def test_the_truth
+  assert true
+end
+</pre>
+    </div>
+    <p>Однако, только макрос <code>test</code> делает имена тестов более читаемыми. Хотя можете
+        использовать и обычные определения метода.</p>
+    <div class="note"><p>Имя метода создается, заменяя пробелы на подчеркивания. Хотя результат не
+        должен быть валидным идентификатором Ruby, имя может содержать знаки пунктуации и т.д. Это
+        связано с тем, что в Ruby технически любая строка может быть именем метода. Это может
+        потребовать, чтобы вызовы <code>define_method</code> и <code>send</code> функционировали
+        правильно, но формально есть только небольшое ограничение на имя.</p></div>
+    <p>Далее посмотрим на наше первое утверждение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assert true
+</pre>
+    </div>
+    <p>Утверждение (assertion) - это строчка кода, которая вычисляет объект (или выражение) для
+        ожидаемых результатов. Например, утверждение может проверить:</p>
+    <ul>
+        <li>является ли это значение равным тому значению?
+        </li>
+        <li>является ли этот объект <code>nil</code>?
+        </li>
+        <li>вызывает ли эта строка кода исключение?
+        </li>
+        <li>является ли пароль пользователя больше, чем 5 символов?
+        </li>
+    </ul>
+    <p>Каждый тест должен содержать минимум одно утверждение без ограничений на их максимальное
+        количество. Только когда все утверждения успешны, тест проходит.</p>
+    <h5 class="inside_page_header" id="vash-pervyy-padayuschiy-test"> Ваш первый падающий тест</h5>
+    <p>Чтобы увидеть, как сообщается провал теста, вы можете добавить проваливающийся тест в
+        тестовый случай <code>article_test.rb</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should not save article without title" do
+  article = Article.new
+  assert_not article.save
+end
+</pre>
+    </div>
+    <p>Давайте запустим только что добавленный тест (где <code>6</code> - это номер строки, где
+        определен тест).</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/article_test.rb:6
+F
+Finished tests in 0.044632s, 22.4054 tests/s, 22.4054 assertions/s.
+  1) Failure:
+test_should_not_save_article_without_title(ArticleTest) [test/models/article_test.rb:6]:
+Failed assertion, no message given.
+1 tests, 1 assertions, 1 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>В результате <code>F</code> обозначает провал. Можете увидеть соответствующую трассировку под
+        <code>1)</code> вместе с именем провалившегося теста. Следующие несколько строк содержат
+        трассировку стека, затем сообщение, где упомянуто фактическое значение и ожидаемое в
+        утверждении значение. По умолчанию сообщение для утверждения предоставляет достаточно
+        информации, чтобы помочь выявить ошибку. Чтобы сделать сообщение о провале для утверждения
+        более читаемым, каждое утверждение предоставляет опциональный параметр для сообщения, как
+        показано тут:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should not save article without title" do
+  article = Article.new
+  assert_not article.save, "Saved the article without a title"
+end
+</pre>
+    </div>
+    <p>Запуск этого теста покажет более дружелюбное сообщение для утверждения:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  1) Failure:
+test_should_not_save_article_without_title(ArticleTest) [test/models/article_test.rb:6]:
+Saved the article without a title
+</pre>
+    </div>
+    <p>Теперь, чтобы этот тест прошел, можно добавить валидацию на уровне модели для поля
+        <em>title</em>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  validates :title, presence: true
+end
+</pre>
+    </div>
+    <p>Теперь тест пройдет. Давайте убедимся в этом, запустив его снова:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/article_test.rb:6
+.
+Finished tests in 0.047721s, 20.9551 tests/s, 20.9551 assertions/s.
+1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Теперь, если вы заметили, мы сначала написали провальный тест для желаемой функциональности,
+        затем мы написали некоторый код, добавляющий функциональность, и, наконец, мы убедились, что
+        наш тест прошел. Этот подход к разработке программного обеспечения называют .</p>
+    <h5 class="inside_page_header" id="kak-vyglyadit-oshibka"> Как выглядит ошибка</h5>
+    <p>Чтобы увидеть, как сообщается об ошибке, вот тест, содержащий ошибку:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should report error" do
+  # переменная some_undefined_variable не определена в тесте
+  some_undefined_variable
+  assert true
+end
+</pre>
+    </div>
+    <p>Теперь вы увидите чуть больше результата в консоли от запуска тестов:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/article_test.rb
+E
+Finished tests in 0.030974s, 32.2851 tests/s, 0.0000 assertions/s.
+  1) Error:
+test_should_report_error(ArticleTest):
+NameError: undefined local variable or method `some_undefined_variable' for #&lt;ArticleTest:0x007fe32e24afe0&gt;
+    test/models/article_test.rb:10:in `block in &lt;class:ArticleTest&gt;'
+1 tests, 0 assertions, 0 failures, 1 errors, 0 skips
+</pre>
+    </div>
+    <p>Отметьте 'E' в результате. Она отмечает тест с ошибкой.</p>
+    <div class="note"><p>Запуск каждого тестового метода останавливается как только случается любая
+        ошибка или провал утверждения, и набор тестов продолжается со следующего метода. Все
+        тестовые методы запускаются в случайном порядке. Для настройки порядка тестирования может
+        быть использована .</p></div>
+    <p>Когда тест проваливается, вам показывается соответствующий бэктрейс. По умолчанию Rails
+        фильтрует этот бэктрейс и печатает только строчки, относящиеся к вашему приложению. Это
+        устраняет шум от фреймворка и помогает сфокусироваться на вашем коде. Однако, бывают
+        ситуации, когда вам захочется увидеть полный бэктрейс. Просто установите аргумент
+        <code>-b</code> (или <code>--backtrace</code>) для включения этого поведения:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test -b test/models/article_test.rb
+</pre>
+    </div>
+    <p>Если хотите, чтобы этот тест прошел, можно его изменить, используя <code>assert_raises</code>
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should report error" do
+  # переменная some_undefined_variable не определена в тесте
+  assert_raises(NameError) do
+    some_undefined_variable
+  end
+end
+</pre>
+    </div>
+    <p>Теперь этот тест должен пройти.</p>
+    <h4 class="inside_page_header" id="dostupnye-utverzhdeniya"> Доступные утверждения</h4>
+    <p>К этому моменту вы уже увидели некоторые из имеющихся утверждений. Утверждения - это рабочие
+        лошадки тестирования. Они единственные, кто фактически выполняет проверки, чтобы убедиться,
+        что все работает как задумано.</p>
+    <p>Ниже представлена выдержка утверждений, которые вы можете использовать с , библиотекой
+        тестирования, используемой Rails по умолчанию. Параметр <code>[msg]</code> - это
+        опциональное строковое сообщение, которое вы можете указать для того, чтобы сделать
+        сообщение о провале более ясным. Это не обязательно.</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Утверждение</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td><code>assert( test, [msg] )</code></td>
+            <td>Утверждает, что <code>test</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not( test, [msg] )</code></td>
+            <td>Утверждает, что <code>test</code> ложно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_equal( expected, actual, [msg] )</code></td>
+            <td>Утверждает, что <code>expected == actual</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_equal( expected, actual, [msg] )</code></td>
+            <td>Утверждает, что <code>expected != actual</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_same( expected, actual, [msg] )</code></td>
+            <td>Утверждает, что <code>expected.equal?(actual)</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_same( expected, actual, [msg] )</code></td>
+            <td>Утверждает, что <code>expected.equal?(actual)</code> ложно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_nil( obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj.nil?</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_nil( obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj.nil?</code> ложно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_empty( obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> является <code>empty?</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_empty( obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> не является <code>empty?</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_match( regexp, string, [msg] )</code></td>
+            <td>Утверждает, что строка соответствует регулярному выражению.</td>
+        </tr>
+        <tr>
+            <td><code>assert_no_match( regexp, string, [msg] )</code></td>
+            <td>Утверждает, что строка не соответствует регулярному выражению.</td>
+        </tr>
+        <tr>
+            <td><code>assert_includes( collection, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> находится в <code>collection</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_includes( collection, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> не находится в <code>collection</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_in_delta( expected, actual, [delta], [msg] )</code></td>
+            <td>Утверждает, что между числами <code>expected</code> и <code>actual</code> разницу
+                <code>delta</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_not_in_delta( expected, actual, [delta], [msg] )</code></td>
+            <td>Утверждает, что между числами <code>expected</code> и <code>actual</code> разница,
+                отличная от <code>delta</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_throws( symbol, [msg] ) { block }</code></td>
+            <td>Утверждает, что переданный блок бросает symbol.</td>
+        </tr>
+        <tr>
+            <td><code>assert_raises( exception1, exception2, ... ) { block }</code></td>
+            <td>Утверждает, что переданный блок генерирует одно из переданных исключений.</td>
+        </tr>
+        <tr>
+            <td><code>assert_nothing_raised( exception1, exception2, ... ) { block }</code></td>
+            <td>Утверждает, что переданный блок не генерирует одно из переданных исключений.</td>
+        </tr>
+        <tr>
+            <td><code>assert_instance_of( class, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> является экземпляром <code>class</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_instance_of( class, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> не является экземпляром <code>class</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_kind_of( class, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> является экземпляром <code>class</code> или класса,
+                наследуемого от него.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_not_kind_of( class, obj, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> не является экземпляром <code>class</code> или
+                класса, наследуемого от него.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_respond_to( obj, symbol, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> отвечает на <code>symbol</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_respond_to( obj, symbol, [msg] )</code></td>
+            <td>Утверждает, что <code>obj</code> не отвечает на <code>symbol</code>.</td>
+        </tr>
+        <tr>
+            <td><code>assert_operator( obj1, operator, [obj2], [msg] )</code></td>
+            <td>Утверждает, что <code>obj1.operator(obj2)</code> истинно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_not_operator( obj1, operator, [obj2], [msg] )</code></td>
+            <td>Утверждает, что <code>obj1.operator(obj2)</code> ложно.</td>
+        </tr>
+        <tr>
+            <td><code>assert_predicate ( obj, predicate, [msg] )</code></td>
+            <td>Утверждает, что <code>obj.predicate</code> истинно, т.е. <code>assert_predicate str,
+                :empty?</code>
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_not_predicate ( obj, predicate, [msg] )</code></td>
+            <td>Утверждает, что <code>obj.predicate</code> ложно, т.е. <code>assert_not_predicate
+                str, :empty?</code>
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_send( array, [msg] )</code></td>
+            <td>Утверждает, что выполнение метода из <code>array[1]</code> на объекте из <code>array[0]</code>
+                с параметрами <code>array[2 and up]</code> истинно. Это странно, да?
+            </td>
+        </tr>
+        <tr>
+            <td><code>flunk( [msg] )</code></td>
+            <td>Утверждает провал. Это полезно для явного указания теста, который еще не закончен.
+            </td>
+        </tr>
+    </table>
+    <p>Представленный выше список утверждений поддерживается minitest. Более полный и более
+        актуальный список всех доступных утверждений смотрите в , в частности </p>
+    <p>В силу модульной природы фреймворка тестирования, возможно создать свои собственные
+        утверждения. Фактически Rails так и делает. Он включает некоторые специализированные
+        утверждения, чтобы сделать жизнь разработчика проще.</p>
+    <div class="note"><p>Создание собственных утверждений это особый разговор, которого мы касаться
+        не будем.</p></div>
+    <h4 class="inside_page_header" id="spetsifichnye-utverzhdeniya-rails"> Специфичные утверждения
+        Rails</h4>
+    <p>Rails добавляет некоторые свои утверждения в фреймворк <code>minitest</code>:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Утверждение</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td><code>assert_difference(expressions, difference = 1, message = nil) {...}</code>
+            </td>
+            <td>Тестирует числовую разницу между возвращаемым значением expression и результатом
+                вычисления в данном блоке.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_no_difference(expressions, message = nil, &amp;block)</code></td>
+            <td>Обеспечивает, что числовой результат вычисления expression не изменяется до и после
+                применения переданного в блоке.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_recognizes(expected_options, path, extras={}, message=nil)</code></td>
+            <td>Обеспечивает, что роутинг данного path был правильно обработан, и что
+                проанализированные опции (заданные в хэше expected_options) соответствуют path. По
+                существу он утверждает, что Rails распознает маршрут, заданный в expected_options.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_generates(expected_path, options, defaults={}, extras = {},
+                message=nil)</code></td>
+            <td>Утверждает, что предоставленные options могут быть использованы для создания
+                предоставленного пути. Это противоположность assert_recognizes. Параметр extras
+                используется, чтобы сообщить запросу имена и значения дополнительных параметров
+                запроса, которые могут быть в строке запроса. Параметр message позволяет определить
+                свое сообщение об ошибке при провале утверждения.
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_response(type, message = nil)</code></td>
+            <td>Утверждает, что отклик идет с определенным кодом статуса. Можете определить <code>:success</code>
+                для обозначения 200-299, <code>:redirect</code> для обозначения 300-399, <code>:missing</code>
+                для обозначения 404, или <code>:error</code> для соответствия диапазону 500-599.
+                Можно передать явный номер статуса или его символьный эквивалент. Более подробно
+                смотрите в и как работает их .
+            </td>
+        </tr>
+        <tr>
+            <td><code>assert_redirected_to(options = {}, message=nil)</code></td>
+            <td>Утверждает, что опции перенаправления передаются в соответствии с вызовами
+                перенаправления в последнем экшне. Это соответствие может быть частичным, так <code>assert_redirected_to(controller:
+                    "weblog")</code> будет также соответствовать перенаправлению <code>redirect_to(controller:
+                    "weblog", action: "show")</code> и тому подобное. Также можно передать
+                именованные маршруты, как в <code>assert_redirected_to root_path</code>, и объекты
+                Active Record, как в <code>assert_redirected_to @article</code>.
+            </td>
+        </tr>
+    </table>
+    <p>Вы увидите использование некоторых из этих утверждений в следующей части.</p>
+    <h4 class="inside_page_header" id="kratkaya-zametka-o-testovyh-sluchayah"> Краткая заметка о
+        тестовых случаях</h4>
+    <p>Все основные утверждения, такие как <code>assert_equal</code>, определенные в <code>Minitest::Assertions</code>,
+        также доступны в классах, используемых в наших тестовых случаях. Фактически, Rails
+        представляет вам следующие классы для наследования:</p>
+    <ul>
+        <li>
+            <code>ActiveSupport::TestCase</code>
+        </li>
+        <li>
+            <code>ActionController::TestCase</code>
+        </li>
+        <li>
+            <code>ActionMailer::TestCase</code>
+        </li>
+        <li>
+            <code>ActionView::TestCase</code>
+        </li>
+        <li>
+            <code>ActionDispatch::IntegrationTest</code>
+        </li>
+        <li>
+            <code>ActiveJob::TestCase</code>
+        </li>
+    </ul>
+    <p>Каждый из этих классов включает <code>Minitest::Assertions</code>, позволяя использовать все
+        основные утверждения в наших тестах.</p>
+    <div class="note"><p>За подробностями о <code>Minitest</code> обратитесь к </p></div>
+    <h4 class="inside_page_header" id="zapusk-testov-rails"> Запуск тестов Rails</h4>
+    <p>Можно запустить все тесты за раз с помощью команды <code>rails test</code>.</p>
+    <p>Или можно запустить отдельный тест, передав команде <code>rails test</code> имя файла,
+        содержащего тестовые случаи.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/article_test.rb
+.
+Finished tests in 0.009262s, 107.9680 tests/s, 107.9680 assertions/s.
+1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Это запустит все тестовые методы из тестового случая.</p>
+    <p>Также можете запустить определенный тестовый метод из тестового случая, предоставив флажок
+        <code>-n</code> или <code>--name</code> и имя метода теста.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/article_test.rb -n test_the_truth
+.
+Finished tests in 0.009064s, 110.3266 tests/s, 110.3266 assertions/s.
+1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Также можно запустить тест в определенной строчке, предоставив номер строчки.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/models/post_test.rb:44 # запускает определенный тест и строчку
+</pre>
+    </div>
+    <p>Также можно запустить целую директорию тестов, предоставив путь к этой директории.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/controllers # запускает все тесты из определенной директории
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testovaya-baza-dannyh"> Тестовая база данных</h3>
+    <p>Почти каждое приложение на Rails сильно взаимодействует с базой данных, и, как результат,
+        тестам также требуется база данных для работы. Чтобы писать эффективные тесты, следует
+        понять, как настроить эту базу данных и наполнить ее образцом данных.</p>
+    <p>По умолчанию каждое приложение на Rails имеет три среды разработки: development, test и
+        production. База данных для каждой из них настраивается в <code>config/database.yml</code>.
+    </p>
+    <p>Отдельная тестовая база данных позволяет настраивать и работать с данными в изоляции. Таким
+        образом, тесты могут искажать тестовые данные с уверенностью, не беспокоясь о данных в базах
+        данных development или production.</p>
+    <h4 class="inside_page_header" id="podderzhka-shemy-testovoy-bazy-dannyh"> Поддержка схемы
+        тестовой базы данных</h4>
+    <p>Чтобы запустить тесты, ваша тестовая база данных должна иметь текущую структуры. Тестовый
+        хелпер проверяет, не имеет ли ваша тестовая база данных отложенных миграций. Если так, он
+        пытается загрузить ваши <code>db/schema.rb</code> или <code>db/structure.sql</code> в
+        тестовую базу данных. Если есть отложенные миграции - будет вызвана ошибка. Обычно это
+        указывает на то, что ваша схема не полностью мигрирована. Запуск миграций для базы данных
+        development (<code>bin/rake db:migrate</code>) приведет схему в актуальное состояние.</p>
+    <div class="note"><p>Если существующие миграции требуют модификации, нужно перестроить тестовую
+        базу данных. Это делается с помощью выполнения <code>bin/rake db:test:prepare</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="polnaya-informatsiya-po-fiksturam"> Полная информация по
+        фикстурам</h4>
+    <p>Для хороших тестов необходимо подумать о настройке тестовых данных. В Rails этим можно
+        управлять, определяя и настраивая фикстуры. Подробности можно узнать в .</p>
+    <h5 class="inside_page_header" id="chto-takoe-fikstury"> Что такое фикстуры?</h5>
+    <p><em>Fixtures</em> это выдуманное слово для образцов данных. Фикстуры позволяют заполнить вашу
+        тестовую базу данных предопределенными данными до запуска тестов. Фикстуры независимы от
+        типа базы данных и написаны на YAML. На каждую модель имеется отдельный файл.</p>
+    <p>Фикстуры расположены в директории <code>test/fixtures</code>. Когда запускаете <code>rails
+        generate model</code> для создания новой модели, Rails автоматически создаст незаконченные
+        фикстуры в этой директории.</p>
+    <h5 class="inside_page_header" id="yaml"> YAML</h5>
+    <p>Фикстуры в формате YAML являются дружелюбным способом описать ваш образец данных. Этот тип
+        фикстур имеет расширение файла <em>.yml</em> (как в <code>users.yml</code>).</p>
+    <p>Вот образец файла фикстуры YAML:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# lo &amp; behold! I am a YAML comment!
+david:
+  name: David Heinemeier Hansson
+  birthday: 1979-10-15
+  profession: Systems development
+steve:
+  name: Steve Ross Kellock
+  birthday: 1974-09-27
+  profession: guy with keyboard
+</pre>
+    </div>
+    <p>Каждой фикстуре дается имя со следующим за ним списком с отступом пар ключ/значение,
+        разделенных двоеточием. Записи обычно разделяются пустой строкой. Можете помещать
+        комментарии в файл фикстуры, используя символ # в первом столбце.</p>
+    <p>Если работаете со , можно просто определить ссылку между двумя различными фикстурами. Вот
+        пример для связи <code>belongs_to</code>/<code>has_many</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# In fixtures/categories.yml
+about:
+  name: About
+# In fixtures/articles.yml
+one:
+  title: Welcome to Rails!
+  body: Hello world!
+  category: about
+</pre>
+    </div>
+    <p>Отметьте, что у ключа <code>category</code> в статье <code>one</code> из <code>fixtures/articles.yml</code>
+        значение <code>about</code>. Это говорит Rails загрузить категорию <code>about</code> из
+        <code>fixtures/categories.yml</code>.</p>
+    <div class="note"><p>При связи двух записей по имени в связанных фикстурах нельзя указывать
+        атрибут <code>id:</code>. Rails автоматически назначит первичный ключ, согласующийся между
+        запусками. Подробнее об этом поведении связей можно прочитать в .</p></div>
+    <h5 class="inside_page_header" id="erb"> ERb</h5>
+    <p>ERb позволяет встраивать код Ruby в шаблоны. Формат фикстур YAML предварительно
+        обрабатывается с помощью ERb при загрузке фикстур. Это позволяет использовать Ruby для
+        помощи в создании некоторых образцов данных. Например, следующий код создаст тысячу
+        пользователей:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% 1000.times do |n| %&gt;
+user_&lt;%= n %&gt;:
+  username: &lt;%= "user#{n}" %&gt;
+  email: &lt;%= "user#{n}@example.com" %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="fikstury-v-deystvii"> Фикстуры в действии</h5>
+    <p>Rails по умолчанию автоматически загружает все фикстуры из директории
+        <code>test/fixtures</code> для ваших тестов моделей и контроллеров. Загрузка состоит из трех
+        этапов:</p>
+    <ul>
+        <li>Убираются любые существующие данные из таблицы, соответствующей фикстуре
+        </li>
+        <li>Загружаются данные фикстуры в таблицу
+        </li>
+        <li>Выгружаются данные фикстуры в переменную, в случае, если вы хотите обращаться к ним
+            напрямую
+        </li>
+    </ul>
+    <div class="info"><p>Чтобы убрать существующие данные из базы, Rails пытается отключить триггеры
+        ссылочной целостности (такие как внешние ключи и проверки ограничений). Если вы получаете
+        надоедливые ошибки доступа при запуске тестов, убедитесь, что у пользователя базы данных
+        есть привилегия отключать эти триггеры в тестовой среде. (В PostgreSQL только
+        суперпользователи могут отключать все триггеры. Подробнее о разрешениях PostgreSQL читайте
+        )</p></div>
+    <h5 class="inside_page_header" id="fikstury-eto-ob-ekty-active-record"> Фикстуры это объекты
+        Active Record</h5>
+    <p>Фикстуры являются экземплярами Active Record. Как упоминалось в этапе №3 выше, Вы можете
+        обращаться к объекту напрямую, поскольку он автоматически доступен как метод, область
+        видимости которого локальна для тестового случая. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# это возвратит объект User для фикстуры с именем david
+users(:david)
+# это возвратит свойство для david, названное id
+users(:david).id
+# он имеет доступ к методам, доступным для класса User
+email(david.partner.email, david.location_tonight)
+</pre>
+    </div>
+    <p>Чтобы получить несколько фикстур за раз, вы можете передать список имен фикстур.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# это возвратит массив, содержаший фикстуры david и steve
+users(:david, :steve)
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testirovanie-modeley"> Тестирование моделей</h3>
+    <p>Тесты моделей используются для тестирования различных моделей вашего приложения.</p>
+    <p>Тесты моделей Rails хранятся в директории <code>test/models</code> directory. Rails
+        предоставляет генератор для создания скелета теста модели.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate test_unit:model article title:string body:text
+create  test/models/article_test.rb
+create  test/fixtures/articles.yml
+</pre>
+    </div>
+    <p>У тестов модели нет своего собственного суперкласса, такого как
+        <code>ActionMailer::TestCase</code>, вместо этого они наследуются от <code>ActiveSupport::TestCase</code>.
+    </p>
+    <h3 class="inside_page_header" id="integratsionnoe-testirovanie"> Интеграционное
+        тестирование</h3>
+    <p>Интеграционные тесты используются для тестирования взаимодействия различных частей вашего
+        приложения. Они в основном используются для тестирования важных рабочих процессов в вашем
+        приложении.</p>
+    <p>Для создания интеграционных тестов Rails используется директория 'test/integration' вашего
+        приложения. Rails предоставляет вам генератор для создания скелета интеграционного
+        теста.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate integration_test user_flows
+      exists  test/integration/
+      create  test/integration/user_flows_test.rb
+</pre>
+    </div>
+    <p>Вот как выглядит вновь созданный интеграционный тест:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class UserFlowsTest &lt; ActionDispatch::IntegrationTest
+  # test "the truth" do
+  #   assert true
+  # end
+end
+</pre>
+    </div>
+    <p>Наследование от <code>ActionController::IntegrationTest</code> дает несколько преимуществ.
+        Это делает доступным несколько дополнительных хелперов для использования в ваших
+        интеграционных тестах.</p>
+    <h4 class="inside_page_header" id="helpery-dostupnye-dlya-integratsionnyh-testov"> Хелперы,
+        доступные для интеграционных тестов</h4>
+    <p>В дополнение к стандартным хелперам тестирования, наследование от <code>ActionDispatch::IntegrationTest</code>
+        дает несколько дополнительных хелперов для написания интеграционных тестов. Давайте для
+        краткости представим три категории хелперов.</p>
+    <p>Для работы с runner-ом интеграционных тестов, смотрите .</p>
+    <p>Для выполнения запросов у вас есть .</p>
+    <p>Если хотите изменить сессию или состояние вашего интеграционного теста, вам поможет .</p>
+    <h4 class="inside_page_header" id="realizatsiya-integratsionnogo-testa"> Реализация
+        интеграционного теста</h4>
+    <p>Давайте добавим интеграционный тест в наше приложение блога. Начнем с основного процесса
+        создания новой статьи блога, чтобы убедиться, что все работает правильно.</p>
+    <p>Начнем с создания скелета нашего интеграционного теста:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate integration_test blog_flow
+</pre>
+    </div>
+    <p>Он должен создать файл для размещения теста, и в результате предыдущей команды вы должны
+        увидеть:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+      invoke  test_unit
+      create    test/integration/blog_flow_test.rb
+</pre>
+    </div>
+    <p>Теперь откроем этот файл и напишем наше первое утверждение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class BlogFlowTest &lt; ActionDispatch::IntegrationTest
+  test "can see the welcome page" do
+    get "/"
+    assert_select "h1", "Welcome#index"
+  end
+end
+</pre>
+    </div>
+    <p>Как помните из раздела "Тестирование вьюх", мы раскрыли <code>assert_select</code> для
+        выборки результирующего HTML запроса.</p>
+    <h5 class="inside_page_header" id="sozdanie-integratsii-statey"> Создание интеграции статей</h5>
+    <p>Как насчет тестирования возможности создавать новую статью в нашем блоге и просматривать
+        полученную статью.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "can create an article" do
+  get "/articles/new"
+  assert_response :success
+  post "/articles",
+    params: { article: { title: "can create", body: "article successfully." } }
+  assert_response :redirect
+  follow_redirect!
+  assert_response :success
+  assert_select "p", "Title:\n  can create"
+end
+</pre>
+    </div>
+    <p>Давайте разобьем этот тест на кусочки, чтобы понять его.</p>
+    <p>Мы начинаем с вызова экшна <code>:new</code> контроллера Articles. Этот запрос должен быть
+        успешным.</p>
+    <p>После этого мы делаем запрос post к экшну <code>:create</code> нашего контроллера Articles:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+post "/articles",
+  params: { article: { title: "can create", body: "article successfully." } }
+assert_response :redirect
+follow_redirect!
+</pre>
+    </div>
+    <p>Следующие две строчки — это обработка редиректа, который мы настроили при создании новой
+        статьи.</p>
+    <div class="note"><p>Не забывайте вызвать <code>follow_redirect!</code> Если планируете сделать
+        последовательные запросы после выполнения редиректа.</p></div>
+    <p>Наконец, мы убеждаемся, что наш отклик был успешным, и нашу статью можно прочесть на
+        странице.</p>
+    <h5 class="inside_page_header" id="idem-dalshe"> Идем дальше</h5>
+    <p>У нас получилось протестировать маленький процесс посещения нашего блога и создания новой
+        статьи. Если мы хотим идти дальше, мы можем добавить тесты для комментирования, удаления
+        статей и редактирования комментариев. Интеграционные тесты — это отличное место для
+        экспериментов с различными сценариями использования приложения.</p>
+    <h3 class="inside_page_header" id="funktsionalnye-testy-dlya-vashih-kontrollerov">
+        Функциональные тесты для ваших контроллеров</h3>
+    <p>В Rails тестирование различных экшнов контроллера — это форма написания функциональных
+        тестов. Помните, что контроллеры обрабатывают входящие веб запросы к вашему приложению и в
+        конечном итоге откликаются отрендеренной вьюхой. При написании функциональных тестов, вы
+        тестируете, как ваши экшны обрабатывают запросы, ожидаемый результат или, в некоторых
+        случаях, отклики вьюх HTML.</p>
+    <h4 class="inside_page_header" id="chto-vklyuchat-v-funktsionalnye-testy"> Что включать в
+        функциональные тесты</h4>
+    <p>Следует протестировать такие вещи, как:</p>
+    <ul>
+        <li>был ли веб запрос успешным?
+        </li>
+        <li>был ли пользователь перенаправлен на правильную страницу?
+        </li>
+        <li>был ли пользователь успешно аутентифицирован?
+        </li>
+        <li>был ли правильный объект сохранен в шаблон отклика?
+        </li>
+        <li>было ли подходящее сообщение отражено для пользователя во вьюхе
+        </li>
+    </ul>
+    <p>Теперь, когда мы использовали Rails scaffold generator для нашего ресурса
+        <code>Article</code>, он также создал код контроллера и тесты. Можете посмотреть файл <code>articles_controller_test.rb</code>
+        в директории <code>test/controllers</code>.</p>
+    <p>Следующая команда сгенерирует тестовый случай для контроллера, предзаполненный тестом для
+        каждого из семи экшнов по умолчанию.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate test_unit:scaffold article
+create test/controllers/articles_controller_test.rb
+</pre>
+    </div>
+    <p>Давайте пробежимся про одному такому тесту, <code>test_should_get_index</code> из файла
+        <code>articles_controller_test.rb</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# articles_controller_test.rb
+class ArticlesControllerTest &lt; ActionController::TestCase
+  test_should_get_index do
+    get :index
+    assert_response :success
+    assert_includes @response.body, 'Articles'
+  end
+end
+</pre>
+    </div>
+    <p>В тесте <code>test_should_get_index</code>, Rails имитирует запрос к экшну index, убеждается,
+        что запрос был успешным, а также обеспечивает, что генерируется правильное тело ответа.</p>
+    <p>Метод <code>get</code> стартует веб запрос и заполняет результаты в ответ. Он принимает 4
+        аргумента:</p>
+    <ul>
+        <li><p>Экшн контроллера, к которому обращаетесь. Он может быть в форме строки или
+            символа.</p></li>
+        <li><p><code>params</code>: опция с хэшем параметров запроса для передачи в экшн (например,
+            параметры строки запроса или переменные для модели article).</p></li>
+        <li><p><code>session</code>: опция с хэшем переменных сессии для передачи вместе с запросом.
+        </p></li>
+        <li><p><code>flash</code>: опция с хэшем значений flash.</p></li>
+    </ul>
+    <p>Все аргументы с ключевым словом опциональны.</p>
+    <p>Пример: Вызов экшна <code>:show</code>, передача <code>id</code>, равного 12, как <code>params</code>,
+        и установка <code>user_id</code> как 5 в сессии:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get(:show, params: { id: 12 }, session: { user_id: 5 })
+</pre>
+    </div>
+    <p>Другой пример: Вызов экшна <code>:view</code>, передача <code>id</code>, равного 12, как
+        <code>params</code>, в этот раз без сессии, но с сообщением flash.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get(:view, params: { id: 12 }, flash: { message: 'booya!' })
+</pre>
+    </div>
+    <div class="note"><p>Если попытаетесь запустить тест <code>test_should_create_article</code> из
+        <code>articles_controller_test.rb</code>, он провалится из-за недавно добавленной валидации
+        на уровне модели, и это правильно.</p></div>
+    <p>Давайте изменим тест <code>test_should_create_article</code> в <code>articles_controller_test.rb</code>
+        так, чтобы все наши тесты проходили:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test_should_create_article do
+  assert_difference('Article.count') do
+    post :create, params: { article: { title: 'Some title' } }
+  end
+  assert_redirected_to article_path(Article.last)
+end
+</pre>
+    </div>
+    <p>Теперь можете попробовать запустить все тесты, и они должны пройти.</p>
+    <h4 class="inside_page_header" id="dostupnye-tipy-zaprosov-dlya-funktsionalnyh-testov">
+        Доступные типы запросов для функциональных тестов</h4>
+    <p>Если вы знакомы с протоколом HTTP, то знаете, что <code>get</code> это тип запроса. Имеется 6
+        типов запросов, поддерживаемых в функциональных тестах Rails:</p>
+    <ul>
+        <li>
+            <code>get</code>
+        </li>
+        <li>
+            <code>post</code>
+        </li>
+        <li>
+            <code>patch</code>
+        </li>
+        <li>
+            <code>put</code>
+        </li>
+        <li>
+            <code>head</code>
+        </li>
+        <li>
+            <code>delete</code>
+        </li>
+    </ul>
+    <p>У всех типов запросов есть эквивалентные методы, которые можно использовать. В обычном
+        приложении C.R.U.D. вы чаще будете использовать <code>get</code>, <code>post</code>, <code>put</code>
+        и <code>delete</code>.</p>
+    <div class="note"><p>Функциональные тесты не проверяют, поддерживается ли определенный тип
+        запроса экшеном, мы больше беспокоимся о результате. Для этого случая существуют тесты
+        запросов, чтобы сделать ваши тесты более целенаправленными.</p></div>
+    <h4 class="inside_page_header" id="testirovanie-zaprosov-xhr-ajax"> Тестирование запросов XHR
+        (AJAX)</h4>
+    <p>Чтобы протестировать запросы AJAX, можно указать опцию <code>xhr: true</code> в методах
+        <code>get</code>, <code>post</code>, <code>patch</code>, <code>put</code> и
+        <code>delete</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "ajax request" do
+  get :show, params: { id: articles(:first).id }, xhr: true
+  assert_equal 'hello world', @response.body
+  assert_equal "text/javascript", @response.content_type
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="tri-hesha-apokalipsisa-the-three-hashes-of-the-apocalypse">
+        Три Хэша Апокалипсиса (The Three Hashes of the Apocalypse)</h4>
+    <p>После того, как запрос был сделан и обработан, у вас будет 3 объекта Hash, готовых для
+        использования:</p>
+    <ul>
+        <li>
+            <code>cookies</code> - Любые установленные куки
+        </li>
+        <li>
+            <code>flash</code> - Любые объекты, находящиеся во flash
+        </li>
+        <li>
+            <code>session</code> - Любый объекты, находящиеся в переменных сессии
+        </li>
+    </ul>
+    <p>Как и в случае с обычными объектами Hash, можете получать доступ к значениям, указав ключ в
+        строке. Также можете указать его именем символа. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+flash["gordon"]               flash[:gordon]
+session["shmession"]          session[:shmession]
+cookies["are_good_for_u"]     cookies[:are_good_for_u]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dostupnye-peremennye-ekzemplyara"> Доступные переменные
+        экземпляра</h4>
+    <p>В ваших функциональных тестах также доступны три переменные экземпляра:</p>
+    <ul>
+        <li>
+            <code>@controller</code> - Контроллер, обрабатывающий запрос
+        </li>
+        <li>
+            <code>@request</code> - Объект запроса
+        </li>
+        <li>
+            <code>@response</code> - Объект отклика
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ustanovka-zagolovkov-i-peremennyh-cgi"> Установка заголовков
+        и переменных CGI</h4>
+    <p> и могут быть установлены непосредственно на переменной экземпляра <code>@request</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# устанавливаем заголовок HTTP
+@request.headers["Accept"] = "text/plain, text/html"
+get :index # имитировать запрос с пользовательским заголовком
+# устанавливаем переменную CGI
+@request.headers["HTTP_REFERER"] = "http://example.com/home"
+post :create # имитировать запрос с пользовательской env переменной
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="testirovanie-soobscheniy-flash"> Тестирование сообщений
+        <code>flash</code>
+    </h4>
+    <p>Как помните, одним из трех хэшей был <code>flash</code>.</p>
+    <p>Мы хотим добавить сообщение <code>flash</code> в наше приложение блога, всякий раз, когда
+        кто-то успешно создает новый объект Article.</p>
+    <p>Давайте начнем с добавления этого утверждения в наш тест
+        <code>test_should_create_article</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test_should_create_article do
+  assert_difference('Article.count') do
+    post :create, params: { article: { title: 'Some title' } }
+  end
+  assert_redirected_to article_path(Article.last)
+  assert_equal 'Article was successfully created.', flash[:notice]
+end
+</pre>
+    </div>
+    <p>Если запустить наш тест сейчас, мы увидим ошибку:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/controllers/articles_controller_test.rb test_should_create_article
+Run options: -n test_should_create_article --seed 32266
+# Running:
+F
+Finished in 0.114870s, 8.7055 runs/s, 34.8220 assertions/s.
+  1) Failure:
+ArticlesControllerTest#test_should_create_article [/Users/zzak/code/bench/sharedapp/test/controllers/articles_controller_test.rb:16]:
+--- expected
++++ actual
+@@ -1 +1 @@
+-"Article was successfully created."
++nil
+1 runs, 4 assertions, 1 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Теперь давайте реализуем сообщение flash в нашем контроллере. Наш экшен <code>:create</code>
+        теперь должен выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @article = Article.new(article_params)
+  if @article.save
+    flash[:notice] = 'Article was successfully created.'
+    redirect_to @article
+  else
+    render 'new'
+  end
+end
+</pre>
+    </div>
+    <p>Если теперь запустить наши тесты, мы увидим, что он проходит:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails test test/controllers/articles_controller_test.rb test_should_create_article
+Run options: -n test_should_create_article --seed 18981
+# Running:
+.
+Finished in 0.081972s, 12.1993 runs/s, 48.7972 assertions/s.
+1 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="obobschenie-izlozhennogo"> Обобщение изложенного</h4>
+    <p>С этого момента в нашем контроллере Articles тестируются экшны <code>:index</code>, <code>:new</code>
+        и <code>:create</code>. Но как насчет работы с существующими данными?</p>
+    <p>Давайте напишем тест для экшна <code>:show</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should show article" do
+  article = articles(:one)
+  get :show, params: { id: article.id }
+  assert_response :success
+end
+</pre>
+    </div>
+    <p>Как помните из нашего обсуждения фикстур, что метод <code>articles()</code> дает нам доступ к
+        нашим фикстурам Articles.</p>
+    <p>Как насчет удаления существующего объекта Article?</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should destroy article" do
+  article = articles(:one)
+  assert_difference('Article.count', -1) do
+    delete :destroy, params: { id: article.id }
+  end
+  assert_redirected_to articles_path
+end
+</pre>
+    </div>
+    <p>Также можно добавить тест для обновления существующего объекта Article.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "should update article" do
+  article = articles(:one)
+  patch :update, params: { id: article.id, article: { title: "updated" } }
+  assert_redirected_to article_path(article)
+end
+</pre>
+    </div>
+    <p>Отметьте, что у нас имеется некоторое дублирование в этих трех тестах, они все получают
+        доступ к одним и тем же данным фикстуры Article. Можно убрать повторения с помощью методов
+        <code>setup</code> и <code>teardown</code>, предоставленных
+        <code>ActiveSupport::Callbacks</code>.</p>
+    <p>Наш тест должен выглядеть как-то так, не обращайте внимания, что остальные тесты были убраны
+        для краткости.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class ArticlesControllerTest &lt; ActionController::TestCase
+  # вызывается перед каждым отдельным тестом
+  def setup
+    @article = articles(:one)
+  end
+  # вызывается после каждого отдельного теста
+  def teardown
+    # когда контроллер использует кэш, это может быть хорошей идеей сбросить его затем
+    Rails.cache.clear
+  end
+  test "should show article" do
+    # переиспользуем инстанс переменную @article из setup
+    get :show, params: { id: @article.id }
+    assert_response :success
+  end
+  test "should destroy article" do
+    assert_difference('Article.count', -1) do
+      delete :destroy, params: { id: @article.id }
+    end
+    assert_redirected_to articles_path
+  end
+  test "should update article" do
+    patch :update, params: { id: @article.id, article: { title: "updated" } }
+    assert_redirected_to article_path(@article)
+  end
+end
+</pre>
+    </div>
+    <p>Подобно другим колбэкам Rails, методы <code>setup</code> и <code>teardown</code> можно
+        использовать, передав блок, lambda или имя метода символом для вызова.</p>
+    <h4 class="inside_page_header" id="testovye-helpery"> Тестовые хелперы</h4>
+    <p>Чтобы избежать дублирования кода, можно добавлять собственные тестовые хелперы. Хорошим
+        примером может быть хелпер входа в систему:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test/test_helper.rb
+module SignInHelper
+  def sign_in(user)
+    session[:user_id] = user.id
+  end
+end
+class ActionController::TestCase
+  include SignInHelper
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class ProfileControllerTest &lt; ActionController::TestCase
+  test "should show profile" do
+    # теперь хелпер может быть переиспользован в любом тесте контроллера
+    sign_in users(:david)
+    get :show
+    assert_response :success
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testirovanie-marshrutov"> Тестирование маршрутов</h3>
+    <p>Как и все другое в вашем приложении Rails, ваши маршруты можно тестировать.</p>
+    <p>Подробности о тестировании маршрутов доступны в Rails, обратитесь к документации API для
+        .</p>
+    <h3 class="inside_page_header" id="testirovanie-vyuh"> Тестирование вьюх</h3>
+    <p>Тестирование отклика на ваш запрос с помощью подтверждения наличия ключевых элементов HTML и
+        их содержимого, это хороший способ протестировать вьюхи вашего приложения. Как и тесты
+        маршрутов, тесты вьюх находятся в <code>test/controllers/</code> или являются частью тестов
+        контроллера. Метод <code>assert_select</code> позволяет осуществить выборку элементов HTML
+        отклика с помощью простого, но мощного синтаксиса.</p>
+    <p>Имеется две формы <code>assert_select</code>:</p>
+    <p><code>assert_select(selector, [equality], [message])</code> обеспечивает, что условие
+        equality выполняется для выбранных через selector элементов, selector может быть выражением
+        селектора CSS (String) или выражением с заменяемыми значениями.</p>
+    <p><code>assert_select(element, selector, [equality], [message])</code> обеспечивает, что
+        условие equality выполняется для всех элементов, выбранных через selector начиная с <em>element</em>
+        (экземпляра <code>Nokogiri::XML::Node</code> или <code>Nokogiri::XML::NodeSet</code>) и его
+        потомков.</p>
+    <p>Например, можете проверить содержимое в элементе <code>title</code> вашего ответа с помощью:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assert_select 'title', "Welcome to Rails Testing Guide"
+</pre>
+    </div>
+    <p>Также можно использовать вложенные блоки <code>assert_select</code> для углубленного
+        исследования.</p>
+    <p>В следующем примере, внутренний <code>assert_select</code> для <code>li.menu_item</code>
+        запускается для полной коллекции элементов, выбранных во внешнем блоке:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assert_select 'ul.navigation' do
+  assert_select 'li.menu_item'
+end
+</pre>
+    </div>
+    <p>Коллекция выбранных элементов может быть перебрана, таким образом <code>assert_select</code>
+        может быть вызван отдельно для каждого элемента.</p>
+    <p>Например, если отклик содержит два упорядоченных списка, каждый из четырех элементов, тогда
+        оба следующих теста пройдут.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assert_select "ol" do |elements|
+  elements.each do |element|
+    assert_select element, "li", 4
+  end
+end
+assert_select "ol" do
+  assert_select "li", 8
+end
+</pre>
+    </div>
+    <p>Это утверждение достаточно мощное. Для более продвинутого использования обратитесь к его
+        .</p>
+    <h5 class="inside_page_header" id="dopolnitelnye-utverzhdeniya-osnovannye-na-vyuhe">
+        Дополнительные утверждения, основанные на вьюхе</h5>
+    <p>В тестировании вьюх в основном используется такие утверждения:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Утверждение</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td><code>assert_select_email</code></td>
+            <td>Позволяет сделать утверждение относительно тела e-mail.</td>
+        </tr>
+        <tr>
+            <td><code>assert_select_encoded</code></td>
+            <td>Позволяет сделать утверждение относительно закодированного HTML. Он делает это
+                декодируя содержимое каждого элемента и затем вызывая блок со всеми декодированными
+                элементами.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>css_select(selector)</code> или <code>css_select(element, selector)</code>
+            </td>
+            <td>Возвращают массив всех элементов, выбранных через <em>selector</em>. Во втором
+                варианте сначала проверяется соответствие базовому <em>element</em>, а затем
+                пытается применить соответствие выражению <em>selector</em> на каждом из его детей.
+                Если нет соответствий, оба варианта возвращают пустой массив.
+            </td>
+        </tr>
+    </table>
+    <p>Вот пример использования <code>assert_select_email</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+assert_select_email do
+  assert_select 'small', 'Please click the "Unsubscribe" link if you want to opt-out.'
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testirovanie-helperov"> Тестирование хелперов</h3>
+    <p>Чтобы протестировать хелперы, нужно проверить, что результат метода хелпера соответствует
+        тому, что вы ожидаете. Тесты, относящиеся к хелперам, расположены в директории <code>test/helpers</code>.
+    </p>
+    <p>Тест хелпера может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class UserHelperTest &lt; ActionView::TestCase
+end
+</pre>
+    </div>
+    <p>Хелпер — это всего лишь простой модуль, в котором можно определять методы, которые будут
+        доступны во вьюхах. Чтобы протестировать результат методов хелпера, нужно просто его
+        подмешать следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserHelperTest &lt; ActionView::TestCase
+  test "should return the user name" do
+    # ...
+  end
+end
+</pre>
+    </div>
+    <p>Более того, так как этот класс теста расширяет <code>ActionView::TestCase</code>, у вас есть
+        доступ к методам хелпера Rails, таким как <code>link_to</code> или <code>pluralize</code>.
+    </p>
+    <h3 class="inside_page_header" id="testing-your-mailers"> Тестирование почтовых
+        рассыльщиков</h3>
+    <p>Тестирование классов рассыльщика требует несколько специфичных инструментов для тщательной
+        работы.</p>
+    <h4 class="inside_page_header" id="derzhim-pochtovik-pod-kontrolem"> Держим почтовик под
+        контролем</h4>
+    <p>Ваши классы рассыльщика - как и любая другая часть вашего приложения на Rails - должны быть
+        протестированы, что они работают так, как ожидается.</p>
+    <p>Тестировать классы рассыльщика нужно, чтобы быть уверенным в том, что:</p>
+    <ul>
+        <li>электронные письма обрабатываются (создаются и отсылаются)
+        </li>
+        <li>содержимое письма правильное (тема, получатель, тело и т.д.)
+        </li>
+        <li>правильные письма отправляются в нужный момент
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="so-vseh-storon"> Со всех сторон</h5>
+    <p>Есть два момента в тестировании рассыльщика, юнит-тесты и функциональные тесты. В юнит-тестах
+        обособленно запускается рассыльщик с жестко заданными входящими значениями, и сравнивается
+        результат с известным значением (фикстуры). В функциональных тестах не нужно тестировать
+        мелкие детали, вместо этого мы тестируем, что наши контроллеры и модели правильно используют
+        рассыльщик. Мы тестируем, чтобы подтвердить, что правильный email был послан в правильный
+        момент.</p>
+    <h4 class="inside_page_header" id="yunit-testirovanie"> Юнит-тестирование</h4>
+    <p>Для того, чтобы протестировать, что ваш рассыльщик работает как надо, можете использовать
+        юнит-тесты для сравнения фактических результатов рассыльщика с предварительно написанными
+        примерами того, что должно быть получено.</p>
+    <h5 class="inside_page_header" id="revansh-fikstur"> Реванш фикстур</h5>
+    <p>Для целей юнит-тестирования рассыльщика фикстуры используются для предоставления примера, как
+        результат <em>должен</em> выглядеть. Так как это примеры электронных писем, а не данные
+        Active Record, как в других фикстурах, они должны храниться в своей поддиректории отдельно
+        от других фикстур. Имя директории в <code>test/fixtures</code> полностью соответствует имени
+        рассыльщика. Таким образом, для рассыльщика с именем <code>UserMailer</code> фикстуры должны
+        располагаться в директории <code>test/fixtures/user_mailer</code>.</p>
+    <p>При создании своего рассыльщика генератор создает незавершенные фикстуры для каждого из
+        экшнов рассыльщиков. Если вы не используете генератор, следует создать эти файлы
+        самостоятельно.</p>
+    <h5 class="inside_page_header" id="prostoy-testovyy-sluchay"> Простой тестовый случай</h5>
+    <p>Вот юнит-тест для тестирования рассыльщика с именем <code>UserMailer</code>, экшен <code>invite</code>
+        которого используется для рассылки приглашений друзьям. Это адаптированная версия исходного
+        теста, созданного генератором для экшена <code>invite</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class UserMailerTest &lt; ActionMailer::TestCase
+  test "invite" do
+    # Создайте email и сохраните его для будущих утверждений
+    email = UserMailer.create_invite('me@example.com',
+                                     'friend@example.com', Time.now)
+    # Отправить письмо, затем проверить, что оно попало в очередь
+    assert_emails 1 do
+      email.deliver_now
+    end
+    # Проверить тело отправленного письма, что оно содержит то, что мы ожидаем
+    assert_equal ['me@example.com'], email.from
+    assert_equal ['friend@example.com'], email.to
+    assert_equal 'You have been invited by me@example.com', email.subject
+    assert_equal read_fixture('invite').join, email.body.to_s
+  end
+end
+</pre>
+    </div>
+    <p>В тесте мы посылаем письмо и сохраняем возвращенный объект в переменной <code>email</code>.
+        Затем мы убеждаемся, что оно было послано (первое утверждение), затем, вот второй порции
+        утверждений, мы убеждаемся, что <code>email</code> содержит в точности то, что мы ожидаем.
+        Хелпер <code>read_fixture</code> используется для считывания содержимого из этого файла.</p>
+    <p>Вот содержимое фикстуры <code>invite</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Hi friend@example.com,
+You have been invited.
+Cheers!
+</pre>
+    </div>
+    <p>Сейчас самое время понять немного больше о написании тестов для ваших рассыльщиков. Строка
+        <code>ActionMailer::Base.delivery_method = :test</code> в
+        <code>config/environments/test.rb</code> устанавливает метод доставки в тестовом режиме,
+        таким образом, письмо не будет фактически доставлено (полезно во избежание спама для ваших
+        пользователей во время тестирования), но вместо этого оно будет присоединено к массиву
+        (<code>ActionMailer::Base.deliveries</code>).</p>
+    <div class="note"><p>Массив <code>ActionMailer::Base.deliveries</code> перезагружается
+        автоматически только в тестах <code>ActionMailer::TestCase</code>. Если хотите чистый массив
+        вне тестов Action Mailer, его можно перезагрузить вручную с помощью <code>ActionMailer::Base.deliveries.clear</code>
+    </p></div>
+    <h4 class="inside_page_header" id="funktsionalnoe-testirovanie"> Функциональное
+        тестирование</h4>
+    <p>Функциональное тестирование рассыльщиков предполагает не только проверку того, что тело
+        письма, получатели и так далее корректны. В функциональных тестах писем мы вызываем методы
+        доставки почты и проверяем, что надлежащие электронные письма присоединяются в перечень
+        доставки. Это позволяет с большой долей уверенности предположить, что методы доставки
+        работают. Возможно, вам будет более интересным, отправляет ли ваша бизнес логика электронные
+        письма тогда, когда это от нее ожидается. Например, можете проверить, что операция по
+        приглашению друзей надлежаще рассылает письма:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class UserControllerTest &lt; ActionController::TestCase
+  test "invite friend" do
+    assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+      post :invite_friend, params: { email: 'friend@example.com' }
+    end
+    invite_email = ActionMailer::Base.deliveries.last
+    assert_equal "You have been invited by me@example.com", invite_email.subject
+    assert_equal 'friend@example.com', invite_email.to[0]
+    assert_match(/Hi friend@example.com/, invite_email.body.to_s)
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testirovanie-zadach"> Тестирование задач</h3>
+    <p>Так как ваши задачи могут быть поставлены в очередь на различных уровнях приложения, вам
+        нужно протестировать как сами задачи (их поведение при получении из очереди), так и то, и
+        что другие элементы правильно кладут их в очередь.</p>
+    <h4 class="inside_page_header" id="prostoy-testovyy-sluchay"> Простой тестовый случай</h4>
+    <p>По умолчанию при генерации задачи, также будет сгенерирован связанный тест в директории
+        <code>test/jobs</code>. Вот пример для задачи биллинга:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class BillingJobTest &lt; ActiveJob::TestCase
+  test 'that account is charged' do
+    BillingJob.perform_now(account, product)
+    assert account.reload.charged_for?(product)
+  end
+end
+</pre>
+    </div>
+    <p>Это очень простой пример, он только проверяет, что задача делает работу так, как
+        ожидается.</p>
+    <p>По умолчанию <code>ActiveJob::TestCase</code> устанавливает адаптер очереди
+        <code>:test</code>, чтобы ваши задачи выполнялись сразу. Это также позволяет убедиться, что
+        все ранее выполненные и поставленные в очередь задачи будут очищены до запуска теста, таким
+        образом гарантируется, что в рамках каждого теста нет ранее запущенных задач.</p>
+    <h4 class="inside_page_header"
+        id="polzovatelskie-utverzhdeniya-i-testirovanie-zadach-vnutri-drugih-komponent">
+        Пользовательские утверждения и тестирование задач внутри других компонент</h4>
+    <p>Active Job поставляется с набором пользовательских утверждений, которые могут быть
+        использованы для уменьшения уровня детализации тестов. Полный список утверждений смотрите в
+        документации API для .</p>
+    <p>Хорошей практикой бывает убедиться, что ваши задачи были поставлены в очередь или выполнены,
+        там, где вы их вызываете (например, внутри контроллера). Именно тут пользовательские
+        утверждения, предоставленные Active Job, особенно полезны. Например, в модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'test_helper'
+class ProductTest &lt; ActiveJob::TestCase
+  test 'billing job scheduling' do
+    assert_enqueued_with(job: BillingJob) do
+      product.charge(account)
+    end
+  end
+end
+</pre>
+    </div>
+
+</body>
+</html>

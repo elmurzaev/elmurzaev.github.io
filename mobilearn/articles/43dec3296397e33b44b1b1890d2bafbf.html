@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Элементарная теория вероятностей</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2>
+</h2>
+<h3></h3>
+<div class="text">Теория вероятностей изучает закономерности, возникающие в случайных
+    экспериментах. Случайным называют эксперимент,
+    результат которого нельзя предсказать заранее. Невозможность предсказать
+    результат отличает случайное явление от детерминированного.
+    <p>Не все случайные явления (эксперименты)
+        можно изучать методами теории вероятностей, а лишь те, которые
+        могут быть воспроизведены в одних и тех же условиях. Случайность и хаос &#151;
+        не одно и то же. Оказывается, что и в случайных экспериментах наблюдаются
+        некоторые закономерности, например
+        свойство <i class="incide">&#171;статистической устойчивости&#187;</i>:
+        если <img align="bottom" height="14"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> &#151;
+        некоторое событие, могущее произойти или не произойти в результате эксперимента,
+        то доля <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img59.gif" width="59">
+        экспериментов, в которых данное событие произошло, имеет тенденцию стабилизироваться
+        с ростом общего числа экспериментов <img align="bottom" height="14"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                 width="13">, приближаясь к некоторому
+        числу <img align="absmiddle" height="20"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img60.gif" width="40">. Это
+        число служит объективной характеристикой
+        &#171;степени возможности&#187; событию <img align="bottom" height="14"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                     width="15"> произойти.
+    </p>
+    <p>Следует помнить, что мы занимаемся
+        математикой и имеем дело не с реальностью, а лишь с её математической
+        моделью. Мы и будем изучать только математические модели, а приложение
+        их к реальности оставим на долю математической и практической статистики.</p>
+</div>
+<h3></h3>
+<div class="lemma">
+    <b>Определение 1. </b>
+    <i class="incide">Пространством элементарных исходов</i> <img align="bottom" height="14"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                                                  width="15"> (&#171;омега&#187;)
+    называется
+    множество, содержащее все возможные результаты данного случайного
+    эксперимента, из которых в эксперименте происходит ровно один.
+    Элементы этого множества называют <i class="incide">элементарными исходами</i>
+    и обозначают буквой <img align="absmiddle" height="16"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img62.gif" width="13">
+    (&#171;омега&#187;).
+</div>
+<div class="lemma">
+    <b>Определение 2. </b>
+    <i class="incide">Событиями</i> мы будем называть подмножества
+    множества <img align="bottom" height="14"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">. Говорят,
+    что в результате эксперимента
+    <i class="incide">произошло</i> событие <img align="absmiddle" height="17"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img63.gif"
+                                                 width="51">, если в эксперименте произошел один из
+    элементарных исходов,
+    входящих в множество <img align="bottom" height="14"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">.
+</div>
+<div class="remark">
+    <b>Замечание 2. </b>
+    Вообще говоря, можно назвать событиями не обязательно любые
+    подмножества множества <img align="bottom" height="14"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                width="15">, а лишь элементы некоторого набора подмножеств.
+    О смысле такого ограничения мы поговорим позднее.
+</div>
+<div class="example">
+    <b>Пример 1. </b>
+    Один раз подбрасывается кубик &#151; игральная кость.
+    Рассмотрим пространство элементарных исходов
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img64.gif"
+         width="147">, элементарные исходы здесь
+    соответствуют числу выпавших очков.
+    <p>Примеры событий:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img65.gif" width="81"> &#151; выпало
+        одно или два очка;
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img66.gif" width="99"> &#151; выпало
+        нечётное число очков.</p>
+</div>
+<div class="example">
+    <b>Пример 2. </b>
+    Два раза подбрасывается игральная кость.
+    Или, что то же самое, один раз подбрасываются две игральные кости.
+    Будем считать пространством элементарных исходов множество пар чисел
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img67.gif"
+         width="38">, где <img align="absmiddle" height="14"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif"
+                               width="8"> (сответственно, <img align="absmiddle" height="19"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img68.gif"
+                                                               width="11">) есть число очков,
+    выпавших при первом (втором)
+    подбрасывании:
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img69.gif"
+         width="220">.
+    <p>Примеры событий:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img70.gif" width="327"> &#151;
+        при первом подбрасывании выпало одно очко;
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img71.gif" width="328"> &#151;
+        при втором подбрасывании выпало одно очко;
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img72.gif" width="328"> &#151;
+        на костях выпало одинаковое число очков;
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img73.gif" width="468"> &#151;
+        на обеих костях выпало нечётное число очков.</p>
+</div>
+<div class="example">
+    <b>Пример 3. </b>
+    На поверхность стола бросается монета. Результатом эксперимента
+    можно считать координату центра монеты.
+    Пространство элементарных исходов &#151; множество точек стола.
+    Если нам не безразличен
+    угол поворота монеты, то можно добавить к множеству положений центра
+    величину этого угла. В этом случае <img align="bottom" height="14"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                            width="15"> есть
+    множество пар <img align="absmiddle" height="20"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img74.gif" width="63">,
+    где <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img75.gif" width="54"> &#151; точка
+    стола и <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img76.gif" width="81"> &#151; угол
+    поворота.
+    Число элементарных исходов такого эксперимента .
+</div>
+<div class="example">
+    <b>Пример 4. </b>
+    Монета подбрасывается до тех пор, пока не выпадет вверх гербом.
+    Пространство элементарных исходов состоит из бесконечного, но
+    числа исходов: <img align="absmiddle" height="20"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img77.gif" width="333">,
+    где  <font>р</font>  означает выпадение решки, а  <font>г</font>  &#151; герба
+    при одном подбрасывании.
+</div>
+<div class="lemma">
+    <b>Определение 3. </b>
+    <p>
+        1. <i class="incide">Достоверным</i> называется
+        событие, которое обязательно происходит в результате эксперимента,
+        т.е. единственное событие, включающее все
+        элементарные исходы &#151; событие <img align="bottom" height="14"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                                width="15">.
+    </p>
+    <p>
+        2. <i class="incide">Невозможным</i> называется
+        событие, которое не может произойти в результате эксперимента,
+        т.е. событие, не содержащее ни одного элементарного исхода
+        (&#171;пустое множество&#187; <img align="absmiddle" height="17"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img78.gif"
+                                           width="16">). Заметим, что всегда
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img79.gif" width="52">. </p>
+</div>
+<h3></h3>
+<div class="text">В теории вероятностей существуют ровно те же операции над множествами, что и в
+    теории множеств.
+</div>
+<div class="lemma">
+    <b>Определение 4. </b>
+    <p>
+        <img class="left" height="96" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/union.gif"
+             width="143">
+        <img class="right" height="99"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/intersec.gif" width="146">
+        1. <i class="incide">Объединением</i> <img align="absmiddle" height="14"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img80.gif"
+                                                   width="49"> событий <img align="bottom"
+                                                                            height="14"
+                                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                            width="15"> и <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17">
+        называется событие, состоящее в том, что произошло либо <img align="bottom" height="14"
+                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                     width="15">, либо <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17">, либо оба события одновременно. На языке теории множеств
+        <img align="absmiddle" height="14"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img80.gif" width="49"> есть множество,
+        содержащее как элементарные исходы из
+        множества <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">, так и
+        элементарные исходы из множества <img align="bottom" height="14"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                              width="17">. </p>
+    <p>
+        2. <i class="incide">Пересечением</i> <img align="absmiddle" height="14"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img81.gif"
+                                                   width="49"> событий <img align="bottom"
+                                                                            height="14"
+                                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                            width="15"> и <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17"> называется событие, состоящее в том, что произошли
+        оба события <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> и
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+             width="17"> одновременно. На языке теории множеств
+        <img align="absmiddle" height="14"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img81.gif" width="49"> есть множество,
+        содержащее элементарные исходы, входящие
+        в пересечение множеств <img align="bottom" height="14"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                    width="15"> и <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                       width="17">.
+    </p>
+    <p><img class="left" height="98" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/oppos.gif"
+            width="143">
+        <img class="right" height="96" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/differ.gif"
+             width="143">
+        3. <i class="incide">Противоположным</i> (или дополнительным)
+        к событию <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">
+        называется событие
+        <img align="absmiddle" height="23"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img82.gif" width="73">, состоящее в
+        том, что событие <img align="bottom" height="14"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">
+        в результате эксперимента не произошло.
+        Т.е. множество <img align="bottom" height="17"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img83.gif" width="15">
+        состоит из элементарных исходов, не входящих
+        в <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+               width="15">. </p>
+    <p>
+        4. <i class="incide">Дополнением</i> <img align="absmiddle" height="20"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img84.gif"
+                                                  width="38"> события <img align="bottom"
+                                                                           height="14"
+                                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                           width="17"> до <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+            width="15"> называется событие, состоящее в том, что произошло
+        событие <img align="bottom" height="14"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">, но не
+        произошло <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17">. Т.е.
+        множество <img align="absmiddle" height="20"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img84.gif" width="38">
+        содержит элементарные исходы, входящие
+        в множество <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">, но
+        не входящие в <img align="bottom" height="14"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17">.
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 5. </b>
+    <p><img class="left" height="98" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/noninter.gif"
+            width="143">1. События <img align="bottom" height="14"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                        width="15"> и <img align="bottom" height="14"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                           width="17"> называют <i class="incide">несовместными</i>,
+        если <img align="absmiddle" height="17"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img85.gif" width="86">. </p>
+    <p>
+        <img class="right" height="95" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/include.gif"
+             width="143">2. События <img align="absmiddle" height="18"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img86.gif"
+                                         width="90"> называют <i class="incide">попарно
+        несовместными</i>,
+        если для любых <img align="absmiddle" height="18"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img87.gif" width="40">,
+        где <img align="absmiddle" height="18"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img88.gif" width="93">, события
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img89.gif" width="21"> и <img
+            align="absmiddle" height="20"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img90.gif" width="22"> несовместны.
+    </p>
+    <p>
+        3. Говорят, что событие <img align="bottom" height="14"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                     width="15"> <i class="incide">влечёт</i> событие <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17">,
+        и пишут <img align="absmiddle" height="17"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img91.gif" width="53">, если
+        всегда, как только происходит событие
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+             width="15">,
+        происходит и событие <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                  width="17">. На языке теории множеств это означает,
+        что любой элементарный исход, входящий в множество <img align="bottom" height="14"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                width="15">,
+        одновременно входит и в множество <img align="bottom" height="14"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                               width="17">, т.е. <img align="bottom" height="14"
+                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                      width="15"> содержится в <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17">. </p>
+</div>
+<h3></h3>
+<div class="text">Пространство элементарных исходов назовём <i class="incide">дискретным</i>,
+    если оно конечно или счётно:
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img92.gif" width="190">
+    </p>
+    <p>Так, эксперименты из примеров
+        , и (но не ) приводят к дискретным пространствам
+        элементарных исходов.</p>
+</div>
+<div class="remark">
+    <b>Замечание 3. </b>
+    <p>Множество <i class="incide">счётно</i>, если существует взаимно-однозначное соответствие
+        между этим множеством и множеством всех натуральных чисел. Счётными
+        множествами являются, например, множество натуральных чисел, множество
+        целых чисел, множество рациональных чисел, множество чётных чисел
+        и т.д. Множество <i class="incide">конечно</i>, если оно состоит из конечного числа
+        элементов.</p>
+</div>
+<div class="text">Чтобы определить вероятность любого события на дискретном пространстве
+    элементарных
+    исходов, достаточно присвоить вероятность каждому элементарному исходу.
+    Тогда вероятность любого события определяется как сумма вероятностей
+    входящих в него элементарных исходов.
+</div>
+<div class="lemma">
+    <b>Определение 6. </b>
+    Поставим каждому элементарному исходу <img align="absmiddle" height="17"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img93.gif"
+                                               width="52"> в соответствие число <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img94.gif"
+        width="79"> так, что
+    <p class="CENTER"><img align="absmiddle" height="44"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img95.gif" width="83">
+    </p>
+    <p>Назовём число <img align="absmiddle" height="18"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img96.gif" width="17"> <i
+            class="incide">вероятностью</i> элементарного исхода <img align="absmiddle" height="17"
+                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img97.gif"
+                                                                      width="19">.
+        Вероятностью события <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                  width="15"> назовём число
+    </p>
+    <p class="CENTER"><img align="middle" height="45"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img98.gif" width="107"> ,
+    </p>
+    <p>равное сумме вероятностей элементарных исходов, входящих в множество <img align="bottom"
+                                                                                 height="14"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                                 width="15">. В
+        случае <img align="absmiddle" height="17"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img99.gif" width="52"> положим
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img100.gif" width="72">. </p>
+</div>
+<div class="remark">
+    <b>Замечание 4. </b>
+    Позднее, познакомившись с аксиоматикой теории вероятностей,
+    мы зададим вероятности событий непосредственно,
+    а не через вероятности элементарных исходов. Тем более, что
+    сложением вероятностей элементарных исходов можно получить лишь вероятность
+    события, состоящего не более чем из счётного числа элементарных исходов
+    (иначе само понятие суммирования не определено).
+    Но на дискретном пространстве элементарных исходов
+    определить вероятности событий так, как это сделано в определении
+    , всегда возможно.
+</div>
+<div class="text">
+    Перечислим очевидные в случае дискретного пространства
+    свойства вероятности, которые мы скоро докажем
+    сразу в общем случае.
+    <p></p>
+    <dl compact>
+        <p></p>
+        <dt>
+            <b>1.</b> 
+        </dt>
+        <dd> <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img101.gif" width="104">;  <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img102.gif" width="72">;  <img
+                align="absmiddle" height="23"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img103.gif" width="131">;
+            <p></p>
+        </dd>
+        <dt>
+            <b>2.</b>  
+        </dt>
+        <dd>Если <img align="bottom" height="14"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> и <img
+                align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17"> несовместны,
+            то
+            <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img104.gif" width="195">;
+            <p></p>
+        </dd>
+        <dt>
+            <b>3.</b>  
+        </dt>
+        <dd>В общем случае <img align="absmiddle" height="20"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img105.gif"
+                                width="287">;
+            <p></p>
+        </dd>
+        <dt>
+            <b>4.</b>  
+        </dt>
+        <dd>Если <img align="absmiddle" height="17"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img91.gif" width="53">, то
+            <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img106.gif" width="102">.
+        </dd>
+    </dl>
+</div>
+<div class="exer">
+    <b>Упражнение 8. </b>
+    Доказать свойства 1 &#151; 4, пользуясь .
+</div>
+<div class="text">
+    Рассмотрим частный случай такой вероятности &#151;
+    так называемую &#171;классическую вероятность&#187;.
+</div>
+<h3></h3>
+<div class="text">Предположим, что мы имеем дело с пространством элементарных
+    исходов, состоящим из конечного числа <img align="bottom" height="14"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img107.gif"
+                                               width="18"> элементов:
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img108.gif"
+         width="162">.
+    Предположим, что из каких-либо соображений
+    мы можем считать элементарные исходы равновозможными.
+    Тогда вероятность любого из них принимается равной <img align="absmiddle" height="20"
+                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img109.gif"
+                                                            width="35">.
+    Эти соображения не имеют отношения к математической
+    модели и основаны на какой-либо симметрии
+    в эксперименте (симметричная монета, хорошо перемешанная колода карт,
+    правильная кость).
+    <p>Если событие <img align="absmiddle" height="21"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img110.gif" width="141">
+        состоит из <img align="bottom" height="14"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12">
+        элементарных исходов, то вероятность этого события
+        равняется отношению <img align="absmiddle" height="20"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img111.gif"
+                                 width="36">:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img112.gif" width="284">
+    </p>
+    <p>где символом <img align="absmiddle" height="20"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img113.gif" width="25">
+        обозначено число элементов конечного множества <img align="bottom" height="14"
+                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                            width="15">. </p>
+</div>
+<div class="lemma">
+    <b>Определение 7. </b>
+    Говорят, что эксперимент удовлетворяет <i class="incide">классическому
+    определению вероятности</i>, если пространство элементарных исходов состоит из конечного
+    числа <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img114.gif" width="64">
+    равновозможных исходов.
+    В этом случае вероятность любого события <img align="bottom" height="14"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                  width="15"> вычисляется по формуле
+    <p class="CENTER"><img align="absmiddle" height="43"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img115.gif" width="91">
+    </p>
+    <p>называемой классическим определением
+        вероятности.</p>
+</div>
+<div class="text">
+    Формулу <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img116.gif" width="117"> читают
+    так:
+    &#171;вероятность события <img align="bottom" height="14"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                   width="15"> равна отношению числа исходов,
+    <i class="incide">благоприятствующих</i> событию <img align="bottom" height="14"
+                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                          width="15">, к общему числу исходов&#187;.
+    Полезно сравнить это определение с классической формулировкой Якоба
+    Бернулли:
+    &#171;Вероятность есть степень достоверности и отличается от неё как часть
+    от целого&#187; (Ars Conjectandi, 1713 г.)
+    <p>Мы видим теперь, что подсчёт вероятности в классической схеме
+        сводится к подсчёту общего числа &#171;шансов&#187; и числа шансов,
+        благоприятствующих какому-либо событию.
+        Число шансов считают с помощью формул комбинаторики.
+    </p>
+    <p>Рассмотрим описанные в параграфе 1
+        .
+        Три схемы: с возвращением и с учётом порядка,
+        без возвращения и с учётом порядка, а также
+        без возвращения и без учёта порядка, удовлетворяют классическому
+        определению вероятности. Общее число элементарных исходов в этих
+        схемах подсчитано в теоремах , ,
+        и равно соответственно <img align="bottom" height="18"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img47.gif"
+                                    width="21">, <img align="absmiddle" height="23"
+                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img117.gif"
+                                                      width="24">, <img align="absmiddle"
+                                                                        height="23"
+                                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img118.gif"
+                                                                        width="24">.
+        Четвёртая же схема &#151; схема выбора с возвращением и без учёта
+        порядка &#151; имеет заведомо неравновозможные исходы.
+    </p>
+</div>
+<div class="example">
+    <b>Пример 5. </b>
+    Рассмотрим выбор двух шариков из двух или, что то же самое,
+    дважды подбросим монету.
+    Если учитывать порядок, то исходов получится четыре, и все они равновозможны,
+    т.е. имеют вероятность по 1/4:
+    <p class="CENTER"><img align="absmiddle" height="39"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img120.gif" width="457">
+    </p>
+    <p>Если порядок не учитывать, то следует объявить два последних
+        исхода одним и тем же результатом эксперимента,
+        и получить не четыре, а три исхода:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="39"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img121.gif" width="405">
+    </p>
+    <p>
+        Первые два исхода имеют вероятности по 1/4, а последний &#151;
+        вероятность 1/4+1/4=1/2. </p>
+</div>
+<div class="exer">
+    <b>Упражнение 9. </b>
+    Посчитать число элементарных исходов в
+    (при подбрасывании двух игральных костей).
+    Каким станет пространство элементарных исходов,
+    если порядок костей не учитывать? Посчитать число элементарных
+    исходов в таком пространстве (пользуясь или прямым
+    подсчётом). Убедиться, что их ровно <img align="absmiddle" height="23"
+                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img123.gif"
+                                             width="64">. Равновозможны ли эти исходы?
+    Посчитать вероятность каждого.
+</div>
+<h3></h3>
+<div class="example">
+    <b>Пример 6. </b>
+    Из урны, в которой <img align="absmiddle" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img124.gif" width="18">
+    белых и <img align="absmiddle" height="17"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img125.gif" width="56"> чёрных
+    шаров,
+    наудачу и без возвращения вынимают <img align="bottom" height="14"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                            width="13"> шаров, <img align="absmiddle" height="17"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img126.gif"
+                                                                    width="52">.
+    Термин &#171;наудачу&#187; означает, что появление любого набора
+    из <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+            width="13"> шаров равновозможно. Найти вероятность того, что
+    будет выбрано <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12"> белых
+    и <img align="absmiddle" height="17"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif" width="44"> чёрных шаров.
+    <p><b>Решение.</b> При <img align="absmiddle" height="15"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img128.gif"
+                                width="51"> или <img align="absmiddle" height="17"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img129.gif"
+                                                     width="120"> искомая вероятность равна нулю,
+        так как соответствующее событие
+        невозможно. Пусть <img align="absmiddle" height="17"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img130.gif"
+                               width="51"> и <img align="absmiddle" height="17"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img131.gif"
+                                                  width="120">.
+    </p>
+    <p>Результатом эксперимента является набор из <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                       width="13"> шаров.
+        Можно не учитывать или учитывать порядок следования шаров, вероятность не должна
+        зависеть от способа подсчёта.</p>
+    <p><b>Выбор без учёта порядка. </b> Общее число элементарных исходов есть число
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+             width="13">-элементных подмножеств множества, состоящего из <img align="absmiddle"
+                                                                              height="14"
+                                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img107.gif"
+                                                                              width="18"> элементов:
+        <img align="absmiddle" height="22"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img132.gif" width="73"> (по ).
+    </p>
+    <p>Обозначим через <img align="absmiddle" height="18"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img133.gif" width="24">
+        событие, вероятность которого требуется найти.
+        Событию <img align="absmiddle" height="18"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img133.gif" width="24">
+        благоприятствует появление любого набора,
+        содержащего <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12">
+        белых шаров и <img align="absmiddle" height="17"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif" width="44">
+        чёрных.
+        Число благоприятных исходов равно произведению (по )
+        числа способов выбрать <img align="bottom" height="14"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                    width="12"> белых шаров из <img align="absmiddle" height="14"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img124.gif"
+                                                                    width="18">
+        и числа способов выбрать <img align="absmiddle" height="17"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif"
+                                      width="44"> чёрных шаров из <img align="absmiddle" height="17"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img125.gif"
+                                                                       width="56">, т.е.
+        <img align="absmiddle" height="27"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img134.gif" width="143">.
+        Вероятность события <img align="absmiddle" height="18"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img133.gif"
+                                 width="24"> равна
+    </p>
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="62"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img135.gif" width="141"></td>
+            <td align="right" width="30">(1)</td>
+        </tr>
+    </table>
+    <p><b>Выбор с учётом порядка. </b> Общее число элементарных исходов есть число
+        способов разместить <img align="absmiddle" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img107.gif"
+                                 width="18"> элементов на <img align="bottom" height="14"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                               width="13"> местах: по ,
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img136.gif" width="308">
+    </p>
+    <p>При подсчёте числа благоприятных исходов нужно учесть число
+        способов выбрать <img align="bottom" height="14"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12">
+        белых и <img align="absmiddle" height="17"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif" width="44"> чёрных
+        шаров и число способов расположить
+        эти шары среди <img align="bottom" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">.
+        Можно, скажем, посчитать число способов
+        выбрать <img align="bottom" height="14"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12"> мест
+        среди <img align="bottom" height="14"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13"> (равное
+        <img align="absmiddle" height="23"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img118.gif" width="24">), затем число
+        способов разместить на этих <img align="bottom" height="14"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                         width="12"> местах <img align="absmiddle" height="14"
+                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img124.gif"
+                                                                 width="18"> белых шаров
+        (равное <img align="absmiddle" height="24"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img137.gif" width="29">),
+        и затем число способов разместить на оставшихся <img align="absmiddle" height="17"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif"
+                                                             width="44"> местах
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img125.gif" width="56"> чёрных шаров
+        (равное <img align="absmiddle" height="27"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img138.gif" width="51">).
+        Перемножив (
+        <small class="quest">почему?</small>
+        ) эти числа, получим
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="52"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img139.gif" width="490">
+    </p>
+</div>
+<div class="text">В рассмотренной задаче мы сопоставили каждому набору
+    из <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+            width="12"> белых и <img align="absmiddle" height="17"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img127.gif"
+                                     width="44"> чёрных шаров вероятность <img align="absmiddle"
+                                                                               height="20"
+                                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img140.gif"
+                                                                               width="48"> получить
+    этот набор при выборе <img align="bottom" height="14"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                               width="13"> шаров из урны, содержащей
+    <img align="absmiddle" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img124.gif"
+         width="18"> белых и <img align="absmiddle" height="17"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img125.gif"
+                                  width="56"> чёрных шаров.
+</div>
+<div class="lemma">
+    <b>Определение 8. </b>
+    Соответствие между числом <img align="bottom" height="14"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                   width="12"> и вероятностью
+    <p class="CENTER"><img align="absmiddle" height="62"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img141.gif" width="150">
+    </p>
+    <p>(где <img align="bottom" height="14"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12"> таково, что
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img142.gif" width="78">, <img
+                align="absmiddle" height="17"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img130.gif" width="51"> и <img
+                align="absmiddle" height="17"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img131.gif" width="120">)
+        называется <i class="incide">гипергеометрическим распределением</i>.</p>
+</div>
+<div class="text">
+    Здесь мы в первый, но далеко не в последний раз встретились с термином
+    <i class="incide">&#171;распределение&#187;</i> вероятностей. Это слово всегда обозначает некий
+    способ разделить
+    (распределить) общую единичную вероятность между какими-то точками
+    или множествами на вещественной прямой.
+    <p>В гипергеометрическом распределении
+        единичная вероятность распределена между подходящими целыми числами <img align="bottom"
+                                                                                 height="14"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                                                 width="12">
+        неравномерно.
+        Каждому целому числу <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                  width="12"> сопоставлена своя вероятность <img align="absmiddle"
+                                                                                 height="20"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img140.gif"
+                                                                                 width="48">.
+        На вещественной прямой можно единичную вероятность распределить
+        по-разному. Этим одно распределение отличается от другого: тем,
+        на каком множестве чисел &#171;распределена&#187; общая единичная вероятность,
+        и тем, какие веса, или вероятности, присвоены отдельным точкам или
+        частям этого множества. </p>
+</div>
+<div class="exer">
+    <b>Упражнение 10. </b>
+    Понять последний абзац.
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p>
+    <sup>1</sup> (27.12.1654 &#151; 16.08.1705, Basel, Switzerland)
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+</p>
+</body>
+
+</body>
+</html>

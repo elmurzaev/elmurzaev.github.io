@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.5. Оператор подготовки</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;prepare statement&gt; ::=
+   PREPARE &lt;SQL statement name&gt;
+   FROM &lt;SQL statement variable&gt;
+&lt;SQL statement variable&gt; ::=  &lt;simple target specification&gt;
+&lt;preparable statement&gt; ::=
+  &lt;preparable SQL data statement&gt;
+| &lt;preparable SQL schema statement&gt;
+| &lt;preparable SQL transaction statement&gt;
+| &lt;preparable SQL session statement&gt;
+| &lt;preparable implementation-defined statement&gt;
+&lt;preparable SQL data statement&gt; ::=
+  &lt;delete statement: searched&gt;
+| &lt;dynamic single row select statement&gt;
+| &lt;insert statement&gt;
+| &lt;dynamic select statement&gt;
+| &lt;update statement: searched&gt;
+| &lt;preparable dynamic delete statement: positioned&gt;
+| &lt;preparable dynamic update statement: positioned&gt;
+&lt;preparable SQL schema statement&gt; ::= &lt;SQL schema statement&gt;
+&lt;preparable SQL transaction statement&gt; ::= &lt;SQL transaction statement&gt;
+&lt;preparable SQL session statement&gt; ::= &lt;SQL session statement&gt;
+&lt;dynamic select statement&gt; ::= &lt;cursor specification&gt;
+&lt;dynamic simple row select statement&gt; ::= &lt;query specification&gt;
+&lt;SQL statement name&gt; ::= &lt;statement name&gt; | &lt;extended statement name&gt;
+&lt;extended statement name&gt; ::= [scope option] &lt;simple value specification&gt;
+&lt;cursor specification&gt; ::=
+  &lt;query expression&gt; [&lt;order by clause&gt;]
+  [&lt;updatability clause&gt;]
+&lt;updatability clause&gt; ::=
+   FOR { READ ONLY | UPDATE [ OF &lt;column name list&gt; ] }
+&lt;query expression&gt; ::=
+  &lt;non-join query expression&gt;
+| &lt;joined table&gt;
+&lt;query specification&gt; ::=
+   SELECT [&lt;set quantifier&gt;]
+  &lt;select list&gt; &lt;table expression&gt;
+&lt;set quantifier&gt; ::= DISTINCT | ALL</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        Оператор PREPARE вызывает компиляцию и построение плана выполнения заданного в текстовой
+        форме оператора SQL. После успешного выполнения оператора PREPARE с подготовленным
+        оператором связывается указанное (литерально или косвенно) имя этого оператора, которое
+        потом может быть использовано в операторах DESCRIBE, EXECUTE, OPEN CURSOR, ALLOCATE CURSOR и
+        DEALLOCATE PREPARE. Эта связь сохраняется до явного выполнения оператора DEALLOCATE PREPARE.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

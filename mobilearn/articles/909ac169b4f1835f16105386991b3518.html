@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Интерфейс запросов Active Record</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="interfeys-zaprosov-active-record"> Интерфейс запросов Active
+        Record</h2>
+    <p>Это руководство раскрывает различные способы получения данных из базы данных, используя
+        Active Record.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>Как искать записи, используя различные методы и условия.
+        </li>
+        <li>Как определять порядок, получаемые атрибуты, группировку и другие свойства поиска
+            записей.
+        </li>
+        <li>Как использовать нетерпеливую загрузку (eager loading) для уменьшения числа запросов к
+            базе данных, необходимых для получения данных.
+        </li>
+        <li>Как использовать методы динамического поиска.
+        </li>
+        <li>Как использовать цепочки методов (method chaining), для использования нескольких
+            ActiveRecord методов одновременно.
+        </li>
+        <li>Как проверять существование отдельных записей.
+        </li>
+        <li>Как выполнять различные вычисления в моделях Active Record.
+        </li>
+        <li>Как запускать EXPLAIN на relations.
+        </li>
+    </ul>
+    <p>Если вы использовали чистый SQL для поиска записей в базе данных, то скорее всего обнаружите,
+        что в Rails есть лучшие способы выполнения тех же операций. Active Record ограждает вас от
+        необходимости использования SQL во многих случаях.</p>
+    <p>Примеры кода далее в этом руководстве будут относиться к некоторым из этих моделей:</p>
+    <div class="info"><p>Все модели используют <code>id</code> как первичный ключ, если не указано
+        иное.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Client &lt; ActiveRecord::Base
+  has_one :address
+  has_many :orders
+  has_and_belongs_to_many :roles
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Address &lt; ActiveRecord::Base
+  belongs_to :client
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  belongs_to :client, counter_cache: true
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Role &lt; ActiveRecord::Base
+  has_and_belongs_to_many :clients
+end
+</pre>
+    </div>
+    <p>Active Record выполнит запросы в базу данных за вас, он совместим с большинством СУБД (MySQL,
+        PostgreSQL и SQLite - это только некоторые из них). Независимо от того, какая используется
+        СУБД, формат методов Active Record будет всегда одинаковый.</p>
+    <h3 class="inside_page_header" id="poluchenie-ob-ektov-iz-bazy-dannyh"> Получение объектов из
+        базы данных</h3>
+    <p>Для получения объектов из базы данных Active Record предоставляет несколько методов поиска. В
+        каждый метод поиска можно передавать аргументы для выполнения определенных запросов в базу
+        данных без необходимости писать на чистом SQL.</p>
+    <p>Методы следующие:</p>
+    <ul>
+        <li>
+            <code>bind</code>
+        </li>
+        <li>
+            <code>create_with</code>
+        </li>
+        <li>
+            <code>distinct</code>
+        </li>
+        <li>
+            <code>eager_load</code>
+        </li>
+        <li>
+            <code>extending</code>
+        </li>
+        <li>
+            <code>from</code>
+        </li>
+        <li>
+            <code>group</code>
+        </li>
+        <li>
+            <code>having</code>
+        </li>
+        <li>
+            <code>includes</code>
+        </li>
+        <li>
+            <code>joins</code>
+        </li>
+        <li>
+            <code>limit</code>
+        </li>
+        <li>
+            <code>lock</code>
+        </li>
+        <li>
+            <code>none</code>
+        </li>
+        <li>
+            <code>offset</code>
+        </li>
+        <li>
+            <code>order</code>
+        </li>
+        <li>
+            <code>preload</code>
+        </li>
+        <li>
+            <code>readonly</code>
+        </li>
+        <li>
+            <code>references</code>
+        </li>
+        <li>
+            <code>reorder</code>
+        </li>
+        <li>
+            <code>reverse_order</code>
+        </li>
+        <li>
+            <code>select</code>
+        </li>
+        <li>
+            <code>uniq</code>
+        </li>
+        <li>
+            <code>where</code>
+        </li>
+    </ul>
+    <p>Все эти методы возвращают экземпляр <code>ActiveRecord::Relation</code>.</p>
+    <p>Вкратце основные операции <code>Model.find(options)</code> таковы:</p>
+    <ul>
+        <li>Преобразовать предоставленные опции в эквивалентный запрос SQL.
+        </li>
+        <li>Выполнить запрос SQL и получить соответствующие результаты из базы данных.
+        </li>
+        <li>Создать экземпляр эквивалентного объекта Ruby подходящей модели для каждой строки
+            результата запроса.
+        </li>
+        <li>Запустить колбэки <code>after_find</code> и далее <code>after_initialize</code>, если
+            таковые имеются.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="poluchenie-odinochnogo-ob-ekta"> Получение одиночного
+        объекта</h4>
+    <p>Active Record представляет несколько различных способов получения одиночного объекта.</p>
+    <h5 class="inside_page_header" id="find"><code>find</code>
+    </h5>
+    <p>Используя метод <code>find</code>, можно получить объект, соответствующий определенному
+        первичному ключу (<em>primary key</em>) и предоставленным опциям. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Ищет клиента с первичным ключом (id) 10.
+client = Client.find(10)
+# =&gt; #&lt;Client id: 10, first_name: "Ryan"&gt;
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.id = 10) LIMIT 1
+</pre>
+    </div>
+    <p>Метод <code>find</code> вызывает исключение <code>ActiveRecord::RecordNotFound</code>, если
+        соответствующей записи не было найдено.</p>
+    <p>Этот метод также можно использовать для получения нескольких объектов. Вызовите метод <code>find</code>
+        и передайте в него массив первичных ключей. Возвращенным результатом будет массив,
+        содержащий все записи, соответствующие представленным <em>первичным ключам</em>. Например:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Найдем клиентов с первичными ключами 1 и 10.
+client = Client.find([1, 10]) # Или даже Client.find(1, 10)
+# =&gt; [#&lt;Client id: 1, first_name: "Lifo"&gt;, #&lt;Client id: 10, first_name: "Ryan"&gt;]
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.id IN (1,10))
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="take"><code>take</code>
+    </h5>
+    <p>Метод <code>take</code> получает запись без какого-либо явного упорядочивания. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.take
+# =&gt; #&lt;Client id: 1, first_name: "Lifo"&gt;
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients LIMIT 1
+</pre>
+    </div>
+    <p>Метод <code>take</code> возвращает <code>nil</code>, если ни одной записи не найдено, и
+        исключение не будет вызвано.</p>
+    <p>В метод <code>take</code> можно передать числовой аргумент, чтобы вернуть это количество
+        результатов. Например</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.take(2)
+# =&gt; [
+  #&lt;Client id: 1, first_name: "Lifo"&gt;,
+  #&lt;Client id: 220, first_name: "Sara"&gt;
+]
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients LIMIT 2
+</pre>
+    </div>
+    <p>Метод <code>take!</code> ведет себя подобно <code>take</code>, за исключением того, что он
+        вызовет <code>ActiveRecord::RecordNotFound</code>, если не найдено ни одной соответствующей
+        записи.</p>
+    <div class="info"><p>Получаемая запись может отличаться в зависимости от движка базы данных.</p>
+    </div>
+    <h5 class="inside_page_header" id="first"><code>first</code>
+    </h5>
+    <p>Метод <code>first</code> находит первую запись, упорядоченную по первичному ключу. Например:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.first
+# =&gt; #&lt;Client id: 1, first_name: "Lifo"&gt;
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients ORDER BY clients.id ASC LIMIT 1
+</pre>
+    </div>
+    <p>Метод <code>first</code> возвращает <code>nil</code>, если не найдено соответствующей записи,
+        и исключение не вызывается.</p>
+    <p>В метод <code>first</code> можно передать числовой аргумент, чтобы вернуть это количество
+        результатов. Например</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.first(3)
+# =&gt; [
+  #&lt;Client id: 1, first_name: "Lifo"&gt;,
+  #&lt;Client id: 2, first_name: "Fifo"&gt;,
+  #&lt;Client id: 3, first_name: "Filo"&gt;
+]
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients ORDER BY clients.id ASC LIMIT 3
+</pre>
+    </div>
+    <p>Метод <code>first!</code> ведет себя подобно <code>first</code>, за исключением того, что он
+        вызовет <code>ActiveRecord::RecordNotFound</code>, если не найдено ни одной соответствующей
+        записи.</p>
+    <h5 class="inside_page_header" id="last"><code>last</code>
+    </h5>
+    <p>Метод <code>last</code> находит последнюю запись, упорядоченную по первичному ключу.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.last
+# =&gt; #&lt;Client id: 221, first_name: "Russel"&gt;
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients ORDER BY clients.id DESC LIMIT 1
+</pre>
+    </div>
+    <p>Метод <code>last</code> возвращает <code>nil</code>, если не найдено соответствующей записи,
+        и исключение не вызывается.</p>
+    <p>В метод <code>last</code> можно передать числовой аргумент, чтобы вернуть это количество
+        результатов. Например</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.last(3)
+# =&gt; [
+  #&lt;Client id: 219, first_name: "James"&gt;,
+  #&lt;Client id: 220, first_name: "Sara"&gt;,
+  #&lt;Client id: 221, first_name: "Russel"&gt;
+]
+</pre>
+    </div>
+    <p>SQL эквивалент этого такой:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients ORDER BY clients.id DESC LIMIT 3
+</pre>
+    </div>
+    <p>Метод <code>last!</code> ведет себя подобно <code>last</code>, за исключением того, что он
+        вызовет <code>ActiveRecord::RecordNotFound</code>, если не найдено ни одной соответствующей
+        записи.</p>
+    <h5 class="inside_page_header" id="find_by"><code>find_by</code>
+    </h5>
+    <p>Метод <code>find_by</code> ищет первую запись, соответствующую некоторым условиям. Например:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_by first_name: 'Lifo'
+# =&gt; #&lt;Client id: 1, first_name: "Lifo"&gt;
+Client.find_by first_name: 'Jon'
+# =&gt; nil
+</pre>
+    </div>
+    <p>Это эквивалент записи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(first_name: 'Lifo').take
+</pre>
+    </div>
+    <p>SQL эквивалент выражения выше, следующий:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.first_name = 'Lifo') LIMIT 1
+</pre>
+    </div>
+    <p>Метод <code>find_by!</code> ведет себя подобно <code>find_by</code>, за исключением того, что
+        он вызовет <code>ActiveRecord::RecordNotFound</code>, если не найдено ни одной
+        соответствующей записи. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_by! first_name: 'does not exist'
+# =&gt; ActiveRecord::RecordNotFound
+</pre>
+    </div>
+    <p>Это эквивалент записи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(first_name: 'does not exist').take!
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="poluchenie-neskolkih-ob-ektov-paketami"> Получение нескольких
+        объектов пакетами</h4>
+    <p>Часто необходимо перебрать огромный набор записей, когда рассылаем письма всем пользователям
+        или импортируем некоторые данные.</p>
+    <p>Это может показаться простым:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Очень неэффективно, когда в таблице users тысячи строк.
+User.all.each do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <p>Но этот подход становится очень непрактичным с увеличением размера таблицы, поскольку <code>User.all.each</code>
+        говорит Active Record извлечь <em>таблицу полностью</em> за один проход, создать объект
+        модели для каждой строки и держать этот массив в памяти. В реальности, если имеется огромное
+        количество записей, полная коллекция может превысить количество доступной памяти.</p>
+    <p>Rails представляет два метода, посвященных разделению записей на дружелюбные к памяти пакеты
+        для обработки. Первый метод, <code>find_each</code>, получает пакет записей и затем
+        вкладывает <em>каждую</em> запись в блок отдельно как модель. Второй метод, <code>find_in_batches</code>,
+        получает пакет записей и затем вкладывает <em>весь пакет</em> в блок как массив моделей.</p>
+    <div class="info"><p>Методы <code>find_each</code> и <code>find_in_batches</code> предназначены
+        для пакетной обработки большого числа записей, которые не поместятся в памяти за раз. Если
+        нужно просто перебрать тысячу записей, более предпочтителен вариант обычных методов поиска.
+    </p></div>
+    <h5 class="inside_page_header" id="find_each"><code>find_each</code>
+    </h5>
+    <p>Метод <code>find_each</code> получает пакет записей и затем вкладывает <em>каждую</em> запись
+        в блок отдельно как модель. В следующем примере <code>find_each</code> получит 1000 записей
+        (текущее значение по умолчанию и для <code>find_each</code>, и для
+        <code>find_in_batches</code>), а затем вложит каждую запись отдельно в блок как модель.
+        Процесс повторится, пока не будут обработаны все записи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.find_each do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <p>Чтобы добавить условия в операцию <code>find_each</code>, можно добавить ее в цепочку с
+        другими методами Active Record, такими как <code>where</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.where(weekly_subscriber: true).find_each do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="optsii-dlya-find_each"> Опции для <code>find_each</code>
+    </h6>
+    <p>Метод <code>find_each</code> принимает большинство опций, допустимых для обычного метода
+        <code>find</code>, за исключением <code>:order</code> и <code>:limit</code>,
+        зарезервированных для внутреннего использования в <code>find_each</code>.</p>
+    <p>Также доступны три дополнительные опции: <code>:batch_size</code>, <code>:begin_at</code> и
+        <code>:end_at</code>.</p>
+    <p><strong><code>:batch_size</code></strong></p>
+    <p>Опция <code>:batch_size</code> позволяет определить число записей, подлежащих получению в
+        одном пакете, до передачи отдельной записи в блок. Например, для получения 5000 записей в
+        пакете:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.find_each(batch_size: 5000) do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <p><strong><code>:begin_at</code></strong></p>
+    <p>По умолчанию записи извлекаются в порядке увеличения первичного ключа, который должен быть
+        числом. Опция <code>:begin_at</code> позволяет вам настроить первый ID последовательности,
+        когда наименьший ID не тот, что вам нужен. Это может быть полезно, например, если хотите
+        возобновить прерванный процесс пакетирования, предоставив последний обработанный ID как
+        контрольную точку.</p>
+    <p>Например, чтобы выслать письма только пользователям с первичным ключом, начинающимся от 2000,
+        и получить их в пакетах по 5000:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.find_each(begin_at: 2000, batch_size: 5000) do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <p>Другим примером является наличие нескольких воркеров, работающих с одной и той же очередью
+        обработки. Можно было бы обрабатывать каждым воркером 10000 записей, установив подходящие
+        опции <code>:begin_at</code> в каждом воркере.</p>
+    <p><strong><code>:end_at</code></strong></p>
+    <p>Подобно опции <code>:begin_at</code>, <code>:end_at</code> позволяет указать последний ID
+        последовательности, когда наибольший ID не тот, что вам нужен.
+        Это может быть полезно, например, если хотите запустить процесс пакетирования, используя
+        подмножество записей на основании <code>:begin_at</code> и <code>:end_at</code></p>
+    <p>Например, чтобы выслать письма только пользователям с первичным ключом от 2000 до 10000, и
+        получить их в пакетах по 5000:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.find_each(begin_at: 2000, end_at: 10000, batch_size: 5000) do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="find_in_batches"><code>find_in_batches</code>
+    </h5>
+    <p>Метод <code>find_in_batches</code> похож на <code>find_each</code> тем, что они оба получают
+        пакеты записей. Различие в том, что <code>find_in_batches</code> передает в блок
+        <em>пакеты</em> как массив моделей, вместо отдельной модели. Следующий пример передаст в
+        представленный блок массив из 1000 счетов за раз, а в последний блок содержащий все
+        оставшиеся счета:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Передает в add_invoices массив из 1000 счетов за раз.
+Invoice.find_in_batches do |invoices|
+  export.add_invoices(invoices)
+end
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="optsii-dlya-find_in_batches"> Опции для
+        <code>find_in_batches</code>
+    </h6>
+    <p>Метод <code>find_in_batches</code> принимает те же опции <code>:batch_size</code>, <code>:begin_at</code>
+        и <code>:end_at</code>, как и <code>find_each</code>.</p>
+    <h3 class="inside_page_header" id="usloviya"> Условия</h3>
+    <p>Метод <code>where</code> позволяет определить условия для ограничения возвращаемых записей,
+        которые представляют <code>WHERE</code>-часть выражения SQL. Условия могут быть заданы как
+        строка, массив или хэш.</p>
+    <h4 class="inside_page_header" id="pure-string-conditions"> Чисто строковые условия</h4>
+    <p>Если вы хотите добавить условия в свой поиск, можете просто определить их там, подобно <code>Client.where("orders_count
+        = '2'")</code>. Это найдет всех клиентов, где значение поля <code>orders_count</code> равно
+        2.</p>
+    <div class="warning"><p>Создание условий в чистой строке подвергает вас риску SQL инъекций.
+        Например, <code>Client.where("first_name LIKE '%#{params[:first_name]}%'")</code> не
+        безопасно. Смотрите следующий раздел для более предпочтительного способа обработки условий с
+        использованием массива.</p></div>
+    <h4 class="inside_page_header" id="array-conditions"> Условия с использованием массива</h4>
+    <p>Что если количество может изменяться, скажем, как аргумент извне, возможно даже от
+        пользователя? Поиск тогда принимает такую форму:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count = ?", params[:orders])
+</pre>
+    </div>
+    <p>Active Record проходит через первый элемент в переданных условиях, подставляя остальные
+        элементы вместо знаков вопроса <code>(?)</code> в первом элементе.</p>
+    <p>Если хотите определить несколько условий:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count = ? AND locked = ?", params[:orders], false)
+</pre>
+    </div>
+    <p>В этом примере первый знак вопроса будет заменен на значение в <code>params[:orders]</code> и
+        второй будет заменен SQL аналогом <code>false</code>, который зависит от адаптера.</p>
+    <p>Этот код значительно предпочтительнее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count = ?", params[:orders])
+</pre>
+    </div>
+    <p>чем такой код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count = #{params[:orders]}")
+</pre>
+    </div>
+    <p>по причине безопасности аргумента. Помещение переменной прямо в строку условий передает
+        переменную в базу данных <em>как есть</em>. Это означает, что неэкранированная переменная,
+        переданная пользователем, может иметь злой умысел. Если так сделать, вы подвергаете базу
+        данных риску, так как если пользователь обнаружит, что он может использовать вашу базу
+        данных, то он сможет сделать с ней что угодно. Никогда не помещайте аргументы прямо в строку
+        условий!</p>
+    <div class="info"><p>Подробнее об опасности SQL инъекций можно узнать из .</p></div>
+    <h5 class="inside_page_header" id="simvoly-zapolniteli-v-usloviyah"> Символы-заполнители в
+        условиях</h5>
+    <p>Подобно тому, как <code>(?)</code> заменяют параметры, можно использовать хэш ключей/значений
+        в условиях с использованием массива:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("created_at &gt;= :start_date AND created_at &lt;= :end_date",
+  {start_date: params[:start_date], end_date: params[:end_date]})
+</pre>
+    </div>
+    <p>Читаемость улучшится, в случае если вы используете большое количество переменных в
+        условиях.</p>
+    <h4 class="inside_page_header" id="hash-conditions"> Условия с использованием хэша</h4>
+    <p>Active Record также позволяет передавать условия в хэше, что улучшает читаемость синтаксиса
+        условий. В этом случае передается хэш с ключами, равными полям, к которым применяются
+        условия, и с значениями, указывающим каким образом вы хотите применить к ним условия:</p>
+    <div class="note"><p>Хэшем можно передать условия проверки только равенства, интервала и
+        подмножества.</p></div>
+    <h5 class="inside_page_header" id="usloviya-ravenstva"> Условия равенства</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(locked: true)
+</pre>
+    </div>
+    <p>Имя поля также может быть строкой, а не символом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where('locked' =&gt; true)
+</pre>
+    </div>
+    <p>В случае отношений belongs_to, может быть использован ключ связи для указания модели, если
+        как значение используется объект Active Record. Этот метод также работает с полиморфными
+        отношениями.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where(author: author)
+Author.joins(:articles).where(articles: { author: author })
+</pre>
+    </div>
+    <div class="note"><p>Значения не могут быть символами. Например, нельзя сделать <code>Client.where(status:
+        :active)</code>.</p></div>
+    <h5 class="inside_page_header" id="intervalnye-usloviya"> Интервальные условия</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(created_at: (Time.now.midnight - 1.day)..Time.now.midnight)
+</pre>
+    </div>
+    <p>Это найдет всех клиентов, созданных вчера, с использованием SQL выражения
+        <code>BETWEEN</code>:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.created_at BETWEEN '2008-12-21 00:00:00' AND '2008-12-22 00:00:00')
+</pre>
+    </div>
+    <p>Это была демонстрация более короткого синтаксиса для примеров в </p>
+    <h5 class="inside_page_header" id="usloviya-podmnozhestva"> Условия подмножества</h5>
+    <p>Если хотите найти записи, используя выражение <code>IN</code>, можете передать массив в хэш
+        условия:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(orders_count: [1,3,5])
+</pre>
+    </div>
+    <p>Этот код создаст подобный SQL:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.orders_count IN (1,3,5))
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="usloviya-not"> Условия NOT</h4>
+    <p>Запросы <code>NOT</code> в SQL могут быть созданы с помощью <code>where.not</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where.not(author: author)
+</pre>
+    </div>
+    <p>Другими словами, этот запрос может быть создан с помощью вызова <code>where</code> без
+        аргументов с далее присоединенным <code>not</code> с переданными условиями для
+        <code>where</code>.</p>
+    <h3 class="inside_page_header" id="ordering"> Сортировка</h3>
+    <p>Чтобы получить записи из базы данных в определенном порядке, можете использовать метод <code>order</code>.
+    </p>
+    <p>Например, если вы получаете ряд записей и хотите упорядочить их в порядке возрастания поля
+        <code>created_at</code> в таблице:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.order(:created_at)
+# ИЛИ
+Client.order("created_at")
+</pre>
+    </div>
+    <p>Также можете определить <code>ASC</code> или <code>DESC</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.order(created_at: :desc)
+# ИЛИ
+Client.order(created_at: :asc)
+# ИЛИ
+Client.order("created_at DESC")
+# ИЛИ
+Client.order("created_at ASC")
+</pre>
+    </div>
+    <p>Или сортировку по нескольким полям:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.order(orders_count: :asc, created_at: :desc)
+# ИЛИ
+Client.order(:orders_count, created_at: :desc)
+# ИЛИ
+Client.order("orders_count ASC, created_at DESC")
+# ИЛИ
+Client.order("orders_count ASC", "created_at DESC")
+</pre>
+    </div>
+    <p>Если хотите вызвать <code>order</code> несколько раз, т.е. в различном контексте, новый
+        порядок будет следовать за предыдущим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.order("orders_count ASC").order("created_at DESC")
+# SELECT * FROM clients ORDER BY orders_count ASC, created_at DESC
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="vybor-opredelennyh-poley"> Выбор определенных полей</h3>
+    <p>По умолчанию <code>Model.find</code> выбирает все множество полей результата, используя
+        <code>select *</code>.</p>
+    <p>Чтобы выбрать подмножество полей из всего множества, можете определить его, используя метод
+        <code>select</code>.</p>
+    <p>Например, чтобы выбрать только столбцы <code>viewable_by</code> и <code>locked</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select("viewable_by, locked")
+</pre>
+    </div>
+    <p>Используемый для этого запрос SQL будет иметь подобный вид:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT viewable_by, locked FROM clients
+</pre>
+    </div>
+    <p>Будьте осторожны, поскольку это также означает, что будет инициализирован объект модели
+        только с теми полями, которые вы выбрали. Если вы попытаетесь обратиться к полям, которых
+        нет в инициализированной записи, то получите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+ActiveModel::MissingAttributeError: missing attribute: &lt;attribute&gt;
+</pre>
+    </div>
+    <p>Где <code>&lt;attribute&gt;</code> это атрибут, который был запрошен. Метод <code>id</code>
+        не вызывает <code>ActiveRecord::MissingAttributeError</code>, поэтому будьте аккуратны при
+        работе со связями, так как они нуждаются в методе <code>id</code> для правильной работы.</p>
+    <p>Если хотите вытащить только по одной записи для каждого уникального значения в определенном
+        поле, можно использовать <code>distinct</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select(:name).distinct
+</pre>
+    </div>
+    <p>Это создаст такой SQL:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT DISTINCT name FROM clients
+</pre>
+    </div>
+    <p>Также можно убрать ограничение уникальности:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+query = Client.select(:name).distinct
+# =&gt; Возвратит уникальные имена
+query.distinct(false)
+# =&gt; Возвратит все имена, даже если есть дубликаты
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="ogranichenie-i-smeschenie"> Ограничение и смещение</h3>
+    <p>Чтобы применить <code>LIMIT</code> к SQL, запущенному с помощью <code>Model.find</code>,
+        нужно определить <code>LIMIT</code>, используя методы <code>limit</code> и
+        <code>offset</code> на relation.</p>
+    <p>Используйте <code>limit</code> для определения количества записей, которые будут получены, и
+        <code>offset</code> - для числа записей, которые будут пропущены до начала возврата записей.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.limit(5)
+</pre>
+    </div>
+    <p>возвратит максимум 5 клиентов, и, поскольку не определено смещение, будут возвращены первые 5
+        клиентов в таблице. Запускаемый SQL будет выглядеть подобным образом:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients LIMIT 5
+</pre>
+    </div>
+    <p>Добавление <code>offset</code> к этому</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.limit(5).offset(30)
+</pre>
+    </div>
+    <p>Возвратит максимум 5 клиентов, начиная с 31-го. SQL выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients LIMIT 5 OFFSET 30
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="gruppirovka"> Группировка</h3>
+    <p>Чтобы применить условие <code>GROUP BY</code> к <code>SQL</code>, можете определить метод
+        <code>group</code> в поисковом запросе.</p>
+    <p>Например, если хотите найти коллекцию дат, в которые были созданы заказы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Order.select("date(created_at) as ordered_date, sum(price) as total_price").group("date(created_at)")
+</pre>
+    </div>
+    <p>Это даст вам отдельный объект <code>Order</code> для каждой даты, в которой были заказы в
+        базе данных.</p>
+    <p>SQL, который будет выполнен, будет выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT date(created_at) as ordered_date, sum(price) as total_price
+FROM orders
+GROUP BY date(created_at)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="obschee-kolichestvo-sgruppirovannyh-elementov"> Общее
+        количество сгруппированных элементов</h4>
+    <p>Чтобы получить общее количество сгруппированных элементов одним запросом, вызовите <code>count</code>
+        после <code>group</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Order.group(:status).count
+# =&gt; { 'awaiting_approval' =&gt; 7, 'paid' =&gt; 12 }
+</pre>
+    </div>
+    <p>SQL, который будет исполнен, будет выглядеть как-то так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT COUNT (*) AS count_all, status AS status
+FROM "orders"
+GROUP BY status
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="vladenie"> Владение</h3>
+    <p>SQL использует условие <code>HAVING</code> для определения условий для полей, указанных в
+        <code>GROUP BY</code>. Условие <code>HAVING</code>, определенное в SQL, запускается в <code>Model.find</code>
+        с использованием метода <code>having</code> для поиска.</p>
+    <p>Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Order.select("date(created_at) as ordered_date, sum(price) as total_price").group("date(created_at)").having("sum(price) &gt; ?", 100)
+</pre>
+    </div>
+    <p>SQL, который будет выполнен, выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT date(created_at) as ordered_date, sum(price) as total_price
+FROM orders
+GROUP BY date(created_at)
+HAVING sum(price) &gt; 100
+</pre>
+    </div>
+    <p>Это возвратит отдельные объекты order для каждого дня, но только те, которые заказаны более
+        чем на 100$ в день.</p>
+    <h3 class="inside_page_header" id="pereopredelyayuschie-usloviya"> Переопределяющие условия</h3>
+    <h4 class="inside_page_header" id="unscope"><code>unscope</code>
+    </h4>
+    <p>Можете указать определенные условия, которые будут убраны, используя метод
+        <code>unscope</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where('id &gt; 10').limit(20).order('id asc').unscope(:order)
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE id &gt; 10 LIMIT 20
+# Оригинальный запрос без `unscope`
+SELECT * FROM articles WHERE id &gt; 10 ORDER BY id asc LIMIT 20
+</pre>
+    </div>
+    <p>Также можно убрать определенные условия <code>where</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where(id: 10, trashed: false).unscope(where: :id)
+# SELECT "articles".* FROM "articles" WHERE trashed = 0
+</pre>
+    </div>
+    <p>Relation, использующий <code>unscope</code> повлияет на любой relation, с которым он слит:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.order('id asc').merge(Article.unscope(:order))
+# SELECT "articles".* FROM "articles"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="only"><code>only</code>
+    </h4>
+    <p>Также можно переопределить условия, используя метод <code>only</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where('id &gt; 10').limit(20).order('id desc').only(:order, :where)
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE id &gt; 10 ORDER BY id DESC
+# Оригинальный запрос без `only`
+SELECT "articles".* FROM "articles" WHERE (id &gt; 10) ORDER BY id desc LIMIT 20
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="reorder"><code>reorder</code>
+    </h4>
+    <p>Метод <code>reorder</code> переопределяет сортировку скоупа по умолчанию. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  ..
+  ..
+  has_many :comments, -&gt; { order('posted_at DESC') }
+end
+Article.find(10).comments.reorder('name')
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE id = 10
+SELECT * FROM comments WHERE article_id = 10 ORDER BY name
+</pre>
+    </div>
+    <p>В случае, если бы условие <code>reorder</code> не было бы использовано, запущенный SQL был
+        бы:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE id = 10
+SELECT * FROM comments WHERE article_id = 10 ORDER BY posted_at DESC
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="reverse_order"><code>reverse_order</code>
+    </h4>
+    <p>Метод <code>reverse_order</code> меняет направление условия сортировки, если оно определено:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count &gt; 10").order(:name).reverse_order
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE orders_count &gt; 10 ORDER BY name DESC
+</pre>
+    </div>
+    <p>Если условие сортировки не было определено в запросе, <code>reverse_order</code> сортирует по
+        первичному ключу в обратном порядке:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where("orders_count &gt; 10").reverse_order
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE orders_count &gt; 10 ORDER BY clients.id DESC
+</pre>
+    </div>
+    <p>Этот метод не принимает аргументы.</p>
+    <h4 class="inside_page_header" id="rewhere"><code>rewhere</code>
+    </h4>
+    <p>Метод <code>rewhere</code> переопределяет существующее именованное условие <code>where</code>.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where(trashed: true).rewhere(trashed: false)
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE `trashed` = 0
+</pre>
+    </div>
+    <p>В случае, когда не используется условие <code>rewhere</code>,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.where(trashed: true).where(trashed: false)
+</pre>
+    </div>
+    <p>SQL, который будет выполнен:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM articles WHERE `trashed` = 1 AND `trashed` = 0
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="nulevoy-relation"> Нулевой Relation</h3>
+    <p>Метод <code>none</code> возвращает сцепляемый relation без записей. Любые последующие
+        условия, сцепленные с возвращенным relation, продолжат возвращать пустые relation. Это
+        полезно в случаях, когда необходим сцепляемый отклик на метод или скоуп, который может
+        вернуть пустые результаты.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.none # returns an empty Relation and fires no queries.
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# От метода visible_articles ожидается, что он вернет Relation.
+@articles = current_user.visible_articles.where(name: params[:name])
+def visible_articles
+  case role
+  when 'Country Manager'
+    Article.where(country: country)
+  when 'Reviewer'
+    Article.published
+  when 'Bad User'
+    Article.none # =&gt; если бы вернули [] или nil, код поломался бы в этом случае
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="ob-ekty-tolko-dlya-chteniya"> Объекты только для чтения</h3>
+    <p>Active Record представляет метод <code>readonly</code> у relation для явного запрета
+        изменения любого возвращаемого объекта. Любая попытка изменить объект только для чтения
+        будет неудачной, вызвав исключение <code>ActiveRecord::ReadOnlyRecord</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+client = Client.readonly.first
+client.visits += 1
+client.save
+</pre>
+    </div>
+    <p>Так как <code>client</code> явно указан как объект только для чтения, вызов вышеуказанного
+        кода вызовет исключение <code>ActiveRecord::ReadOnlyRecord</code> при вызове <code>client.save</code>
+        с обновленным значением <code>visits</code>.</p>
+    <h3 class="inside_page_header" id="blokirovka-zapisey-dlya-obnovleniya"> Блокировка записей для
+        обновления</h3>
+    <p>Блокировка полезна для предотвращения гонки условий при обновлении записей в базе данных и
+        обеспечения атомарного обновления.</p>
+    <p>Active Record предоставляет два механизма блокировки:</p>
+    <ul>
+        <li>Оптимистичная блокировка
+        </li>
+        <li>Пессимистичная блокировка
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="optimistichnaya-blokirovka"> Оптимистичная блокировка</h4>
+    <p>Оптимистичная блокировка позволяет нескольким пользователям обращаться к одной и той же
+        записи для редактирования и предполагает минимум конфликтов с данными. Она осуществляется с
+        помощью проверки, сделал ли другой процесс изменения в записи, с тех пор как она была
+        открыта. Если это происходит, вызывается исключение
+        <code>ActiveRecord::StaleObjectError</code>, и обновление игнорируется.</p>
+    <p><strong>Столбец оптимистичной блокировки</strong></p>
+    <p>Чтобы начать использовать оптимистичную блокировку, таблица должна иметь столбец,
+        называющийся <code>lock_version</code>, с типом integer. Каждый раз, когда запись
+        обновляется, Active Record увеличивает значение <code>lock_version</code>, и средства
+        блокирования обеспечивают, что для записи, вызванной дважды, та, которая первая успеет будет
+        сохранена, а для второй будет вызвано исключение <code>ActiveRecord::StaleObjectError</code>.
+        Пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+c1 = Client.find(1)
+c2 = Client.find(1)
+c1.first_name = "Michael"
+c1.save
+c2.name = "should fail"
+c2.save # Raises a ActiveRecord::StaleObjectError
+</pre>
+    </div>
+    <p>Вы ответственны за разрешение конфликта с помощью обработки исключения и либо отката, либо
+        объединения, либо применения бизнес-логики, необходимой для разрешения конфликта.</p>
+    <p>Это поведение может быть отключено, если установить <code>ActiveRecord::Base.lock_optimistically
+        = false</code>.</p>
+    <p>Для переопределения имени столбца <code>lock_version</code>, <code>ActiveRecord::Base</code>
+        предоставляет атрибут класса <code>locking_column</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Client &lt; ActiveRecord::Base
+  self.locking_column = :lock_client_column
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="pessimistichnaya-blokirovka"> Пессимистичная блокировка</h4>
+    <p>Пессимистичная блокировка использует механизм блокировки, предоставленный лежащей в основе
+        базой данных. Использование <code>lock</code> при построении relation применяет эксклюзивную
+        блокировку на выделенные строки. Relation использует <code>lock</code> обычно упакованный
+        внутри transaction для предотвращения условий взаимной блокировки (дедлока).</p>
+    <p>Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Item.transaction do
+  i = Item.lock.first
+  i.name = 'Jones'
+  i.save!
+end
+</pre>
+    </div>
+    <p>Вышеописанная сессия осуществляет следующие SQL для бэкенда MySQL:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SQL (0.2ms)   BEGIN
+Item Load (0.3ms)   SELECT * FROM `items` LIMIT 1 FOR UPDATE
+Item Update (0.4ms)   UPDATE `items` SET `updated_at` = '2009-02-07 18:05:56', `name` = 'Jones' WHERE `id` = 1
+SQL (0.8ms)   COMMIT
+</pre>
+    </div>
+    <p>Можете передать чистый SQL в опцию <code>:lock</code> для разрешения различных типов
+        блокировок. Например, MySQL имеет выражение, называющееся <code>LOCK IN SHARE MODE</code>,
+        которым можно заблокировать запись, но разрешить другим запросам читать ее. Для указания
+        этого выражения, просто передайте его как опцию блокировки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Item.transaction do
+  i = Item.lock("LOCK IN SHARE MODE").find(1)
+  i.increment!(:views)
+end
+</pre>
+    </div>
+    <p>Если у вас уже имеется экземпляр модели, можно начать транзакцию и затребовать блокировку
+        одновременно, используя следующий код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+item = Item.first
+item.with_lock do
+  # Этот блок вызывается в транзакции,
+  # элемент уже заблокирован.
+  item.increment!(:views)
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="joining-tables"> Соединительные таблицы</h3>
+    <p>Active Record предоставляет метод поиска с именем <code>joins</code> для определения условия
+        <code>JOIN</code> в результирующем SQL. Есть разные способы определить метод
+        <code>joins</code>:</p>
+    <h4 class="inside_page_header" id="ispolzovanie-strokovogo-fragmenta-sql"> Использование
+        строкового фрагмента SQL</h4>
+    <p>Можете просто дать чистый SQL, определяющий условие <code>JOIN</code> в <code>joins</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.joins('LEFT OUTER JOIN addresses ON addresses.client_id = clients.id')
+</pre>
+    </div>
+    <p>Это приведет к следующему SQL:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT clients.* FROM clients LEFT OUTER JOIN addresses ON addresses.client_id = clients.id
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-massiva-hesha-imenovannyh-svyazey">
+        Использование массива/хэша именованных связей</h4>
+    <div class="warning"><p>Этот метод работает только с <code>INNER JOIN</code>.</p></div>
+    <p>Active Record позволяет использовать имена , определенных в модели, как ярлыки для
+        определения условия <code>JOIN</code> этих связей при использовании метода
+        <code>joins</code>.</p>
+    <p>Например, рассмотрим следующие модели <code>Category</code>, <code>Article</code>, <code>Comment</code>,
+        <code>Guest</code> и <code>Tag</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Category &lt; ActiveRecord::Base
+  has_many :articles
+end
+class Article &lt; ActiveRecord::Base
+  belongs_to :category
+  has_many :comments
+  has_many :tags
+end
+class Comment &lt; ActiveRecord::Base
+  belongs_to :article
+  has_one :guest
+end
+class Guest &lt; ActiveRecord::Base
+  belongs_to :comment
+end
+class Tag &lt; ActiveRecord::Base
+  belongs_to :article
+end
+</pre>
+    </div>
+    <p>Сейчас все нижеследующее создаст ожидаемые соединительные запросы с использованием <code>INNER
+        JOIN</code>:</p>
+    <h5 class="inside_page_header" id="soedinenie-odinochnoy-svyazi"> Соединение одиночной
+        связи</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Category.joins(:articles)
+</pre>
+    </div>
+    <p>Это создаст:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT categories.* FROM categories
+  INNER JOIN articles ON articles.category_id = categories.id
+</pre>
+    </div>
+    <p>Или, по-русски, "возвратить объект Category для всех категорий со статьями". Отметьте, что
+        будут дублирующиеся категории, если имеется более одной статьи в одной категории. Если нужны
+        уникальные категории, можно использовать <code>Category.joins(:articles).uniq</code>.</p>
+    <h5 class="inside_page_header" id="soedinenie-neskolkih-svyazey"> Соединение нескольких
+        связей</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.joins(:category, :comments)
+</pre>
+    </div>
+    <p>Это создаст:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT articles.* FROM articles
+  INNER JOIN categories ON articles.category_id = categories.id
+  INNER JOIN comments ON comments.article_id = articles.id
+</pre>
+    </div>
+    <p>Или, по-русски, "возвратить все статьи, у которых есть категория и как минимум один
+        комментарий". Отметьте, что статьи с несколькими комментариями будут показаны несколько
+        раз.</p>
+    <h5 class="inside_page_header" id="soedinenie-vlozhennyh-svyazey-odnogo-urovnya"> Соединение
+        вложенных связей (одного уровня)</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.joins(comments: :guest)
+</pre>
+    </div>
+    <p>Это создаст:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT articles.* FROM articles
+  INNER JOIN comments ON comments.article_id = articles.id
+  INNER JOIN guests ON guests.comment_id = comments.id
+</pre>
+    </div>
+    <p>Или, по-русски, "возвратить все статьи, имеющие комментарий, сделанный гостем".</p>
+    <h5 class="inside_page_header" id="soedinenie-vlozhennyh-svyazey-raznyh-urovney"> Соединение
+        вложенных связей (разных уровней)</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Category.joins(articles: [{ comments: :guest }, :tags])
+</pre>
+    </div>
+    <p>Это создаст:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT categories.* FROM categories
+  INNER JOIN articles ON articles.category_id = categories.id
+  INNER JOIN comments ON comments.article_id = articles.id
+  INNER JOIN guests ON guests.comment_id = comments.id
+  INNER JOIN tags ON tags.article_id = articles.id
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="opredelenie-usloviy-v-soedinitelnyh-tablitsah"> Определение
+        условий в соединительных таблицах</h4>
+    <p>В соединительных таблицах можно определить условия, используя надлежащие и условия.
+        предоставляют специальный синтаксис для определения условий в соединительных таблицах:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+time_range = (Time.now.midnight - 1.day)..Time.now.midnight
+Client.joins(:orders).where('orders.created_at' =&gt; time_range)
+</pre>
+    </div>
+    <p>Альтернативный и более чистый синтаксис для этого - вложенные хэш-условия:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+time_range = (Time.now.midnight - 1.day)..Time.now.midnight
+Client.joins(:orders).where(orders: { created_at: time_range })
+</pre>
+    </div>
+    <p>Будут найдены все клиенты, имеющие созданные вчера заказы, снова используя выражение SQL
+        <code>BETWEEN</code>.</p>
+    <h3 class="inside_page_header" id="neterpelivaya-zagruzka-svyazey"> Нетерпеливая загрузка
+        связей</h3>
+    <p>Нетерпеливая загрузка - это механизм загрузки связанных записей объекта, возвращаемого <code>Model.find</code>,
+        с использованием как можно меньшего количества запросов.</p>
+    <p><strong>Проблема N + 1 запроса</strong></p>
+    <p>Рассмотрим следующий код, который находит 10 клиентов и печатает их почтовые индексы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+clients = Client.limit(10)
+clients.each do |client|
+  puts client.address.postcode
+end
+</pre>
+    </div>
+    <p>На первый взгляд выглядит хорошо. Но проблема лежит в общем количестве выполненных запросов.
+        Вышеупомянутый код выполняет 1 (чтобы найти 10 клиентов) + 10 (каждый на одного клиента для
+        загрузки адреса) = итого <strong>11</strong> запросов.</p>
+    <p><strong>Решение проблемы N + 1 запроса</strong></p>
+    <p>Active Record позволяет заранее указать все связи, которые должны быть загружены. Это
+        возможно с помощью указания метода <code>includes</code> на вызове <code>Model.find</code>.
+        Посредством <code>includes</code>, Active Record обеспечивает то, что все указанные связи
+        загружаются с использованием минимально возможного количества запросов.</p>
+    <p>Пересматривая вышеупомянутую задачу, мы можем переписать <code>Client.limit(10)</code> для
+        использование нетерпеливой загрузки адресов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+clients = Client.includes(:address).limit(10)
+clients.each do |client|
+  puts client.address.postcode
+end
+</pre>
+    </div>
+    <p>Этот код выполнит всего <strong>2</strong> запроса, вместо <strong>11</strong> запросов из
+        прошлого примера:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients LIMIT 10
+SELECT addresses.* FROM addresses
+  WHERE (addresses.client_id IN (1,2,3,4,5,6,7,8,9,10))
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="neterpelivaya-zagruzka-neskolkih-svyazey"> Нетерпеливая
+        загрузка нескольких связей</h4>
+    <p>Active Record позволяет нетерпеливо загружать любое количество связей в одном вызове <code>Model.find</code>
+        с использованием массива, хэша, или вложенного хэша массивов/хэшей, с помощью метода <code>includes</code>.
+    </p>
+    <h5 class="inside_page_header" id="massiv-neskolkih-svyazey"> Массив нескольких связей</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.includes(:category, :comments)
+</pre>
+    </div>
+    <p>Это загрузит все статьи и связанные категорию и комментарии для каждой статьи.</p>
+    <h5 class="inside_page_header" id="vlozhennyy-hesh-svyazey"> Вложенный хэш связей</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Category.includes(articles: [{ comments: :guest }, :tags]).find(1)
+</pre>
+    </div>
+    <p>Вышеприведенный код находит категории с id 1 и нетерпеливо загружает все связанные статьи,
+        теги и комментарии каждой статьи, а также гостей, связанных с комментариями.</p>
+    <h4 class="inside_page_header" id="opredelenie-usloviy-dlya-neterpelivoy-zagruzki-svyazey">
+        Определение условий для нетерпеливой загрузки связей</h4>
+    <p>Хотя Active Record и позволяет определить условия для нетерпеливой загрузки связей, как и в
+        <code>joins</code>, рекомендуем использовать вместо этого .</p>
+    <p>Однако, если вы сделаете так, то сможете использовать <code>where</code> как обычно.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.includes(:comments).where("comments.visible" =&gt; true)
+</pre>
+    </div>
+    <p>Это сгенерирует запрос с ограничением <code>LEFT OUTER JOIN</code>, в то время как метод
+        <code>joins</code> сгенерировал бы его с использованием функции <code>INNER JOIN</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  SELECT "articles"."id" AS t0_r0, ... "comments"."updated_at" AS t1_r5 FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id" WHERE (comments.visible = 1)
+</pre>
+    </div>
+    <p>Если бы не было условия <code>where</code>, то сгенерировался бы обычный набор из двух
+        запросов.</p>
+    <div class="note"><p>Использование <code>where</code> подобным образом будет работать только,
+        если вы передадите в него хэш. Для фрагментов SQL необходимо использовать
+        <code>references</code> для принуждения соединения таблиц:</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.includes(:comments).where("comments.visible = true").references(:comments)
+</pre>
+    </div>
+    <p>Если, в случае с этим запросом <code>includes</code>, не будет ни одного комментария ни для
+        одной статьи, все статьи все равно будут загружены. При использовании <code>joins</code>
+        (INNER JOIN), соединительные условия <strong>должны</strong> соответствовать, иначе ни одной
+        записи не будет возвращено.</p>
+    <h3 class="inside_page_header" id="skoupy"> Скоупы</h3>
+    <p>Скоупинг позволяет определить часто используемые запросы, к которым можно обращаться как к
+        вызовам метода в связанных объектах или моделях. С помощью этих скоупов можно использовать
+        каждый ранее раскрытый метод, такой как <code>where</code>, <code>joins</code> и <code>includes</code>.
+        Все методы скоупов возвращают объект <code>ActiveRecord::Relation</code>, который позволяет
+        вызывать следующие методы (такие как другие скоупы).</p>
+    <p>Для определения простого скоупа мы используем метод <code>scope</code> внутри класса, передав
+        запрос, который хотим запустить при вызове скоупа:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  scope :published, -&gt; { where(published: true) }
+end
+</pre>
+    </div>
+    <p>Это в точности то же самое, что определение метода класса, и то, что именно вы используете,
+        является вопросом профессионального предпочтения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  def self.published
+    where(published: true)
+  end
+end
+</pre>
+    </div>
+    <p>Скоупы также сцепляются с другими скоупами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  scope :published,               -&gt; { where(published: true) }
+  scope :published_and_commented, -&gt; { published.where("comments_count &gt; 0") }
+end
+</pre>
+    </div>
+    <p>Для вызова этого скоупа <code>published</code>, можно вызвать его либо на классе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.published # =&gt; [опубликованные статьи]
+</pre>
+    </div>
+    <p>Либо на связи, состоящей из объектов <code>Article</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+category = Category.first
+category.articles.published # =&gt; [опубликованные статьи, принадлежащие этой категории]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="peredacha-argumenta"> Передача аргумента</h4>
+    <p>Скоуп может принимать аргументы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  scope :created_before, -&gt;(time) { where("created_at &lt; ?", time) }
+end
+</pre>
+    </div>
+    <p>Вызывайте скоуп, как будто это метод класса:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.created_before(Time.zone.now)
+</pre>
+    </div>
+    <p>Однако, это всего лишь дублирование функциональности, которая должна быть предоставлена
+        методом класса.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  def self.created_before(time)
+    where("created_at &lt; ?", time)
+  end
+end
+</pre>
+    </div>
+    <p>Использование метода класса - более предпочтительный способ принятию аргументов скоупом. Эти
+        методы также будут доступны на связанных объектах:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+category.articles.created_before(time)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="primenenie-skoupa-po-umolchaniyu"> Применение скоупа по
+        умолчанию</h4>
+    <p>Если хотите, чтобы скоуп был применен ко всем запросам к модели, можно использовать метод
+        <code>default_scope</code> в самой модели.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Client &lt; ActiveRecord::Base
+  default_scope { where("removed_at IS NULL") }
+end
+</pre>
+    </div>
+    <p>Когда запросы для этой модели будут выполняться, запрос SQL теперь будет выглядеть примерно
+        так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE removed_at IS NULL
+</pre>
+    </div>
+    <p>Если необходимо сделать более сложные вещи со скоупом по умолчанию, альтернативно его можно
+        определить как метод класса:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Client &lt; ActiveRecord::Base
+  def self.default_scope
+    # Should return an ActiveRecord::Relation.
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sliyanie-skoupov"> Слияние скоупов</h4>
+    <p>Подобно условиям <code>where</code>, скоупы сливаются с использованием <code>AND</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  scope :active, -&gt; { where state: 'active' }
+  scope :inactive, -&gt; { where state: 'inactive' }
+end
+User.active.inactive
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'active' AND "users"."state" = 'inactive'
+</pre>
+    </div>
+    <p>Можно комбинировать условия <code>scope</code> и <code>where</code>, и результирующий sql
+        будет содержать все условия, соединенные с помощью <code>AND</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.active.where(state: 'finished')
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'active' AND "users"."state" = 'finished'
+</pre>
+    </div>
+    <p>Если необходимо, чтобы сработало только последнее условие <code>where</code>, тогда можно
+        использовать <code>Relation#merge</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.active.merge(User.inactive)
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'inactive'
+</pre>
+    </div>
+    <p>Важным предостережением является то, что <code>default_scope</code> будет переопределен
+        условиями <code>scope</code> и <code>where</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  default_scope { where state: 'pending' }
+  scope :active, -&gt; { where state: 'active' }
+  scope :inactive, -&gt; { where state: 'inactive' }
+end
+User.all
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending'
+User.active
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'active'
+User.where(state: 'inactive')
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'inactive'
+</pre>
+    </div>
+    <p>Как видите, <code>default_scope</code> был переопределен как условием <code>scope</code>, так
+        и <code>where</code>.</p>
+    <h4 class="inside_page_header" id="udalenie-vseh-skoupov"> Удаление всех скоупов</h4>
+    <p>Если хотите удалить скоупы по какой-то причине, можете использовать метод
+        <code>unscoped</code>. Это особенно полезно, если в модели определен
+        <code>default_scope</code>, и он не должен быть применен для конкретно этого запроса.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.unscoped.load
+</pre>
+    </div>
+    <p>Этот метод удаляет все скоупы и выполняет обычный запрос к таблице.</p>
+    <p>Отметьте, что сцепление <code>unscoped</code> со <code>scope</code> не работает. В этих
+        случаях рекомендовано использовать блочную форму <code>unscoped</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.unscoped {
+  Client.created_before(Time.zone.now)
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="dynamic-finders"> Динамический поиск</h3>
+    <p>Для каждого поля (также называемого атрибутом), определенного в вашей таблице, Active Record
+        предоставляет метод поиска. Например, если есть поле <code>first_name</code> в вашей модели
+        <code>Client</code>, вы автоматически получаете <code>find_by_first_name</code> от Active
+        Record. Если также есть поле <code>locked</code> в модели <code>Client</code>, вы также
+        получаете <code>find_by_locked</code> метод.</p>
+    <p>Можете определить восклицательный знак (<code>!</code>) в конце динамического поиска, чтобы
+        он вызвал ошибку <code>ActiveRecord::RecordNotFound</code>, если не возвратит ни одной
+        записи, например так <code>Client.find_by_name!("Ryan")</code></p>
+    <p>Если хотите искать и по first_name, и по locked, можете сцепить эти поиски вместе, просто
+        написав "<code>and</code>" между полями, например <code>Client.find_by_first_name_and_locked("Ryan",
+            true)</code>.</p>
+    <h3 class="inside_page_header" id="method-chaining"> Цепочки методов</h3>
+    <p>В Active Record есть полезный приём программирования ,
+        который позволяет нам комбинировать множество Active Record методов.</p>
+    <p>Вы можете сцепить несколько методов в единое выражение, если предыдущий вызываемый метод
+        возвращает
+        <code>ActiveRecord::Relation</code>, такие как, <code>all</code>, <code>where</code>, и
+        <code>joins</code>. Методы которые возвращают одиночный объект
+        (смотрите )) должны вызываться в конце.</p>
+    <p>Ниже представлено несколько примеров. Это руководство не покрывает все возможности, а только
+        некоторые, для примера.
+        Когда вызывается Active Record метод, запрос не сразу формируется и отправляется в базу,
+        это происходит только тогда, когда данные реально необходимы. Таким образом, каждый пример
+        ниже генерирует только один запрос.</p>
+    <h4 class="inside_page_header" id="poluchenie-otfiltrovannyh-dannyh-iz-neskolkih-tablits">
+        Получение отфильтрованных данных из нескольких таблиц</h4>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Person
+  .select('people.id, people.name, comments.text')
+  .joins(:comments)
+  .where('comments.created_at &gt; ?', 1.week.ago)
+</pre>
+    </div>
+    <p>Результат должен быть примерно следующим:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT people.id, people.name, comments.text
+FROM people
+INNER JOIN comments
+  ON comments.person_id = people.id
+WHERE comments.created_at = '2015-01-01'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="poluchenie-opredelyonnyh-dannyh-iz-neskolkih-tablits">
+        Получение определённых данных из нескольких таблиц</h4>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Person
+  .select('people.id, people.name, companies.name')
+  .joins(:company)
+  .find_by('people.name' =&gt; 'John') # это должно быть в конце
+</pre>
+    </div>
+    <p>Выражение выше, сгенерирует следующий SQL запрос:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT people.id, people.name, companies.name
+FROM people
+INNER JOIN companies
+  ON companies.person_id = people.id
+WHERE people.name = 'John'
+LIMIT 1
+</pre>
+    </div>
+    <div class="note"><p>Обратите внимание, что если запросу соответствует несколько записей, <code>find_by</code>
+        вернет только первую запись и проигнорирует остальные (смотрите <code>LIMIT 1</code> выше).
+    </p></div>
+    <h3 class="inside_page_header" id="poisk-ili-sozdanie-novogo-ob-ekta"> Поиск или создание нового
+        объекта</h3>
+    <p>Часто бывает, что вам нужно найти запись или создать ее, если она не существует. Вы можете
+        сделать это с помощью методов <code>find_or_create_by</code> и
+        <code>find_or_create_by!</code>.</p>
+    <h4 class="inside_page_header" id="find_or_create_by"><code>find_or_create_by</code>
+    </h4>
+    <p>Метод <code>find_or_create_by</code> проверяет, существует ли запись с атрибутами. Если нет,
+        то вызывается <code>create</code>. Давайте рассмотрим пример.</p>
+    <p>Предположим, вы хотите найти клиента по имени 'Andy', и, если такого нет, создать его. Это
+        можно сделать, выполнив:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_or_create_by(first_name: 'Andy')
+# =&gt; #&lt;Client id: 1, first_name: "Andy", orders_count: 0, locked: true, created_at: "2011-08-30 06:09:27", updated_at: "2011-08-30 06:09:27"&gt;
+</pre>
+    </div>
+    <p>SQL, генерируемый этим методом, выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.first_name = 'Andy') LIMIT 1
+BEGIN
+INSERT INTO clients (created_at, first_name, locked, orders_count, updated_at) VALUES ('2011-08-30 05:22:57', 'Andy', 1, NULL, '2011-08-30 05:22:57')
+COMMIT
+</pre>
+    </div>
+    <p><code>find_or_create_by</code> возвращает либо уже существующую запись, либо новую запись. В
+        нашем случае, у нас еще нет клиента с именем Andy, поэтому запись будет создана и
+        возвращена.</p>
+    <p>Новая запись может быть не сохранена в базу данных; это зависит от того, прошли валидации или
+        нет (подобно <code>create</code>).</p>
+    <p>Предположим, мы хотим установить атрибут 'locked' как <code>false</code>, если создаем новую
+        запись, но не хотим включать его в запрос. Таким образом, мы хотим найти клиента по имени
+        "Andy" или, если этот клиент не существует, создать клиента по имени "Andy", который не
+        заблокирован.</p>
+    <p>Этого можно достичь двумя способами. Первый - это использование <code>create_with</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.create_with(locked: false).find_or_create_by(first_name: 'Andy')
+</pre>
+    </div>
+    <p>Второй способ - это использование блока:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_or_create_by(first_name: 'Andy') do |c|
+  c.locked = false
+end
+</pre>
+    </div>
+    <p>Блок будет запущен только если клиент был создан. Во второй раз при запуске этого кода блок
+        будет проигнорирован.</p>
+    <h4 class="inside_page_header" id="find_or_create_by"><code>find_or_create_by!</code>
+    </h4>
+    <p>Можно также использовать <code>find_or_create_by!</code>, чтобы вызвать исключение, если
+        новая запись невалидна. Валидации не раскрываются в этом руководстве, но давайте на момент
+        предположим, что вы временно добавили</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+validates :orders_count, presence: true
+</pre>
+    </div>
+    <p>в модель <code>Client</code>. Если попытаетесь создать нового <code>Client</code> без
+        передачи <code>orders_count</code>, запись будет невалидной и будет вызвано исключение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_or_create_by!(first_name: 'Andy')
+# =&gt; ActiveRecord::RecordInvalid: Validation failed: Orders count can't be blank
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="find_or_initialize_by"><code>find_or_initialize_by</code>
+    </h4>
+    <p>Метод <code>find_or_initialize_by</code> работает похоже на <code>find_or_create_by</code>,
+        но он вызывает не <code>create</code>, а <code>new</code>. Это означает, что новый экземпляр
+        модели будет создан в памяти, но не будет сохранен в базу данных. Продолжая пример с <code>find_or_create_by</code>,
+        теперь мы хотим клиента по имени 'Nick':</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+nick = Client.find_or_initialize_by(first_name: 'Nick')
+# =&gt; &lt;Client id: nil, first_name: "Nick", orders_count: 0, locked: true, created_at: "2011-08-30 06:09:27", updated_at: "2011-08-30 06:09:27"&gt;
+nick.persisted?
+# =&gt; false
+nick.new_record?
+# =&gt; true
+</pre>
+    </div>
+    <p>Поскольку объект еще не сохранен в базу данных, создаваемый SQL выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT * FROM clients WHERE (clients.first_name = 'Nick') LIMIT 1
+</pre>
+    </div>
+    <p>Когда захотите сохранить его в базу данных, просто вызовите <code>save</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+nick.save
+# =&gt; true
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="poisk-s-pomoschyu-sql"> Поиск с помощью SQL</h3>
+    <p>Если вы предпочитаете использовать собственные запросы SQL для поиска записей в таблице,
+        можете использовать <code>find_by_sql</code>. Метод <code>find_by_sql</code> возвратит
+        массив объектов, даже если лежащий в основе запрос вернет всего лишь одну запись. Например,
+        можете запустить такой запрос:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.find_by_sql("SELECT * FROM clients
+  INNER JOIN orders ON clients.id = orders.client_id
+  ORDER BY clients.created_at desc")
+# =&gt;  [
+  #&lt;Client id: 1, first_name: "Lucas" &gt;,
+  #&lt;Client id: 2, first_name: "Jan" &gt;,
+  # ...
+]
+</pre>
+    </div>
+    <p><code>find_by_sql</code> предоставляет простой способ создания произвольных запросов к базе
+        данных и получения экземпляров объектов.</p>
+    <h4 class="inside_page_header" id="select_all"><code>select_all</code>
+    </h4>
+    <p>У <code>find_by_sql</code> есть близкий родственник, называемый
+        <code>connection#select_all</code>. <code>select_all</code> получит объекты из базы данных,
+        используя произвольный SQL, как и в <code>find_by_sql</code>, но не создаст их экземпляры.
+        Вместо этого, вы получите массив хэшей, где каждый хэш указывает на запись.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.connection.select_all("SELECT first_name, created_at FROM clients WHERE id = '1'")
+# =&gt; [
+  {"first_name"=&gt;"Rafael", "created_at"=&gt;"2012-11-10 23:23:45.281189"},
+  {"first_name"=&gt;"Eileen", "created_at"=&gt;"2013-12-09 11:22:35.221282"}
+]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="pluck"><code>pluck</code>
+    </h4>
+    <p><code>pluck</code> может быть использован для запроса отдельного столбца или нескольких
+        столбцов из таблицы, лежащей в основе модели. Он принимает имя столбца как аргумент и
+        возвращает массив значений определенного столбца соответствующего типа данных.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(active: true).pluck(:id)
+# SELECT id FROM clients WHERE active = 1
+# =&gt; [1, 2, 3]
+Client.distinct.pluck(:role)
+# SELECT DISTINCT role FROM clients
+# =&gt; ['admin', 'member', 'guest']
+Client.pluck(:id, :name)
+# SELECT clients.id, clients.name FROM clients
+# =&gt; [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
+</pre>
+    </div>
+    <p><code>pluck</code> позволяет заменить такой код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select(:id).map { |c| c.id }
+# или
+Client.select(:id).map(&amp;:id)
+# или
+Client.select(:id, :name).map { |c| [c.id, c.name] }
+</pre>
+    </div>
+    <p>на:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.pluck(:id)
+# или
+Client.pluck(:id, :name)
+</pre>
+    </div>
+    <p>В отличие от <code>select</code>, <code>pluck</code> непосредственно конвертирует результат
+        запроса в массив Ruby, без создания объектов <code>ActiveRecord</code>. Это означает лучшую
+        производительность для больших или часто используемых запросов. Однако любые переопределения
+        методов в модели будут недоступны. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Client &lt; ActiveRecord::Base
+  def name
+    "I am #{super}"
+  end
+end
+Client.select(:name).map &amp;:name
+# =&gt; ["I am David", "I am Jeremy", "I am Jose"]
+Client.pluck(:name)
+# =&gt; ["David", "Jeremy", "Jose"]
+</pre>
+    </div>
+    <p>Более того, в отличие от <code>select</code> и других скоупов <code>Relation</code>, <code>pluck</code>
+        вызывает немедленный запрос, и поэтому не может быть соединен с любыми последующими
+        скоупами, хотя он работает со скоупами, подключенными ранее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.pluck(:name).limit(1)
+# =&gt; NoMethodError: undefined method `limit' for #&lt;Array:0x007ff34d3ad6d8&gt;
+Client.limit(1).pluck(:name)
+# =&gt; ["David"]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ids"><code>ids</code>
+    </h4>
+    <p><code>ids</code> может быть использован для сбора всех ID для relation, используя первичный
+        ключ таблицы.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Person.ids
+# SELECT id FROM people
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  self.primary_key = "person_id"
+end
+Person.ids
+# SELECT person_id FROM people
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="suschestvovanie-ob-ektov"> Существование объектов</h3>
+    <p>Если вы просто хотите проверить существование объекта, есть метод, называемый
+        <code>exists?</code>. Этот метод запрашивает базу данных, используя тот же запрос, что и
+        <code>find</code>, но вместо возврата объекта или коллекции объектов, он возвращает или
+        <code>true</code>, или <code>false</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.exists?(1)
+</pre>
+    </div>
+    <p>Метод <code>exists?</code> также принимает несколько значений, при этом возвращает
+        <code>true</code>, если хотя бы хотя бы одна запись из них существует.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.exists?(id: [1,2,3])
+# или
+Client.exists?(name: ['John', 'Sergei'])
+</pre>
+    </div>
+    <p>Даже возможно использовать <code>exists?</code> без аргументов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(first_name: 'Ryan').exists?
+</pre>
+    </div>
+    <p>Пример выше вернет <code>true</code> если есть хотя бы один клиент с <code>first_name</code>
+        'Ryan' и <code>false</code> в противном случае.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.exists?
+</pre>
+    </div>
+    <p>Это возвратит <code>false</code>, если таблица <code>clients</code> пустая, и
+        <code>true</code> в противном случае.</p>
+    <p>Для проверки на существование также можно использовать <code>any?</code> и <code>many?</code>
+        на модели или relation.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# на модели
+Article.any?
+Article.many?
+# на именованном скоупе
+Article.recent.any?
+Article.recent.many?
+# на relation
+Article.where(published: true).any?
+Article.where(published: true).many?
+# на связи
+Article.first.categories.any?
+Article.first.categories.many?
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="vychisleniya"> Вычисления</h3>
+    <p>Этот раздел использует count для примера в этой преамбуле, но описанные опции применяются ко
+        всем подразделам.</p>
+    <p>Все методы вычисления работают прямо на модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.count
+# SELECT count(*) AS count_all FROM clients
+</pre>
+    </div>
+    <p>Или на relation:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(first_name: 'Ryan').count
+# SELECT count(*) AS count_all FROM clients WHERE (first_name = 'Ryan')
+</pre>
+    </div>
+    <p>Можете также использовать различные методы поиска на relation для выполнения сложных
+        вычислений:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.includes("orders").where(first_name: 'Ryan', orders: { status: 'received' }).count
+</pre>
+    </div>
+    <p>Что выполнит:</p>
+    <div class="code_container">
+<pre class="brush: sql; gutter: false; toolbar: false">
+SELECT count(DISTINCT clients.id) AS count_all FROM clients
+  LEFT OUTER JOIN orders ON orders.client_id = client.id WHERE
+  (clients.first_name = 'Ryan' AND orders.status = 'received')
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="kolichestvo"> Количество</h4>
+    <p>Если хотите увидеть, сколько записей есть в таблице модели, можете вызвать
+        <code>Client.count</code>, и он возвратит число. Если хотите быть более определенным и найти
+        всех клиентов с присутствующим в базе данных возрастом, используйте
+        <code>Client.count(:age)</code>.</p>
+    <p>Про опции смотрите выше .</p>
+    <h4 class="inside_page_header" id="srednee"> Среднее</h4>
+    <p>Если хотите увидеть среднее значение определенного показателя в одной из ваших таблиц, можно
+        вызвать метод <code>average</code> для класса, относящегося к таблице. Вызов этого метода
+        выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.average("orders_count")
+</pre>
+    </div>
+    <p>Это возвратит число (возможно, с плавающей запятой, такое как 3.14159265), представляющее
+        среднее значение поля.</p>
+    <p>Про опции смотрите выше .</p>
+    <h4 class="inside_page_header" id="minimum"> Минимум</h4>
+    <p>Если хотите найти минимальное значение поля в таблице, можете вызвать метод
+        <code>minimum</code> для класса, относящегося к таблице. Вызов этого метода выглядит так:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.minimum("age")
+</pre>
+    </div>
+    <p>Про опции смотрите выше .</p>
+    <h4 class="inside_page_header" id="maksimum"> Максимум</h4>
+    <p>Если хотите найти максимальное значение поля в таблице, можете вызвать метод
+        <code>maximum</code> для класса, относящегося к таблице. Вызов этого метода выглядит так:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.maximum("age")
+</pre>
+    </div>
+    <p>Про опции смотрите выше .</p>
+    <h4 class="inside_page_header" id="summa"> Сумма</h4>
+    <p>Если хотите найти сумму полей для всех записей в таблице, можете вызвать метод
+        <code>sum</code> для класса, относящегося к таблице. Вызов этого метода выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.sum("orders_count")
+</pre>
+    </div>
+    <p>Про опции смотрите выше .</p>
+    <h3 class="inside_page_header" id="zapusk-explain"> Запуск EXPLAIN</h3>
+    <p>Можно запустить EXPLAIN на запросах, вызываемых в relations. Например,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.where(id: 1).joins(:articles).explain
+</pre>
+    </div>
+    <p>может выдать</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+EXPLAIN for: SELECT `users`.* FROM `users` INNER JOIN `articles` ON `articles`.`user_id` = `users`.`id` WHERE `users`.`id` = 1
++----+-------------+----------+-------+---------------+
+| id | select_type | table    | type  | possible_keys |
++----+-------------+----------+-------+---------------+
+|  1 | SIMPLE      | users    | const | PRIMARY       |
+|  1 | SIMPLE      | articles | ALL   | NULL          |
++----+-------------+----------+-------+---------------+
++---------+---------+-------+------+-------------+
+| key     | key_len | ref   | rows | Extra       |
++---------+---------+-------+------+-------------+
+| PRIMARY | 4       | const |    1 |             |
+| NULL    | NULL    | NULL  |    1 | Using where |
++---------+---------+-------+------+-------------+
+2 rows in set (0.00 sec)
+</pre>
+    </div>
+    <p>для MySQL.</p>
+    <p>Active Record применяет красивое форматирование, эмулирующее оболочку соответствующей базы
+        данных. Таким образом, запуск того же запроса в адаптере PostgreSQL выдаст вместо этого</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+EXPLAIN for: SELECT "users".* FROM "users" INNER JOIN "articles" ON "articles"."user_id" = "users"."id" WHERE "users"."id" = 1
+                                  QUERY PLAN
+------------------------------------------------------------------------------
+ Nested Loop Left Join  (cost=0.00..37.24 rows=8 width=0)
+   Join Filter: (articles.user_id = users.id)
+   -&gt;  Index Scan using users_pkey on users  (cost=0.00..8.27 rows=1 width=4)
+         Index Cond: (id = 1)
+   -&gt;  Seq Scan on articles  (cost=0.00..28.88 rows=8 width=4)
+         Filter: (articles.user_id = 1)
+(6 rows)
+</pre>
+    </div>
+    <p>Нетерпеливая загрузка может вызвать более одного запроса за раз, и некоторые запросы могут
+        нуждаться в результате предыдущих. Поэтому <code>explain</code> фактически запускает запрос,
+        а затем узнает о дальнейших планах по запросам. Например,</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.where(id: 1).includes(:articles).explain
+</pre>
+    </div>
+    <p>выдаст</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+EXPLAIN for: SELECT `users`.* FROM `users`  WHERE `users`.`id` = 1
++----+-------------+-------+-------+---------------+
+| id | select_type | table | type  | possible_keys |
++----+-------------+-------+-------+---------------+
+|  1 | SIMPLE      | users | const | PRIMARY       |
++----+-------------+-------+-------+---------------+
++---------+---------+-------+------+-------+
+| key     | key_len | ref   | rows | Extra |
++---------+---------+-------+------+-------+
+| PRIMARY | 4       | const |    1 |       |
++---------+---------+-------+------+-------+
+1 row in set (0.00 sec)
+EXPLAIN for: SELECT `articles`.* FROM `articles`  WHERE `articles`.`user_id` IN (1)
++----+-------------+----------+------+---------------+
+| id | select_type | table    | type | possible_keys |
++----+-------------+----------+------+---------------+
+|  1 | SIMPLE      | articles | ALL  | NULL          |
++----+-------------+----------+------+---------------+
++------+---------+------+------+-------------+
+| key  | key_len | ref  | rows | Extra       |
++------+---------+------+------+-------------+
+| NULL | NULL    | NULL |    1 | Using where |
++------+---------+------+------+-------------+
+1 row in set (0.00 sec)
+</pre>
+    </div>
+    <p>для MySQL.</p>
+    <h4 class="inside_page_header" id="interpretatsiya-explain"> Интерпретация EXPLAIN</h4>
+    <p>Интерпретация результатов EXPLAIN находится за рамками этого руководства. Может быть полезной
+        следующая информация:</p>
+    <ul>
+        <li><p>SQLite3: </p></li>
+        <li><p>MySQL: </p></li>
+        <li><p>PostgreSQL: </p></li>
+    </ul>
+
+</body>
+</html>

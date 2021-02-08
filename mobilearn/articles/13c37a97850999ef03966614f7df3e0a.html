@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 5. Указатели и ссылки. Работа со строками</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l5_1">
+    <h1> 1. Указатели </h1>
+    <p>
+        Каждая переменная, которую вы объявляете в программе, имеет <b>адрес</b> – номер ячейки
+        памяти, в которой она расположена. Адрес является неотъемлемой характеристикой переменной.
+        Можно объявить другую переменную, которая будет хранить этот адрес и которая называется <b>указателем</b>.
+        Указатели применяются при передаче в функцию параметров, которые мы хотим изменить, при
+        работе с массивами, при работе с динамической памятью и в ряде других случаев.
+    </p>
+    <p>
+        Объявление указателя имеет следующий синтаксис:
+        <span class="sint">
+<i>&lt;тип&gt;</i> *<i>&lt;идентификатор&gt;</i> [ = <i>&lt;инициализатор&gt;</i>]; </span>
+    </p>
+    <p>
+        Указатель может указывать на значения , типа, , , функции, указателя.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> *pi;
+            </td>
+            <td class="commenti">// Указатель на <i>int</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *ppc;
+            </td>
+            <td class="commenti">// Указатель на указатель на <i>char</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span>* p, s;
+            </td>
+            <td class="commenti">// Плохой стиль объявления, <b>s</b> – не указатель!</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> *p, s;
+            </td>
+            <td class="commenti">// Видно, что <b>s</b> – не указатель</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> *p, *s;
+            </td>
+            <td class="commenti">// Два указателя</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *names[] = {"John", "Anna"};
+            </td>
+            <td class="commenti">// Массив указателей</td>
+        </tr>
+    </table>
+
+    <p>
+        В последнем объявлении для формирования типа используются два оператора: * и [ ], один из
+        которых стоит перед именем, а другой – после. Использование операторов объявления
+        значительно упростилось бы, будь они все либо префиксами, либо суффиксами. Однако, *, [] и
+        () разрабатывались так, чтобы отражать их смысл в выражениях. Таким образом, * является
+        префиксом, а [] и () – суффиксами. Суффиксные операторы «крепче связаны» с именем, чем
+        префиксные. Следовательно, <b>*names[]</b> означает массив указателей на какие-либо объекты,
+        а для определения типов наподобие «указатель на функцию», необходимо использовать скобки.
+    </p>
+    <p id="l5_valore_ind">
+        Существуют две операции, которые имеют отношение к работе с указателями. Этими операциями
+        являются:
+    </p>
+    <ul>
+        <li> операция взятия адреса (адресация) <b>&amp;</b>;
+        </li>
+        <li> операция взятия значения по адресу (косвенная адресация или разыменование) <b>*</b>.
+        </li>
+    </ul>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a, *p;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">p = &amp;a;</td>
+            <td class="commenti">// Переменной <b>p</b> присваивается адрес переменной <b>a</b></td>
+        </tr>
+        <tr>
+            <td class="esempi">*p = 0;</td>
+            <td class="commenti">// Значение по адресу, находящемуся в переменной <b>p</b> (т.е.
+                значение переменной <b>а</b>), становится равным 0
+            </td>
+        </tr>
+    </table>
+    <h2 id="l5_1_4">1.1. Адресная арифметика </h2>
+    <p>
+        Над указателями можно производить следующие действия:
+    </p>
+    <ul>
+        <li> складывать указатель и целое число;
+        </li>
+        <li> вычитать из указателя целое число;
+        </li>
+        <li> вычитать из указателя указатель – получается целое число.
+        </li>
+    </ul>
+    <p>
+        При этом прибавляемое/вычитаемое или полученное целое число обозначает не количество байт, а
+        количество <b>элементов</b> того типа, на который указывает указатель, т.е. это число
+        умножается или делится на размер типа.
+    </p>
+    <p><img alt="Использование указателя"
+            src="http://natalia.appmat.ru/c&amp;c++/images%5Cpointers.gif">
+    </p>
+    <p>
+        Вычитание указателей друг из друга определено только в том случае, если оба указателя
+        указывают на элементы одного и того же массива (хотя язык не позволяет быстро проверить, так
+        ли это). Результатом вычитания одного указателя из другого будет количество элементов
+        массива (целое число) между этими указателями. В результате прибавления целого числа к
+        указателю и вычитания целого числа из указателя получается новый указатель. Если полученный
+        таким образом указатель не указывает на элемент того же массива (или на элемент, следующий
+        за последним), что и исходный указатель, то результат его использования не определён.
+    </p>
+    <p>
+        Указатели можно использовать для обработки массивов.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a[100], n, *end, *p;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">end = a + n;</td>
+            <td class="commenti">// <b>n</b> - количество элементов массива <b>a</b>. Имя массива
+                является адресом его начала (см. ).
+                // Таким образом, <b>end</b> - адрес элемента, находящегося после последнего
+                элемента массива.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (p = a; p &lt; end; p++)
+            </td>
+            <td class="commenti"></td>
+
+        </tr>
+        <tr>
+            <td class="esempi"> printf("%4d", *p);</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Из того, что можно вычитать из указателя целое число, следует, что возможно использование
+        отрицательных чисел в операции <b>[ ]</b>.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a[N];
+                <span class="chiavi">int</span> *endA = a + N - 1, i;
+                <span class="chiavi">for</span> (i = 0; i &lt; N; i++)
+                printf("%4d", endA[-i]);
+            </td>
+        </tr>
+    </table>
+    <h2 id="l5_1_1">1.2. Указатель на <i>void</i></h2>
+    <p>
+        Специальное применение имеют указатели на тип <b><i>void</i></b>. Указатель на тип
+        <i>void</i> может указывать на значения любого типа. Однако для выполнения операций над
+        указателем на <i>void</i> либо над указуемым объектом, необходимо явно привести тип
+        указателя к типу, отличному от указателя на <i>void</i>.
+    </p>
+    <p>
+        Указатель на объект любого типа можно присвоить переменной типа <i>void*</i>, один
+        <i>void*</i> можно присвоить другому <i>void*</i>, пару <i>void*</i> можно сравнивать на
+        равенство и неравенство, и, наконец, <i>void*</i> можно явно преобразовать в указатель на
+        другой тип. Прочие операции могут оказаться опасными, потому что компилятор не знает, на
+        какого сорта объект ссылается указатель на самом деле. Поэтому другие операции вызывают
+        сообщение об ошибке на этапе компиляции. Чтобы воспользоваться <i>void*</i>, необходимо явно
+        преобразовать его в указатель определённого типа.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">int</span> *pi)
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">void</span> *pv = pi;</td>
+            <td class="commenti">// Правильно – неявное преобразование типа из <i>int*</i> в <i>void*</i>
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> *pv;</td>
+            <td class="commenti">// Ошибка – нельзя разыменовывать <i>void*</i></td>
+        </tr>
+        <tr>
+            <td class="esempi"> pv++;</td>
+            <td class="commenti">// Ошибка – нельзя произвести инкремент <i>void*</i></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">int</span> *pi2 = <span class="chiavi">static_cast</span>&lt;<span
+                    class="chiavi">int</span>*&gt;(pv);
+            </td>
+            <td class="commenti">// Явное преобразование в <i>int*</i></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">double</span> *pd1 = pv;</td>
+            <td class="commenti">// Ошибка</td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">double</span> *pd2 = pi;</td>
+            <td class="commenti">// Ошибка</td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">double</span> *pd3 = <span class="chiavi">static_cast</span>&lt;<span
+                    class="chiavi">double</span>*&gt;(pv);
+            </td>
+            <td class="commenti">// Небезопасно!</td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Как правило, не безопасно использовать указатель, преобразованный к типу, отличному от типа
+        объекта, на который он указывает.
+    </p>
+    <p>
+        Основными применениями <span><i>void *</i></span> являются передача указателей функциям,
+        которым не позволено делать предположения о типе объектов, а равно возврат объектов
+        «неуточненного» типа из функций. Чтобы воспользоваться таким объектом, необходимо явно
+        преобразовать тип указателя.
+    </p>
+    <p>
+        Функции, использующие указатели <span><i>void *</i></span>, обычно существуют на самых
+        нижних уровнях системы, где происходит работа с аппаратными ресурсами. Наличие <span><i>void *</i></span>
+        на более высоких уровнях подозрительно и, скорее всего, является индикатором ошибки на этапе
+        проектирования.
+    </p>
+    <h2 id="l5_1_5">1.3. Указатели на функции </h2>
+    <p>
+        С функцией можно проделать только две вещи: вызвать её и получить её адрес. Указатель,
+        полученный взятием адреса функции, можно затем использовать для вызова функции.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">int</span> x) { ... }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> (*pf)(<span class="chiavi">int</span>);
+            </td>
+            <td class="commenti">// Указатель на функцию. Скобки обязательны!</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> g()
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { pf = &amp;f;</td>
+            <td class="commenti">// <b>pf</b> указывает на функцию <i>f</i></td>
+        </tr>
+        <tr>
+            <td class="esempi"> pf(0);</td>
+            <td class="commenti">// Вызов функции <i>f</i> через указатель <b>pf</b></td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Компилятор распознаёт, что <b>pf</b> является указателем и вызывает функцию, на которую он
+        указывает. То есть, разыменование указателя на функцию при помощи
+        <span>операции <b>*</b></span> необязательно. Аналогично, необязательно пользоваться
+        операцией <b>&amp;</b> для получения адреса функции.
+    </p>
+    <p>
+        Параметры указателей на функцию объявляются точно так же, как и параметры самих функций. При
+        присваивании типы функций должны в точности совпадать.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">typedef void</span> (*PF)(<span class="chiavi">int</span>);
+            </td>
+            <td class="commenti">// Для объявления типа «указатель на функцию» можно использовать
+                объявление <i>typedef</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">PF pf;</td>
+            <td class="commenti">// Объявляем сам указатель на функцию, используя предварительно
+                определённый тип
+            </td>
+
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f1(<span class="chiavi">int</span> x) { ... }
+                <span class="chiavi">int</span> f2(<span class="chiavi">int</span> x) { ... }
+                <span class="chiavi">void</span> f3(<span class="chiavi">char</span> x) { ... }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f ()
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { pf = &amp;f1;</td>
+            <td class="commenti">// Правильно</td>
+        </tr>
+        <tr>
+            <td class="esempi"> pf = &amp;f2;</td>
+            <td class="commenti">// Ошибка - не тот возвращаемый тип</td>
+        </tr>
+        <tr>
+            <td class="esempi"> pf = &amp;f3;</td>
+            <td class="commenti">// Ошибка - не тот тип параметра</td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Правила передачи параметров при вызове функций через указатель те же самые, что и при
+        непосредственном вызове функций.
+    </p>
+    <h2 id="l5_1_3">1.4. Указатели и константы </h2>
+    <p>
+        В операциях с указателями участвуют два объекта – сам указатель и объект, на который он
+        ссылается. Помещение ключевого слова <i>const</i> перед объявлением указателя делает
+        константой объект, а не указатель. Для объявления самого указателя в качестве константы,
+        используется оператор объявления <span><i>* const</i></span>, а не просто <i>*</i>.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">char</span> *p)
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">char</span> s[] = "const";</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">const char</span> *p1 = s;</td>
+            <td class="commenti">// Указатель на константу</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p1[3] = 'r';</td>
+            <td class="commenti">// Ошибка - <b>p1</b> указывает на константу</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p1 = p;</td>
+            <td class="commenti">// Правильно</td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">char</span> * <span class="chiavi">const</span>
+                p2 = s;
+            </td>
+            <td class="commenti">// Константный указатель (инициализация необходима)</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p2[3] = 'r';</td>
+            <td class="commenti">// Правильно</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p1 = p;</td>
+            <td class="commenti">// Ошибка - <b>p2</b> является константой</td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">const char</span> * <span
+                    class="chiavi">const</span> p3 = s;
+            </td>
+            <td class="commenti">// Константный указатель на константу</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p3[3] = 'r';</td>
+            <td class="commenti">// Ошибка - <b>p3</b> указывает на константу</td>
+        </tr>
+        <tr>
+            <td class="esempi"> p3 = p;</td>
+            <td class="commenti">// Ошибка - <b>p3</b> является константой</td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Можно присвоить адрес переменной указателю на константу, потому что это безвредная операция.
+        Нельзя, однако, присвоить адрес константы произвольному указателю, потому что в этом случае
+        можно было бы изменить значение константного объекта.
+    </p>
+    <h2 id="l5_1_2">1.5. Ноль </h2>
+    <p>
+        Ноль имеет тип <i>int</i>. Благодаря стандартным преобразованиям, ноль можно использовать в
+        качестве константы любого интегрального типа, типа с плавающей точкой и указателя. Тип нуля
+        определяется по контексту. Ноль, как правило (но не всегда), будет физически представлен в
+        виде последовательности нулевых битов соответствующей длины.
+    </p>
+    <p>
+        Гарантируется, что нет объектов с нулевым адресом. Следовательно, указатель, равный нулю,
+        можно интерпретировать как указатель, который ни на что не ссылается.
+    </p>
+    <p>
+        В языке С обычно определялся макрос <i>NULL</i> для представления такого нулевого указателя.
+        Так как в <span>C++</span> типы проверяются более жестко, использование простого нуля вместо
+        <i>NULL</i> приведёт к меньшим проблемам.
+    </p>
+    <h2 id="l5_1_6">1.6. Указатель на указатель </h2>
+    <p>
+        Возможно объявление переменной, которая содержит адрес другой переменной, которая, в свою
+        очередь, также является указателем. Такая переменная может быть необходима, если в функции
+        нужно изменить адрес какого-либо объекта. Однако наличие более двух звёздочек в объявлении
+        переменной говорит, скорее всего, о плохом проектировании.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> **ppi;
+            </td>
+            <td class="commenti">// Объявляем указатель на указатель на целое</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">int</span> **ppi)
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">int</span> *pi = *ppi;</td>
+            <td class="commenti">// Указателю на целое присваивается значение, хранящееся по
+                адресу,
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"><b>...</b></td>
+            <td class="commenti">// содержащемуся в указателе на указатель на целое</td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+</section>
+<section id="l5_2">
+    <h1> 2. Ссылки </h1>
+    <p id="l5_note">
+        Ссылка является альтернативным именем объекта. <i>Ссылка</i> – это объект, который
+        синтаксически выглядит как переменная, а по семантике является . Объявление ссылки, кроме
+        случаев, когда ссылка является параметром функции, возвращаемым функцией значением или
+        членом класса, должно содержать инициализатор. Далее все операции производятся не над самой
+        ссылкой, а над тем объектом, на который она указывает.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a = 10;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> &amp;r = a;
+            </td>
+            <td class="commenti">// Объявляем и инициализируем ссылку</td>
+
+        </tr>
+        <tr>
+            <td class="esempi">r++;</td>
+            <td class="commenti">// Значение переменной <b>а</b> становится 11</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">double</span> &amp;a) { a +=
+                3.14; }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">double</span> d = 0;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">f(d);</td>
+            <td class="commenti">// <b>d</b> = 3.14</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> v[20];
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span>&amp; f(int i) { <span class="chiavi"> return</span>
+                v[i]; }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">f(3) = 7;</td>
+            <td class="commenti">// Элементу массива <b>v[3]</b> присваивается 7</td>
+        </tr>
+    </table>
+    <p>
+        На первый взгляд, ссылка является удобной заменой указателю, но она затрудняет понимание
+        программы из-за несовпадения синтаксиса и семантики ссылки. Однако ссылки могут быть полезны
+        для того, чтобы не передавать по значению (и не копировать) параметр функции, который имеет
+        большой размер. В том случае, если мы не собираемся менять этот параметр внутри функции,
+        можно объявить ссылку с модификатором <span class="sint">const</span>. В этом случае мы
+        будем гарантированы, что параметр не изменится, вместо большого объекта будет передаваться
+        его адрес, а для пользователя всё будет выглядеть как передача параметра по значению.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X { ... };
+            </td>
+            <td class="commenti">// Описание большого класса</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> f (<span class="chiavi">const</span> X&amp; x) { ...
+                }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+</section>
+<section id="l5_3">
+    <h1>3. Строки </h1>
+    <p>
+        <b>Строка</b> – это последовательность (массив) символов (типа <i></i>), которая
+        заканчивается специальным символом – признаком конца строки. Это символ записывается как <b>'\0'</b>
+        (не путайте с символом переноса строки <b>'\n'</b>) и равен 0. При вводе строки символ конца
+        строки добавляется автоматически. Все функции работы со строками – и стандартные, и
+        создаваемые программистом – должны ориентироваться на этот символ. Если требуется
+        сформировать новую строку, то обязательно надо добавлять признак конца строки. Если этого не
+        сделать, то при дальнейшей работе возникнут ошибки.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">'a'</td>
+            <td class="commenti">// Символьная константа - один символ</td>
+        </tr>
+        <tr>
+            <td class="esempi">"a"</td>
+            <td class="commenti">// Строковый литерал - массив из <b>двух</b> символов 'a' и '\0',
+                заменяется на <b>адрес</b>.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> str[51];
+            </td>
+            <td class="commenti">// Объявление строки</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *str;
+            </td>
+            <td class="commenti">// <b>Нельзя</b>, т.к. не выделяется память под элементы строки
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *str = "abcd";
+            </td>
+            <td class="commenti">// Можно, но очень осторожно!</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *str1 = "abc", *str2 = "abc";
+            </td>
+            <td class="commenti">// Не известно, будет ли выполняться str1 == str2?</td>
+        </tr>
+    </table>
+    <p id="l5_literal">
+        <i>Строковым литералом</i> называется последовательность символов, заключённых в двойные
+        кавычки. В строковом литерале на один символ больше, чем используется при его записи –
+        добавляется символ '\0'.
+    </p>
+    <p>
+        Тип строкового литерала есть «массив с надлежащим количество константных символов».
+        Строковый литерал можно присвоить переменной типа <i>char *</i>. Это разрешается, потому что
+        в предыдущих определениях С и <span>C++</span> типом строкового литерала был <i>char *</i>.
+        Однако изменение строкового литерала через такой указатель является ошибкой.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> *str = "С &amp; С++";
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">str[2] = '?';</td>
+            <td class="commenti">// Ошибка времени выполнения!</td>
+        </tr>
+    </table>
+    <p>
+        То, что строковые литералы являются константами, не только является очевидным, но и
+        позволяет при реализации произвести значительную оптимизацию методов хранения и доступа к
+        строковым литералам. Если же нужна строка, которую можно модифицировать, следует объявить и
+        инициализировать массив символов.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> str[] = "С &amp; С++";
+            </td>
+            <td class="commenti">// Массив из 8 символов</td>
+        </tr>
+        <tr>
+            <td class="esempi">str[2] = '?';</td>
+            <td class="commenti">// Правильно</td>
+        </tr>
+    </table>
+    <p>
+        Память под строковые литералы выделяется статически, поэтому их можно возвращать в качестве
+        значения функции.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">const char</span> *error_massage()
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">return</span> "Недостаточно параметров"; }
+            </td>
+            <td class="commenti">// После выхода из функции память, содержащая строку, не будет
+                освобождена
+            </td>
+        </tr>
+    </table>
+    <p>
+        Поскольку мы не знаем, сколько в строке содержится символов, но знаем, что в конце стоит
+        символ конца строки, цикл для обработки строки пишется следующим образом:
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; str[i] !=
+                '\0'; i++) { <b>...</b> }.
+            </td>
+        </tr>
+    </table>
+    <p>
+        Можно опустить сравнение с нулем, для <span>C++</span> это будет эквивалентно:
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; str[i]; i++)
+                { <b>...</b> }.
+            </td>
+        </tr>
+    </table>
+    <p>
+        Можно использовать указатели для обработки строк:
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span> str[50], *p;
+                ...
+                <span class="chiavi">for</span> (p = str; *p; p++) { <b>...</b> }.
+            </td>
+        </tr>
+    </table>
+    <p>
+        Заголовки стандартных функций работы со строками хранятся в файле <span class="sint">&lt;string.h&gt;</span>.
+        Основными из этих функций являются:
+    </p>
+    <table>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Определение длины строки</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">int</span>     <span
+                        class="fun">strlen</span>(<span
+                        class="type">const char</span> *<var>str</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Сравнение строк</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">int</span>     <span
+                        class="fun">strcmp</span>(<span
+                        class="type">const char</span> *<var>str1</var>, <span class="type">const char</span> *<var>str2</var>); </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Копирование</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span
+                        class="fun">strcpy</span>(<span class="type">char</span> *<var>str1</var>,          <span
+                        class="type">const char</span> *<var>str2</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Конкатенация строк</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span
+                        class="fun">strcat</span>(<span class="type">char</span> *<var>str1</var>,           <span
+                        class="type">const char</span> *<var>str2</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Поиск символа в строке</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span
+                        class="fun">strchr</span>(<span
+                        class="type">const char</span> *<var>str</var>,    <span
+                        class="type">char</span> <var>c</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Поиск подстроки</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span
+                        class="fun">strstr</span>(<span
+                        class="type">const char</span> *<var>str1</var>,   <span class="type">const char</span> *<var>str2</var>); </span>
+            </td>
+        </tr>
+    </table>
+    <p>
+        Ввод/вывод строки:
+    </p>
+    <table>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Ввод строки до пробела или другого разделителя</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – функция <i>scanf</i> с форматом <i>%s</i>; </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Ввод строки, содержащей пробелы</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span class="fun">gets</span> (<span
+                        class="type">char</span> *<var>buffer</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Ввод строки из файла, <b>n</b> задаёт максимальное количество символов для
+                        ввода
+                    </li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">char</span> *<span class="fun">fgets</span>(<span
+                        class="type">char</span> *<var>string</var>, <span
+                        class="type">int</span> <var>n</var>, <span class="type">FILE</span> *<var>stream</var>); </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Вывод строки с форматированием</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – функция <i>printf</i> с форматом <i>%s</i>; </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Вывод строки</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">int</span> <span
+                        class="fun">puts</span>(<span
+                        class="type">const char</span> *<var>string</var>); </span></td>
+        </tr>
+        <tr>
+            <td class="bnone">
+                <ul>
+                    <li>Вывод строки в файл</li>
+                </ul>
+            </td>
+            <td class="bnone">
+                <span class="sint"> – <span class="type">int</span> <span
+                        class="fun">fputs</span>(<span
+                        class="type">const char</span> *<var>string</var>, <span
+                        class="type">FILE</span> *<var>stream</var>); </span></td>
+        </tr>
+    </table>
+</section>
+<section id="l5_4">
+    <h2> 4. Примеры </h2>
+    <p>
+        <b>Пример 1.</b> Функция, которая меняет все вхождения буквы «я» на «а», «а» – на «б», «б» –
+        на «в» и т.д. Остальные символы оставаются без изменения
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span>* Change(<span class="chiavi">char</span> *str)
+                { <span class="chiavi">char</span> *p;
+                <span class="chiavi">for</span> (p = str; *p; p++)
+                <span class="chiavi">if</span> (*p == 'я')
+                *p = 'а';
+                <span class="chiavi">else if</span> ('а'&lt;= *p &amp;&amp; *p &lt;= 'ю')
+                (*p)++;
+                <span class="chiavi">return</span> str;
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+        <b>Пример 2.</b> Функция, формирующая строку, состоящую из символов исходной строки, не
+        входящих в заданное множество
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">char</span>* NotEntered(<span class="chiavi">char</span> *dest,
+                <span class="chiavi">const char</span> *source, <span
+                    class="chiavi">const char</span> *symbols)
+                { <span class="chiavi"> int</span> i, j;
+                <span class="chiavi">for</span> (i = 0, j = 0; source[i]; i++)
+                <span class="chiavi">if</span> (!strchr(symbols, source[i]))
+                dest[j++] = source[i];
+            </td>
+            <td class="commenti"></td>
+
+        </tr>
+        <tr>
+            <td class="esempi"><b>dest[j] = '\0';</b>
+                <span class="chiavi">return</span> dest;
+                }
+            </td>
+            <td class="commenti">// Обязательно добавляем признак конца строки в формируемую строку
+
+            </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>

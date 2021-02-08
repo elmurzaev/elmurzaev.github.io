@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Примеры использования формулы свёртки</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<div class="example">
+    <b>Пример 30. </b>
+    Пусть случайные величины <img align="absmiddle" height="19"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img155.gif"
+                                  width="10"> и <img align="absmiddle" height="18"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img156.gif"
+                                                     width="12"> имеют . Докажем, что их сумма имеет
+    нормальное распределение
+    с параметрами <img align="absmiddle" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img702.gif" width="44"> и
+    <img align="absmiddle" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1005.gif"
+         width="51">.
+    <p>По , плотность суммы равна
+    </p>
+    <p class="CENTER">
+        <img align="absmiddle" height="128"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1006.gif" width="521">
+    </p>
+    <p>Последний интеграл равен единице, поскольку под интегралом стоит плотность
+        нормального распределения с параметрами <img align="absmiddle" height="14"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img702.gif"
+                                                     width="44"> и <img align="absmiddle"
+                                                                        height="38"
+                                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1007.gif"
+                                                                        width="55">.
+    </p>
+    <p>Итак, мы получили, что плотность суммы есть плотность нормального
+        распределения с параметрами 0 и 2. </p>
+</div>
+<div class="text">Если сумма двух независимых случайных величин из одного и того же
+    распределения (возможно, с разными параметрами)
+    имеет такое же распределение, говорят, что это распределение
+    <i class="incide">устойчиво</i> относительно суммирования.
+    <p>В следующих утверждениях, доказать которые предлагается читателю,
+        перечислены практически все устойчивые распределения.
+    </p>
+</div>
+<div class="lemma">
+    <b>Лемма 3. </b>
+    Пусть случайные величины <img align="absmiddle" height="19"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1008.gif"
+                                  width="55"> и
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1009.gif"
+         width="57"> <i class="incide">независимы</i>. Тогда <img align="absmiddle" height="20"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1010.gif"
+                                                                  width="109">.
+</div>
+<div class="lemma">
+    <b>Лемма 4. </b>
+    Пусть случайные величины <img align="absmiddle" height="20"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img661.gif"
+                                  width="67"> и <img align="absmiddle" height="20"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1011.gif"
+                                                     width="72"> <i class="incide">независимы</i>.
+    Тогда <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1012.gif" width="126">.
+</div>
+<div class="lemma">
+    <b>Лемма 5. </b>
+    Пусть случайные величины <img align="absmiddle" height="23"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1013.gif"
+                                  width="80"> и <img align="absmiddle" height="23"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1014.gif"
+                                                     width="82"> <i class="incide">независимы</i>.
+    Тогда <img align="absmiddle" height="23"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1015.gif" width="165">.
+</div>
+<div class="lemma">
+    <b>Лемма 6. </b>
+    Пусть случайные величины <img align="absmiddle" height="21"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1016.gif"
+                                  width="70"> и <img align="absmiddle" height="21"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1017.gif"
+                                                     width="72"> <i class="incide">независимы</i>.
+    Тогда <img align="absmiddle" height="21"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1018.gif" width="131">.
+</div>
+<div class="text">
+    Все эти утверждения мы докажем позднее, используя аппарат
+    характеристических функций, хотя при некотором терпении
+    можно попробовать доказать их и напрямую,
+    как в примере .
+    <p> не устойчиво по суммированию,
+        однако оно является частным случаем ,
+        которое уже устойчиво относительно суммирования.
+    </p>
+</div>
+<div class="lemma">
+    <b>Лемма 7. </b>
+    Пусть <i class="incide">независимые</i> случайные величины
+    <img align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img874.gif"
+         width="73"> имеют показательное распределение <img align="absmiddle" height="21"
+                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img720.gif"
+                                                            width="75">.
+    Тогда <img align="absmiddle" height="21"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1019.gif" width="159">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b>
+    Докажем утверждение по индукции. При <img align="absmiddle" height="14"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1020.gif"
+                                              width="45"> оно верно в силу равенства
+    <img align="absmiddle" height="21" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img720.gif"
+         width="75">.
+    Пусть утверждение леммы справедливо для <img align="absmiddle" height="17"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img352.gif"
+                                                 width="76">. Докажем, что оно верно
+    и для <img align="absmiddle" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img353.gif" width="46">.
+    По предположению индукции <img align="absmiddle" height="20"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1021.gif"
+                                   width="173"> имеет распределение <img align="absmiddle"
+                                                                         height="21"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1022.gif"
+                                                                         width="50">,
+    т.е. плотность распределения величины <img align="absmiddle" height="20"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1023.gif"
+                                               width="39"> равна
+    <p class="CENTER"><img align="absmiddle" height="84"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1024.gif"
+                           width="348"></p>
+    <p>Тогда по формуле свёртки плотность суммы
+        <img align="absmiddle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1025.gif" width="139"> равна
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="68"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1026.gif"
+                           width="522"></p>
+    <p>Так как <img align="absmiddle" height="21"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1027.gif" width="111"> при
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1028.gif" width="76">, т.е. при
+        <img align="absmiddle" height="15"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1029.gif" width="46">,
+        то плотность под интегралом отлична от нуля, только если переменная
+        интегрирования изменяется в пределах <img align="absmiddle" height="17"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1030.gif"
+                                                  width="77"> при <img align="absmiddle" height="15"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img806.gif"
+                                                                       width="44">.
+        При <img align="absmiddle" height="17"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1031.gif" width="44">
+        подынтегральная функция, а вместе с ней и плотность <img align="absmiddle" height="22"
+                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1032.gif"
+                                                                 width="51">, равна нулю. При <img
+                align="absmiddle" height="15"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img806.gif" width="44"> имеем:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="77"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1033.gif"
+                           width="465"></p>
+    <p>Поэтому <img align="absmiddle" height="21"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1034.gif" width="76">, что и
+        требовалось доказать.
+    </p>
+    <p class="qed">QED</p>
+</div>
+<div class="example">
+    <b>Пример 31. </b>
+    не является устойчивым относительно суммирования.
+    Найдём функцию и плотность распределения суммы двух независимых случайных
+    величин с одинаковым равномерным на отрезке [0, 1] распределением, но не
+    по формуле свёртки, а используя .
+    <p>Пусть <img align="absmiddle" height="21"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1035.gif" width="97"> &#151;
+        <i class="incide">независимые</i> случайные величины.
+        Пару <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img875.gif" width="54"> можно
+        считать координатой точки, брошенной
+        в единичный квадрат.
+        Тогда <img align="absmiddle" height="21"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1036.gif" width="206"> равна
+        площади
+        области внутри квадрата под прямой <img align="absmiddle" height="17"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1037.gif"
+                                                width="92">. Эта область
+         &#151; заштрихованные треугольник при <img align="absmiddle" height="17"
+                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1038.gif"
+                                                    width="76">, и пятиугольник при <img
+                align="absmiddle" height="17"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1039.gif" width="76">.
+        Окончательно получаем:
+    </p>
+    <p class="CENTER">
+        <img class="right" height="103"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1042.gif" width="101">
+        <img class="right" height="103"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1041.gif" width="101"><span
+            class="quad"> </span>
+        <img align="absmiddle" height="120"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1040.gif" width="314">
+    </p>
+    <p>Плотность распределения суммы равна
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="93"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1043.gif"
+                           width="245"></p>
+    <p>Это &#151; плотность так называемого &#171;треугольного&#187; распределения Симпсона.
+        Мы видим, что равномерное распределение не обладает устойчивостью относительно
+        суммирования. </p>
+</div>
+<p>
+</p>
+<p>
+</p>
+</body>
+
+</body>
+</html>

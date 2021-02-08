@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Обзор Action View</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="obzor-action-view"> Обзор Action View</h2>
+    <p>После прочтения этого руководства вы узнаете:</p>
+    <ul>
+        <li>Что такое Action View, и как его использовать вместе с Rails.
+        </li>
+        <li>Как лучше использовать шаблоны, партиалы и макеты.
+        </li>
+        <li>Какие хелперы предоставлены Action View, и как сделать свои собственные.
+        </li>
+        <li>Как использовать локализованные вьюхи.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="chto-takoe-action-view"> Что такое Action View?</h3>
+    <p>Action View и Action Controller — это два важных компонента Action Pack. В Rails веб-запросы
+        обрабатываются Action Pack, который разделяет работу между контроллером (выполнение логики)
+        и вьюхой (рендеринг шаблона). Обычно Action Controller будет ответственен за связь с базой
+        данных и выполнение действий CRUD. Тогда Action View ответственен за компиляцию отклика.</p>
+    <p>Шаблоны Action View пишутся с помощью тегов вложенного Ruby, смешанных с HTML. Чтобы избежать
+        загромождения вьюх шаблонным кодом, общее поведение для форм, дат и строк представлено рядом
+        хелпер-классов. В существующее приложение также легко добавлять новые хелперы.</p>
+    <div class="note"><p>Некоторые особенности Action View связаны с Active Record, но это не
+        означает, что Action View зависит от Active Record. Action View — это независимый пакет,
+        который можно использовать с любой библиотекой Ruby.</p></div>
+    <h3 class="inside_page_header" id="ispolzovanie-action-view-s-rails"> Использование Action View
+        с Rails</h3>
+    <p>Для каждого контроллера имеется связанная директория в директории <code>app/views</code>,
+        содержащая файлы шаблонов, в которых сверстаны вьюхи, связанные с этим контроллером. Эти
+        файлы используются для отображения вьюхи, являющейся результатом каждого действия
+        контроллера.</p>
+    <p>Давайте взглянем на то, что делает Rails по умолчанию, когда создает новый ресурс с помощью
+        генератора скаффолда:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold article
+      [...]
+      invoke  scaffold_controller
+      create    app/controllers/articles_controller.rb
+      invoke    erb
+      create      app/views/articles
+      create      app/views/articles/index.html.erb
+      create      app/views/articles/edit.html.erb
+      create      app/views/articles/show.html.erb
+      create      app/views/articles/new.html.erb
+      create      app/views/articles/_form.html.erb
+      [...]
+</pre>
+    </div>
+    <p>В Rails имеется соглашение по именованию вьюх. Обычно имя вьюхи совпадает со связанным экшном
+        контроллера, как вы видите выше. Например, экшн index контроллера в <code>articles_controller.rb</code>
+        будет использовать файл вьюхи <code>index.html.erb</code> в директории <code>app/views/articles</code>.
+        Полный HTML, возвращенный клиенту, состоит из комбинации этого файла ERB, шаблона макета,
+        оборачивающего его, и всех партиалов, на которые вьюха может ссылаться. В этом руководстве
+        имеется более детальное описание каждого из этих компонентов.</p>
+    <h3 class="inside_page_header" id="shablony-partialy-i-makety"> Шаблоны, партиалы и макеты</h3>
+    <p>Как уже упоминалось, итоговый HTML состоит из трех элементов Rails: шаблонов
+        (<code>Templates</code>), партиалов (<code>Partials</code>) и макетов (<code>Layouts</code>).
+        Ниже краткий обзор каждого из них.</p>
+    <h4 class="inside_page_header" id="shablony"> Шаблоны</h4>
+    <p>Шаблоны Action View могут быть написаны несколькими способами. Если у файла шаблона
+        расширение <code>.erb</code>, то он использует смесь ERB (Embedded Ruby) и HTML. Если у
+        файла шаблона расширение <code>.builder</code>, то используется библиотека <code>Builder::XmlMarkup</code>.
+    </p>
+    <p>Rails поддерживает несколько систем шаблонирования и использует расширение файла, чтобы
+        различать их. Например, файл HTML, использующий систему шаблонирования ERB, будет иметь
+        расширение файла <code>.html.erb</code>.</p>
+    <h5 class="inside_page_header" id="erb"> ERB</h5>
+    <p>В шаблоне ERB код Ruby может быть включен с помощью тегов <code>&lt;% %&gt;</code> и <code>&lt;%=
+        %&gt;</code>. Теги <code>&lt;% %&gt;</code> используются для выполнения кода Ruby, который
+        ничего не возвращает, такого как условия, циклы или блоки, а теги <code>&lt;%= %&gt;</code>
+        используются, когда вам нужен результат выполнения.</p>
+    <p>Рассмотрим следующий цикл для имен:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Names of all the people&lt;/h1&gt;
+&lt;% @people.each do |person| %&gt;
+  Name: &lt;%= person.name %&gt;&lt;br&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Цикл настроен с помощью обычных вложенных тегов (<code>&lt;% %&gt;</code>), а имя вставлено с
+        помощью выводящих вложенных тегов (<code>&lt;%= %&gt;</code>). Отметьте, что это не просто
+        совет по использованию: обычные функции для вывода, такие как <code>print</code> и <code>puts</code>
+        не будут рендериться во вьюху в шаблонах ERB. Поэтому, так будет неправильно:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%# WRONG %&gt;
+Hi, Mr. &lt;% puts "Frodo" %&gt;
+</pre>
+    </div>
+    <p>Чтобы запретить предварительные и завершающие пробелы можно использовать <code>&lt;%-</code>
+        <code>-%&gt;</code> вместо <code>&lt;%</code> и <code>%&gt;</code>.</p>
+    <h5 class="inside_page_header" id="builder"> Builder</h5>
+    <p>Шаблоны Builder — это более программная альтернатива ERB. Они особенно полезны для генерации
+        содержимого в XML. Объект XmlMarkup с именем <code>xml</code> автоматически доступен в
+        шаблонах с расширением <code>.builder</code>.</p>
+    <p>Вот несколько простых примеров:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+xml.em("emphasized")
+xml.em { xml.b("emph &amp; bold") }
+xml.a("A Link", "href" =&gt; "http://rubyonrails.org")
+xml.target("name" =&gt; "compile", "option" =&gt; "fast")
+</pre>
+    </div>
+    <p>которые создадут:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;em&gt;emphasized&lt;/em&gt;
+&lt;em&gt;&lt;b&gt;emph &amp;amp; bold&lt;/b&gt;&lt;/em&gt;
+&lt;a href="http://rubyonrails.org"&gt;A link&lt;/a&gt;
+&lt;target option="fast" name="compile" /&gt;
+</pre>
+    </div>
+    <p>Любой метод с блоком будет трактован как разметка тега XML с вложенной разметкой в блоке.
+        Например, следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+xml.div {
+  xml.h1(@person.name)
+  xml.p(@person.bio)
+}
+</pre>
+    </div>
+    <p>создаст что-то вроде:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;div&gt;
+  &lt;h1&gt;David Heinemeier Hansson&lt;/h1&gt;
+  &lt;p&gt;A product of Danish Design during the Winter of '79...&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+    </div>
+    <p>Ниже полноценный пример RSS, фактически используемый в Basecamp:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+xml.rss("version" =&gt; "2.0", "xmlns:dc" =&gt; "http://purl.org/dc/elements/1.1/") do
+  xml.channel do
+    xml.title(@feed_title)
+    xml.link(@url)
+    xml.description "Basecamp: Recent items"
+    xml.language "en-us"
+    xml.ttl "40"
+    for item in @recent_items
+      xml.item do
+        xml.title(item_title(item))
+        xml.description(item_description(item)) if item_description(item)
+        xml.pubDate(item_pubDate(item))
+        xml.guid(@person.firm.account.url + @recent_items.url(item))
+        xml.link(@person.firm.account.url + @recent_items.url(item))
+        xml.tag!("dc:creator", item.author_name) if item_has_creator?(item)
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="keshirovanie-shablonov"> Кэширование шаблонов</h5>
+    <p>По умолчанию Rails компилирует каждый шаблон в метод перед тем, как рендерить его. Когда вы
+        измените шаблон в режиме development, Rails проверит время изменения файла и перекомпилирует
+        его.</p>
+    <h4 class="inside_page_header" id="partialy"> Партиалы</h4>
+    <p>Частичные шаблоны - обычно называемые "партиалы" - это другая схема разделения процесса
+        рендеринга на более управляемые части. С помощью партиалов можно извлечь части кода из ваших
+        шаблонов в отдельные файлы, а также повторно использовать их в разных шаблонах.</p>
+    <h5 class="inside_page_header" id="imenovanie-partialov"> Именование партиалов</h5>
+    <p>Чтобы отрендерить партиал как часть вьюхи, в ней используется метод <code>render</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render "menu" %&gt;
+</pre>
+    </div>
+    <p>Это отрендерит файл с именем <code>_menu.html.erb</code> во вьюхе, которая рендерится.
+        Обратите внимание на первый символ подчеркивания: партиалы именуются, начинаясь с
+        подчеркивания, чтобы отличить их от обычных вьюх, хотя к ним и обращаются без подчеркивания.
+        Это истинно даже если вы вставляете партиал из другой директории:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render "shared/menu" %&gt;
+</pre>
+    </div>
+    <p>Этот код вставит партиал из <code>app/views/shared/_menu.html.erb</code>.</p>
+    <h5 class="inside_page_header" id="ispolzovanie-partialov-dlya-uproscheniya-vyuh"> Использование
+        партиалов для упрощения вьюх</h5>
+    <p>Одним из способов использования является трактовка их как эквивалент подпрограмм; способ
+        выноса подробностей из вьюхи, чтобы можно было проще понять, что происходит. Например, у вас
+        может быть такая вьюха:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= render "shared/ad_banner" %&gt;
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;p&gt;Here are a few of our fine products:&lt;/p&gt;
+&lt;% @products.each do |product| %&gt;
+  &lt;%= render partial: "product", locals: { product: product } %&gt;
+&lt;% end %&gt;
+&lt;%= render "shared/footer" %&gt;
+</pre>
+    </div>
+    <p>Тут партиалы <code>_ad_banner.html.erb</code> и <code>_footer.html.erb</code> могут содержать
+        код, разделяемый между несколькими страницами вашего приложения. Вам не нужно знать
+        подробности этих разделов, чтобы сконцентрироваться на определенной странице.</p>
+    <h5 class="inside_page_header" id="render-bez-optsiy-partial-i-locals"><code>render</code> без
+        опций <code>partial</code> и <code>locals</code>
+    </h5>
+    <p>В вышеприведенном примере <code>render</code> принимает 2 опции: <code>partial</code> и
+        <code>locals</code>. Но если это единственные опции, которые нужно передать, их можно
+        опустить. например, вместо:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", locals: { product: @product } %&gt;
+</pre>
+    </div>
+    <p>Можно сделать:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render "product", product: @product %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="optsii-as-i-object"> Опции <code>as</code> и
+        <code>object</code>
+    </h5>
+    <p>По умолчанию у <code>ActionView::Partials::PartialRenderer</code> есть собственный объект в
+        локальной переменной с тем же именем, как у шаблона. Так, если имеем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product" %&gt;
+</pre>
+    </div>
+    <p>в product мы получим <code>@product</code> в локальной переменной <code>product</code>, как
+        будто мы написали:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", locals: { product: @product } %&gt;
+</pre>
+    </div>
+    <p>С помощью опции <code>as</code> можно указать другое имя для локальной переменной. Например,
+        если мы хотим, чтобы она была <code>item</code> вместо <code>product</code>, можно сделать:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", as: "item" %&gt;
+</pre>
+    </div>
+    <p>Опцию <code>object</code> можно использовать, чтобы непосредственно указать, какой объект
+        рендерится в партиале; полезно, когда объект шаблона находится где-то еще (например, в
+        другой переменной экземпляра или в локальной переменной).</p>
+    <p>Например, вместо:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", locals: { product: @item } %&gt;
+</pre>
+    </div>
+    <p>можно сделать:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", object: @item %&gt;
+</pre>
+    </div>
+    <p>Опции <code>object</code> и <code>as</code> можно использовать вместе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", object: @item, as: "item" %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="rendering-kollektsiy"> Рендеринг коллекций</h5>
+    <p>Часто бывает, что шаблону нужно пройтись по коллекции и отрендерить подшаблон для каждого
+        элемента. Этот паттерн был реализован как отдельный метод, принимающий массив и рендерящий
+        партиал для каждого элемента массива.</p>
+    <p>Поэтому такой пример для рендеринга всех продуктов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% @products.each do |product| %&gt;
+  &lt;%= render partial: "product", locals: { product: product } %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>может быть переписан с помощью одной строчки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", collection: @products %&gt;
+</pre>
+    </div>
+    <p>Когда партиал вызывается с коллекцией, у отдельных экземпляров партиалов есть доступ к
+        рендерящемуся члену коллекции через переменную с именем партиала. В данном случае партиал
+        <code>_product</code>, и в нем можно обратиться к <code>product</code>, чтобы получить члена
+        коллекции, который рендерится.</p>
+    <p>Для рендеринга коллекций можно использовать сокращенный синтаксис. Предположим, <code>@products</code>
+        — это коллекция экземпляров <code>Product</code>, тогда можно просто написать следующее,
+        чтобы получить тот же самый результат:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render @products %&gt;
+</pre>
+    </div>
+    <p>Rails определяет имя используемого партиала по имени модели в коллекции, в данном случае
+        <code>Product</code>. Фактически с помощью этого сокращенного синтаксиса можно рендерить
+        коллекцию, состоящую из экземпляров различных моделей, и Rails выберет подходящий партиал
+        для каждого члена коллекции.</p>
+    <h5 class="inside_page_header" id="spacer-templates"> Spacer Templates</h5>
+    <p>Также можете определить второй партиал, который будет отрендерен между экземплярами главного
+        партиала, используя опцию <code>:spacer_template</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: @products, spacer_template: "product_ruler" %&gt;
+</pre>
+    </div>
+    <p>Rails отрендерит партиал <code>_product_ruler</code> (без переданных в него данных) между
+        каждой парой партиалов <code>_product</code>.</p>
+    <h4 class="inside_page_header" id="makety"> Макеты</h4>
+    <p>Макеты могут быть использованы для рендеринга общего шаблона вокруг результатов экшна
+        контроллера Rails. Обычно в приложении Rails будет несколько макетов, в которых будут
+        рендериться страницы. Например, на сайте может быть один макет для вошедшего пользователя и
+        другой для маркетинга и продаж. Макет для вошедшего пользователя может включать навигацию
+        верхнего уровня, которая должна присутствовать во многих экшнах контроллера. Макет для
+        продаж для приложения SaaS может включать верхнеуровневую навигацию для таких вещей как
+        страницы "Pricing" и "Contact Us". Ожидается, что каждый макет должен выглядеть по разному.
+        Подробнее о макетах можно прочитать в руководстве .</p>
+    <h3 class="inside_page_header" id="makety-partialov"> Макеты партиалов</h3>
+    <p>У партиалов могут быть собственные макеты, применимые к ним. Эти макеты отличаются от тех,
+        которые применяются к экшну контроллера, хотя они работают подобным образом.</p>
+    <p>Допустим, мы отображаем статью на странице, которая должна быть обернута в <code>div</code>
+        для целей отображения. Сначала мы создадим новую <code>Article</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Article.create(body: 'Partial Layouts are cool!')
+</pre>
+    </div>
+    <p>В шаблоне <code>show</code> мы отобразим партиал <code>_article</code>, обернутый в макет
+        <code>box</code>:</p>
+    <p><strong>articles/show.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: 'article', layout: 'box', locals: { article: @article } %&gt;
+</pre>
+    </div>
+    <p>Макет <code>box</code> просто оборачивает партиал <code>_article</code> в <code>div</code>:
+    </p>
+    <p><strong>articles/_box.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;div class='box'&gt;
+  &lt;%= yield %&gt;
+&lt;/div&gt;
+</pre>
+    </div>
+    <p>Партиал <code>_article</code> оборачивает <code>body</code> статьи в <code>div</code> с
+        <code>id</code> статьи с помощью хелпера <code>div_for</code>:</p>
+    <p><strong>articles/_article.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= div_for(article) do %&gt;
+  &lt;p&gt;&lt;%= article.body %&gt;&lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>что отобразит следующее:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;div class='box'&gt;
+  &lt;div id='article_1'&gt;
+    &lt;p&gt;Partial Layouts are cool!&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+    </div>
+    <p>Отметьте, что у макета партиала есть доступ к локальной переменной <code>article</code>,
+        переданной в вызов <code>render</code>. Однако, в отличие от макетов приложения, макеты
+        партиалов должны начинаться с подчеркивания.</p>
+    <p>Также можно отрендерить блок кода в макете партиала вместо вызова <code>yield</code>.
+        Например, если у нас нет партиала <code>_article</code>, вместо него можно использовать это:
+    </p>
+    <p><strong>articles/show.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% render(layout: 'box', locals: { article: @article }) do %&gt;
+  &lt;%= div_for(article) do %&gt;
+    &lt;p&gt;&lt;%= article.body %&gt;&lt;/p&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Предположив, что мы используем тот же партиал <code>_box</code>, мы получим тот же результат,
+        что и в предыдущем примере.</p>
+    <h3 class="inside_page_header" id="puti-vyuh"> Пути вьюх</h3>
+    <p>При построении ответа, контроллер должен решить, где располагаются различные вьюхи.</p>
+    <p>Мы можем добавить другие папки и дать им определенный приоритет при разрешении пути используя
+        методы <code>prepend_view_path</code> и <code>append_view_path</code>.</p>
+    <p>Это позволяет добавлять новые пути в начало или конец списка, использованного для разрешения
+        этих путей.</p>
+    <h4 class="inside_page_header" id="prepend-view-path"> Prepend view path</h4>
+    <p>Может быть полезным, например, когда мы хотим поместить вьюхи в разные папки для
+        поддоменов.</p>
+    <p>Мы можем сделать это используя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+prepend_view_path "app/views/#{request.subdomain}"
+</pre>
+    </div>
+    <p>Тогда наш список станет подобным:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+[
+  ~/rails_app/app/views/&lt;subdomain&gt;,
+  ~/rails_app/app/views,
+  # ...
+]
+</pre>
+    </div>
+    <p>Это добавит путь для subdomain в начало списка.</p>
+    <h4 class="inside_page_header" id="append-view-path"> Append view path</h4>
+    <p>Аналогично, мы можем добавить путь:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+append_view_path "app/views/direct"
+</pre>
+    </div>
+    <p>Это добавит путь <code>app/views/direct</code> в конец поиска пути.</p>
+    <h3 class="inside_page_header" id="obzor-helperov-predostavlennyh-action-view"> Обзор хелперов,
+        предоставленных Action View</h3>
+    <p>WIP: Тут перечислены не все хелперы. За полным списком можно обратиться к </p>
+    <p>Нижеследующее является лишь кратким обзором хелперов, доступных в Action View. Рекомендуется
+        обратиться к , покрывающей все хелперы более подробнее, но это является хорошей отправной
+        точкой.</p>
+    <h4 class="inside_page_header" id="assettaghelper"> AssetTagHelper</h4>
+    <p>Этот модуль предоставляет методы для генерации HTML, связывающего вьюхи с ресурсами, такими
+        как картинки, файлы JavaScript, таблицы стилей и новостные ленты.</p>
+    <p>По умолчанию Rails связывает с ресурсами на текущем хосте в папке public, но можно направить
+        Rails связывать с ресурсами на выделенном сервере ресурсов, установив <code>config.action_controller.asset_host</code>
+        в конфигурации приложения, обычно в <code>config/environments/production.rb</code>.
+        Например, допустим хост ваших ресурсов <code>assets.example.com</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_controller.asset_host = "assets.example.com"
+image_tag("rails.png") # =&gt; &lt;img src="http://assets.example.com/images/rails.png" alt="Rails" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="auto_discovery_link_tag"> auto_discovery_link_tag</h5>
+    <p>Возвращает тег ссылки, которую могут использовать браузеры и агрегаторы новостей для
+        автоматического определения RSS или ленты Atom.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+auto_discovery_link_tag(:rss, "http://www.example.com/feed.rss", { title: "RSS Feed" }) # =&gt;
+  &lt;link rel="alternate" type="application/rss+xml" title="RSS Feed" href="http://www.example.com/feed" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="image_path"> image_path</h5>
+    <p>Вычисляет путь до ресурса картинки в директории <code>app/assets/images</code>. Будут
+        переданы полные пути от корня документа. Используется внутренне <code>image_tag</code> для
+        создания пути к картинке.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+image_path("edit.png") # =&gt; /assets/edit.png
+</pre>
+    </div>
+    <p>К имени файла будет добавлена метка, если config.assets.digest установлен true.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+image_path("edit.png") # =&gt; /assets/edit-2d1a2db63fc738690021fedb5a65b68e.png
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="image_url"> image_url</h5>
+    <p>Вычисляет url ресурса картинки в директории <code>app/assets/images</code>. Он вызовет <code>image_path</code>
+        и соединит с вашим текущим хостом или хостом ресурсов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+image_url("edit.png") # =&gt; http://www.example.com/assets/edit.png
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="image_tag"> image_tag</h5>
+    <p>Возвращает тег картинки HTML для источника. Источником может быть полный путь или файл,
+        существующий в директории <code>app/assets/images</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+image_tag("icon.png") # =&gt; &lt;img src="/assets/icon.png" alt="Icon" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="javascript_include_tag"> javascript_include_tag</h5>
+    <p>Возвращает тег скрипта HTML для каждого представленного источника. Можно передать имя файла
+        (расширение <code>.js</code> опционально) или файлы JavaScript, существующие в директории
+        <code>app/assets/javascripts</code> для включения на текущую страницу, или передать полный
+        путь относительно корня документа.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_include_tag "common" # =&gt; &lt;script src="/assets/common.js"&gt;&lt;/script&gt;
+</pre>
+    </div>
+    <p>Если приложение не использует файлопровод, чтобы включить JavaScript библиотеку jQuery,
+        передайте <code>:defaults</code> как источник. При использовании <code>:defaults</code>,
+        если существует <code>application.js</code> в директории <code>app/assets/javascripts</code>,
+        он также будет включен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_include_tag :defaults
+</pre>
+    </div>
+    <p>Также можно включить все файлы JavaScript в директории <code>app/assets/javascripts</code> с
+        помощью <code>:all</code> в качестве источника.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_include_tag :all
+</pre>
+    </div>
+    <p>Также можно кэшировать несколько файлов JavaScript в один файл, что требует меньше соединений
+        HTTP для скачивания и может быть лучше сжато gzip (что сделает передачу быстрее).
+        Кэширование произойдет, только если <code>ActionController::Base.perform_caching</code>
+        установлена true (по умолчанию для окружения production, но не для development).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_include_tag :all, cache: true # =&gt;
+  &lt;script src="/javascripts/all.js"&gt;&lt;/script&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="javascript_path"> javascript_path</h5>
+    <p>Вычисляет путь до ресурса JavaScript в директории <code>app/assets/javascripts</code>. Если у
+        имени файла источника нет расширения, будет добавлено <code>.js</code>. Будут переданы
+        полные пути от корня документа. Используется внутренне <code>javascript_include_tag</code>
+        для создания пути к скрипту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_path "common" # =&gt; /assets/common.js
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="javascript_url"> javascript_url</h5>
+    <p>Вычисляет url ресурса JavaScript в директории <code>app/assets/javascripts</code>. Он вызовет
+        <code>javascript_path</code> и соединит с вашим текущим хостом или хостом ресурсов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_url "common" # =&gt; http://www.example.com/assets/common.js
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="stylesheet_link_tag"> stylesheet_link_tag</h5>
+    <p>Возвращает тег ссылки на таблицу стилей для каждого представленного источника. Если не
+        указать расширение, автоматически будет добавлено <code>.css</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+stylesheet_link_tag "application" # =&gt; &lt;link href="/assets/application.css" media="screen" rel="stylesheet" /&gt;
+</pre>
+    </div>
+    <p>Также можно включить все стили из директории стилей, используя <code>:all</code> в качестве
+        источника:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+stylesheet_link_tag :all
+</pre>
+    </div>
+    <p>Также можно кэшировать несколько таблиц стилей в один файл, что требует меньше соединений
+        HTTP для скачивания и может быть лучше сжато gzip (что сделает передачу быстрее).
+        Кэширование произойдет, только если <code>ActionController::Base.perform_caching</code>
+        установлена true (по умолчанию для окружения production, но не для development).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+stylesheet_link_tag :all, cache: true
+# =&gt; &lt;link href="/assets/all.css" media="screen" rel="stylesheet" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="stylesheet_path"> stylesheet_path</h5>
+    <p>Вычисляет путь до ресурса таблицы стилей в директории <code>app/assets/stylesheets</code>.
+        Если у имени файла источника нет расширения, будет добавлено <code>.css</code>. Будут
+        переданы полные пути от корня документа. Используется внутренне
+        <code>stylesheet_link_tag</code> для создания пути к таблице стилей.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+stylesheet_path "application" # =&gt; /assets/application.css
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="stylesheet_url"> stylesheet_url</h5>
+    <p>Вычисляет url ресурса таблицы стилей в директории <code>app/assets/stylesheets</code>. Он
+        вызовет <code>stylesheet_path</code> и соединит с вашим текущим хостом или хостом ресурсов.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+stylesheet_url "application" # =&gt; http://www.example.com/assets/application.css
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="atomfeedhelper"> AtomFeedHelper</h4>
+    <h5 class="inside_page_header" id="atom_feed"> atom_feed</h5>
+    <p>Этот хелпер позволяет с легкостью создать новостную ленту Atom. Вот пример полного
+        использования:</p>
+    <p><strong>config/routes.rb</strong></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :articles
+</pre>
+    </div>
+    <p><strong>app/controllers/articles_controller.rb</strong></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def index
+  @articles = Article.all
+  respond_to do |format|
+    format.html
+    format.atom
+  end
+end
+</pre>
+    </div>
+    <p><strong>app/views/articles/index.atom.builder</strong></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+atom_feed do |feed|
+  feed.title("Articles Index")
+  feed.updated((@articles.first.created_at))
+  @articles.each do |article|
+    feed.entry(article) do |entry|
+      entry.title(article.title)
+      entry.content(article.body, type: 'html')
+      entry.author do |author|
+        author.name(article.author_name)
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="benchmarkhelper"> BenchmarkHelper</h4>
+    <h5 class="inside_page_header" id="benchmark"> benchmark</h5>
+    <p>Позволяет измерить время выполнения блока в шаблоне и записать результат в лог. Оберните этот
+        блок вокруг затратных операций или потенциальных узких мест, чтобы получить время чтения для
+        операций.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% benchmark "Process data files" do %&gt;
+  &lt;%= expensive_files_operation %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Это добавит в лог что-то вроде "Process data files (0.34523)", затем это можно использовать
+        для сравнения времени при оптимизации кода.</p>
+    <h4 class="inside_page_header" id="cachehelper"> CacheHelper</h4>
+    <h5 class="inside_page_header" id="cache"> cache</h5>
+    <p>Метод для кэширования фрагмента вьюхи, в отличие от целого экшна или страницы. Эта техника
+        полезна для кэширования кусочков, таких как меню, списки заголовков, статичные фрагменты
+        HTML и так далее. Этот метод принимает блок, содержащий код, который вы хотите закэшировать.
+        Подробности смотрите в <code>ActionController::Caching::Fragments</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% cache do %&gt;
+  &lt;%= render "shared/footer" %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="capturehelper"> CaptureHelper</h4>
+    <h5 class="inside_page_header" id="capture"> capture</h5>
+    <p>Метод <code>capture</code> позволяет извлечь часть шаблона в переменную. Эту переменную потом
+        можно использовать в любом месте шаблона или макета.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% @greeting = capture do %&gt;
+  &lt;p&gt;Welcome! The date and time is &lt;%= Time.now %&gt;&lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Захваченная переменная может быть потом где-то использована.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Welcome!&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;%= @greeting %&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="content_for"> content_for</h5>
+    <p>Вызов <code>content_for</code> сохраняет блок разметки как идентификатор для дальнейшего
+        использования. Можно сделать последующие вызовы сохраненного содержимого в других шаблонах
+        или макете, передав идентификатор в качестве аргумента в <code>yield</code>.</p>
+    <p>Например, допустим у нас есть стандартный макет приложения, но также есть специальная
+        страница, требующая определенный JavaScript, который не требуется на остальном сайте. Можно
+        использовать <code>content_for</code>, чтобы включить этот JavaScript на нашу специальную
+        страницу без влияния на оставшуюся часть сайта.</p>
+    <p><strong>app/views/layouts/application.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Welcome!&lt;/title&gt;
+    &lt;%= yield :special_script %&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;Welcome! The date and time is &lt;%= Time.now %&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <p><strong>app/views/articles/special.html.erb</strong></p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;This is a special page.&lt;/p&gt;
+&lt;% content_for :special_script do %&gt;
+  &lt;script&gt;alert('Hello!')&lt;/script&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="datehelper"> DateHelper</h4>
+    <h5 class="inside_page_header" id="date_select"> date_select</h5>
+    <p>Возвращает набор тегов select (по одному для года, месяца и дня), предзаполненных для доступа
+        к определенному атрибуту даты.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date_select("article", "published_on")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="datetime_select"> datetime_select</h5>
+    <p>Возвращает набор тегов select (по одному для года, месяца, дня, часа и минуты),
+        предзаполненных для доступа к определенному атрибуту даты-времени.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+datetime_select("article", "published_on")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="distance_of_time_in_words"> distance_of_time_in_words</h5>
+    <p>Возвращает приблизительный промежуток времени между двумя объектами Time или Date или
+        числами-секундами. Установите <code>include_seconds</code> в true, если хотите более
+        детальное приближение.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+distance_of_time_in_words(Time.now, Time.now + 15.seconds)        # =&gt; less than a minute
+distance_of_time_in_words(Time.now, Time.now + 15.seconds, include_seconds: true)  # =&gt; less than 20 seconds
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_date"> select_date</h5>
+    <p>Возвращает набор тегов HTML select (по одному для года, месяца и дня), предзаполненных
+        предоставленной <code>date</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает select для даты со предоставленной датой как значение по умолчанию (шесть дней от сегодня)
+select_date(Time.today + 6.days)
+# Создает select для даты с сегодняшней датой как значение по умолчанию (без аргумента)
+select_date()
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_datetime"> select_datetime</h5>
+    <p>Возвращает набор тегов HTML select (по одному для года, месяца, дня, часа и минуты),
+        предзаполненных предоставленным <code>datetime</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает select для datetime со предоставленным значением по умолчанию (четыре дня от сегодня)
+select_datetime(Time.now + 4.days)
+# Создает select для datetime с сегодняшней датой как значение по умолчанию (без аргумента)
+select_datetime()
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_day"> select_day</h5>
+    <p>Возвращает тег select с опциями для каждого дня с 1 до 31 с выбранным текущим днем.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для дней с предоставленной датой как значение по умолчанию
+select_day(Time.today + 2.days)
+# Создает поле select для дней с данным числом как значение по умолчанию
+select_day(5)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_hour"> select_hour</h5>
+    <p>Возвращает тег select с опциями для каждого часа с 0 до 23 с выбранным текущим часом.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для часов с предоставленным временем как значение по умолчанию
+select_hour(Time.now + 6.hours)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_minute"> select_minute</h5>
+    <p>Возвращает тег select с опциями для каждой минуты с 0 до 59 с выбранной текущей минутой.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для минут с предоставленным временем как значение по умолчанию
+select_minute(Time.now + 6.hours)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_month"> select_month</h5>
+    <p>Возвращает тег select с опциями для каждого месяца с January до December с выбранным текущим
+        месяцем.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для месяцев с текущим месяцем как значение по умолчанию
+select_month(Date.today)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_second"> select_second</h5>
+    <p>Возвращает тег select с опциями для каждой секунды с 0 до 59 с выбранной текущей
+        секундой.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для секунд с предоставленным временем как значение по умолчанию
+select_second(Time.now + 16.minutes)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_time"> select_time</h5>
+    <p>Возвращает набор тегов HTML select (по одному для часа и минуты).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поля select с предоставленным временем как значение по умолчанию
+select_time(Time.now)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_year"> select_year</h5>
+    <p>Возвращает тег select с опциями для каждого года из пяти от и до выбранного текущего.
+        Пятилетний радиус может быть изменен с помощью опциональных ключей <code>:start_year</code>
+        и <code>:end_year</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает поле select для пяти лет в обе стороны от Date.today, являющаяся значением по умолчанию для текущего года
+select_year(Date.today)
+# Создает поле select от 1900 до 2016 со значением по умолчанию текущим годом
+select_year(Date.today, start_year: 1900, end_year: 2016)
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="time_ago_in_words"> time_ago_in_words</h5>
+    <p>Подобен <code>distance_of_time_in_words</code>, где <code>to_time</code> установлен <code>Time.now</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+time_ago_in_words(3.minutes.from_now)  # =&gt; 3 minutes
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="time_select"> time_select</h5>
+    <p>Возвращает набор тегов select (по одному для часа, минуты и, опционально, секунды),
+        предзаполненных для доступа к определенному атрибуту времени. Селекты подготовлены к
+        многопараметровому назначению в объекте Active Record.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Создает тег select для времени, который при POST будет сохранен в переменную order отправленного атрибута
+time_select("order", "submitted")
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="debughelper"> DebugHelper</h4>
+    <p>Возвращает тег <code>pre</code> с объектом, выгруженным в YAML. Это создает удобочитаемый
+        способ просмотра объекта.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+my_hash = { 'first' =&gt; 1, 'second' =&gt; 'two', 'third' =&gt; [1,2,3] }
+debug(my_hash)
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;pre class='debug_dump'&gt;---
+first: 1
+second: two
+third:
+- 1
+- 2
+- 3
+&lt;/pre&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="formhelper"> FormHelper</h4>
+    <p>Хелперы форм разработаны для более простой работы с моделями по сравнению со стандартными
+        элементами HTML, предоставляя набор методов для создания форм на основе ваших моделей. Этот
+        хелпер создает HTML для форм, предоставляя метод для каждого типа полей (например text,
+        password, select и так далее). Когда форма подтверждается (т.е. когда пользователь нажимает
+        кнопку подтверждения или form.submit вызывается в JavaScript), поля формы будут встроены в
+        объект params и переданы в контроллер.</p>
+    <p>Имеется два типа хелперов форм: те, которые работают с атрибутами модели, и те, которые нет.
+        Этот хелпер имеет дело с теми, которые работают с атрибутами; чтобы посмотреть примеры
+        хелперов форм, которые не работают с атрибутами модели, обратитесь к документации <code>ActionView::Helpers::FormTagHelper</code>.
+    </p>
+    <p>Основной метод этого хелпера, <code>form_for</code>, дает возможность создавать форму для
+        экземпляра модели; например, допустим, что имеется модель Person, и мы хотим создать ее
+        новый экземпляр:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Note: переменная @person была создана в контроллере (т.е. @person = Person.new)
+&lt;%= form_for @person, url: { action: "create" } do |f| %&gt;
+  &lt;%= f.text_field :first_name %&gt;
+  &lt;%= f.text_field :last_name %&gt;
+  &lt;%= submit_tag 'Create' %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Созданным HTML будет:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form action="/people/create" method="post"&gt;
+  &lt;input id="person_first_name" name="person[first_name]" type="text" /&gt;
+  &lt;input id="person_last_name" name="person[last_name]" type="text" /&gt;
+  &lt;input name="commit" type="submit" value="Create" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Объект params, созданный после отправки этой формы, будет выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{ "action" =&gt; "create", "controller" =&gt; "people", "person" =&gt; { "first_name" =&gt; "William", "last_name" =&gt; "Smith" } }
+</pre>
+    </div>
+    <p>В хэше params будет вложенное значение person, к которому можно получить доступ в контроллере
+        с помощью params[:person].</p>
+    <h5 class="inside_page_header" id="check_box"> check_box</h5>
+    <p>Возвращает тэг чекбокса с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Допустим, что @article.validated? равен 1:
+check_box("article", "validated")
+# =&gt; &lt;input type="checkbox" id="article_validated" name="article[validated]" value="1" /&gt;
+#    &lt;input name="article[validated]" type="hidden" value="0" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="fields_for"> fields_for</h5>
+    <p>Создает пространство имен вокруг определенного объекта модели наподобие <code>form_for</code>,
+        но не создает сами теги формы. Это делает <code>fields_for</code> подходящим для указания
+        дополнительных объектов модели в той же форме:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @person, url: { action: "update" } do |person_form| %&gt;
+  First name: &lt;%= person_form.text_field :first_name %&gt;
+  Last name : &lt;%= person_form.text_field :last_name %&gt;
+  &lt;%= fields_for @person.permission do |permission_fields| %&gt;
+    Admin?  : &lt;%= permission_fields.check_box :admin %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="file_field"> file_field</h5>
+    <p>Возвращает поле для загрузки файла с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+file_field(:user, :avatar)
+# =&gt; &lt;input type="file" id="user_avatar" name="user[avatar]" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="form_for"> form_for</h5>
+    <p>Создает форму и пространство имен вокруг определенного объекта модели, используемого как
+        основа для запроса значений для полей.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @article do |f| %&gt;
+  &lt;%= f.label :title, 'Title' %&gt;:
+  &lt;%= f.text_field :title %&gt;&lt;br&gt;
+  &lt;%= f.label :body, 'Body' %&gt;:
+  &lt;%= f.text_area :body %&gt;&lt;br&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="hidden_field"> hidden_field</h5>
+    <p>Возвращает тег скрытого поля с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hidden_field(:user, :token)
+# =&gt; &lt;input type="hidden" id="user_token" name="user[token]" value="#{@user.token}" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="label"> label</h5>
+    <p>Возвращает тег label с учетом поля ввода для определенного атрибута.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+label(:article, :title)
+# =&gt; &lt;label for="article_title"&gt;Title&lt;/label&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="password_field"> password_field</h5>
+    <p>Возвращает тег input типа "password" с учетом доступа к определенному атрибуту..</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+password_field(:login, :pass)
+# =&gt; &lt;input type="text" id="login_pass" name="login[pass]" value="#{@login.pass}" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="radio_button"> radio_button</h5>
+    <p>Возвращает тег радио кнопки с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Let's say that @article.category returns "rails":
+radio_button("article", "category", "rails")
+radio_button("article", "category", "java")
+# =&gt; &lt;input type="radio" id="article_category_rails" name="article[category]" value="rails" checked="checked" /&gt;
+#    &lt;input type="radio" id="article_category_java" name="article[category]" value="java" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="text_area"> text_area</h5>
+    <p>Возвращает набор открывающего и закрывающего тега textarea с учетом доступа к определенному
+        атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+text_area(:comment, :text, size: "20x30")
+# =&gt; &lt;textarea cols="20" rows="30" id="comment_text" name="comment[text]"&gt;
+#      #{@comment.text}
+#    &lt;/textarea&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="text_field"> text_field</h5>
+    <p>Возвращает тег input типа "text" с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+text_field(:article, :title)
+# =&gt; &lt;input type="text" id="article_title" name="article[title]" value="#{@article.title}" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="email_field"> email_field</h5>
+    <p>Возвращает тег input типа "email" с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+email_field(:user, :email)
+# =&gt; &lt;input type="email" id="user_email" name="user[email]" value="#{@user.email}" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="url_field"> url_field</h5>
+    <p>Возвращает тег input типа "url" с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+url_field(:user, :url)
+# =&gt; &lt;input type="url" id="user_url" name="user[url]" value="#{@user.url}" /&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="formoptionshelper"> FormOptionsHelper</h4>
+    <p>Представляет ряд методов для превращения различного рода контейнеров в набор тегов
+        option.</p>
+    <h5 class="inside_page_header" id="collection_select"> collection_select</h5>
+    <p>Возвращает теги <code>select</code> и <code>option</code> для коллекции значений,
+        возвращаемых <code>method</code> для класса <code>object</code>.</p>
+    <p>Пример структуры объекта для использования с этим методом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  belongs_to :author
+end
+class Author &lt; ActiveRecord::Base
+  has_many :articles
+  def name_with_initial
+    "#{first_name.first}. #{last_name}"
+  end
+end
+</pre>
+    </div>
+    <p>Пример использования (выбор связанного Author для экземпляра Article, <code>@article</code>):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+collection_select(:article, :author_id, Author.all, :id, :name_with_initial, { prompt: true })
+</pre>
+    </div>
+    <p>Если <code>@article.author_id</code> — 1, это вернет:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;select name="article[author_id]"&gt;
+  &lt;option value=""&gt;Please select&lt;/option&gt;
+  &lt;option value="1" selected="selected"&gt;D. Heinemeier Hansson&lt;/option&gt;
+  &lt;option value="2"&gt;D. Thomas&lt;/option&gt;
+  &lt;option value="3"&gt;M. Clark&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection_radio_buttons"> collection_radio_buttons</h5>
+    <p>Возвращает теги <code>radio_button</code> для коллекции значений, возвращаемых
+        <code>method</code> для класса <code>object</code>.</p>
+    <p>Пример структуры объекта для использования с этим методом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  belongs_to :author
+end
+class Author &lt; ActiveRecord::Base
+  has_many :articles
+  def name_with_initial
+    "#{first_name.first}. #{last_name}"
+  end
+end
+</pre>
+    </div>
+    <p>Пример использования (выбор связанного Author для экземпляра Article, <code>@article</code>):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+collection_radio_buttons(:article, :author_id, Author.all, :id, :name_with_initial)
+</pre>
+    </div>
+    <p>Если <code>@article.author_id</code> — 1, это вернет:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="article_author_id_1" name="article[author_id]" type="radio" value="1" checked="checked" /&gt;
+&lt;label for="article_author_id_1"&gt;D. Heinemeier Hansson&lt;/label&gt;
+&lt;input id="article_author_id_2" name="article[author_id]" type="radio" value="2" /&gt;
+&lt;label for="article_author_id_2"&gt;D. Thomas&lt;/label&gt;
+&lt;input id="article_author_id_3" name="article[author_id]" type="radio" value="3" /&gt;
+&lt;label for="article_author_id_3"&gt;M. Clark&lt;/label&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="collection_check_boxes"> collection_check_boxes</h5>
+    <p>Возвращает теги <code>check_box</code> для коллекции значений, возвращаемых
+        <code>method</code> для класса <code>object</code>.</p>
+    <p>Пример структуры объекта для использования с этим методом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  has_and_belongs_to_many :authors
+end
+class Author &lt; ActiveRecord::Base
+  has_and_belongs_to_many :articles
+  def name_with_initial
+    "#{first_name.first}. #{last_name}"
+  end
+end
+</pre>
+    </div>
+    <p>Пример использования (выбор связанного Author для экземпляра Article, <code>@article</code>):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+collection_check_boxes(:article, :author_ids, Author.all, :id, :name_with_initial)
+</pre>
+    </div>
+    <p>Если <code>@article.author_id</code> — [1], это вернет:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="article_author_ids_1" name="article[author_ids][]" type="checkbox" value="1" checked="checked" /&gt;
+&lt;label for="article_author_ids_1"&gt;D. Heinemeier Hansson&lt;/label&gt;
+&lt;input id="article_author_ids_2" name="article[author_ids][]" type="checkbox" value="2" /&gt;
+&lt;label for="article_author_ids_2"&gt;D. Thomas&lt;/label&gt;
+&lt;input id="article_author_ids_3" name="article[author_ids][]" type="checkbox" value="3" /&gt;
+&lt;label for="article_author_ids_3"&gt;M. Clark&lt;/label&gt;
+&lt;input name="article[author_ids][]" type="hidden" value="" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="country_options_for_select"> country_options_for_select</h5>
+    <p>Возвращает строку из тегов option с практически всеми странами мира.</p>
+    <h5 class="inside_page_header" id="country_select"> country_select</h5>
+    <p>Возвращает теги select и option для заданного объекта и метода, с помощью
+        country_options_for_select для создания списка тегов option.</p>
+    <h5 class="inside_page_header" id="option_groups_from_collection_for_select">
+        option_groups_from_collection_for_select</h5>
+    <p>Возвращает строку с тегами <code>option</code>, подобно <code>options_from_collection_for_select</code>,
+        но группирует их тегами <code>optgroup</code> на основе отношений аргументов.</p>
+    <p>Пример структуры объекта для использования с этим методом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Continent &lt; ActiveRecord::Base
+  has_many :countries
+  # attribs: id, name
+end
+class Country &lt; ActiveRecord::Base
+  belongs_to :continent
+  # attribs: id, name, continent_id
+end
+</pre>
+    </div>
+    <p>Пример использования:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+option_groups_from_collection_for_select(@continents, :countries, :name, :id, :name, 3)
+</pre>
+    </div>
+    <p>Возможный результат:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;optgroup label="Africa"&gt;
+  &lt;option value="1"&gt;Egypt&lt;/option&gt;
+  &lt;option value="4"&gt;Rwanda&lt;/option&gt;
+  ...
+&lt;/optgroup&gt;
+&lt;optgroup label="Asia"&gt;
+  &lt;option value="3" selected="selected"&gt;China&lt;/option&gt;
+  &lt;option value="12"&gt;India&lt;/option&gt;
+  &lt;option value="5"&gt;Japan&lt;/option&gt;
+  ...
+&lt;/optgroup&gt;
+</pre>
+    </div>
+    <p>Note: Возвращаются только теги <code>optgroup</code> и <code>option</code>, вам все еще нужно
+        обернуть результат в подходящий тег <code>select</code>.</p>
+    <h5 class="inside_page_header" id="options_for_select"> options_for_select</h5>
+    <p>Принимает контейнер (hash, array, enumerable, ваш тип) и возвращает строку тегов option.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+options_for_select([ "VISA", "MasterCard" ])
+# =&gt; &lt;option&gt;VISA&lt;/option&gt; &lt;option&gt;MasterCard&lt;/option&gt;
+</pre>
+    </div>
+    <p>Note: Возвращаются только теги <code>option</code>, вам все еще нужно обернуть результат в
+        обычный тег HTML <code>select</code>.</p>
+    <h5 class="inside_page_header" id="options_from_collection_for_select">
+        options_from_collection_for_select</h5>
+    <p>Возвращает строку тегов option, собранную с помощью итерации по <code>collection</code> и
+        назначая результат вызова <code>value_method</code> как значение option и
+        <code>text_method</code> как текст option.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# options_from_collection_for_select(collection, value_method, text_method, selected = nil)
+</pre>
+    </div>
+    <p>Например, представим цикл, проходящий по каждому человеку в <code>@project.people</code> для
+        создания тега ввода:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+options_from_collection_for_select(@project.people, "id", "name")
+# =&gt; &lt;option value="#{person.id}"&gt;#{person.name}&lt;/option&gt;
+</pre>
+    </div>
+    <p>Note: Возвращаются только теги <code>option</code>, вам все еще нужно обернуть результат в
+        обычный тег HTML <code>select</code>.</p>
+    <h5 class="inside_page_header" id="select"> select</h5>
+    <p>Создает тег select и ряд связанных тегов option для предоставленного объекта и метода.</p>
+    <p>Пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+select("article", "person_id", Person.all.collect { |p| [ p.name, p.id ] }, { include_blank: true })
+</pre>
+    </div>
+    <p>Если <code>@article.person_id</code> — 1, это выдаст:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;select name="article[person_id]"&gt;
+  &lt;option value=""&gt;&lt;/option&gt;
+  &lt;option value="1" selected="selected"&gt;David&lt;/option&gt;
+  &lt;option value="2"&gt;Sam&lt;/option&gt;
+  &lt;option value="3"&gt;Tobias&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="time_zone_options_for_select">
+        time_zone_options_for_select</h5>
+    <p>Возвращает строку тегов option для практически всех временных зон мира.</p>
+    <h5 class="inside_page_header" id="time_zone_select"> time_zone_select</h5>
+    <p>Возвращает теги select и option для заданного объекта и метода с помощью <code>time_zone_options_for_select</code>
+        для создания списка тегов option.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+time_zone_select( "user", "time_zone")
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="date_field"> date_field</h5>
+    <p>Создает тег input типа "date", созданного с учетом доступа к определенному атрибуту.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date_field("user", "dob")
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="formtaghelper"> FormTagHelper</h4>
+    <p>Предоставляет ряд методов для создания тегов форм, не полагающихся на объект Active Record,
+        назначенный шаблону, как делает FormHelper. Вместо этого вы предоставляете имена и значения
+        вручную.</p>
+    <h5 class="inside_page_header" id="check_box_tag"> check_box_tag</h5>
+    <p>Создает поле ввода в виде чек-бокса.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+check_box_tag 'accept'
+# =&gt; &lt;input id="accept" name="accept" type="checkbox" value="1" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="field_set_tag"> field_set_tag</h5>
+    <p>Создает fieldset для группировки элементов форм HTML.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= field_set_tag do %&gt;
+  &lt;p&gt;&lt;%= text_field_tag 'name' %&gt;&lt;/p&gt;
+&lt;% end %&gt;
+# =&gt; &lt;fieldset&gt;&lt;p&gt;&lt;input id="name" name="name" type="text" /&gt;&lt;/p&gt;&lt;/fieldset&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="file_field_tag"> file_field_tag</h5>
+    <p>Создает поле загрузки файла.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_tag({ action:"post" }, multipart: true) do %&gt;
+  &lt;label for="file"&gt;File to Upload&lt;/label&gt; &lt;%= file_field_tag "file" %&gt;
+  &lt;%= submit_tag %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Примерный результат:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+file_field_tag 'attachment'
+# =&gt; &lt;input id="attachment" name="attachment" type="file" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="form_tag"> form_tag</h5>
+    <p>Начинает тег form, указывающий action url, настроенный с помощью <code>url_for_options</code>,
+        как в <code>ActionController::Base#url_for</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_tag '/articles' do %&gt;
+  &lt;div&gt;&lt;%= submit_tag 'Save' %&gt;&lt;/div&gt;
+&lt;% end %&gt;
+# =&gt; &lt;form action="/articles" method="post"&gt;&lt;div&gt;&lt;input type="submit" name="submit" value="Save" /&gt;&lt;/div&gt;&lt;/form&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="hidden_field_tag"> hidden_field_tag</h5>
+    <p>Создает скрытое поле input, используемое для передачи данных, которые могли бы быть потеряны
+        из-за особенностей HTTP, или данные, которые должны быть скрыт от пользователя.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hidden_field_tag 'token', 'VUBJKB23UIVI1UU1VOBVI@'
+# =&gt; &lt;input id="token" name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="image_submit_tag"> image_submit_tag</h5>
+    <p>Отображает изображение, при нажатии на котором будет отправлена форма.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+image_submit_tag("login.png")
+# =&gt; &lt;input src="/images/login.png" type="image" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="label_tag"> label_tag</h5>
+    <p>Создает тег label.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+label_tag 'name'
+# =&gt; &lt;label for="name"&gt;Name&lt;/label&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="password_field_tag"> password_field_tag</h5>
+    <p>Создает поле для ввода пароля, поле маскированного текста, которое спрячет то, что вводит
+        пользователь символами маски.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+password_field_tag 'pass'
+# =&gt; &lt;input id="pass" name="pass" type="password" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="radio_button_tag"> radio_button_tag</h5>
+    <p>Создает радио-кнопку; используйте группу радио-кнопок с одинаковым именем, чтобы разрешить
+        пользователям выбирать из группы опций.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+radio_button_tag 'gender', 'male'
+# =&gt; &lt;input id="gender_male" name="gender" type="radio" value="male" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="select_tag"> select_tag</h5>
+    <p>Создает выпадающее поле выбора.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+select_tag "people", "&lt;option&gt;David&lt;/option&gt;"
+# =&gt; &lt;select id="people" name="people"&gt;&lt;option&gt;David&lt;/option&gt;&lt;/select&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="submit_tag"> submit_tag</h5>
+    <p>Создает кнопку подтверждения с текстом-надписью.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+submit_tag "Publish this article"
+# =&gt; &lt;input name="commit" type="submit" value="Publish this article" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="text_area_tag"> text_area_tag</h5>
+    <p>Создает поле ввода текста; используйте textarea для длинного ввода текста, такого как статьи
+        или описания.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+text_area_tag 'article'
+# =&gt; &lt;textarea id="article" name="article"&gt;&lt;/textarea&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="text_field_tag"> text_field_tag</h5>
+    <p>Создает обычное поле ввода текста; используйте их для ввода небольших кусочков текста, таких
+        как имя пользователя или поисковый запрос.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+text_field_tag 'name'
+# =&gt; &lt;input id="name" name="name" type="text" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="email_field_tag"> email_field_tag</h5>
+    <p>Создает стандартное поле ввода с типом email.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+email_field_tag 'email'
+# =&gt; &lt;input id="email" name="email" type="email" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="url_field_tag"> url_field_tag</h5>
+    <p>Создает стандартное поле ввода с типом url.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+url_field_tag 'url'
+# =&gt; &lt;input id="url" name="url" type="url" /&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="date_field_tag"> date_field_tag</h5>
+    <p>Создает стандартное поле ввода с типом date.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date_field_tag "dob"
+# =&gt; &lt;input id="dob" name="dob" type="date" /&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="javascripthelper"> JavaScriptHelper</h4>
+    <p>Предоставляет функционал для работы с JavaScript в ваших вьюхах.</p>
+    <h5 class="inside_page_header" id="escape_javascript"> escape_javascript</h5>
+    <p>Экранирует переводы строк и одиночные и двойные кавычки во фрагментах JavaScript.</p>
+    <h5 class="inside_page_header" id="javascript_tag"> javascript_tag</h5>
+    <p>Возвращает тег JavaScript, оборачивающий предоставленный код.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+javascript_tag "alert('All is good')"
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;script&gt;
+//&lt;![CDATA[
+alert('All is good')
+//]]&gt;
+&lt;/script&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="numberhelper"> NumberHelper</h4>
+    <p>Представляет методы для конвертации чисел в форматированные строки. Методы предоставлены для
+        телефонных номеров, валют, процентов, позиционных систем исчисления и размеров файла.</p>
+    <h5 class="inside_page_header" id="number_to_currency"> number_to_currency</h5>
+    <p>Форматирует число в строку с валютой (например, $13.65).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_to_currency(1234567890.50) # =&gt; $1,234,567,890.50
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="number_to_human_size"> number_to_human_size</h5>
+    <p>Форматирует размер в байтах в более понимаемое представление; полезно для показа размеров
+        файла пользователям.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_to_human_size(1234)          # =&gt; 1.2 KB
+number_to_human_size(1234567)       # =&gt; 1.2 MB
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="number_to_percentage"> number_to_percentage</h5>
+    <p>Форматирует число в строку с процентом.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_to_percentage(100, precision: 0)        # =&gt; 100%
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="number_to_phone"> number_to_phone</h5>
+    <p>Форматирует число в телефонный номер США.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_to_phone(1235551234) # =&gt; 123-555-1234
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="number_with_delimiter"> number_with_delimiter</h5>
+    <p>Группирует тысячи в числе с помощью разделителя.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_with_delimiter(12345678) # =&gt; 12,345,678
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="number_with_precision"> number_with_precision</h5>
+    <p>Форматирует число с помощью определенного уровня точности, по умолчанию 3.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number_with_precision(111.2345)     # =&gt; 111.235
+number_with_precision(111.2345, 2)  # =&gt; 111.23
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sanitizehelper"> SanitizeHelper</h4>
+    <p>Модуль SanitizeHelper представляет набор методов для очистки текста от нежелательных
+        элементов HTML.</p>
+    <h5 class="inside_page_header" id="sanitize"> sanitize</h5>
+    <p>Хелпер sanitize экранирует все теги HTML и удалит все атрибуты, которые не разрешены
+        явно.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+sanitize @article.body
+</pre>
+    </div>
+    <p>Если переданы опции или <code>:attributes</code>, или <code>:tags</code>, разрешены только
+        упомянутые теги и атрибуты, и ничего более.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+sanitize @article.body, tags: %w(table tr td), attributes: %w(id class style)
+</pre>
+    </div>
+    <p>Чтобы изменить значения по умолчанию для многократного использования, например, добавить теги
+        таблиц к значениям по умолчанию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Application &lt; Rails::Application
+  config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td'
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="sanitize_css-style"> sanitize_css(style)</h5>
+    <p>Экранирует блок кода CSS.</p>
+    <h5 class="inside_page_header" id="strip_links-html"> strip_links(html)</h5>
+    <p>Обрезает все теги ссылок в тексте, оставляя только текст ссылки.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+strip_links("&lt;a href="http://rubyonrails.org"&gt;Ruby on Rails&lt;/a&gt;")
+# =&gt; Ruby on Rails
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+strip_links("emails to &lt;a href="mailto:me@email.com"&gt;me@email.com&lt;/a&gt;.")
+# =&gt; emails to me@email.com.
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+strip_links('Blog: &lt;a href="http://myblog.com/"&gt;Visit&lt;/a&gt;.')
+# =&gt; Blog: Visit.
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="strip_tags-html"> strip_tags(html)</h5>
+    <p>Обрезает все теги HTML из html, включая комментарии. Он использует html-scanner tokenizer,
+        поэтому способность парсинга ограничена этим html-scanner.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+strip_tags("Strip &lt;i&gt;these&lt;/i&gt; tags!")
+# =&gt; Strip these tags!
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+strip_tags("&lt;b&gt;Bold&lt;/b&gt; no more!  &lt;a href='more.html'&gt;See more&lt;/a&gt;")
+# =&gt; Bold no more!  See more
+</pre>
+    </div>
+    <p>NB: Результат все еще может содержать неэкранированные символы '&lt;', '&gt;', '&amp;' и
+        путать браузеры.</p>
+    <h4 class="inside_page_header" id="csrfhelper"> CsrfHelper</h4>
+    <p>Возвращает метатеги "csrf-param" и "csrf-token" с, соответственно, именами параметра и токена
+        против межсайтовой подделки запросов.</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;%= csrf_meta_tags %&gt;
+</pre>
+    </div>
+    <div class="note"><p>Обычные формы создают скрытые поля, поэтому они не используют эти теги.
+        Подробнее в .</p></div>
+    <h3 class="inside_page_header" id="lokalizovannye-vyuhi"> Локализованные вьюхи</h3>
+    <p>В Action View есть возможность рендерить различные шаблоны в зависимости от текущей
+        локали.</p>
+    <p>Например, у вас есть <code>ArticlesController</code> с экшном show. По умолчанию вызов этого
+        экшна отрендерит <code>app/views/articles/show.html.erb</code>. Но если вы установите <code>I18n.locale
+            = :de</code>, то вместо него будет отрендерен
+        <code>app/views/articles/show.de.html.erb</code>. Если локализованный шаблон отсутствует,
+        будет использована недекорированная версия. Это означает, что не нужно предоставлять
+        локализованные вьюхи для всех случаев, но они будут предпочтены и использованы, если будут
+        доступны.</p>
+    <p>Ту же технику можно использовать для локализации страниц ошибок в директории public.
+        Например, установка <code>I18n.locale = :de</code> и создание
+        <code>public/500.de.html</code> и <code>public/404.de.html</code> позволит иметь
+        локализованные страницы ошибок.</p>
+    <p>Так как Rails не ограничивает символы, используемые для установления I18n.locale, эту систему
+        можно использовать для отображения различного содержимого, зависящего от чего-либо иного.
+        Например, предположим у вас есть пользователи "expert", которые должны видеть страницы иные,
+        чем пользователи "normal". Можно добавить следующее в
+        <code>app/controllers/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+before_action :set_expert_locale
+def set_expert_locale
+  I18n.locale = :expert if current_user.expert?
+end
+</pre>
+    </div>
+    <p>Затем можно добавить специальные вьюхи, такие как <code>app/views/articles/show.expert.html.erb</code>
+        которые будут отображены только экспертам.</p>
+    <p>Подробнее об API интернационализации Rails (I18n) можно прочитать .</p>
+
+</body>
+</html>

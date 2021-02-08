@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>2.1. Операции над матрицами</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+</td>
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal"><b>Определение. </b>Матрицей
+        размера <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1098" type="#_x0000_t75"
+                     style='width:24.75pt;height:9.75pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image139.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="13"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image140.gif"
+                                       v:shapes="_x0000_i1098" width="33"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1098"
+                         DrawAspect="Content" ObjectID="_1072191202">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>называется
+        прямоугольная таблица из чисел <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1099"
+                     type="#_x0000_t75" style='width:155.25pt;height:17.25pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image141.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image142.gif"
+                                       v:shapes="_x0000_i1099" width="207"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1099"
+                         DrawAspect="Content" ObjectID="_1072191203">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1100" type="#_x0000_t75" style='width:114pt;height:63pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image143.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image144.gif"
+                                   v:shapes="_x0000_i1100" width="152"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1100"
+                         DrawAspect="Content" ObjectID="_1072191204">
+            </o:OLEObject>
+        </xml><![endif]-->,</p>
+    <p align="left" class="MsoNormal">состоящая
+        из <i><span lang="EN-US">m</span></i> строк и <i><span lang="EN-US">n</span></i> столбцов.
+    </p>
+    <p class="MsoNormal">Матрица размера <i><span lang="EN-US">m</span></i><span lang="EN-US"><span>&#180;</span></span><i><span
+            lang="EN-US">m</span></i> называется <i>квадратной</i>.</p>
+    <p class="MsoNormal">Две матрицы считаются <i>равными</i>,
+        если равны их размеры и равны элементы, стоящие на одинаковых местах.</p>
+    <p class="MsoNormal"><b>Определение.</b>
+        Суммой <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1101" type="#_x0000_t75"
+                     style='width:27pt;height:11.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image145.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image146.gif"
+                                       v:shapes="_x0000_i1101" width="36"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1101"
+                         DrawAspect="Content" ObjectID="_1072191205">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>матриц <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1102" type="#_x0000_t75" style='width:99pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image147.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image148.gif"
+                                       v:shapes="_x0000_i1102" width="132"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1102"
+                         DrawAspect="Content" ObjectID="_1072191206">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>размера <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1103" type="#_x0000_t75" style='width:24.75pt;height:9.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image149.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="13"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image140.gif"
+                                       v:shapes="_x0000_i1103" width="33"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1103"
+                         DrawAspect="Content" ObjectID="_1072191207">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>называется матрица <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1104" type="#_x0000_t75" style='width:39pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image150.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image151.gif"
+                                       v:shapes="_x0000_i1104" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1104"
+                         DrawAspect="Content" ObjectID="_1072191208">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>того же размера, каждый
+        элемент которой равен сумме соответственных элементов матриц <i><span lang="EN-US">A</span></i>
+        и <i><span lang="EN-US">B</span></i>:</p>
+    <p class="MsoNormal"><span lang="EN-US"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1105" type="#_x0000_t75" style='width:182.25pt;height:17.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image152.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="23"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image153.gif"
+                                   v:shapes="_x0000_i1105" width="243"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1105"
+                         DrawAspect="Content" ObjectID="_1072191209">
+            </o:OLEObject>
+        </xml><![endif]--></span></p>
+    <p class="MsoNormal">Произведением <span lang="EN-US"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1106" type="#_x0000_t75"
+                 style='width:23.25pt;height:12pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image154.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="16"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image155.gif"
+                                   v:shapes="_x0000_i1106" width="31"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1106"
+                         DrawAspect="Content" ObjectID="_1072191210">
+            </o:OLEObject>
+        </xml><![endif]--></span><span> </span>матрицы <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1107" type="#_x0000_t75" style='width:39pt;height:17.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image156.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="23"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image157.gif"
+                                   v:shapes="_x0000_i1107" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1107"
+                         DrawAspect="Content" ObjectID="_1072191211">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>на число <i><span><span>a</span></span></i> называется
+        матрица <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1108" type="#_x0000_t75" style='width:39pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image158.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image159.gif"
+                                       v:shapes="_x0000_i1108" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1108"
+                         DrawAspect="Content" ObjectID="_1072191212">
+            </o:OLEObject>
+        </xml><![endif]-->, получающаяся из матрицы <i><span lang="EN-US">A</span></i> умножением
+        всех её
+        элементов на <i><span><span>a</span></span></i>: <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1109" type="#_x0000_t75" style='width:168pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image160.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image161.gif"
+                                       v:shapes="_x0000_i1109" width="224"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1109"
+                         DrawAspect="Content" ObjectID="_1072191213">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Пример 9. </b>Вычислить
+        <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1110" type="#_x0000_t75" style='width:48pt;
+ height:12pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image162.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="16"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image163.gif"
+                                       v:shapes="_x0000_i1110" width="64"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1110"
+                         DrawAspect="Content" ObjectID="_1072191214">
+            </o:OLEObject>
+        </xml><![endif]-->, если </p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1111" type="#_x0000_t75"
+                 style='width:153pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image164.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image165.gif"
+                                   v:shapes="_x0000_i1111" width="204"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1111"
+                         DrawAspect="Content" ObjectID="_1072191215">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Решение.</b> Находим <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1112" type="#_x0000_t75" style='width:21pt;height:12pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image166.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="16"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image167.gif"
+                                   v:shapes="_x0000_i1112" width="28"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1112"
+                         DrawAspect="Content" ObjectID="_1072191216">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1113" type="#_x0000_t75" style='width:21pt;height:11.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image168.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image169.gif"
+                                       v:shapes="_x0000_i1113" width="28"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1113"
+                         DrawAspect="Content" ObjectID="_1072191217">
+            </o:OLEObject>
+        </xml><![endif]-->, умножая элементы матрицы <i><span lang="EN-US">A</span></i> на число
+        3, а элементы матрицы <i><span lang="EN-US">B</span></i> – на 2. Имеем</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1114" type="#_x0000_t75"
+                 style='width:173.25pt;height:29.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image170.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="39"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image171.gif"
+                                   v:shapes="_x0000_i1114" width="231"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1114"
+                         DrawAspect="Content" ObjectID="_1072191218">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Складывая теперь элементы матриц <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1115" type="#_x0000_t75" style='width:21pt;height:12pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image166.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="16"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image167.gif"
+                                   v:shapes="_x0000_i1115" width="28"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1115"
+                         DrawAspect="Content" ObjectID="_1072191219">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1116" type="#_x0000_t75" style='width:21pt;height:11.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image172.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image169.gif"
+                                       v:shapes="_x0000_i1116" width="28"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1116"
+                         DrawAspect="Content" ObjectID="_1072191221">
+            </o:OLEObject>
+        </xml><![endif]-->, стоящие на одинаковых местах, получим</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1117" type="#_x0000_t75"
+                 style='width:227.25pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image173.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image174.gif"
+                                   v:shapes="_x0000_i1117" width="303"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1117"
+                         DrawAspect="Content" ObjectID="_1072191222">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Определение. </b>Произведением
+        матрицы <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1118" type="#_x0000_t75"
+                     style='width:39pt;height:17.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image156.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image157.gif"
+                                       v:shapes="_x0000_i1118" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1118"
+                         DrawAspect="Content" ObjectID="_1072191223">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>размера <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1119" type="#_x0000_t75" style='width:24.75pt;height:9.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image149.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="13"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image140.gif"
+                                       v:shapes="_x0000_i1119" width="33"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1119"
+                         DrawAspect="Content" ObjectID="_1072191224">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>на матрицу <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1120" type="#_x0000_t75" style='width:39pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image158.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image159.gif"
+                                       v:shapes="_x0000_i1120" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1120"
+                         DrawAspect="Content" ObjectID="_1072191225">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>размера <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1121" type="#_x0000_t75" style='width:23.25pt;height:12.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image175.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="17"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image176.gif"
+                                       v:shapes="_x0000_i1121" width="31"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1121"
+                         DrawAspect="Content" ObjectID="_1072191226">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>называется матрица <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1122" type="#_x0000_t75" style='width:39pt;height:17.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image150.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image151.gif"
+                                       v:shapes="_x0000_i1122" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1122"
+                         DrawAspect="Content" ObjectID="_1072191227">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>размера <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1123" type="#_x0000_t75" style='width:24.75pt;height:12.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image177.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="17"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image178.gif"
+                                       v:shapes="_x0000_i1123" width="33"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1123"
+                         DrawAspect="Content" ObjectID="_1072191228">
+            </o:OLEObject>
+        </xml><![endif]-->, элемент которой <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1124"
+                     type="#_x0000_t75" style='width:12.75pt;height:17.25pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image179.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="23"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image180.gif"
+                                       v:shapes="_x0000_i1124" width="17"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1124"
+                         DrawAspect="Content" ObjectID="_1072191229">
+            </o:OLEObject>
+        </xml><![endif]-->, стоящий в <i><span lang="EN-US">i</span></i>-ой строке и <i><span
+                lang="EN-US">j</span></i>-ом столбце, равен сумме произведений элементов <i><span
+                lang="EN-US">i</span></i>-ой строки матрицы <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1125"
+                     type="#_x0000_t75" style='width:11.25pt;height:11.25pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image181.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image182.gif"
+                                       v:shapes="_x0000_i1125" width="15"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1125"
+                         DrawAspect="Content" ObjectID="_1072191230">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и соответствующих
+        элементов <i><span lang="EN-US">j</span></i>-го столбца матрицы <i>B</i>:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1126" type="#_x0000_t75"
+                 style='width:197.25pt;height:33.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image183.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="45"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image184.gif"
+                                   v:shapes="_x0000_i1126" width="263"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1126"
+                         DrawAspect="Content" ObjectID="_1072191231">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Так как в произведении матриц строки и столбцы не
+        равноправны, то <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1127" type="#_x0000_t75"
+                     style='width:53.25pt;height:11.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image185.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image186.gif"
+                                       v:shapes="_x0000_i1127" width="71"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1127"
+                         DrawAspect="Content" ObjectID="_1072191232">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Пример 10.</b>
+        Вычислить произведение матриц</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1128" type="#_x0000_t75"
+                 style='width:71.25pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image187.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image188.gif"
+                                   v:shapes="_x0000_i1128" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1128"
+                         DrawAspect="Content" ObjectID="_1072191233">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1129" type="#_x0000_t75" style='width:66.75pt;height:47.25pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image189.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="63"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image190.gif"
+                                       v:shapes="_x0000_i1129" width="89"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1129"
+                         DrawAspect="Content" ObjectID="_1072191234">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Решение.</b> Согласно
+        определению произведение матриц получаем так: умножаем элементы первой строки
+        матрицы <i><span lang="EN-US">A</span></i> на соответствующие элементы
+        первого столбца матрицы <i>B</i>,
+        произведения складываем и ставим в первую строку и первый столбец матрицы-произведения.
+        Умножаем далее элементы первой строки матрицы <i><span lang="EN-US">A</span></i> на
+        элементы второго столбца матрицы <i>B</i>,
+        произведения складываем и ставим в первую строку и второй столбец
+        матрицы-произведения и т.д.</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1130" type="#_x0000_t75" style='width:141.75pt;height:47.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image191.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image192.gif"
+                                   v:shapes="_x0000_i1130" width="189"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1130"
+                         DrawAspect="Content" ObjectID="_1072191235">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1131" type="#_x0000_t75"
+                 style='width:246pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image193.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image194.gif"
+                                   v:shapes="_x0000_i1131" width="328"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1131"
+                         DrawAspect="Content" ObjectID="_1072191236">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Пример 11. </b>Вычислить
+        <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1132" type="#_x0000_t75" style='width:23.25pt;
+ height:11.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image195.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image196.gif"
+                                       v:shapes="_x0000_i1132" width="31"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1132"
+                         DrawAspect="Content" ObjectID="_1072191237">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1133" type="#_x0000_t75" style='width:23.25pt;height:11.25pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image197.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="15"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image198.gif"
+                                       v:shapes="_x0000_i1133" width="31"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1133"
+                         DrawAspect="Content" ObjectID="_1072191238">
+            </o:OLEObject>
+        </xml><![endif]-->, если</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1134" type="#_x0000_t75"
+                 style='width:152.25pt;height:77.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image199.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="103"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image200.gif"
+                                   v:shapes="_x0000_i1134" width="203"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1134"
+                         DrawAspect="Content" ObjectID="_1072191239">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Решение.</b></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1135" type="#_x0000_t75"
+                 style='width:195.75pt;height:12.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image201.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="17"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image202.gif"
+                                   v:shapes="_x0000_i1135" width="261"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1135"
+                         DrawAspect="Content" ObjectID="_1072191240">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Перемножим теперь матрицы в другом порядке.</p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1136" type="#_x0000_t75"
+                 style='width:170.25pt;height:125.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image203.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="167"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image204.gif"
+                                   v:shapes="_x0000_i1136" width="227"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1136"
+                         DrawAspect="Content" ObjectID="_1072191241">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Естественно, мы получили разные результаты.</p>
+    <p class="MsoNormal">Матрицу, все элементы которой равны нулю, мы будем называть <i>нулевой</i>.
+    </p>
+    <p class="MsoNormal">Матрицу <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1137"
+                 type="#_x0000_t75" style='width:93pt;height:60.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image205.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="81"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image206.gif"
+                                   v:shapes="_x0000_i1137" width="124"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1137"
+                         DrawAspect="Content" ObjectID="_1072191242">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>называют <i>единичной</i>.</p>
+    <p class="MsoNormal">Если матрицы <i><span lang="EN-US">A</span></i> и <i>E</i> – квадратные
+        одного размера матрицы, то</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1138" type="#_x0000_t75"
+                 style='width:71.25pt;height:11.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image207.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="15"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image208.gif"
+                                   v:shapes="_x0000_i1138" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1138"
+                         DrawAspect="Content" ObjectID="_1072191243">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Действительно, возьмём, например,</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1139" type="#_x0000_t75"
+                 style='width:138.75pt;height:33pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image209.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="44"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image210.gif"
+                                   v:shapes="_x0000_i1139" width="185"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1139"
+                         DrawAspect="Content" ObjectID="_1072191244">
+            </o:OLEObject>
+        </xml><![endif]-->.Умножим <i><span lang="EN-US">A</span></i> на <i><span
+                lang="EN-US">E</span></i> справа.</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1140" type="#_x0000_t75"
+                 style='width:266.25pt;height:65.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image211.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="87"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image212.gif"
+                                   v:shapes="_x0000_i1140" width="355"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1140"
+                         DrawAspect="Content" ObjectID="_1072191245">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Пример 12.</b> Пусть <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1141" type="#_x0000_t75" style='width:150pt;height:30.75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image213.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image214.gif"
+                                   v:shapes="_x0000_i1141" width="200"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1141"
+                         DrawAspect="Content" ObjectID="_1072191246">
+            </o:OLEObject>
+        </xml><![endif]-->. Найти значение многочлена <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1142" type="#_x0000_t75" style='width:24.75pt;height:13.5pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image215.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="18"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image216.gif"
+                                       v:shapes="_x0000_i1142" width="33"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1142"
+                         DrawAspect="Content" ObjectID="_1072191247">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b>
+        Подставим вместо <i><span lang="EN-US">x</span></i> под знак многочлена матрицу <i><span
+                lang="EN-US">A</span></i>.</p>
+    <p class="MsoNormal">Тогда<sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1143"
+                 type="#_x0000_t75" style='width:91.5pt;height:15pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image217.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image218.gif"
+                                   v:shapes="_x0000_i1143" width="122"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1143"
+                         DrawAspect="Content" ObjectID="_1072191248">
+            </o:OLEObject>
+        </xml><![endif]-->, где <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1144"
+                     type="#_x0000_t75" style='width:42pt;height:12.75pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image219.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="17"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image220.gif"
+                                       v:shapes="_x0000_i1144" width="56"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1144"
+                         DrawAspect="Content" ObjectID="_1072191249">
+            </o:OLEObject>
+        </xml><![endif]-->, а вместо числа 4 мы ввели матрицу <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1145" type="#_x0000_t75" style='width:18.75pt;height:9.75pt'
+                    o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image221.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="13"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image222.gif"
+                                       v:shapes="_x0000_i1145" width="25"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1145"
+                         DrawAspect="Content" ObjectID="_1072191250">
+            </o:OLEObject>
+        </xml><![endif]-->, так как складывать можно только матрицы одинакового
+        размера, но не матрицу с числом.</p>
+    <p class="MsoNormal">Вычислим <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1146"
+                 type="#_x0000_t75" style='width:14.25pt;height:13.5pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image223.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="18"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image224.gif"
+                                   v:shapes="_x0000_i1146" width="19"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1146"
+                         DrawAspect="Content" ObjectID="_1072191252">
+            </o:OLEObject>
+        </xml><![endif]-->. Имеем</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1147" type="#_x0000_t75"
+                 style='width:269.25pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image225.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image226.gif"
+                                   v:shapes="_x0000_i1147" width="359"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1147"
+                         DrawAspect="Content" ObjectID="_1072191253">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Далее <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1148"
+                 type="#_x0000_t75" style='width:147.75pt;height:30.75pt' o:ole=""
+                 fillcolor="window">
+            <v:imagedata src="obj.files/image227.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image228.gif"
+                                   v:shapes="_x0000_i1148" width="197"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1148"
+                         DrawAspect="Content" ObjectID="_1072191254">
+            </o:OLEObject>
+        </xml><![endif]-->,</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1149" type="#_x0000_t75"
+                 style='width:111pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image229.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image230.gif"
+                                   v:shapes="_x0000_i1149" width="148"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1149"
+                         DrawAspect="Content" ObjectID="_1072191255">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1150" type="#_x0000_t75"
+                 style='width:247.5pt;height:60pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image231.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image232.gif"
+                                   v:shapes="_x0000_i1150" width="330"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1150"
+                         DrawAspect="Content" ObjectID="_1072191256">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+</td>
+
+</body>
+</html>

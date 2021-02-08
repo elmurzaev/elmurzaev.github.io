@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Asset Pipeline</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="asset-pipeline"> Asset Pipeline</h2>
+    <p>Это руководство раскрывает файлопровод (asset pipeline).</p>
+    <p>Обратившись к этому руководству, вы узнаете:</p>
+    <ul>
+        <li>Что такое файлопровод, и зачем он нужен.
+        </li>
+        <li>Как должным образом организовывать ресурсы своего приложения.
+        </li>
+        <li>Преимущества файлопровода.
+        </li>
+        <li>Как добавить препроцессор к файлопроводу.
+        </li>
+        <li>Как упаковывать ресурсы в гем.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="what-is-the-asset-pipeline"> Что такое файлопровод (Asset
+        Pipeline)?</h3>
+    <p>Файлопровод представляет фреймворк для соединения и минимизации или сжатия ресурсов
+        JavaScript и CSS. Он также добавляет возможность писать эти ресурсы на других языках и
+        препроцессорах, таких как CoffeeScript, Sass и ERB.</p>
+    <p>Технически файлопровод более не особенность ядра Rails 4, он был извлечен из фреймворка в гем
+        .</p>
+    <p>Файлопровод по умолчанию включен.</p>
+    <p>Можно отключить файлопровод при создании нового приложения, передав опцию <code>--skip-sprockets</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rails new appname --skip-sprockets
+</pre>
+    </div>
+    <p>Rails 4 автоматически добавляет гемы <code>sass-rails</code>, <code>coffee-rails</code> и
+        <code>uglifier</code> в ваш Gemfile, которые используются Sprockets для компрессии ресурсов:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
++gem 'sass-rails'
++gem 'uglifier'
++gem 'coffee-rails'
+</pre>
+    </div>
+    <p>Использование опции <code>--skip-sprockets</code> предотвратит Rails 4 от добавления <code>sass-rails</code>
+        и <code>uglifier</code> в Gemfile, поэтому, если вы позже решите включить файлопровод, будет
+        необходимо добавить эти гемы в Gemfile. Также, создание приложения с опцией <code>--skip-sprockets</code>
+        сгенерирует немного иной файл <code>config/application.rb</code>, с закомментированным
+        выражением требования sprockets railtie. Нужно убрать оператор комментирования, если в
+        дальнейшем вы захотите включить файлопровод:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# require "sprockets/railtie"
+</pre>
+    </div>
+    <p>Чтобы установить методы компрессии ресурсов, установите соответствующие конфигурационные
+        опции в <code>production.rb</code> - <code>config.assets.css_compressor</code> для CSS и
+        <code>config.assets.js_compressor</code> для JavaScript:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.css_compressor = :yui
+config.assets.js_compressor = :uglifier
+</pre>
+    </div>
+    <div class="note"><p>Гем <code>sass-rails</code> автоматически используется для сжатия CSS, если
+        он подключен в Gemfile, опцию <code>config.assets.css_compressor</code> устанавливать не
+        нужно.</p></div>
+    <h4 class="inside_page_header" id="osnovnye-osobennosti"> Основные особенности</h4>
+    <p>Первой особенностью файлопровода является соединение ресурсов, что может уменьшить количество
+        запросов, необходимых браузеру для отображения страницы. Браузеры ограничены в количестве
+        запросов, которые они могут выполнить параллельно, поэтому меньшее количество запросов может
+        означать более быструю загрузку вашего приложения.</p>
+    <p>Sprockets соединяет все JavaScript файлы в один главный файл <code>.js</code> и все CSS файлы
+        в один главный файл <code>.css</code>. Как будет сказано далее в этом руководстве, можно
+        настроить эту стратегию, сгруппировав файлы любым способом. В production, Rails вставляет
+        метку MD5 в каждое имя файла, таким образом файл кэшируется браузером. Кэш можно сделать
+        недействительным, изменив эту метку, что происходит автоматически каждый раз, когда
+        изменяется содержимое файла.</p>
+    <p>Второй особенностью файлопровода является минимизация или сжатие ресурсов. Для файлов CSS это
+        выполняется путем удаления пробелов и комментариев. Для JavaScript могут быть применены
+        более сложные процессы. Можно выбирать из набора встроенных опций или определить свои.</p>
+    <p>Третьей особенностью файлопровода является то, что он позволяет писать эти ресурсы на языке
+        более высокого уровня с дальнейшей прекомпиляцией до фактического ресурса. Поддерживаемые
+        языки по умолчанию включают Sass для CSS, CoffeeScript для JavaScript и ERB для обоих.</p>
+    <h4 class="inside_page_header" id="chto-za-metki-i-zachem-oni-nuzhny"> Что за метки и зачем они
+        нужны?</h4>
+    <p>Метки (fingerprinting) - это техника, реализующая зависимость имени файла от его содержимого.
+        При изменении содержимого файла, имя файла также изменяется. Для статичного или нечасто
+        обновляемого содержимого это предоставляет легкий способ сказать, идентичны ли две версии
+        файла, даже если они на разных серверах, или имеют различную дату размещения.</p>
+    <p>Когда имя файла уникально и основано на его содержимом, заголовками HTTP можно установить
+        повсеместное кэширование (в CDN, у провайдера, в сетевом оборудовании или браузере), чтобы у
+        них была собственная копия содержимого. Когда содержимое изменяется, метка тоже изменится.
+        Это приведет к тому, что удаленные клиенты запросят новую копию содержимого. Эта техника
+        известна как <em>cache busting</em>.</p>
+    <p>Техникой, используемой sprockets для меток, является вставка хеша содержимого в имя, обычно в
+        конце. Например, файл CSS <code>global.css</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+global-908e25f4bf641868d8683022a5b62f54.css
+</pre>
+    </div>
+    <p>Это стратегия, принятая файлопроводом Rails.</p>
+    <p>Прежней стратегией Rails было добавление строки запроса, основанной на дате, к каждому
+        ресурсу, присоединенному с помощью встроенного хелпера. В исходнике созданный код выглядел
+        так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+/stylesheets/global.css?1309495796
+</pre>
+    </div>
+    <p>У стратегии, основанной на строке запроса, имелось несколько недостатков:</p>
+    <ul>
+        <li>
+            <p><strong>Не все кэши надежно кэшировали содержимое, когда имя файла отличалось только
+                параметрами строки запроса</strong></p>
+            <p>, "...избегать строки запросов для кэшируемых ресурсов". Он обнаружил, что в этом
+                случае 5-20% запросов не будут закэшированы. В частности, строки запроса совсем не
+                работают с некоторыми сетями доставки контента (CDN) для инвалидации кэша.</p>
+        </li>
+        <li>
+            <p><strong>Имя файла может быть разным на разных узлах в мультисерверных
+                окружениях.</strong></p>
+            <p>По умолчанию, строка запроса в Rails 2.x основывается на времени изменения файлов.
+                Когда ресурсы размещаются в кластер, нет никакой гарантии, что временная метка будет
+                одной и той же, в результате будут использованы различные значения в зависимости от
+                того, какой сервер будет обрабатывать запрос.</p>
+        </li>
+        <li>
+            <p><strong>Слишком много прекращенного кэша</strong></p>
+            <p>При размещении статичных ресурсов с каждым новым релизом кода, mtime (время
+                последнего изменения) <em>всех</em> этих файлов изменялось, принуждая всех удаленных
+                клиентов получать их снова, даже если содержимое этих ресурсов не менялось.</p>
+        </li>
+    </ul>
+    <p>Метки исправляют эти проблемы, избегая строки запроса и обеспечивая то, что имя файла
+        основывается на его содержимом.</p>
+    <p>По умолчанию метки включены для сред development и production. Их можно включить или
+        отключить в конфигурации с помощью опции <code>config.assets.digest</code>.</p>
+    <p>Более подробно:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="how-to-use-the-asset-pipeline"> Как использовать файлопровод
+        (Asset Pipeline)</h3>
+    <p>В прежних версиях Rails, все ресурсы были расположены в субдиректориях <code>public</code>,
+        таких как <code>images</code>, <code>javascripts</code> и <code>stylesheets</code>. Сейчас,
+        с файлопроводом, предпочтительным местом размещения для этих ресурсов стала директория
+        <code>app/assets</code>. Файлы в этой директории отдаются промежуточной программой
+        Sprockets.</p>
+    <p>Ресурсы все еще могут быть размещены в <code>public</code>. Любой ресурс в
+        <code>public</code> будет отдан как статичный файл приложением или веб-сервером, когда
+        <code>config.serve_static_files</code> установлена true. Следует использовать <code>app/assets</code>
+        для файлов, которые должны пройти некоторую предварительную обработку перед тем, как будут
+        отданы.</p>
+    <p>По умолчанию в production Rails прекомпилирует эти файлы в <code>public/assets</code>.
+        Прекомпилированные копии затем отдаются веб-сервером как статичные ресурсы. Файлы в <code>app/assets</code>
+        никогда не отдаются напрямую в production.</p>
+    <h4 class="inside_page_header" id="resursy-konkretnogo-kontrollera"> Ресурсы конкретного
+        контроллера</h4>
+    <p>При генерации скаффолда или контроллера, Rails также генерирует файл JavaScript (или файл
+        CoffeeScript, если гем <code>coffee-rails</code> имеется в <code>Gemfile</code>) и файл CSS
+        (или файл SCSS, если <code>sass-rails</code> имеется в <code>Gemfile</code>) для этого
+        контроллера. Дополнительно при генерации скаффолда, Rails генерирует файл scaffolds.css (или
+        scaffolds.scss, если <code>sass-rails</code> находится в <code>Gemfile</code>.)</p>
+    <p>Например, если генерируете <code>ProjectsController</code>, Rails также добавит новый файл
+        <code>app/assets/javascripts/projects.coffee</code> и еще один <code>app/assets/stylesheets/projects.scss</code>.
+        По умолчанию эти файлы будут готовы к немедленному использованию вашим приложением, с
+        помощью директивы <code>require_tree</code>. Смотрите о подробностях
+        <code>require_tree</code>.</p>
+    <p>Опционально можно включить таблицы стилей и файлы JavaScript конкретного контроллера только
+        для их соответствующих контроллеров, используя следующее:</p>
+    <p><code>&lt;%= javascript_include_tag params[:controller] %&gt;</code> или <code>&lt;%=
+        stylesheet_link_tag params[:controller] %&gt;</code>.</p>
+    <p>При этом убедитесь, что не используете директиву <code>require_tree</code>, так как она
+        приведет к тому, что ресурсы будут включены более одного раза.</p>
+    <div class="warning"><p>При использовании прекомпиляции ресурсов, необходимо убедиться, что
+        ресурсы контроллера будут прекомпилированы при варианте загрузки их на основе страницы. По
+        умолчанию файлы .coffee и .scss не будут прекомпилированы отдельно. Смотрите о подробностях
+        работы прекомпиляции.</p></div>
+    <div class="note"><p>Вам необходим runtime, поддерживаемый ExecJS, чтобы использовать
+        CoffeeScript. Если используете Mac OS X или Windows, у вас уже имеется JavaScript runtime,
+        установленный в операционной системе. Обратитесь к документации по , чтобы узнать обо всех
+        поддерживаемых JavaScript runtime-ах.</p></div>
+    <p>Отключить создание ресурсов при генерации контроллера можно, добавив следующее в конфигурацию
+        <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  config.generators do |g|
+    g.assets false
+  end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="organizatsiya-resursov"> Организация ресурсов</h4>
+    <p>Ресурсы файлопровода могут быть размещены в приложении в одном из этих трех мест: <code>app/assets</code>,
+        <code>lib/assets</code> или <code>vendor/assets</code>.</p>
+    <p><code>app/assets</code> предназначено для ресурсов, принадлежащих приложению, таких как
+        изображения, файлы JavaScript или таблицы стилей, изготовленные специально для приложения.
+    </p>
+    <p><code>lib/assets</code> предназначено для кода ваших собственных библиотек, которые не
+        вписываются в сферу применения приложения или эти библиотеки используются в нескольких
+        приложениях.</p>
+    <p><code>vendor/assets</code> предназначено для ресурсов, принадлежащих сторонним субъектам,
+        таких как код плагинов JavaScript и фреймворки CSS. Имейте в виду, что код третьей стороны
+        со ссылками на другие файлы, также обрабатывающиеся файлопроводом (изображения, таблицы
+        стилей и так далее), должен быть переписан с помощью хелперов, таких как
+        <code>asset_path</code>.</p>
+    <div class="warning"><p>Если вы обновляетесь с Rails 3, примите во внимание, что ресурсы в
+        <code>lib/assets</code> или <code>vendor/assets</code> доступны для включения в манифестах
+        приложения, но больше не являются частью массива прекомпиляции. Что делать в этом случае,
+        смотрите .</p></div>
+    <h5 class="inside_page_header" id="puti-poiska"> Пути поиска</h5>
+    <p>Когда к файлу обращаются из манифеста или хелпера, Sprockets ищет в трех дефолтных местах
+        размещения ресурсов для этого файла.</p>
+    <p>Дефолтные места следующие: директории <code>images</code>, <code>javascripts</code> и <code>stylesheets</code>
+        в папке <code>app/assets</code>, но эти поддиректории не особенные - поиск будет вестись по
+        любому пути в <code>assets/*</code>.</p>
+    <p>Для примера, на эти файлы:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+app/assets/javascripts/home.js
+lib/assets/javascripts/moovinator.js
+vendor/assets/javascripts/slider.js
+vendor/assets/somepackage/phonebox.js
+</pre>
+    </div>
+    <p>можно сослаться в манифесте таким образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+//= require home
+//= require moovinator
+//= require slider
+//= require phonebox
+</pre>
+    </div>
+    <p>Ресурсы в поддиректориях также доступны.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+app/assets/javascripts/sub/something.js
+</pre>
+    </div>
+    <p>доступен как:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+//= require sub/something
+</pre>
+    </div>
+    <p>Можно просмотреть путь поиска, проинспектировав
+        <code>Rails.application.config.assets.paths</code> в консоли Rails.</p>
+    <p>Помимо стандартных путей <code>assets/*</code> в файлопровод могут быть добавлены
+        дополнительные (полные) пути в <code>config/application.rb</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.paths &lt;&lt; Rails.root.join("lib", "videoplayer", "flash")
+</pre>
+    </div>
+    <p>Пути обходятся в том порядке, в котором они выводятся в пути поиска. По умолчанию это
+        означает, что имеют преимущество файлы в <code>app/assets</code>, они перекроют
+        соответствующие пути в <code>lib</code> и <code>vendor</code>.</p>
+    <p>Важно заметить, что если хотите сослаться на что-то еще, в прекомпилированный массив должен
+        быть добавлен манифест, или оно не будет доступно в среде production.</p>
+    <h5 class="inside_page_header" id="ispolzovanie-indeksnyh-faylov"> Использование индексных
+        файлов</h5>
+    <p>Sprockets использует файлы с именем <code>index</code> (с соответствующим расширением) для
+        специальных целей.</p>
+    <p>Например, если имеется библиотека jQuery с множеством модулей, хранящаяся в <code>lib/assets/javascripts/library_name</code>,
+        файл <code>lib/assets/javascripts/library_name/index.js</code> служит манифестом для всех
+        файлов в этой библиотеке. Этот файл может включать список всех требуемых файлов в нужном
+        порядке, или просто директиву <code>require_tree</code>.</p>
+    <p>Библиотека в целом может быть доступна из манифеста приложения следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+//= require library_name
+</pre>
+    </div>
+    <p>Это упрощает поддержку и сохраняет чистоту, позволяя коду быть сгруппированным перед
+        включением где-нибудь еще.</p>
+    <h4 class="inside_page_header" id="kodirovanie-ssylok-na-resursy"> Кодирование ссылок на
+        ресурсы</h4>
+    <p>Sprockets не добавляет какие-либо новые методы для доступа к вашим ресурсам - используйте
+        знакомые методы <code>javascript_include_tag</code> и <code>stylesheet_link_tag</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "application", media: "all" %&gt;
+&lt;%= javascript_include_tag "application" %&gt;
+</pre>
+    </div>
+    <p>При использовании гема turbolinks, который включен по умолчанию в Rails 4, включите опцию
+        'data-turbolinks-track', которая вызывает проверку turbolinks, что ресурс был обновлен,
+        таким образом загружая его на страницу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+&lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
+</pre>
+    </div>
+    <p>В обычных вьюхах можно получить доступ к изображениям в директории
+        <code>public/assets/images</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "rails.png" %&gt;
+</pre>
+    </div>
+    <p>При условии, что файлопровод включен в вашем приложении (и не отключен в контексте текущей
+        среды), этот файл будет отдан с помощью Sprockets. Если файл существует в <code>public/assets/rails.png</code>,
+        он будет отдан веб-сервером.</p>
+    <p>Кроме того, запрос файла с хешем MD5, такого как <code>public/assets/rails-af27b6a414e6da00003503148be9b409.png</code>
+        будет обработан тем же образом. Как генерируются эти хеши будет раскрыто позже в этом
+        руководстве в разделе .</p>
+    <p>Sprockets также будет смотреть среди путей, определенных в <code>config.assets.paths</code>,
+        включающих стандартные пути приложения и любые пути, добавленные engine-ами Rails.</p>
+    <p>Изображения также могут быть организованы в субдиректории и могут быть доступны с помощью
+        указания имени директории в теге:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "icons/rails.png" %&gt;
+</pre>
+    </div>
+    <div class="warning"><p>Если вы прекомпилируете ресурсы (смотрите раздел далее), связывание с
+        несуществующим ресурсом вызовет исключение на вызывающей странице. Это также справедливо и
+        для связывания с пустой строкой. Поэтому будьте осторожны при использовании
+        <code>image_tag</code> и других хелперов с данными, предоставленными пользователями.</p>
+    </div>
+    <h5 class="inside_page_header" id="css-i-erb"> CSS и ERB</h5>
+    <p>Файлопровод автоматически вычисляет ERB. Это означает, что, если добавить расширение <code>erb</code>
+        к ресурсу CSS (например, <code>application.css.erb</code>), будут доступны хелперы, такие
+        как <code>asset_path</code>, в правилах вашего CSS:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+.class { background-image: url(&lt;%= asset_path 'image.png' %&gt;) }
+</pre>
+    </div>
+    <p>Этот фрагмент кода записывает путь к определенному указанному ресурсу. Этот пример имеет
+        смысл если имеется изображение в одном из путей загрузки ресурсов, такое как <code>app/assets/images/image.png</code>,
+        на которое тут будет ссылка. Если это изображение уже имеется в <code>public/assets</code>
+        как файл с меткой, то будет ссылка на него.</p>
+    <p>Если хотите использовать - метод встраивания данных изображения непосредственно в файл CSS -
+        используйте хелпер <code>asset_data_uri</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+#logo { background: url(&lt;%= asset_data_uri 'logo.png' %&gt;) }
+</pre>
+    </div>
+    <p>Этот фрагмент кода вставит правильно отформатированный URI в код CSS.</p>
+    <p>Отметьте, что закрывающий тег не может быть стиля <code>-%&gt;</code>.</p>
+    <h5 class="inside_page_header" id="css-i-sass"> CSS и Sass</h5>
+    <p>При использовании файлопровода пути к ресурсам должны быть переписаны.
+        <code>sass-rails</code> предоставляет хелперы <code>-url</code> и <code>-path</code> helpers
+        (через дефис в Sass, через подчеркивание в Ruby) для следующих типов ресурсов: изображение,
+        шрифт, видео, аудио, JavaScript и таблица стилей.</p>
+    <ul>
+        <li>
+            <code>image-url("rails.png")</code> возвращает <code>url(/assets/rails.png)</code>
+        </li>
+        <li>
+            <code>image-path("rails.png")</code> возвращает <code>"/assets/rails.png"</code>.
+        </li>
+    </ul>
+    <p>Также может быть использована более общая форма:</p>
+    <ul>
+        <li>
+            <code>asset-url("rails.png")</code> возвращает <code>url(/assets/rails.png)</code>
+        </li>
+        <li>
+            <code>asset-path("rails.png")</code> возвращает <code>"/assets/rails.png"</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="javascript-coffeescript-i-erb"> JavaScript/CoffeeScript и
+        ERB</h5>
+    <p>Если добавить расширение <code>erb</code> к ресурсу JavaScript, сделав его чем-то вроде
+        <code>application.js.erb</code>, можно использовать хелпер <code>asset_path</code> в коде
+        вашего JavaScript:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+$('#logo').attr({ src: "&lt;%= asset_path('logo.png') %&gt;" });
+</pre>
+    </div>
+    <p>Этот фрагмент кода записывает путь к определенному указанному ресурсу.</p>
+    <p>Подобным образом можно использовать хелпер <code>asset_path</code> в файлах CoffeeScript с
+        расширением <code>erb</code> (т.е. <code>application.coffee.erb</code>):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$('#logo').attr src: "&lt;%= asset_path('logo.png') %&gt;"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="manifest-files-and-directives"> Файлы манифеста и
+        директивы</h4>
+    <p>Sprockets использует файлы манифеста для определения, какие ресурсы включать и отдавать. Эти
+        файлы манифеста содержат <em>директивы</em> - инструкции, говорящие Sprockets, какие файлы
+        требуются для создания отдельного файла CSS или JavaScript. С помощью этих директив
+        Sprockets загружает указанные файлы, при необходимости их обрабатывает, соединяет в
+        отдельный файл и затем сжимает их (если
+        <code>Rails.application.config.assets.compress</code> равно true). При отдаче одного файла,
+        а не нескольких, время загрузки страницы значительно уменьшается, поскольку браузер делает
+        меньше запросов. Компрессия также уменьшает размер файла, что позволяет браузеру быстрее его
+        скачать.</p>
+    <p>К примеру, новое приложение Rails включает дефолтный файл <code>app/assets/javascripts/application.js</code>,
+        содержащий следующие строки:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+// ...
+//= require jquery
+//= require jquery_ujs
+//= require_tree .
+</pre>
+    </div>
+    <p>В файлах JavaScript директивы начинаются с <code>//=</code>. В вышеприведенном примере файл
+        использует директивы <code>require</code> и <code>require_tree</code>. Директива <code>require</code>
+        используется, чтобы указать Sprockets на требуемые файлы. Здесь затребованы файлы <code>jquery.js</code>
+        и <code>jquery_ujs.js</code>, которые доступны где-то по пути поиска для Sprockets. Не нужно
+        явно указывать расширение. Sprockets предполагает, что вы требуете файл <code>.js</code>,
+        когда выполняется из файла <code>.js</code>.</p>
+    <p>Директива <code>require_tree</code> говорит Sprockets рекурсивно включить <em>все</em> файлы
+        JavaScript в указанной директории в результирующий файл. Эти пути должны быть определены
+        только относительно файла манифеста. Также можно использовать директиву <code>require_directory</code>,
+        включающая все файлы JavaScript только в определенной директории, без рекурсии.</p>
+    <p>Директивы обрабатываются сверху вниз, но порядок, в котором файлы включаются с помощью <code>require_tree</code>
+        не определен. Не следует полагаться на какой-то определенный порядок при ее использовании.
+        Если хотите убедиться, что какой-то определенный JavaScript закончится до некоторого другого
+        в объединенном файле, затребуйте нужный файл раньше в манифесте. Отметьте, что семейство
+        директив <code>require</code> предотвращает повторное включения файлов в результирующий
+        файл.</p>
+    <p>Rails также создает дефолтный файл <code>app/assets/stylesheets/application.css</code>,
+        содержащий эти строки:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+/* ...
+*= require_self
+*= require_tree .
+*/
+</pre>
+    </div>
+    <p>Rails 4 создает оба <code>app/assets/javascripts/application.js</code> и <code>app/assets/stylesheets/application.css</code>
+        независимо от того, была ли выбрана опция <code>--skip-sprockets</code> при создании нового
+        приложения Rails. Это для того, чтобы было просто добавить файлопровод в будущем, если
+        захотите.</p>
+    <p>Директивы, работающие в файлах JavaScript, также работают в таблицах стилей (хотя, очевидно,
+        включая таблицы стилей вместо JavaScript). В манифесте CSS директива
+        <code>require_tree</code> работает так же, как и для JavaScript, включающая все таблицы
+        стилей из текущей директории.</p>
+    <p>В этом примере использована <code>require_self</code>. Это помещает CSS, содержащийся в файле
+        (если есть) в месте расположения вызова <code>require_self</code>.</p>
+    <div class="note"><p>Если хотите использовать несколько файлов Sass, как правило следует
+        использовать вместо директив Sprockets. При использовании директив Sprockets все файлы
+        существуют в своей собственной области видимости, что делает переменные или примеси (mixins)
+        доступными только в определяющем их документе.</p></div>
+    <p>Можно подключить несколько файлов с помощью <code>@import "*"</code>, и добавить все дерево с
+        помощью <code>@import "**/*"</code>, что эквивалентно <code>require_tree</code>. Обратитесь
+        к за подробностями и важными предостережениями.</p>
+    <p>Можно иметь сколько угодно манифестов. Для примера, манифесты <code>admin.css</code> и <code>admin.js</code>
+        могут содержать файлы JS и CSS, используемые для административного раздела приложения.</p>
+    <p>Применяются те же оговорки о порядке следования, что сделаны выше. В частности, можно
+        определить отдельные файлы и порядок, в котором они будут компилироваться. Например, можно
+        соединить три файла CSS вместе следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+/* ...
+*= require reset
+*= require layout
+*= require chrome
+*/
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="predvaritelnaya-obrabotka"> Предварительная обработка</h4>
+    <p>Расширение, использованное для ресурса, определяет, какая будет применена предварительная
+        обработка. Когда генерируется скаффолд или контроллер с помощью дефолтного набора гемов
+        Rails, создадутся файл CoffeeScript и файл SCSS вместо обычных файлов JavaScript и CSS. В
+        использованном ранее примере был контроллер с именем "projects", который создал файлы <code>app/assets/javascripts/projects.coffee</code>
+        и <code>app/assets/stylesheets/projects.scss</code>.</p>
+    <p>В режиме development или если отключен файлопровод, когда запрашиваются эти файлы, они
+        обрабатываются процессорами, предоставленными гемами <code>coffee-script</code> и
+        <code>sass</code>, а затем отдаются браузеру как JavaScript и CSS соответственно. Когда
+        файлопровод включен, эти файлы обрабатываются и помещаются в директорию
+        <code>public/assets</code> для раздачи или приложением Rails, или веб-сервером.</p>
+    <p>Может быть запрошен дополнительный уровень обработки, если добавить другое расширение, каждое
+        расширение обрабатывается в порядке справа налево. Их следует использовать в том порядке, в
+        котором должна быть применена обработка. Например, таблица стилей с именем <code>app/assets/stylesheets/projects.scss.erb</code>
+        сначала обрабатывается как ERB, затем SCSS и, наконец, отдается как CSS. То же самое
+        применимо к файлу JavaScript - <code>app/assets/javascripts/projects.coffee.erb</code>
+        обрабатывается как ERB, затем CoffeeScript и отдается как JavaScript.</p>
+    <p>Помните, что порядок этих препроцессоров важен. Например, если вы вызовете свой файл
+        JavaScript <code>app/assets/javascripts/projects.erb.coffee</code>, то он будет сначала
+        обработан интерпретатором CoffeeScript, который не понимает ERB, и, следовательно, возникнут
+        проблемы.</p>
+    <h3 class="inside_page_header" id="in-development"> В development</h3>
+    <p>В режиме development ресурсы отдаются как отдельные файлы в порядке, в котором они определены
+        в файле манифеста.</p>
+    <p>Этот манифест <code>app/assets/javascripts/application.js</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+//= require core
+//= require projects
+//= require tickets
+&lt;/plain&gt;
+сгенерирует этот HTML:
+```html
+&lt;script src="/assets/core.js?body=1"&gt;&lt;/script&gt;
+&lt;script src="/assets/projects.js?body=1"&gt;&lt;/script&gt;
+&lt;script src="/assets/tickets.js?body=1"&gt;&lt;/script&gt;
+</pre>
+    </div>
+    <p>Параметр <code>body</code> требуется Sprockets.</p>
+    <h4 class="inside_page_header" id="proverka-oshibok-vo-vremya-vypolneniya"> Проверка ошибок во
+        время выполнения</h4>
+    <p>По умолчанию файлопровод проверит потенциальные ошибки в режиме development во время
+        выполнения. Чтобы отключить это поведение, можно установить:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.raise_runtime_errors = false
+</pre>
+    </div>
+    <p>Когда эта опция true, файлопровод проверит, все ли файлы ресурсов, загруженные в приложении,
+        включены в список <code>config.assets.precompile</code>. Если
+        <code>config.assets.digest</code> также true, файлопровод затребует, чтобы все запросы к
+        файлам ресурсов включали метки.</p>
+    <h4 class="inside_page_header" id="otklyuchenie-metok"> Отключение меток</h4>
+    <p>Можно отключить метки, добавив в <code>config/environments/development.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.digest = false
+</pre>
+    </div>
+    <p>Когда эта опция true, для URL файла ресурса будет генерироваться метка.</p>
+    <h4 class="inside_page_header" id="otklyuchenie-otladki"> Отключение отладки</h4>
+    <p>Можно отключить режим отладки, обновив <code>config/environments/development.rb</code>,
+        вставив:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.debug = false
+</pre>
+    </div>
+    <p>Когда режим отладки отключен, Sprockets соединяет все файлы и запускает необходимые
+        препроцессоры. С отключенным режимом отладки вышеуказанный манифест создаст:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;script src="/assets/application.js"&gt;&lt;/script&gt;
+</pre>
+    </div>
+    <p>Ресурсы компилируются и кэшируются при первом запросе после запуска сервера. Sprockets
+        устанавливает HTTP заголовок контроля кэша <code>must-revalidate</code> для уменьшения
+        нагрузки на последующие запросы - на них браузер получает отклик 304 (Not Modified).</p>
+    <p>Если какой-либо из файлов в манифесте изменился между запросами, сервер возвращает новый
+        скомпилированный файл.</p>
+    <p>Режим отладки также может быть включен в методе хелпера Rails:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "application", debug: true %&gt;
+&lt;%= javascript_include_tag "application", debug: true %&gt;
+</pre>
+    </div>
+    <p>Опция <code>:debug</code> излишняя, если режим отладки всегда включен.</p>
+    <p>Также можно включить сжатие в режиме development в качестве проверки на нормальность и
+        отключать его по требованию, когда необходимо для отладки.</p>
+    <h3 class="inside_page_header" id="in-production"> В production</h3>
+    <p>В среде production Sprockets использует схему меток, . По умолчанию Rails полагает, что
+        ресурсы прекомпилированы и будут отданы как статичные ресурсы вашим веб-сервером.</p>
+    <p>В течение фазы прекомпиляции из содержимого компилированных файлов создается MD5 и
+        вставляется в имена файлов, когда они записываются на диск. Эти имена меток используются
+        хелперами Rails вместо имени манифеста.</p>
+    <p>Например, это:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= javascript_include_tag "application" %&gt;
+&lt;%= stylesheet_link_tag "application" %&gt;
+</pre>
+    </div>
+    <p>создаст что-то наподобие этого:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;script src="/assets/application-908e25f4bf641868d8683022a5b62f54.js"&gt;&lt;/script&gt;
+&lt;link href="/assets/application-4dd5b109ee3439da54f5bdfd78a80473.css" media="screen"
+rel="stylesheet" /&gt;
+</pre>
+    </div>
+    <div class="note"><p>с Asset Pipeline опции <code>:cache</code> и <code>:concat</code> больше не
+        используются, удалите эти опции из <code>javascript_include_tag</code> и <code>stylesheet_link_tag</code>.
+    </p></div>
+    <p>Режим меток контролируется с помощью инициализационной опции
+        <code>config.assets.digest</code> (которая по умолчанию <code>true</code> для production и
+        development).</p>
+    <div class="note"><p>В нормальных обстоятельствах опция <code>config.assets.digest</code> по
+        умолчанию не должна изменяться. Если нет дайджеста в именах файлов и установлены заголовки с
+        вечным кэшированием, удаленные клиенты никогда не узнают, когда перезапросить файлы при
+        изменении их содержимого.</p></div>
+    <h4 class="inside_page_header" id="precompiling-assets"> Прекомпиляция ресурсов</h4>
+    <p>В Rails имеется встроенная задача rake для компиляции на диск манифестов ресурсов и других
+        файлов в файлопроводе.</p>
+    <p>Скомпилированные ресурсы записываются в адрес, указанный в <code>config.assets.prefix</code>.
+        По умолчанию это директория <code>/assets</code>.</p>
+    <p>Эту задачу можно вызвать на сервере во время деплоймента, чтобы создать скомпилированные
+        версии ресурсов непосредственно на сервере. Смотрите следующий раздел, чтобы узнать о том,
+        как скомпилировать локально.</p>
+    <p>Задача rake такая:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ RAILS_ENV=production bin/rake assets:precompile
+</pre>
+    </div>
+    <p>Capistrano (версии 2.15.1 и выше) включает рецепт для управления этим при деплое. Добавьте
+        следующую строку в <code>Capfile</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+load 'deploy/assets'
+</pre>
+    </div>
+    <p>Это свяжет папку, указанную в <code>config.assets.prefix</code> с <code>shared/assets</code>.
+        Если вы уже используете эту общую папку, вам следует написать собственную задачу для деплоя.
+    </p>
+    <p>Важно то, что эта папка является общей между деплоями, так что удаленно кэшированные
+        страницы, ссылающиеся на старые скомпилированные ресурсы, все еще будут работать, пока не
+        истечет срок кэширования.</p>
+    <p>По умолчанию компилирующиеся файлы включают <code>application.js</code>, <code>application.css</code>
+        и все не-JS/CSS файлы (это автоматически включает все ресурсы изображений) из папок <code>app/assets</code>,
+        включая гемы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[ Proc.new { |filename, path| path =~ /app\/assets/ &amp;&amp; !%w(.js .css).include?(File.extname(filename)) },
+/application.(css|js)$/ ]
+</pre>
+    </div>
+    <div class="note"><p>Условие отбора (и другие части прекомпиляционного массива; смотрите выше)
+        применяется к итоговым скомпилированным именам файлов. Это означает, что все, что
+        компилируется в JS/CSS, исключается, так же, как и файлы с чистым JS/CSS; например, файлы
+        <code>.coffee</code> и <code>.scss</code> <em>не</em> включаются автоматически, так как они
+        компилируются в JS/CSS.</p></div>
+    <p>Если у вас имеются для включения другие манифесты или отдельные таблицы стилей или файлы
+        JavaScript, их можно добавить в массив <code>precompile</code> в <code>config/initializers/assets.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.config.assets.precompile += ['admin.js', 'admin.css', 'swfObject.js']
+</pre>
+    </div>
+    <div class="note"><p>Всегда определяйте ожидаемое имя скомпилированного файла, оканчивающееся на
+        .js или .css, даже если хотите добавить в массив прекомпиляции файлы Sass или
+        CoffeeScript.</p></div>
+    <p>Задача rake также создает <code>manifest-md5hash.json</code>, который содержит список всех
+        ваших ресурсов и соответствующие им метки. Это используется методами хелпера Rails, чтобы
+        избежать направления запроса в Sprockets. Обычный файл манифеста выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"files":{"application-723d1be6cc741a3aabb1cec24276d681.js":{"logical_path":"application.js","mtime":"2013-07-26T22:55:03-07:00","size":302506,
+"digest":"723d1be6cc741a3aabb1cec24276d681"},"application-12b3c7dd74d2e9df37e7cbb1efa76a6d.css":{"logical_path":"application.css","mtime":"2013-07-26T22:54:54-07:00","size":1560,
+"digest":"12b3c7dd74d2e9df37e7cbb1efa76a6d"},"application-1c5752789588ac18d7e1a50b1f0fd4c2.css":{"logical_path":"application.css","mtime":"2013-07-26T22:56:17-07:00","size":1591,
+"digest":"1c5752789588ac18d7e1a50b1f0fd4c2"},"favicon-a9c641bf2b81f0476e876f7c5e375969.ico":{"logical_path":"favicon.ico","mtime":"2013-07-26T23:00:10-07:00","size":1406,
+"digest":"a9c641bf2b81f0476e876f7c5e375969"},"my_image-231a680f23887d9dd70710ea5efd3c62.png":{"logical_path":"my_image.png","mtime":"2013-07-26T23:00:27-07:00","size":6646,
+"digest":"231a680f23887d9dd70710ea5efd3c62"}},"assets":{"application.js":
+"application-723d1be6cc741a3aabb1cec24276d681.js","application.css":
+"application-1c5752789588ac18d7e1a50b1f0fd4c2.css",
+"favicon.ico":"favicona9c641bf2b81f0476e876f7c5e375969.ico","my_image.png":
+"my_image-231a680f23887d9dd70710ea5efd3c62.png"}}
+</pre>
+    </div>
+    <p>Размещение манифеста по умолчанию - корень папки, определенной в
+        <code>config.assets.prefix</code> (по умолчанию '/assets').</p>
+    <div class="note"><p>Если в production отсутствуют прекомпилированные файлы, вы получите
+        исключение
+        <code>Sprockets::Helpers::RailsHelper::AssetPaths::AssetNotPrecompiledError</code>,
+        указывающее имя отсутствующего файла(-ов).</p></div>
+    <h5 class="inside_page_header" id="vechnyy-zagolovok-expires"> Вечный заголовок Expires</h5>
+    <p>Прекомпилированные ресурсы существуют в файловой системе и отдаются непосредственно
+        веб-сервером. По умолчанию у них нет заголовков вечного кэширования, таким образом, чтобы
+        получить преимущество от меток, необходимо обновить конфигурацию вашего сервера, чтобы
+        добавить эти заголовки.</p>
+    <p>Для Apache:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Директивы Expires* требуют, чтобы модуль Apache `mod_expires` был включен.
+&lt;Location /assets/&gt;
+  # Не рекомендуется использование ETag, когда присутствует Last-Modified
+  Header unset ETag
+  FileETag None
+  # RFC предписывает кэшировать только на 1 год
+  ExpiresActive On
+  ExpiresDefault "access plus 1 year"
+&lt;/Location&gt;
+</pre>
+    </div>
+    <p>Для NGINX:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+location ~ ^/assets/ {
+  expires 1y;
+  add_header Cache-Control public;
+  add_header ETag "";
+  break;
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="lokalnaya-prekompilyatsiya"> Локальная прекомпиляция</h4>
+    <p>Имеется несколько причин того, что может возникнуть желание компилировать ресурсы локально.
+        Вот некоторые из них:</p>
+    <ul>
+        <li>У вас нет права записи в файловую систему production.
+        </li>
+        <li>Вы размещаетесь более чем на одном сервере и хотите избежать дублирования работы.
+        </li>
+        <li>Вы часто производите деплои, не включающие изменения ресурсов.
+        </li>
+    </ul>
+    <p>Локальная компиляция позволяет зафиксировать скомпилированные файлы в управлении версиями и
+        деплоить как обычно.</p>
+    <p>Однако есть три оговорки:</p>
+    <ul>
+        <li>Вы не должны запускать задачу Capistrano, которая компилирует ресурсы.
+        </li>
+        <li>Вы должны убедиться, что в вашей системе разработки присутствуют все необходимые
+            компрессоры или минифайеры.
+        </li>
+        <li>Вы должны изменить следующую конфигурационную настройку приложения:
+        </li>
+    </ul>
+    <p>В <code>config/environments/development.rb</code> поместите следующую строчку:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.prefix = "/dev-assets"
+</pre>
+    </div>
+    <p>Изменение <code>prefix</code> позволяет Sprockets использовать другой URL для обслуживания
+        ресурсов в режиме development и передавать все запросы в Sprockets. Префикс остался
+        установленным <code>/assets</code> в режиме production. Без этого изменения приложение будет
+        обслуживаться прекомпилированными ресурсами из <code>/assets</code> в development, и вы не
+        увидите какие-либо локальные изменения, пока снова не скомпилируете ресурсы.</p>
+    <p>На практике это позволит прекомпилировать локально, держать эти файлы в рабочей ветке и при
+        необходимости фиксировать в системе контроля версий. Режим development будет работать так,
+        как от от него ожидается.</p>
+    <h4 class="inside_page_header" id="kompilyatsiya-v-realnom-vremeni"> Компиляция в реальном
+        времени</h4>
+    <p>В некоторых обстоятельствах вам, возможно, захочется использовать компиляцию в реальном
+        времени. В этом режиме все запросы для ресурсов в файлопроводе обрабатываются
+        непосредственно Sprockets.</p>
+    <p>Чтобы включить эту опцию, установите:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.compile = true
+</pre>
+    </div>
+    <p>При первом запросе ресурсы компилируются и кэшируются так, как описывалось в разделе про , и
+        имена манифеста, использованного в хелперах, изменяется путем включения хеша MD5.</p>
+    <p>Sprockets также устанавливает HTTP заголовок <code>Cache-Control</code> как <code>max-age=31536000</code>.
+        Это сигнализирует всем кэшам между вашим сервером и браузером клиента, что это содержимое
+        (отданный файл) может быть закэшировано на 1 год. В результате уменьшается количество
+        запросов для этого ресурса на ваш сервер; есть хороший шанс, что ресурс будет в локальном
+        кэше браузера или в каком-либо промежуточном кэше.</p>
+    <p>Этот режим использует больше памяти, имеет худшее быстродействие, чем по-умолчанию, и не
+        рекомендуется.</p>
+    <p>Если приложение размещается в системе без существующего JavaScript runtimes, возможно
+        понадобится добавить в Gemfile следующий фрагмент кода:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+group :production do
+  gem 'therubyracer'
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="cdns"> CDN</h4>
+    <p>CDN расшифровывается как , она в основном предназначена для кэширования файлов ресурсов по
+        всему миру, поэтому, когда браузер запрашивает ресурс, кэшированная копия будет
+        географически ближайшая к этому браузеру. Если вы отдаете файлы ресурсов непосредственно от
+        вашего сервера Rails в production, лучшей практикой будет использовать CDN перед вашим
+        приложением.</p>
+    <p>Обычным образцом использования CDN является установка вашего приложения в production как
+        "origin" сервер. Это означает, что когда браузер запрашивает ресурс из CDN, и кэш
+        отсутствует, он возьмет файл с вашего сервера на лету и кэширует его. Например, если вы
+        запустили приложение Rails на <code>example.com</code>, и у вас настроен CDN на <code>mycdnsubdomain.fictional-cdn.com</code>,
+        то, когда делается запрос к <code>mycdnsubdomain.fictional-cdn.com/assets/smile.png</code>,
+        CDN единожды запросит ваш сервер на <code>example.com/assets/smile.png</code> и кэширует
+        запрос. Следующий запрос к CDN, пришедший по тому же самому URL, получит кэшированную копию.
+        Когда CDN может отдать ресурс напрямую, он никогда не затронет ваш сервер Rails. Так как
+        ресурс из CDN географически ближайший к браузеру, запрос быстрее, и, так как вашему серверу
+        не нужно тратить время на раздачу ресурсов, он может сфокусироваться на как можно быстром
+        обслуживании кода приложения.</p>
+    <h5 class="inside_page_header" id="nastroyka-cdn-na-razdachu-staticheskih-resursov"> Настройка
+        CDN на раздачу статических ресурсов</h5>
+    <p>Для настройки CDN вам нужно, чтобы ваше приложение было запущенно в production в интернете на
+        публично доступном URL, например <code>example.com</code>. Далее необходимо
+        зарегистрироваться на сервисе CDN облачного провайдера. После этого необходимо настроить
+        "origin" для CDN, указав ваш сайт <code>example.com</code>, по документации провайдера по
+        настройке origin-сервера.</p>
+    <p>Подготовленный CDN даст определенный поддомен для вашего приложения, такой как <code>mycdnsubdomain.fictional-cdn.com</code>
+        (отметьте, что fictional-cdn.com это не существующий провайдер CDN в настоящее время).
+        Теперь, когда есть настроенный сервер CDN, необходимо сообщить браузерам использовать ваш
+        CDN для того, чтобы брать ресурсы оттуда, а не от сервера Rails. Это можно осуществить,
+        настроив Rails, установив ваш CDN в качестве хоста ресурсов, вместо использования
+        относительного пути. Для настройки хоста ресурсов в Rails, необходимо установить <code>config.action_controller.asset_host</code>
+        в <code>config/production.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_controller.asset_host = 'mycdnsubdomain.fictional-cdn.com'
+</pre>
+    </div>
+    <div class="note"><p>Необходимо предоставить только "host", это поддомен и корневой домен, не
+        нужно указывать протокол или "scheme", такие как <code>http://</code> или
+        <code>https://</code>. Когда запрашивается страница, протокол в созданной ссылке на ваш
+        ресурс будет соответствовать тому, какой доступ к странице.</p></div>
+    <p>Это значение также можно настроить с помощью , чтобы упростить запуск staging-копий вашего
+        сайта:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+config.action_controller.asset_host = ENV['CDN_HOST']
+</pre>
+    </div>
+    <div class="note"><p>Чтобы это работало, вам необходимо установить на сервере
+        <code>CDN_HOST</code> значение <code>mycdnsubdomain.fictional-cdn.com</code>.</p></div>
+    <p>После того, как вы настроили свой сервер и ваш CDN, когда вы отдаете страницу, содержащую
+        ресурс:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= asset_path('smile.png') %&gt;
+</pre>
+    </div>
+    <p>Вместо того, чтобы вернуть путь, такой как <code>/assets/smile.png</code> (метки опущены для
+        читаемости), созданный URL будет содержать полный путь к вашему CDN.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+http://mycdnsubdomain.fictional-cdn.com/assets/smile.png
+</pre>
+    </div>
+    <p>Если на CDN имеется копия <code>smile.png</code>, она будет отдана браузеру, и ваш сервер
+        даже не узнает, что она была запрошена. Если на CDN нет копии, он попытается найти ее на
+        "origin" <code>example.com/assets/smile.png</code>, а затем сохранить ее для дальнейшего
+        использования.</p>
+    <p>Если хотите отдавать только некоторые ресурсы из CDN, можно использовать опцию
+        <code>:host</code> в хелпере ресурса, переопределяющую значение, установленное в <code>config.action_controller.asset_host</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= asset_path 'image.png', host: 'mycdnsubdomain.fictional-cdn.com' %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="nastroyka-povedeniya-keshirovaniya-cdn"> Настройка поведения
+        кэширования CDN</h5>
+    <p>CDN работает, кэшируя содержимое. Если в CDN имеется устаревшее или плохое содержимое, то это
+        скорее навредит, чем поможет вашему приложению. Целью этого раздела является описание
+        основных особенностей кэширования многих CDN, поведение вашего определенного провайдера
+        может немного отличаться.</p>
+    <h6 class="inside_page_header" id="keshirovanie-zaprosov-cdn"> Кэширование запросов CDN</h6>
+    <p>Хотя CDN описывается как кэширующий файлы ресурсов, на самом деле он кэширует целые запросы.
+        Они включают тело ресурса, а также его заголовки. Наиболее важным является <code>Cache-Control</code>,
+        который сообщает CDN (и браузерам), как кэшировать содержимое. Это означает, что если кто-то
+        запрашивает несуществующий ресурс <code>/assets/i-dont-exist.png</code>, и ваше приложение
+        Rails возвращает 404, тогда ваш CDN скорее всего закэширует страницу 404, если присутствует
+        валидный заголовок <code>Cache-Control</code>.</p>
+    <h6 class="inside_page_header" id="otladka-zagolovkov-cdn"> Отладка заголовков CDN</h6>
+    <p>Одним из способов проверить, что заголовки кэшируются правильно на CDN, является
+        использование . Вы можете запросить заголовки от сервера и от CDN, чтобы сверить, что они
+        одинаковые:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ curl -I http://www.example/assets/application-
+d0e099e021c95eb0de3615fd1d8c4d83.css
+HTTP/1.1 200 OK
+Server: Cowboy
+Date: Sun, 24 Aug 2014 20:27:50 GMT
+Connection: keep-alive
+Last-Modified: Thu, 08 May 2014 01:24:14 GMT
+Content-Type: text/css
+Cache-Control: public, max-age=2592000
+Content-Length: 126560
+Via: 1.1 vegur
+</pre>
+    </div>
+    <p>Против копии на CDN.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ curl -I http://mycdnsubdomain.fictional-cdn.com/application-
+d0e099e021c95eb0de3615fd1d8c4d83.css
+HTTP/1.1 200 OK Server: Cowboy Last-
+Modified: Thu, 08 May 2014 01:24:14 GMT Content-Type: text/css
+Cache-Control:
+public, max-age=2592000
+Via: 1.1 vegur
+Content-Length: 126560
+Accept-Ranges:
+bytes
+Date: Sun, 24 Aug 2014 20:28:45 GMT
+Via: 1.1 varnish
+Age: 885814
+Connection: keep-alive
+X-Served-By: cache-dfw1828-DFW
+X-Cache: HIT
+X-Cache-Hits:
+68
+X-Timer: S1408912125.211638212,VS0,VE0
+</pre>
+    </div>
+    <p>Проверьте документацию вашего CDN, чтобы найти подробности о том, что такое
+        <code>X-Cache</code> или любые другие добавленные ими заголовки.</p>
+    <h6 class="inside_page_header" id="cdn-i-zagolovok-cache-control"> CDN и заголовок
+        Cache-Control</h6>
+    <p> - это спецификация W3C, описывающая, как может быть закэширован запрос. Когда не
+        используется CDN, браузер использует эту информацию для кэширования содержимого. Это очень
+        полезно для неизменяемых ресурсов, так как браузеру не нужно повторно скачивать CSS или
+        JavaScript сайта при каждом запросе. Как правило, мы хотим, чтобы наш сервер Rails сообщил
+        нашему CDN (и браузеру), что ресурс "public", что означает, что любой кэш может сохранять
+        запрос. Также, мы в основном хотим установить <code>max-age</code>, который означает, как
+        долго кэш будет хранить объект до недействительности кэша. Значение <code>max-age</code>
+        устанавливается в секундах с максимально возможным значением <code>31536000</code>, равным
+        одному году. Это можно сделать в вашем приложении rails, установив</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+config.static_cache_control = "public, max-age=31536000"
+</pre>
+    </div>
+    <p>Теперь, когда ваше приложение отдает ресурс в production, CDN сохранит ресурс на один год.
+        Так как большинство CDN также кэшируют заголовки запроса, этот <code>Cache-Control</code>
+        будет передан всем браузерам, обращающимся к этому ресурсу, и браузер будет знать, что он
+        может хранить этот ресурс очень долго без необходимости повторного запроса.</p>
+    <h6 class="inside_page_header" id="cdn-i-nedeystvitelnost-kesha-osnovannogo-na-url"> CDN и
+        недействительность кэша, основанного на URL</h6>
+    <p>Большинство CDN кэшируют содержимое ресурса, основываясь на полном URL. Это означает, что
+        запрос к</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+http://mycdnsubdomain.fictional-cdn.com/assets/smile-123.png
+</pre>
+    </div>
+    <p>Будет полностью по-другому закэширован, чем</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+http://mycdnsubdomain.fictional-cdn.com/assets/smile.png
+</pre>
+    </div>
+    <p>Если хотите установить длительный <code>max-age</code> в вашем <code>Cache-Control</code> (и
+        делаете так), то убедитесь, что, когда вы изменяете ваши ресурсы, ваш кэш прекращается.
+        Например, при изменении рожицы смайлика в изображении с желтого на синий, вы хотите, чтобы
+        все посетители вашего сайта получили новую синюю рожицу. При использовании CDN с настройкой
+        файлопровода Rails <code>config.assets.digest</code>, установленной true по умолчанию,
+        каждый ресурс будет иметь другое имя, если он изменится. Таким образом, вам даже не нужно
+        вручную прекращать любые элементы в вашем кэше. Используя иную технику для уникального имени
+        ресурса, ваши пользователи также получат самый свежий ресурс.</p>
+    <h3 class="inside_page_header" id="nastroyka-fayloprovoda"> Настройка файлопровода</h3>
+    <h4 class="inside_page_header" id="szhatie-css"> Сжатие CSS</h4>
+    <p>Одним из вариантов для сжатия CSS является YUI. представляет минификацию.</p>
+    <p>Следующая строка включает сжатие YUI и требует гем <code>yui-compressor</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.css_compressor = :yui
+</pre>
+    </div>
+    <p>Имеется другой вариант для сжатия CSS, если у вас установлен гем sass-rails</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.css_compressor = :sass
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="szhatie-javascript"> Сжатие JavaScript</h4>
+    <p>Возможные варианты для сжатия JavaScript это <code>:closure</code>, <code>:uglifier</code>
+        and <code>:yui</code>. Они требуют использование гемов <code>closure-compiler</code>, <code>uglifier</code>
+        или <code>yui-compressor</code> соответственно.</p>
+    <p>Gemfile по умолчанию включает . Этот гем оборачивает (написанный для NodeJS) в Ruby. Он
+        сжимает ваш код, убирая пробелы и комментарии, сокращая имена локальных переменных и
+        выполняя иные микро-оптимизации, наподобие замены ваших выражений <code>if</code> и <code>else</code>
+        на тернарные операторы там, где возможно.</p>
+    <p>Следующая строка вызывает <code>uglifier</code> для сжатия JavaScript.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.js_compressor = :uglifier
+</pre>
+    </div>
+    <div class="note"><p>Необходим runtime, поддерживаемый , чтобы использовать
+        <code>uglifier</code>. Если используете Mac OS X или Windows, у вас уже имеется JavaScript
+        runtime, установленный в операционной системе.</p></div>
+    <div class="note"><p>Инициализационная опция <code>config.assets.compress</code> в Rails 4
+        больше не используется для сжатия CSS или JavaScript. Ее установка больше не влияет на
+        приложение. Вместо нее установка <code>config.assets.css_compressor</code> и <code>config.assets.js_compressor</code>
+        будет управлять сжатием ресурсов CSS и JavaScript.</p></div>
+    <h4 class="inside_page_header" id="ispolzovanie-sobstvennogo-kompressora"> Использование
+        собственного компрессора</h4>
+    <p>Настройки конфигурации компрессора для CSS и JavaScript также могут принимать любой объект.
+        Этот объект должен иметь метод <code>compress</code>, принимающий строку как единственный
+        аргумент, и он должен возвращать строку.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Transformer
+  def compress(string)
+    do_something_returning_a_string(string)
+  end
+end
+</pre>
+    </div>
+    <p>Чтобы его включить, передайте <code>new</code> объект в настройку конфигурации в <code>application.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.css_compressor = Transformer.new
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="izmenenie-puti-assets"> Изменение пути <em>assets</em>
+    </h4>
+    <p>Публичный путь, используемый Sprockets по умолчанию, это <code>/assets</code>.</p>
+    <p>Он может быть заменен на что-то другое:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.prefix = "/some_other_path"
+</pre>
+    </div>
+    <p>Это удобная опция, если вы обновляете старый проект, не использующий файлопровод и уже
+        использующий этот путь, или вы хотите использовать этот путь для нового ресурса.</p>
+    <h4 class="inside_page_header" id="zagolovki-x-sendfile"> Заголовки X-Sendfile</h4>
+    <p>Заголовок X-Sendfile — это указание веб-серверу игнорировать отклик от приложения, и вместо
+        этого отдать определенный файл с диска. Эта опция отключена по умолчанию, но может быть
+        включена, если ее поддерживает сервер. Когда опция включена, обязанность по отдаче файла
+        передается веб-серверу, который справляется с ней быстрее. Обратитесь к , чтобы узнать, как
+        использовать эту особенность.</p>
+    <p>Apache и NGINX поддерживают эту опцию. Она включается в <code>config/environments/production.rb</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config.action_dispatch.x_sendfile_header = "X-Sendfile" # для Apache
+# config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # для NGINX
+</pre>
+    </div>
+    <div class="warning"><p>Если вы обновляете свое существующее приложение и намереваетесь
+        использовать эту опцию, убедитесь, что скопировали эту опцию только в
+        <code>production.rb</code> и в любую другую среду, которую вы определили, как имеющую
+        поведение production (не в <code>application.rb</code>).</p></div>
+    <div class="info"><p>За дальнейшими подробностями обращайтесь к документации своих
+        веб-серверов:</p></div>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="hranilische-kesha-resursov"> Хранилище кэша ресурсов</h3>
+    <p>Sprockets использует хранилище кэша Rails по умолчанию для кэширования ресурсов в development
+        и production. Это может быть изменено настройкой <code>config.assets.cache_store</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.cache_store = :memory_store
+</pre>
+    </div>
+    <p>Опции, принимаемые хранилищем кэша ресурсов, те же самые, что и для хранилища кэша
+        приложения.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.cache_store = :memory_store, { size: 32.megabytes }
+</pre>
+    </div>
+    <p>Чтобы отключить хранилище кэша ресурсов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.configure do |env|
+  env.cache = ActiveSupport::Cache.lookup_store(:null_store)
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="dobavlenie-resursov-v-vashi-gemy"> Добавление ресурсов в ваши
+        гемы</h3>
+    <p>Ресурсы также могут идти от внешних источников в виде гемов.</p>
+    <p>Хорошим примером этого является гем <code>jquery-rails</code>, поставляющийся вместе с Rails
+        как гем стандартной JavaScript библиотеки. Этот гем содержит класс engine, унаследованный от
+        <code>Rails::Engine</code>. Сделав так, Rails становится проинформированным, что директории
+        для этого гема могут содержать ресурсы, и директории <code>app/assets</code>, <code>lib/assets</code>
+        и <code>vendor/assets</code> этого engine добавляются в путь поиска Sprockets.</p>
+    <h3 class="inside_page_header" id="sozdanie-preprotsessora-v-vashey-biblioteke-ili-geme">
+        Создание препроцессора в вашей библиотеке или геме</h3>
+    <p>Так как Sprockets использует как основной интерфейс для различных движков шаблонов, ваш гем
+        должен просто реализовать протокол шаблонов Tilt. Обычно следует унаследовать подкласс от
+        <code>Tilt::Template</code> и переопределить методы <code>prepare</code>, инициализирующий
+        ваш шаблон, и <code>evaluate</code>, возвращающий обработанный материал. Исходник шаблона
+        хранится в <code>data</code>. Чтобы узнать больше, взгляните на исходники.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module BangBang
+  class Template &lt; ::Tilt::Template
+    def prepare
+      # Здесь происходит инициализация
+    end
+    # Добавляет "!" к оригинальному шаблону.
+    def evaluate(scope, locals, &amp;block)
+      "#{data}!"
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Теперь, когда у вас есть класс <code>Template</code>, пришло время связать его с расширением
+        для файлов шаблона:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Sprockets.register_engine '.bang', BangBang::Template
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="obnovlenie-so-staryh-versiy-rails"> Обновление со старых
+        версий Rails</h3>
+    <p>Имеется несколько проблем при обновлении c Rails 3.0 или Rails 2.x. Первая — это перемещение
+        файлов из <code>public/</code> в новые места размещения. Смотрите ранее в руководстве для
+        правильного размещения файлов разных типов.</p>
+    <p>Следующей является необходимость избегать дублирования файлов JavaScript. Так как jQuery
+        является библиотекой JavaScript по умолчанию, начиная с Rails 3.1 и далее, не нужно
+        копировать <code>jquery.js</code> в <code>app/assets</code>, он будет включен автоматически.
+    </p>
+    <p>Третья это обновление файлов различных сред с правильными значениями по умолчанию.</p>
+    <p>В <code>application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Версия ваших ресурсов, измените ее, если хотите, чтобы срок существующих ресурсов истек
+config.assets.version = '1.0'
+# Измените путь, откуда отдаются ресурсы
+# config.assets.prefix = "/assets"
+</pre>
+    </div>
+    <p>В <code>development.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Разворачивать строки, загружающие ресурсы the lines which load the assets
+config.assets.debug = true
+</pre>
+    </div>
+    <p>И в <code>production.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Выбрать используемый компрессор (если имеется)
+# config.assets.js_compressor = :uglifier
+# config.assets.css_compressor = :yui
+# Не обращаться к файлопроводу, если отсутствует прекомпилированный ресурс
+config.assets.compile = false
+# Создавать дайджесты для URL ресурсов. Это планируется сделать устаревшей.
+config.assets.digest = true
+# Прекомпилировать дополнительные ресурсы (application.js, application.css и все
+# не-JS/CSS уже добавлены)
+# config.assets.precompile `= %w( search.js )
+</pre>
+    </div>
+    <p>Rails 4 более не устанавливает конфигурационные значения по умолчанию для Sprockets в <code>test.rb</code>,
+        поэтому теперь <code>test.rb</code> требует конфигурацию Sprockets. Старыми значениями по
+        умолчанию в тестовом окружении являются: <code>config.assets.compile = true</code>, <code>config.assets.compress
+            =
+            false</code>, <code>config.assets.debug = false</code> и <code>config.assets.digest =
+            false</code>.</p>
+    <p>Следующее также должно быть добавлено в <code>Gemfile</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'sass-rails',   "~&gt; 3.2.3"
+gem 'coffee-rails', "~&gt; 3.2.1"
+gem 'uglifier'
+</pre>
+    </div>
+
+</body>
+</html>

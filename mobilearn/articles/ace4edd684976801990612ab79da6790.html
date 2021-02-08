@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расчет быстровращающегося диска</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 41.</strong> Расчет быстровращающегося диска</p>
+    <p align="justify">   Значительный интерес представляет задача о напряжениях и деформациях в
+        быстро вращающихся валах и дисках. Высокие скорости вращения валов паровых турбин
+        обусловливают появление в валах и дисках значительных центробежных усилий. Вызванные ими
+        напряжения распределяются симметрично относительно оси вращения диска.</p>
+    <p align="justify">   Рассмотрим наиболее простую задачу о расчете диска постоянной толщины.
+        Расчет такого диска положен в основу некоторых приближенных способов расчета дисков любого
+        профиля. Воспользуемся некоторыми результатами, полученными при выводе формул для расчета
+        толстостенных цилиндров. Предположим, что по толщине диска, принимаемой равной единице,
+        напряжения <img src="http://www.toehelp.ru/theory/sopromat/image001-40.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image002-40.gif"> не меняются; осевое
+        напряжение <img src="http://www.toehelp.ru/theory/sopromat/image003-39.gif"> будем считать
+        равным нулю.</p>
+    <p align="justify">   Составим условия равновесия элемента <i>АВ</i>, выделенного из диска двумя
+        меридиональными сечениями и двумя концентрическими цилиндрическими поверхностями (фиг. 586).
+        В данном случае, кроме сил, действующих по граням элемента <i>АВ</i>, необходимо принять во
+        внимание также и силу инерции</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image004-39.gif"></p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image005-39.gif"><br><br>
+        <b>Рис.1.</b> Расчетная схема вращающегося диска.
+    </center>
+    <p>направленную вдоль радиуса от центра к внешнему контуру диска. Вместо ранее полученного
+        уравнения равновесия получим:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image006-39.gif"></p></td>
+            <td><p>(1)</p></td>
+        </tr>
+    </table>
+    <p>Уравнение условий совместности деформаций также остаются в силе и для данной задачи, т.
+        е.</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image007-39.gif"></p></td>
+            <td><p>(1)</p></td>
+        </tr>
+    </table>
+    <p>Подставляя в это уравнение значение разности <img
+            src="http://www.toehelp.ru/theory/sopromat/image008-38.gif"> из (35.4), находим:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image009-38.gif"></p></td>
+            <td><p>(2)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Дифференцируя уравнение (1) по <i>r</i> и подставляя в него вместо <img
+            src="http://www.toehelp.ru/theory/sopromat/image010-38.gif"> его значение из формулы
+        (2), получаем линейное дифференциальное уравнение</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image011-38.gif"></p>
+    <p>или</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image012-38.gif"></p>
+    <p>Интегрируя это уравнение, находим:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image013-38.gif"></p></td>
+            <td><p>(4)</p></td>
+        </tr>
+    </table>
+    <p>Из (1) и (4) следует, что</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image014-37.gif"></p></td>
+            <td><p>(5)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   В формулах (4) и (5) <i>А</i> и <i>В</i> &#151; постоянные интегрирования,
+        которые должны быть определены из условий на контуре диска. При определении постоянных
+        рассмотрим два случая: 1) диск с отверстием в центре и 2) сплошной диск. При этом вначале
+        предположим, что края диска свободны от внешних усилий.</p>
+    <p align="justify">   Для диска с центральным отверстием напряжение <img
+            src="http://www.toehelp.ru/theory/sopromat/image015-37.gif"> должно быть равно нулю как
+        при<img src="http://www.toehelp.ru/theory/sopromat/image016-36.gif">, так и при <img
+                src="http://www.toehelp.ru/theory/sopromat/image017-36.gif"> (рис.1). Эти условия на
+        контуре при подстановке их в формулу (4) приводят к уравнениям:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image018-34.gif"></p>
+    <p>и</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image019-34.gif"></p>
+    <p>откуда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image020-34.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image021-34.gif"></p>
+    <p>Подставляя значения <i>А </i>и <i>В</i> в формулы (35.7) и (35.8), получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image022-34.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image023-34.gif"></p>
+    <p>Полагая для краткости можем написать:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image024-34.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image025-34.gif"></p>
+    <p>можем написать:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image026-33.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image027-33.gif"></p>
+    <p align="justify">   Замечаем, что напряжение <img
+            src="http://www.toehelp.ru/theory/sopromat/image028-33.gif"> обращается в нуль при <img
+            src="http://www.toehelp.ru/theory/sopromat/image029-31.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image030-30.gif">, т. е. на внутреннем и
+        наружном контурах диска; при значениях <img
+                src="http://www.toehelp.ru/theory/sopromat/image031-29.gif"> между 1 и <img
+                src="http://www.toehelp.ru/theory/sopromat/image032-28.gif"> напряжение <img
+                src="http://www.toehelp.ru/theory/sopromat/image033-28.gif"> положительно и, как
+        нетрудно убедиться, достигает наибольшей величины при<img
+                src="http://www.toehelp.ru/theory/sopromat/image034-27.gif"> При этом</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image035-27.gif"></p></td>
+            <td><p>(6)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Напряжение <img
+            src="http://www.toehelp.ru/theory/sopromat/image036-26.gif"> при всех значениях <img
+            src="http://www.toehelp.ru/theory/sopromat/image037-25.gif"> также положительно и
+        наибольшей величины достигает у внутреннего края диска, где <img
+                src="http://www.toehelp.ru/theory/sopromat/image038-23.gif">:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image039-22.gif"></p></td>
+            <td><p>(7)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Сравнивая выражения (6) и (7), убеждаемся, что <img
+            src="http://www.toehelp.ru/theory/sopromat/image040-22.gif"> всегда больше <img
+            src="http://www.toehelp.ru/theory/sopromat/image041-22.gif"> Поэтому при проверке
+        прочности диска как по теории наибольших касательных напряжений, так и по энергетической
+        теории условие прочности должно быть написано в таком виде:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image042-22.gif"></p>
+    <p> </p>
+    <p><strong>Диск равного сопротивления.</strong></p>
+    <p align="justify">   Получено, что, изменение напряжений <img
+            src="http://www.toehelp.ru/theory/sopromat/image043-22.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image044-21.gif"> вдоль радиуса диска
+        постоянной толщины весьма значительно. Наиболее неравномерное распределение напряжений имеет
+        место в дисках постоянной толщины с отверстием в центре. При расчете подобных дисков
+        приходится ориентироваться на наибольшее напряжение у внутреннего края диска, что сильно
+        ограничивает возможность повышения предельных скоростей. Для достижения высоких скоростей
+        вращения диски приходится делать с переменной толщиной, уменьшающейся от центра к окружности
+        диска. Наиболее выгодным является такой профиль диска, в котором напряжения во всех точках
+        диска сохраняют постоянное значение. Подобные диски называются дисками равного
+        сопротивления. При расчете этих дисков исходят из предположения, что по толщине диска
+        напряжения не меняются, что обычно влечет за собой небольшие погрешности в величинах
+        напряжений.</p>
+    <p align="justify">   Основные формулы для расчета дисков переменной толщины по прежнему могут
+        быть выведены из рассмотрения условий равновесия элемента диска <i>abcd</i>.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image045-21.gif"><br><br>
+        <b>Рис.2.</b> Равновесие элемента диска равного сопротивления.
+    </center>
+    <p> </p>
+    <p align="justify">   Переменную толщину диска, являющуюся некоторой функцией радиуса <i>r</i>,
+        обозначим через <i>z</i>. На элемент <i>abcd</i> по меридиональным сечениям <i>ad</i> и <i>bc</i>
+        действуют две силы <img src="http://www.toehelp.ru/theory/sopromat/image046-21.gif">,
+        составляющие между собой угол <img
+                src="http://www.toehelp.ru/theory/sopromat/image047-21.gif">; по грани <i>dc</i> на
+        этот элемент действует радиальное усилие <img
+                src="http://www.toehelp.ru/theory/sopromat/image048-21.gif">, направленное к центру
+        диска, а по грани <i>ab</i> &#151; радиальное усилие <img
+                src="http://www.toehelp.ru/theory/sopromat/image049-19.gif">, направленное от центра
+        к наружной поверхности диска. К этим усилиям должна быть присоединена еще и сила инерции
+        массы элемента</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image050-18.gif"></p>
+    <p>направленная от центра к окружности диска.</p>
+    <p align="justify">   Проектируя все перечисленные выше усилия на направление радиуса, получаем
+        такое дифференциальное уравнение равновесия диска переменной толщины:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image051-18.gif"></p>
+    <p>или</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image052-18.gif"></p>
+    <p>При <i>z</i> = const, это уравнение обращается в известное для диска постоянной толщины.</p>
+    <p align="justify">   В случае диска равного сопротивления напряжения <img
+            src="http://www.toehelp.ru/theory/sopromat/image053-17.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image054-15.gif"> всюду постоянны и равны
+        между собой. Приравнивая их величине допускаемого напряжения [<img
+                src="http://www.toehelp.ru/theory/sopromat/image055-15.gif">], можем так переписать
+        уравнение равновесия:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image056-14.gif"></p>
+    <p>или</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image057-14.gif"></p>
+    <p>где</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image058-14.gif"></p>
+    <p>Интегрируя это уравнение, находим:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image059-14.gif"></p>
+    <p align="justify">где С &#151; постоянная интегрирования. Если диск не имеет отверстия в
+        центре, то из условия, что при <i>r</i> = 0 <i>z</i> = <i>z</i><sub>0</sub>, следует: С =
+        <i>z</i><sub>0</sub>. Толщина диска в центре (<i>z</i><sub>0</sub>) определяется из условий
+        на контуре диска.</p>
+    <p align="justify">   Сплошной диск равного сопротивления может быть применен даже при очень
+        высоких окружных скоростях. Однако по конструктивным соображениям на практике обычно
+        применяются диски переменной толщины с отверстием в центре, профиль которых, близкий к
+        профилю диска равного сопротивления, обеспечивает наиболее выгодное распределение напряжений
+        вдоль радиуса. Методы расчета таких дисков рассматриваются в специальных курсах.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

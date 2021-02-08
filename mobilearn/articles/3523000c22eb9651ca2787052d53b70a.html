@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Метод математической индукции.</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="column-2">
+    <h2>АЛГЕБРА: Последовательности</h2>
+    <h3>7.3. Метод математической индукции</h3>
+    <b><font color="#880000"><p>Формулировка метода математической индукции.</p>
+    </font></b><font><p>Пусть имеется некоторое утверждение </p></font><i>Q</i>(<i>n</i><font>),
+    сформулированное применительно к натуральному (или целому) числу </font><i>n</i><font>. Пусть
+    это утверждение верно для числа </font><i>n</i><font> = 1 (или </font><i>n</i> =
+    <i>n</i><sub>0</sub>, <i>n</i><sub>0</sub> <font>О</font> <i>Z</i><font>) и каково бы ни было
+    натуральное число </font><i>k</i><font> (целое </font><i>k</i> <font>і</font>
+    <i>n</i><sub>0</sub><font>), предполагая справедливость утверждения</font>
+    <i>Q</i>(<i>n</i><font>) для </font><i>n</i> = <i>k</i><font>, можно доказать
+    справедливость </font><i>Q</i>(<i>n</i><font>) для </font><i>n</i> = <i>k</i><font> + 1.
+    Тогда </font><i>Q</i>(<i>n</i><font>) справедливо для любого натурального
+    числа </font><i>n</i><font> (любого целого числа </font><i>n <font>і</font> n</i><sub>0</sub>).
+    <font><p>Для доказательства справедливости некоторого утверждения </p>
+    </font><i>Q</i>(<i>n</i><font>) методом математической индукции необходимо</font>:
+    <ol>
+        <font>
+            <li>Проверить справедливость</li>
+        </font><i>Q</i>(<i>n</i><font>) для </font><i>n</i> = 1 (<i>n</i> =
+        <i>n</i><sub>0</sub><font>) - базис индукции;
+        <li>Предположить справедливость утверждения</li>
+    </font> <i>Q</i>(<i>n</i><font>) для некоторого произвольного целого числа </font><i>k</i>
+        <font>і</font> 1 (<i>k</i> <font>і</font> <i>n</i><sub>0</sub>);
+        <font>
+            <li>На основе этого предположения и 1) доказать справедливость</li>
+        </font><i>Q</i>(<i>n</i><font>) для числа </font><i>n</i> = <i>k</i> + 1 - <font>индукционный</font>
+        <font>шаг.</font>
+    </ol>
+    <b><font color="#880000"><p>Вывод формул общего члена арифметической и геометрической прогрессии
+        методом математической индукции.</p>
+    </font></b><font><p>"</p></font><i>n</i> <font>О</font> <i>N a<sub>n</sub></i> =
+    <i>a<sub>1</sub></i> +<i> d</i>(<i>n</i> -1) ; <font>"</font><i>n</i> <font>О</font> <i>N</i>,
+    <i>n <font>і</font> </i>2 <i>b<sub>n</sub></i> = <i>b<sub>1</sub></i> <font>Ч</font>
+    <i>q<sup>n</sup></i> -1.
+    <font><p>(для геометрической прогрессии используем метод при </p>
+    </font><i>n</i><sub>0 </sub><font>= 2, так как не исключается случай </font><i>q</i>
+    <font>=</font><font> 0; при </font><i>q</i> <font>№</font><font> 0 формула общего члена также
+    справедлива для любого натурального </font><i>n</i>).
+    <font><p>Доказательство</p></font>.
+    <ol>
+        <font>
+            <li>Докажем для</li>
+        </font><i>n</i> = 1 (<i>n</i> = <i>n</i><sub>0 </sub><font>= 2) . Так как
+        <i>а</i></font><sub>1</sub> = <i>a<sub>1</sub></i> + 0<i> = a<sub>1</sub></i> +<i> d
+        <font>Ч</font> </i>0 = <i>a<sub>1</sub></i> +<i> d</i><font>(1 - 1) (по
+        определению </font><i>b<sub>2</sub></i> = <i>b<sub>1</sub></i> <font>Ч</font> <i>q </i>= <i>b<sub>1</sub></i>
+        <font>Ч</font> <i>q</i><sup>2-1</sup><font>), то для этих случаев формулы общего члена
+        верны.
+        <li>Предположим, что формулы верны при некотором натуральном</li>
+    </font><i>n</i> = <i>k</i> (<i>k</i> <font>і</font><font> 2), т. е. </font><i>a<sub>k</sub></i>
+        = <i>a<sub>1</sub></i> +<i> d</i>(<i>k</i> -1) (<i>b<sub>k</sub></i> = <i>b<sub>1</sub></i>
+        <font>Ч</font> <i>q<sup>k</sup></i> -1).
+        <font>
+            <li>Докажем, что она справедлива при</li>
+        </font><i>n</i> = <i>k</i><font> + 1, т. е. </font><i>a<sub>k+1</sub></i> = <i>a<sub>1</sub></i>
+        +<i> d </i>[(<i>k</i> +1)-1] (<i>b<sub>k+1</sub></i> = <i>b<sub>1</sub></i> <font>Ч</font>
+        <i>q</i><sup>[ (<i>k</i>+1) -1] </sup>).
+    </ol>
+    <font><p>По определению арифметической (геометрической) прогрессии и предположению индукции, а
+        также по свойству степеней получаем:</p>
+    </font><i></i>
+    <p>a<sub>k +1</sub> = <i>a<sub>k</sub></i> +<i> d</i> = <i>a<sub>1</sub></i> +<i> d</i>(<i>k</i>
+        -1) + <i>d</i> = <i>a<sub>1</sub></i> +<i> dk</i> = <i>a<sub>1</sub></i> +<i>
+            d </i>[(<i>k</i> +1)-1]</p>
+    <p>(<i>b<sub>k</sub></i> +1 = <i>b<sub>k</sub></i> <font>Ч</font> <i>q</i> =
+        <i>b<sub>1</sub></i> <font>Ч</font> <i>q<sup>k</sup></i> -1 <font>Ч</font> <i>q</i> =
+        <i>b<sub>1</sub></i> <font>Ч</font> <i>q<sup>k</sup></i> -1+1 = <i>b<sub>1</sub></i>
+        <font>Ч</font> <i>q<sup>k</sup></i> = <i>b<sub>1</sub></i> <font>Ч</font> <i>q</i><sup>[
+            (<i>k</i>+1) -1] </sup><font>), что и требовалось доказать.</font></p>
+    <p>Замечание. Если <i>q</i> <font>№</font><font> 0, то формула общего члена геометрической
+        прогрессии верна и для </font><i>n</i><font> = 1, так как </font><i>b<sub>1</sub></i> = <i>b<sub>1</sub></i>
+        <font>Ч </font>1= <i>b<sub>1</sub></i> <font>Ч</font> <i>q</i><sup>0</sup> =
+        <i>b<sub>1</sub></i> <font>Ч</font> <i>q</i><sup>1-1</sup>.</p>
+    <div id="vk_comments"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Макеты и рендеринг в Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="makety-i-rendering-v-rails"> Макеты и рендеринг в Rails</h2>
+    <p>Это руководство раскрывает основы возможностей макетов Action Controller и Action View.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как использовать различные методы рендеринга, встроенные в Rails.
+        </li>
+        <li>Как создавать макеты с несколькими разделами содержимого.
+        </li>
+        <li>Как использовать частичные шаблоны для соблюдения принципа DRY в ваших вьюхах.
+        </li>
+        <li>Как использовать вложенные макеты (подшаблоны).
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="obzor-kak-kusochki-skladyvayutsya-vmeste"> Обзор: как кусочки
+        складываются вместе</h3>
+    <p>Это руководство сосредотачивается на взаимодействии между контроллером и вьюхой
+        (представлением) в треугольнике модель-представление-контроллер (MVC). Как вы знаете,
+        контроллер ответственен за управление целым процессом обслуживания запросов в Rails, хотя
+        обычно любой серьезный код переносится в модель. Но когда приходит время послать ответ
+        обратно пользователю, контроллер передает все вьюхе. Именно эта передача является предметом
+        данного руководства.</p>
+    <p>В общих чертах все связано с решением, что же должно быть послано как ответ, и вызовом
+        подходящего метода для создания этого ответа. Если ответом является полноценная вьюха, Rails
+        также проводит дополнительную работу по упаковыванию вьюхи в макет и, возможно, по вставке
+        частичных вьюх. В общем, все эти этапы вы увидите сами в следующих разделах.</p>
+    <h3 class="inside_page_header" id="sozdanie-otklikov"> Создание откликов</h3>
+    <p>С точки зрения контроллера есть три способа создать отклик HTTP:</p>
+    <ul>
+        <li>Вызвать <code>render</code> для создания полного отклика, возвращаемого браузеру
+        </li>
+        <li>Вызвать <code>redirect_to</code> для передачи браузеру кода переадресации HTTP
+        </li>
+        <li>Вызвать <code>head</code> для создания отклика, включающего только заголовки HTTP,
+            возвращаемого браузеру
+        </li>
+    </ul>
+    <p>Мы раскроем каждый из этих методов по очереди. Но сначала немного о самой простой вещи,
+        которую может делать контроллер для создания отклика: не делать ничего.</p>
+    <h4 class="inside_page_header"
+        id="rendering-po-umolchaniyu-soglashenie-nad-konfiguratsiey-v-deystvii"> Рендеринг по
+        умолчанию: соглашение над конфигурацией в действии</h4>
+    <p>Вы уже слышали, что Rails содействует принципу "convention over configuration". Рендеринг по
+        умолчанию - прекрасный пример этого. По умолчанию контроллеры в Rails автоматически рендерят
+        вьюхи с именами, соответствующими экшну. Например, если есть такой код в вашем классе <code>BooksController</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class BooksController &lt; ApplicationController
+end
+</pre>
+    </div>
+    <p>И следующее в файле маршрутов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :books
+</pre>
+    </div>
+    <p>И у вас имеется файл вьюхи <code>app/views/books/index.html.erb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;h1&gt;Books are coming soon!&lt;/h1&gt;
+</pre>
+    </div>
+    <p>Rails автоматически отрендерит <code>app/views/books/index.html.erb</code> при переходе на
+        адрес <code>/books</code>, и вы увидите на экране надпись "Books are coming soon!"</p>
+    <p>Однако это сообщение минимально полезно, поэтому вскоре вы создадите модель <code>Book</code>
+        и добавите экшн index в <code>BooksController</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class BooksController &lt; ApplicationController
+  def index
+    @books = Book.all
+  end
+end
+</pre>
+    </div>
+    <p>Снова отметьте, что у нас соглашения превыше конфигурации в том, что отсутствует избыточный
+        рендер в конце этого экшна index. Правило в том, что не нужно что-то избыточно рендерить в
+        конце экшна контроллера, rails будет искать шаблон <code>action_name.html.erb</code> по пути
+        вьюх контроллера и отрендерит его, поэтому в нашем случае Rails отрендерит файл <code>app/views/books/index.html.erb</code>.
+    </p>
+    <p>Итак, в нашей вьюхе мы хотим отобразить свойства всех книг, это делается с помощью шаблона
+        ERB, подобного следующему:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Listing Books&lt;/h1&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Summary&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;% @books.each do |book| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= book.content %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to "Show", book %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to "Edit", edit_book_path(book) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to "Remove", book, method: :delete, data: { confirm: "Are you sure?" } %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+&lt;br&gt;
+&lt;%= link_to "New book", new_book_path %&gt;
+</pre>
+    </div>
+    <div class="note"><p>Фактически рендеринг осуществляется подклассами <code>ActionView::TemplateHandlers</code>.
+        Мы не будем углубляться в этот процесс, но важно знать, что расширение файла вьюхи
+        контролирует выбор обработчика шаблона. Начиная с Rails 2, стандартные расширения это <code>.erb</code>
+        для ERB (HTML со встроенным Ruby) и <code>.builder</code> для Builder (генератор XML).</p>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-render"> Использование <code>render</code>
+    </h4>
+    <p>Во многих случаях метод <code>ActionController::Base#render</code> выполняет большую работу
+        по рендерингу содержимого Вашего приложения для использования в браузере. Имеются различные
+        способы настройки возможностей <code>render</code>. Вы можете рендерить вьюху по умолчанию
+        для шаблона Rails, или определенный шаблон, или файл, или встроенный код, или совсем ничего.
+        Можно рендерить текст, JSON или XML. Также можно определить тип содержимого или статус HTTP
+        отрендеренного отклика.</p>
+    <div class="info"><p>Если хотите увидеть точные результаты вызова <code>render</code> без
+        необходимости смотреть его в браузере, можете вызвать <code>render_to_string</code>. Этот
+        метод принимает те же самые опции, что и <code>render</code>, но возвращает строку вместо
+        отклика для браузера.</p></div>
+    <h5 class="inside_page_header" id="ne-renderim-nichego"> Не рендерим ничего</h5>
+    <p>Самое простое, что мы можем сделать с <code>render</code> это не рендерить ничего:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render nothing: true
+</pre>
+    </div>
+    <p>Если взглянуть на отклик, используя cURL, увидим следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ curl -i 127.0.0.1:3000/books
+HTTP/1.1 200 OK
+Connection: close
+Date: Sun, 24 Jan 2010 09:25:18 GMT
+Transfer-Encoding: chunked
+Content-Type: */*; charset=utf-8
+X-Runtime: 0.014297
+Set-Cookie: _blog_session=...snip...; path=/; HttpOnly
+Cache-Control: no-cache
+$
+</pre>
+    </div>
+    <p>Мы видим пустой отклик (нет данных после строки <code>Cache-Control</code>), но Rails
+        установил отклик 200 OK, поэтому запрос был успешным. Можете установить опцию
+        <code>:status</code>, чтобы изменить этот отклик. Пустой рендеринг полезен для запросов
+        AJAX, когда все, что вы хотите вернуть браузеру, - это подтверждение того, что запрос был
+        выполнен.</p>
+    <div class="info"><p>Возможно следует использовать метод <code>head</code>, который рассмотрим
+        во второй части этой главы, вместо <code>render :nothing</code>. Это придаст дополнительную
+        гибкость и сделает явным то, что генерируются только заголовки HTTP.</p></div>
+    <h5 class="inside_page_header" id="rendering-vyuhi-ekshna"> Рендеринг вьюхи экшна</h5>
+    <p>Если хотите отрендерить вьюху, соответствующую другому шаблону этого же контроллера, можно
+        использовать <code>render</code> с именем вьюхи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def update
+  @book = Book.find(params[:id])
+  if @book.update(book_params)
+    redirect_to(@book)
+  else
+    render "edit"
+  end
+end
+</pre>
+    </div>
+    <p>Если вызов <code>update</code> проваливается, вызов экшна <code>update</code> в этом
+        контроллере отрендерит шаблон <code>edit.html.erb</code>, принадлежащий тому же контроллеру.
+    </p>
+    <p>Если хотите, можете использовать символ вместо строки для определения экшна для
+        рендеринга:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def update
+  @book = Book.find(params[:id])
+  if @book.update(book_params)
+    redirect_to(@book)
+  else
+    render :edit
+  end
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="rendering-shablona-ekshna-iz-drugogo-kontrollera"> Рендеринг
+        шаблона экшна из другого контроллера</h5>
+    <p>Что, если вы хотите отрендерить шаблон из абсолютно другого контроллера? Это можно также
+        сделать с <code>render</code>, который принимает полный путь шаблона для рендера
+        (относительно <code>app/views</code>). Например, если запускаем код в <code>AdminProductsController</code>
+        который находится в <code>app/controllers/admin</code>, можете отрендерить результат экшна в
+        шаблон в <code>app/views/products</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render "products/show"
+</pre>
+    </div>
+    <p>Rails знает, что эта вьюха принадлежит другому контроллеру, поскольку содержит символ слэша в
+        строке. Если хотите быть точными, можете использовать опцию <code>:template</code> (которая
+        требовалась в Rails 2.2 и более ранних):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render template: "products/show"
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="rendering-proizvolnogo-fayla"> Рендеринг произвольного
+        файла</h5>
+    <p>Метод <code>render</code> также может использовать вьюху, которая расположена вне вашего
+        приложения (возможно, вы совместно используете вьюхи двумя приложениями на Rails):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render "/u/apps/warehouse_app/current/app/views/products/show"
+</pre>
+    </div>
+    <p>Rails определяет, что это рендер файла по начальному символу слэша. Если хотите быть точным,
+        можете использовать опцию <code>:file</code> (которая требовалась в Rails 2.2 и более
+        ранних):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render file: "/u/apps/warehouse_app/current/app/views/products/show"
+</pre>
+    </div>
+    <p>Опция <code>:file</code> принимает абсолютный путь в файловой системе. Разумеется, вам
+        необходимы права на просмотр того, что вы используете для рендера.</p>
+    <div class="note"><p>По умолчанию файл рендериться с использованием текущего макета.</p></div>
+    <div class="info"><p>Если вы работаете под Microsoft Windows, то должны использовать опцию
+        <code>:file</code> для рендера файла, потому что имена файлов Windows не имеют тот же
+        формат, как имена файлов Unix.</p></div>
+    <h5 class="inside_page_header" id="oborachivanie"> Оборачивание</h5>
+    <p>Вышеописанные три метода рендера (рендеринг другого шаблона в контроллере, рендеринг шаблона
+        в другом контроллере и рендеринг произвольного файла в файловой системе) на самом деле
+        являются вариантами одного и того же экшна.</p>
+    <p>Фактически в методе BooksController, в экшне edit, в котором мы хотим отрендерить шаблон
+        edit, если книга не была успешно обновлена, все нижеследующие вызовы отрендерят шаблон
+        <code>edit.html.erb</code> в директории <code>views/books</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render :edit
+render action: :edit
+render "edit"
+render "edit.html.erb"
+render action: "edit"
+render action: "edit.html.erb"
+render "books/edit"
+render "books/edit.html.erb"
+render template: "books/edit"
+render template: "books/edit.html.erb"
+render "/path/to/rails/app/views/books/edit"
+render "/path/to/rails/app/views/books/edit.html.erb"
+render file: "/path/to/rails/app/views/books/edit"
+render file: "/path/to/rails/app/views/books/edit.html.erb"
+</pre>
+    </div>
+    <p>Какой из них вы будете использовать - это вопрос стиля и соглашений, но практическое правило
+        заключается в использовании простейшего, которое имеет смысл для кода и написания.</p>
+    <h5 class="inside_page_header" id="ispolzovanie-render-s-inline"> Использование
+        <code>render</code> с <code>:inline</code>
+    </h5>
+    <p>Метод <code>render</code> вполне может обойтись без вьюхи, если вы используете опцию <code>:inline</code>
+        для поддержки ERB, как части вызова метода. Это вполне валидно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render inline: "&lt;% products.each do |p| %&gt;&lt;p&gt;&lt;%= p.name %&gt;&lt;/p&gt;&lt;% end %&gt;"
+</pre>
+    </div>
+    <div class="warning"><p>Должно быть серьезное основание для использования этой опции. Вкрапление
+        ERB в контроллер нарушает MVC ориентированность Rails и создает трудности для других
+        разработчиков в следовании логике вашего проекта. Вместо этого используйте отдельную
+        erb-вьюху.</p></div>
+    <p>По умолчанию встроенный рендеринг использует ERb. Можете принудить использовать вместо этого
+        Builder с помощью опции <code>:type</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render inline: "xml.p {'Horrid coding practice!'}", type: :builder
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="rendering-teksta"> Рендеринг текста</h5>
+    <p>Вы можете послать простой текст - совсем без разметки - обратно браузеру с использованием
+        опции <code>:plain</code> в <code>render</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render plain: "OK"
+</pre>
+    </div>
+    <div class="info"><p>Рендеринг чистого текста наиболее полезен, когда вы делаете Ajax отклик,
+        или отвечаете на запросы веб-сервиса, ожидающего что-то иное, чем HTML.</p></div>
+    <div class="note"><p>По умолчанию при использовании опции <code>:plain</code> текст рендерится
+        без использования текущего макета. Если хотите, чтобы Rails вложил текст в текущий макет,
+        необходимо добавить опцию <code>layout: true</code> и использовать расширение
+        <code>.txt.erb</code> для файла макета.</p></div>
+    <h5 class="inside_page_header" id="rendering-html"> Рендеринг HTML</h5>
+    <p>Вы можете вернуть html, используя опцию <code>:html</code> метода <code>render</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render html: "&lt;strong&gt;Not Found&lt;/strong&gt;".html_safe
+</pre>
+    </div>
+    <div class="info"><p>Это полезно когда вы хотите отрендерить небольшой кусочек HTML кода.
+        Однако, если у вас достаточно сложная разметка, стоит рассмотреть выделение её в отдельный
+        файл.</p></div>
+    <div class="note"><p>Эта опция будет экранировать HTML, если строка не будет являться
+        безопасной.</p></div>
+    <h5 class="inside_page_header" id="rendering-json"> Рендеринг JSON</h5>
+    <p>JSON - это формат данных javascript, используемый многими библиотеками Ajax. Rails имеет
+        встроенную поддержку для конвертации объектов в JSON и рендеринга этого JSON браузеру:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render json: @product
+</pre>
+    </div>
+    <div class="info"><p>Не нужно вызывать <code>to_json</code> в объекте, который хотите рендерить.
+        Если используется опция <code>:json</code>, <code>render</code> автоматически вызовет <code>to_json</code>
+        за вас.</p></div>
+    <h5 class="inside_page_header" id="rendering-xml"> Рендеринг XML</h5>
+    <p>Rails также имеет встроенную поддержку для конвертации объектов в XML и рендеринга этого XML
+        для вызывающего:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render xml: @product
+</pre>
+    </div>
+    <div class="info"><p>Не нужно вызывать <code>to_xml</code> в объекте, который хотите рендерить.
+        Если используется опция <code>:xml</code>, <code>render</code> автоматически вызовет <code>to_xml</code>
+        за вас.</p></div>
+    <h5 class="inside_page_header" id="rendering-vneshnego-javascript"> Рендеринг внешнего
+        JavaScript</h5>
+    <p>Rails может рендерить чистый JavaScript:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render js: "alert('Hello Rails');"
+</pre>
+    </div>
+    <p>Это пошлет указанную строку в браузер с типом MIME <code>text/javascript</code>.</p>
+    <h5 class="inside_page_header" id="rendering-chistogo-soderzhimogo"> Рендеринг чистого
+        содержимого</h5>
+    <p>Вы можете вернуть чистый текст, без установки типа содержимого,
+        используя опцию <code>:body</code>, метода <code>render</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render body: "raw"
+</pre>
+    </div>
+    <div class="info"><p>Эта опция должна использоваться, только если вам не важен тип содержимого
+        ответа.
+        Использование <code>:plain</code> или <code>:html</code> уместнее в большинстве случаев.</p>
+    </div>
+    <div class="note"><p>Возвращенным откликом от этой опции будет <code>text/html</code> (если не
+        будет переопределен),
+        так как это тип содержимого по умолчанию у отклика Action Dispatch.</p></div>
+    <h5 class="inside_page_header" id="optsii-dlya-render"> Опции для <code>render</code>
+    </h5>
+    <p>Вызов метода <code>render</code> как правило принимает пять опций:</p>
+    <ul>
+        <li>
+            <code>:content_type</code>
+        </li>
+        <li>
+            <code>:layout</code>
+        </li>
+        <li>
+            <code>:location</code>
+        </li>
+        <li>
+            <code>:status</code>
+        </li>
+        <li>
+            <code>:formats</code>
+        </li>
+    </ul>
+    <h6 class="inside_page_header" id="optsiya-content_type"> Опция <code>:content_type</code>
+    </h6>
+    <p>По умолчанию Rails укажет результатам операции рендеринга тип содержимого MIME <code>text/html</code>
+        (или <code>application/json</code> если используется опция <code>:json</code>, или <code>application/xml</code>
+        для опции <code>:xml</code>). Иногда бывает так, что вы хотите изменить это, и тогда можете
+        настроить опцию <code>:content_type</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render file: filename, content_type: "application/rss"
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="optsiya-layout"> Опция <code>:layout</code>
+    </h6>
+    <p>С большинством опций для <code>render</code>, отрендеренное содержимое отображается как часть
+        текущего макета. Вы узнаете более подробно о макетах, и как их использовать, позже в этом
+        руководстве.</p>
+    <p>Опция <code>:layout</code> нужна, чтобы сообщить Rails использовать определенный файл как
+        макет для текущего экшна:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render layout: "special_layout"
+</pre>
+    </div>
+    <p>Также можно сообщить Rails рендерить вообще без макета:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render layout: false
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="optsiya-location"> Опция <code>:location</code>
+    </h6>
+    <p>Опцию <code>:location</code> можно использовать, чтобы установить заголовок HTTP <code>Location</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render xml: photo, location: photo_url(photo)
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="the-status-option"> Опция <code>:status</code>
+    </h6>
+    <p>Rails автоматически сгенерирует отклик с корректным кодом статуса HTML (в большинстве случаев
+        равный <code>200 OK</code>). Опцию <code>:status</code> можно использовать, чтобы изменить
+        это:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render status: 500
+render status: :forbidden
+</pre>
+    </div>
+    <p>Rails понимает как числовые коды статуса, так и соответствующие символы, показанные ниже.</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Класс отклика</th>
+            <th>Код статуса HTTP</th>
+            <th>Символ</th>
+        </tr>
+        <tr>
+            <td><strong>Informational</strong></td>
+            <td>100</td>
+            <td>:continue</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>101</td>
+            <td>:switching_protocols</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>102</td>
+            <td>:processing</td>
+        </tr>
+        <tr>
+            <td><strong>Success</strong></td>
+            <td>200</td>
+            <td>:ok</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>201</td>
+            <td>:created</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>202</td>
+            <td>:accepted</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>203</td>
+            <td>:non_authoritative_information</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>204</td>
+            <td>:no_content</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>205</td>
+            <td>:reset_content</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>206</td>
+            <td>:partial_content</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>207</td>
+            <td>:multi_status</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>208</td>
+            <td>:already_reported</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>226</td>
+            <td>:im_used</td>
+        </tr>
+        <tr>
+            <td><strong>Redirection</strong></td>
+            <td>300</td>
+            <td>:multiple_choices</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>301</td>
+            <td>:moved_permanently</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>302</td>
+            <td>:found</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>303</td>
+            <td>:see_other</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>304</td>
+            <td>:not_modified</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>305</td>
+            <td>:use_proxy</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>306</td>
+            <td>:reserved</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>307</td>
+            <td>:temporary_redirect</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>308</td>
+            <td>:permanent_redirect</td>
+        </tr>
+        <tr>
+            <td><strong>Client Error</strong></td>
+            <td>400</td>
+            <td>:bad_request</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>401</td>
+            <td>:unauthorized</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>402</td>
+            <td>:payment_required</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>403</td>
+            <td>:forbidden</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>404</td>
+            <td>:not_found</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>405</td>
+            <td>:method_not_allowed</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>406</td>
+            <td>:not_acceptable</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>407</td>
+            <td>:proxy_authentication_required</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>408</td>
+            <td>:request_timeout</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>409</td>
+            <td>:conflict</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>410</td>
+            <td>:gone</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>411</td>
+            <td>:length_required</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>412</td>
+            <td>:precondition_failed</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>413</td>
+            <td>:request_entity_too_large</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>414</td>
+            <td>:request_uri_too_long</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>415</td>
+            <td>:unsupported_media_type</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>416</td>
+            <td>:requested_range_not_satisfiable</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>417</td>
+            <td>:expectation_failed</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>422</td>
+            <td>:unprocessable_entity</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>423</td>
+            <td>:locked</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>424</td>
+            <td>:failed_dependency</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>426</td>
+            <td>:upgrade_required</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>428</td>
+            <td>:precondition_required</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>429</td>
+            <td>:too_many_requests</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>431</td>
+            <td>:request_header_fields_too_large</td>
+        </tr>
+        <tr>
+            <td><strong>Server Error</strong></td>
+            <td>500</td>
+            <td>:internal_server_error</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>501</td>
+            <td>:not_implemented</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>502</td>
+            <td>:bad_gateway</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>503</td>
+            <td>:service_unavailable</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>504</td>
+            <td>:gateway_timeout</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>505</td>
+            <td>:http_version_not_supported</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>506</td>
+            <td>:variant_also_negotiates</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>507</td>
+            <td>:insufficient_storage</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>508</td>
+            <td>:loop_detected</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>510</td>
+            <td>:not_extended</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>511</td>
+            <td>:network_authentication_required</td>
+        </tr>
+    </table>
+    <div class="note"><p>Если вы попытаетесь отрендерить содержимое наряду с кодом не
+        соответствующим для отдачи
+        (100-199, 204, 205 or 304), он будет исключён из ответа.</p></div>
+    <h6 class="inside_page_header" id="optsiya-formats"> Опция <code>:formats</code>
+    </h6>
+    <p>Rails использует формат определённый в запросе (или <code>:html</code> по умолчанию). Вы
+        можете изменить его, передав в опцию <code>:formats</code> символ или массив:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render formats: :xml
+render formats: [:json, :xml]
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="poisk-maketov"> Поиск макетов</h6>
+    <p>Чтобы найти текущий макет, Rails сначала смотрит файл в <code>app/views/layouts</code> с
+        именем, таким же, как имя контроллера. Например, рендеринг экшнов из класса <code>PhotosController</code>
+        будет использовать <code>/app/views/layouts/photos.html.erb</code> (или <code>app/views/layouts/photos.builder</code>).
+        Если такого макета нет, Rails будет использовать <code>/app/views/layouts/application.html.erb</code>
+        или <code>/app/views/layouts/application.builder</code>. Если нет макета <code>.erb</code>,
+        Rails будет использовать макет <code>.builder</code>, если таковой имеется. Rails также
+        предоставляет несколько способов более точно назначить определенные макеты отдельным
+        контроллерам и экшнам.</p>
+    <h6 class="inside_page_header" id="opredelenie-maketov-dlya-kontrollerov"> Определение макетов
+        для контроллеров</h6>
+    <p>Вы можете переопределить дефолтные соглашения по макетам в контроллере, используя объявление
+        <code>layout</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  layout "inventory"
+  #...
+end
+</pre>
+    </div>
+    <p>С этим объявлением все вьюхи, рендеренные ProductsController, будут использовать <code>app/views/layouts/inventory.html.erb</code>
+        как макет.</p>
+    <p>Чтобы привязать определенный макет к приложению в целом, используйте объявление в классе
+        <code>ApplicationController</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ApplicationController &lt; ActionController::Base
+  layout "main"
+  #...
+end
+</pre>
+    </div>
+    <p>С этим объявлением каждая из вьюх во всем приложении будет использовать <code>app/views/layouts/main.html.erb</code>
+        как макет.</p>
+    <h6 class="inside_page_header" id="vybor-maketov-vo-vremya-vypolneniya"> Выбор макетов во время
+        выполнения</h6>
+    <p>Можете использовать символ для отсрочки выбора макета до тех пор, пока не будет произведен
+        запрос:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  layout :products_layout
+  def show
+    @product = Product.find(params[:id])
+  end
+  private
+    def products_layout
+      @current_user.special? ? "special" : "products"
+    end
+end
+</pre>
+    </div>
+    <p>Теперь, если текущий пользователь является специальным, он получит специальный макет при
+        просмотре продукта.</p>
+    <p>Можете даже использовать вложенный метод, такой как Proc, для определения макета. Например,
+        если передать объект Proc, то блок, переданный в Proc, будет передан в экземпляр <code>контроллера</code>,
+        таким образом макет может быть определен, основываясь на текущем запросе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  layout Proc.new { |controller| controller.request.xhr? ? "popup" : "application" }
+end
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="uslovnye-makety"> Условные макеты</h6>
+    <p>Макеты, определенные на уровне контроллера, поддерживают опции <code>:only</code> и <code>:except</code>.
+        Эти опции принимают либо имя метода, либо массив имен методов, соответствующих именам
+        методов в контроллере:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  layout "product", except: [:index, :rss]
+end
+</pre>
+    </div>
+    <p>С таким объявлением макет <code>product</code> будет использован везде, кроме методов <code>rss</code>
+        и <code>index</code>.</p>
+    <h6 class="inside_page_header" id="nasledovanie-maketa"> Наследование макета</h6>
+    <p>Объявления макетов участвуют в иерархии, и более определенное объявление макета всегда
+        переопределяет более общие. Например:</p>
+    <ul>
+        <li>
+            <p><code>application_controller.rb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ApplicationController &lt; ActionController::Base
+  layout "main"
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>articles_controller.rb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>special_articles_controller.rb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class SpecialArticlesController &lt; PostsController
+  layout "special"
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>old_articles_controller.rb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class OldArticlesController &lt; SpecialPostsController
+  layout false
+  def show
+    @article = Article.find(params[:id])
+  end
+  def index
+    @old_articles = Article.older
+    render layout: "old"
+  end
+  # ...
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>В этом приложении:</p>
+    <ul>
+        <li>В целом, вьюхи будут рендериться в макет <code>main</code>
+        </li>
+        <li>
+            <code>ArticlesController#index</code> будет использовать макет <code>main</code>
+        </li>
+        <li>
+            <code>SpecialArticlesController#index</code> будет использовать макет
+            <code>special</code>
+        </li>
+        <li>
+            <code>OldArticlesController#show</code> не будет использовать макет совсем
+        </li>
+        <li>
+            <code>OldArticlesController#index</code> будет использовать макет <code>old</code>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="izbeganie-oshibok-dvoynogo-rendera"> Избегание ошибок
+        двойного рендера</h5>
+    <p>Рано или поздно, большинство разработчиков на Rails увидят сообщение об ошибке "Can only
+        render or redirect once per action". Хоть такое и раздражает, это относительно просто
+        правится. Обычно такое происходит в связи с фундаментальным непониманием метода работы
+        <code>render</code>.</p>
+    <p>Например, вот некоторый код, который вызовет эту ошибку:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def show
+  @book = Book.find(params[:id])
+  if @book.special?
+    render action: "special_show"
+  end
+  render action: "regular_show"
+end
+</pre>
+    </div>
+    <p>Если <code>@book.special?</code> определяется как <code>true</code>, Rails начинает процесс
+        рендеринга, выгружая переменную <code>@book</code> во вьюху <code>special_show</code>. Но
+        это <em>не</em> остановит от выполнения остальной код в экшне <code>show</code>, и когда
+        Rails достигнет конца экшна, он начнет рендерить вьюху <code>show</code> - и выдаст ошибку.
+        Решение простое: убедитесь, что у вас есть только один вызов <code>render</code> или <code>redirect</code>
+        за один проход. Еще может помочь такая вещь, как <code>and return</code>. Вот исправленная
+        версия метода:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def show
+  @book = Book.find(params[:id])
+  if @book.special?
+    render action: "special_show" and return
+  end
+  render action: "regular_show"
+end
+</pre>
+    </div>
+    <p>Убедитесь, что используете <code>and return</code> вместо <code>&amp;&amp; return</code>,
+        поскольку <code>&amp;&amp; return</code> не будет работать в связи с приоритетом операторов
+        в языке Ruby.</p>
+    <p>Отметьте, что неявный рендер, выполняемый ActionController, определяет, был ли вызван <code>render</code>
+        поэтому следующий код будет работать без проблем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def show
+  @book = Book.find(params[:id])
+  if @book.special?
+    render action: "special_show"
+  end
+end
+</pre>
+    </div>
+    <p>Это отрендерит книгу с заданным <code>special?</code> с помощью шаблона
+        <code>special_show</code>, в то время как остальные книги будут рендериться с дефолтным
+        шаблоном <code>show</code>.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-redirect_to"> Использование
+        <code>redirect_to</code>
+    </h4>
+    <p>Другой способ управлять возвратом отклика на запрос HTTP - с помощью <code>redirect_to</code>.
+        Как вы видели, <code>render</code> говорит Rails, какую вьюху (или иной ресурс) использовать
+        в создании ответа. Метод <code>redirect_to</code> делает нечто полностью отличное: он
+        говорит браузеру послать новый запрос по другому URL. Например, можно перенаправить из того
+        места, где сейчас выполняется код, в индекс фотографий вашего приложения, с помощью этого
+        вызова:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+redirect_to photos_url
+</pre>
+    </div>
+    <p><code>redirect_to</code> можно использовать с любыми аргументами, которые могут
+        использоваться с <code>link_to</code> или <code>url_for</code>. Также имеется специальное
+        перенаправление, посылающее пользователя обратно на страницу, с которой он пришел:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+redirect_to :back
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="poluchenie-razlichnogo-koda-statusa-perenapravleniya">
+        Получение различного кода статуса перенаправления</h5>
+    <p>Rails использует код статуса HTTP 302, временное перенаправление, при вызове <code>redirect_to</code>.
+        Если хотите использовать иной код статуса, возможно 301, постоянное перенаправление, можете
+        использовать опцию <code>:status</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+redirect_to photos_path, status: 301
+</pre>
+    </div>
+    <p>Подобно опции <code>:status</code> для <code>render</code>, <code>:status</code> для <code>redirect_to</code>
+        принимает и числовые, и символьные обозначения заголовка.</p>
+    <h5 class="inside_page_header" id="razlichie-mezhdu-render-i-redirect_to"> Различие между <code>render</code>
+        и <code>redirect_to</code>
+    </h5>
+    <p>Иногда неопытные разработчики думают о <code>redirect_to</code> как о разновидности команды
+        <code>goto</code>, перемещающую выполнение из одного места в другое в вашем коде Rails. Это
+        <em>не</em> правильно. Ваш код останавливается и ждет нового запроса от браузера. Просто
+        получается так, что вы говорите браузеру, какой запрос он должен сделать следующим,
+        возвращая код статуса HTTP 302.</p>
+    <p>Рассмотрим эти экшны, чтобы увидеть разницу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def index
+  @books = Book.all
+end
+def show
+  @book = Book.find_by(id: params[:id])
+  if @book.nil?
+    render action: "index"
+  end
+end
+</pre>
+    </div>
+    <p>С кодом в такой форме, вероятно, будет проблема, если переменная <code>@book</code> равна
+        <code>nil</code>. Помните, <code>render :action</code> не запускает какой-либо код в
+        указанном экшне, и таким образом ничего не будет присвоено переменной <code>@books</code>,
+        которую возможно требует вьюха <code>index</code>. Способ исправить это - использовать
+        перенаправление вместо рендера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def index
+  @books = Book.all
+end
+def show
+  @book = Book.find_by(id: params[:id])
+  if @book.nil?
+    redirect_to action: :index
+  end
+end
+</pre>
+    </div>
+    <p>С таким кодом браузер сделает новый запрос для индексной страницы, код в методе
+        <code>index</code> запустится, и все будет хорошо.</p>
+    <p>Единственный недостаток этого кода в том, что он требует круговорот через браузер: браузер
+        запрашивает экшн show с помощью <code>/books/1</code>, и контроллер обнаруживает, что книг
+        нет, поэтому отсылает отклик-перенаправление 301 браузеру, сообщающий перейти на <code>/books/</code>,
+        браузер выполняет и посылает новый запрос контроллеру, теперь запрашивая экшн
+        <code>index</code>, затем контроллер получает все книги в базе данных и рендерит шаблон
+        index, отсылает его обратно браузеру, который затем показывает его на экране.</p>
+    <p>Пока это небольшое приложение, такое состояние не может быть проблемой, но иногда стоит
+        подумать, если время отклика важно. Можем продемонстрировать один из способов управления
+        этим с помощью хитрого примера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def index
+  @books = Book.all
+end
+def show
+  @book = Book.find_by(id: params[:id])
+  if @book.nil?
+    @books = Book.all
+    flash.now[:alert] = "Your book was not found"
+    render "index"
+  end
+end
+</pre>
+    </div>
+    <p>Это обнаружит, что нет книг с определенным ID, заполнит переменную экземпляра
+        <code>@books</code> всеми книгами в модели, и затем напрямую отрендерит шаблон <code>index.html.erb</code>,
+        возвратив его браузеру с предупреждающим сообщением в flash, сообщающим пользователю, что
+        произошло.</p>
+    <h4 class="inside_page_header"
+        id="ispolzovanie-head-dlya-sozdaniya-otklika-soderzhaschego-tolko-zagolovok"> Использование
+        <code>head</code> для создания отклика, содержащего только заголовок</h4>
+    <p>Метод <code>head</code> существует, чтобы позволить возвращать отклики браузеру, содержащие
+        только заголовки. Он представляет более явную альтернативу вызова <code>render
+            :nothing</code>. Метод <code>head</code> принимает число или символ (смотрите ),
+        представляющие код статуса HTTP. Аргумент опций интерпретируется как хэш имен заголовков и
+        значений. Например, можно возвратить только заголовок ошибки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+head :bad_request
+</pre>
+    </div>
+    <p>Это создаст следующий заголовок:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+HTTP/1.1 400 Bad Request
+Connection: close
+Date: Sun, 24 Jan 2010 12:15:53 GMT
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=utf-8
+X-Runtime: 0.013483
+Set-Cookie: _blog_session=...snip...; path=/; HttpOnly
+Cache-Control: no-cache
+</pre>
+    </div>
+    <p>Или можете использовать другие заголовки HTTP для передачи другой информации:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+head :created, location: photo_path(@photo)
+</pre>
+    </div>
+    <p>Что создаст:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+HTTP/1.1 201 Created
+Connection: close
+Date: Sun, 24 Jan 2010 12:16:44 GMT
+Transfer-Encoding: chunked
+Location: /photos/1
+Content-Type: text/html; charset=utf-8
+X-Runtime: 0.083496
+Set-Cookie: _blog_session=...snip...; path=/; HttpOnly
+Cache-Control: no-cache
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="strukturirovanie-maketov"> Структурирование макетов</h3>
+    <p>Когда Rails рендерит вьюху как отклик, он делает это путем объединения вьюхи с текущим
+        макетом, используя правила для нахождения текущего макета, которые мы рассмотрели ранее. В
+        макетах у вас есть доступ к трем инструментам объединения различных кусочков результата для
+        формирования общего отклика:</p>
+    <ul>
+        <li>Тэги ресурсов
+        </li>
+        <li>
+            <code>yield</code> и <code>content_for</code>
+        </li>
+        <li>Партиалы
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="helpery-resursnyh-tegov"> Хелперы ресурсных тегов</h4>
+    <p>Хелперы ресурсных тегов представляют методы для создания HTML, связывающие вьюхи с ресурсами,
+        такими как каналы, Javascript, таблицы стилей, изображения, видео и аудио. Есть шесть типов
+        хелперов ресурсных тегов:</p>
+    <ul>
+        <li>
+            <code>auto_discovery_link_tag</code>
+        </li>
+        <li>
+            <code>javascript_include_tag</code>
+        </li>
+        <li>
+            <code>stylesheet_link_tag</code>
+        </li>
+        <li>
+            <code>image_tag</code>
+        </li>
+        <li>
+            <code>video_tag</code>
+        </li>
+        <li>
+            <code>audio_tag</code>
+        </li>
+    </ul>
+    <p>Эти теги можно использовать в макетах или других вьюхах, хотя
+        <code>auto_discovery_link_tag</code>, <code>javascript_include_tag</code>, and <code>stylesheet_link_tag</code>
+        как правило используются в разделе <code>&lt;head&gt;</code> макета.</p>
+    <div class="warning"><p>Хелперы ресурсных тегов <em>не</em> проверяют существование ресурсов по
+        заданному месту расположения; они просто предполагают, что вы знаете, что делаете, и создают
+        ссылку.</p></div>
+    <h5 class="inside_page_header" id="prisoedinenie-kanalov-s-pomoschyu-auto_discovery_link_tag">
+        Присоединение каналов с помощью <code>auto_discovery_link_tag</code>
+    </h5>
+    <p>Хелпер <code>auto_discovery_link_tag</code> создает HTML, который многие браузеры и программы
+        чтения каналов могут использовать для определения наличия каналов RSS или ATOM. Он принимает
+        тип ссылки (<code>:rss</code> или <code>:atom</code>), хэш опций, которые передаются через
+        url_for, и хэш опций для тега:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= auto_discovery_link_tag(:rss, {action: "feed"},
+  {title: "RSS Feed"}) %&gt;
+</pre>
+    </div>
+    <p>Вот три опции тега, доступные для <code>auto_discovery_link_tag</code>:</p>
+    <ul>
+        <li>
+            <code>:rel</code> определяет значение <code>rel</code> в ссылке. Значение по умолчанию
+            "alternate"
+        </li>
+        <li>
+            <code>:type</code> определяет явный тип MIME. Rails генерирует подходящий тип MIME
+            автоматически
+        </li>
+        <li>
+            <code>:title</code> определяет заголовок ссылки. Значение по умолчанию это значение
+            <code>:type</code> в верхнем регистре, например, "ATOM" или "RSS".
+        </li>
+    </ul>
+    <h5 class="inside_page_header"
+        id="prisoedinenie-faylov-javascript-s-pomoschyu-javascript_include_tag"> Присоединение
+        файлов Javascript с помощью <code>javascript_include_tag</code>
+    </h5>
+    <p>Хелпер <code>javascript_include_tag</code> возвращает HTML тег <code>script</code> для
+        каждого предоставленного источника.</p>
+    <p>При использовании Rails с включенным "Asset Pipeline":/asset-pipeline enabled, этот хелпер
+        создаст ссылку на <code>/assets/javascripts/</code>, а не на <code>public/javascripts</code>,
+        что использовалось в прежних версиях Rails. Эта ссылка обслуживается файлопроводом (asset
+        pipeline).</p>
+    <p>Файл JavaScript в приложении Rails или engine Rails размещается в одном из трех мест: <code>app/assets</code>,
+        <code>lib/assets</code> или <code>vendor/assets</code>. Эти места детально описаны в .</p>
+    <p>Можно определить полный путь относительно корня документа или URL, по желанию. Например,
+        сослаться на файл JavaScript, находящийся в директории с именем <code>javascripts</code> в
+        одной из <code>app/assets</code>, <code>lib/assets</code> или <code>vendor/assets</code>,
+        можно так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= javascript_include_tag "main" %&gt;
+</pre>
+    </div>
+    <p>Rails тогда выдаст такой тег <code>script</code>:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;script src='/assets/main.js'&gt;&lt;/script&gt;
+</pre>
+    </div>
+    <p>Затем запрос к этому ресурсу будет обслужен гемом Sprockets.</p>
+    <p>Чтобы включить несколько файлов, таких как <code>app/assets/javascripts/main.js</code> и
+        <code>app/assets/javascripts/columns.js</code> за один раз:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= javascript_include_tag "main", "columns" %&gt;
+</pre>
+    </div>
+    <p>Чтобы включить <code>app/assets/javascripts/main.js</code> и <code>app/assets/javascripts/photos/columns.js</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= javascript_include_tag "main", "/photos/columns" %&gt;
+</pre>
+    </div>
+    <p>Чтобы включить <code>http://example.com/main.js</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= javascript_include_tag "http://example.com/main.js" %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="prisoedinenie-faylov-css-s-pomoschyu-stylesheet_link_tag">
+        Присоединение файлов CSS с помощью <code>stylesheet_link_tag</code>
+    </h5>
+    <p>Хелпер <code>stylesheet_link_tag</code> возвращает HTML тег <code>&lt;link&gt;</code> для
+        каждого предоставленного источника.</p>
+    <p>При использовании Rails с включенным "Asset Pipeline" (файлопроводом), этот хелпер создаст
+        ссылку на <code>/assets/stylesheets/</code>. Эта ссылка будет затем обработана гемом
+        Sprockets. Файл таблицы стилей может быть размещен в одном из трех мест:
+        <code>app/assets</code>, <code>lib/assets</code> или <code>vendor/assets</code>.</p>
+    <p>Можно определить полный путь относительно корня документа или URL. Например, на файл таблицы
+        стилей в директории <code>stylesheets</code>, размещенной в одной из <code>app/assets</code>,
+        <code>lib/assets</code> или <code>vendor/assets</code>, можно сослаться так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "main" %&gt;
+</pre>
+    </div>
+    <p>Чтобы включить <code>app/assets/stylesheets/main.css</code> и <code>app/assets/stylesheets/columns.css</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "main", "columns" %&gt;
+</pre>
+    </div>
+    <p>Чтобы включить <code>app/assets/stylesheets/main.css</code> и <code>app/assets/stylesheets/photos/columns.css</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "main", "/photos/columns" %&gt;
+</pre>
+    </div>
+    <p>Чтобы включить <code>http://example.com/main.css</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "http://example.com/main.css" %&gt;
+</pre>
+    </div>
+    <p>По умолчанию <code>stylesheet_link_tag</code> создает ссылки с <code>media="screen"
+        rel="stylesheet"</code>. Можно переопределить любое из этих дефолтных значений, указав
+        соответствующую опцию (:media, :rel):</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "main_print", media: "print" %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="prisoedinenie-izobrazheniy-s-pomoschyu-image_tag">
+        Присоединение изображений с помощью <code>image_tag</code>
+    </h5>
+    <p>Хелпер <code>image_tag</code> создает HTML тег <code>&lt;img /&gt;</code> для определенного
+        файла. По умолчанию файлы загружаются из <code>public/images</code>.</p>
+    <div class="warning"><p>Отметьте, что вы должны определить расширение у файла с
+        изображением.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "header.png" %&gt;
+</pre>
+    </div>
+    <p>Вы можете предоставить путь к изображению, если желаете:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "icons/delete.gif" %&gt;
+</pre>
+    </div>
+    <p>Вы можете предоставить хэш дополнительных опций HTML:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "icons/delete.gif", {height: 45} %&gt;
+</pre>
+    </div>
+    <p>Или альтернативный текст, если пользователь отключил показ изображений в браузере. Если вы не
+        определили явно тег alt, по умолчанию будет указано имя файла с большой буквы и без
+        расширения, например, эти два тега изображения возвратят одинаковый код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "home.gif" %&gt;
+&lt;%= image_tag "home.gif", alt: "Home" %&gt;
+</pre>
+    </div>
+    <p>Можете указать специальный тег size в формате "{width}x{height}":</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "home.gif", size: "50x20" %&gt;
+</pre>
+    </div>
+    <p>В дополнение к вышеописанным специальным тегам, можно предоставить итоговый хэш стандартных
+        опций HTML, таких как <code>:class</code>, или <code>:id</code>, или <code>:name</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= image_tag "home.gif", alt: "Go Home",
+                          id: "HomeImage",
+                          class: "nav_bar" %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="prisoedinenie-video-s-pomoschyu-video_tag"> Присоединение
+        видео с помощью <code>video_tag</code>
+    </h5>
+    <p>Хелпер <code>video_tag</code> создает тег HTML 5 <code>&lt;video&gt;</code> для определенного
+        файла. По умолчанию файлы загружаются из <code>public/videos</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= video_tag "movie.ogg" %&gt;
+</pre>
+    </div>
+    <p>Создаст</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;video src="/videos/movie.ogg" /&gt;
+</pre>
+    </div>
+    <p>Подобно <code>image_tag</code>, можно предоставить путь или абсолютный, или относительный к
+        директории <code>public/videos</code>. Дополнительно можно определить опцию <code>size:
+            "#{width}x#{height}"</code>, как и в <code>image_tag</code>. Теги видео также могут
+        иметь любые опции HTML, определенные в конце (<code>id</code>, <code>class</code> и др.).
+    </p>
+    <p>Тег видео также поддерживает все HTML опции <code>&lt;video&gt;</code> с помощью хэша HTML
+        опций, включая:</p>
+    <ul>
+        <li>
+            <code>poster: "image_name.png"</code>, предоставляет изображение для размещения вместо
+            видео до того, как оно начнет проигрываться.
+        </li>
+        <li>
+            <code>autoplay: true</code>, запускает проигрывание по загрузке страницы.
+        </li>
+        <li>
+            <code>loop: true</code>, запускает видео сначала, как только оно достигает конца.
+        </li>
+        <li>
+            <code>controls: true</code>, предоставляет пользователю поддерживаемые браузером
+            средства управления для взаимодействия с видео.
+        </li>
+        <li>
+            <code>autobuffer: true</code>, файл видео предварительно загружается для пользователя по
+            загрузке страницы.
+        </li>
+    </ul>
+    <p>Также можно определить несколько видео для проигрывания, передав массив видео в <code>video_tag</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= video_tag ["trailer.ogg", "movie.ogg"] %&gt;
+</pre>
+    </div>
+    <p>Это создаст:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;video&gt;
+  &lt;source src="/videos/trailer.ogg" /&gt;
+  &lt;source src="/videos/movie.ogg" /&gt;
+&lt;/video&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="prisoedinenie-audiofaylov-s-pomoschyu-audio_tag">
+        Присоединение аудиофайлов с помощью <code>audio_tag</code>
+    </h5>
+    <p>Хелпер <code>audio_tag</code> создает тег HTML 5 <code>&lt;audio&gt;</code> для определенного
+        файла. По умолчанию файлы загружаются из <code>public/audios</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= audio_tag "music.mp3" %&gt;
+</pre>
+    </div>
+    <p>Если хотите, можете предоставить путь к аудио файлу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= audio_tag "music/first_song.mp3" %&gt;
+</pre>
+    </div>
+    <p>Также можно предоставить хэш дополнительных опций, таких как <code>:id</code>,
+        <code>:class</code> и т.д.</p>
+    <p>Подобно <code>video_tag</code>, <code>audio_tag</code> имеет специальные опции:</p>
+    <ul>
+        <li>
+            <code>autoplay: true</code>, начинает воспроизведение аудио по загрузке страницы
+        </li>
+        <li>
+            <code>controls: true</code>, предоставляет пользователю поддерживаемые браузером
+            средства управления для взаимодействия с аудио.
+        </li>
+        <li>
+            <code>autobuffer: true</code>, файл аудио предварительно загружается для пользователя по
+            загрузке страницы.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ponimanie-yield"> Понимание <code>yield</code>
+    </h4>
+    <p>В контексте макета, <code>yield</code> определяет раздел, где должно быть вставлено
+        содержимое из вьюхи. Самый простой способ его использования - это иметь один
+        <code>yield</code> там, куда вставится все содержимое вьюхи, которая в настоящий момент
+        рендерится:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;%= yield %&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <p>Также можете создать макет с несколькими областями yield:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;%= yield :head %&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;%= yield %&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <p>Основное тело вьюхи всегда рендериться в неименованный <code>yield</code>. Чтобы рендерить
+        содержимое в именованный <code>yield</code>, используйте метод <code>content_for</code>.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-metoda-content_for"> Использование метода <code>content_for</code>
+    </h4>
+    <p>Метод <code>content_for</code> позволяет вставить содержимое в блок <code>yield</code> в
+        вашем макете. <code>content_for</code> можно использовать только для вставки содержимого в
+        именованные yields. Например, эта вьюха будет работать с макетом, который вы только что
+        видели:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% content_for :head do %&gt;
+  &lt;title&gt;A simple page&lt;/title&gt;
+&lt;% end %&gt;
+&lt;p&gt;Hello, Rails!&lt;/p&gt;
+</pre>
+    </div>
+    <p>Результат рендеринга этой страницы в макет будет таким HTML:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt;A simple page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;p&gt;Hello, Rails!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <p>Метод <code>content_for</code> очень полезен, когда ваш макет содержит отдельные области,
+        такие как боковые панели или футеры, в которые нужно вставить свои блоки содержимого. Это
+        также полезно при вставке тегов, загружающих специфичные для страницы файлы javascript или
+        css в head общего макета.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-partialov"> Использование партиалов</h4>
+    <p>Частичные шаблоны - также называемые "партиалы" - являются еще одним подходом к разделению
+        процесса рендеринга на более управляемые части. С партиалами можно перемещать код для
+        рендеринга определенных кусков отклика в свои отдельные файлы.</p>
+    <h5 class="inside_page_header" id="imenovanie-partialov"> Именование партиалов</h5>
+    <p>Чтобы отрендерить партиал как часть вьюхи, используем метод <code>render</code> внутри вьюхи
+        и включаем опцию <code>:partial</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= render "menu" %&gt;
+</pre>
+    </div>
+    <p>Это отрендерит файл, названный <code>_menu.html.erb</code> в этом месте при рендеринге вьюхи.
+        Отметьте начальный символ подчеркивания: файлы партиалов начинаются со знака подчеркивания
+        для отличия их от обычных вьюх, хотя в вызове они указаны без подчеркивания. Это справедливо
+        даже тогда, когда партиалы вызываются из другой папки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= render "shared/menu" %&gt;
+</pre>
+    </div>
+    <p>Этот код затянет партиал из <code>app/views/shared/_menu.html.erb</code>.</p>
+    <h5 class="inside_page_header" id="ispolzovanie-partialov-dlya-uproscheniya-vyuh"> Использование
+        партиалов для упрощения вьюх</h5>
+    <p>Партиалы могут использоваться как эквивалент подпрограмм: способ убрать подробности из вьюхи
+        так, чтобы можно было легче понять, что там происходит. Например, у вас может быть такая
+        вьюха:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render "shared/ad_banner" %&gt;
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;p&gt;Here are a few of our fine products:&lt;/p&gt;
+...
+&lt;%= render "shared/footer" %&gt;
+</pre>
+    </div>
+    <p>Здесь партиалы <code>_ad_banner.html.erb</code> и <code>_footer.html.erb</code> могут
+        содержать контент, размещенный на многих страницах вашего приложения. Вам не нужно видеть
+        подробностей этих разделов, когда вы сосредотачиваетесь на определенной странице.</p>
+    <p>Как вы уже могли видеть из предыдущих разделов данного руководства, <code>yield</code>
+        является очень мощным инструментом для очистки ваших макетов. Имейте в виду, что это чистый
+        воды ruby, так что вы можете использовать его практически везде. Например, мы можем
+        использовать его для соблюдения принципа DRY; унификация и объявление формы, для нескольких
+        похожих ресурсов:</p>
+    <ul>
+        <li>
+            <p><code>users/index.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= render "shared/search_filters", search: @q do |f| %&gt;
+  &lt;p&gt;
+    Name contains: &lt;%= f.text_field :name_contains %&gt;
+  &lt;/p&gt;
+&lt;%= end %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>roles/index.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= render "shared/search_filters", search: @q do |f| %&gt;
+  &lt;p&gt;
+    Title contains: &lt;%= f.text_field :title_contains %&gt;
+  &lt;/p&gt;
+&lt;%= end %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>shared/_search_filters.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for(@q) do |f| %&gt;
+  &lt;h1&gt;Search form:&lt;/h1&gt;
+  &lt;fieldset&gt;
+    &lt;%= yield f %&gt;
+  &lt;/fieldset&gt;
+  &lt;p&gt;
+    &lt;%= f.submit "Search" %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <div class="info"><p>Для содержимого, располагаемого на всех страницах вашего приложения, можете
+        использовать партиалы прямо в макетах.</p></div>
+    <h5 class="inside_page_header" id="maket-partialov"> Макет партиалов</h5>
+    <p>Партиал может использовать свой собственный файл макета, подобно тому, как вьюха может
+        использовать макет. Например, можете вызвать подобный партиал:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "link_area", layout: "graybar" %&gt;
+</pre>
+    </div>
+    <p>Это найдет партиал с именем <code>_link_area.html.erb</code> и отрендерит его, используя
+        макет <code>_graybar.html.erb</code>. Отметьте, что макеты для партиалов также начинаются с
+        подчеркивания, как и обычные партиалы, и размещаются в той же папке с партиалами, которым
+        они принадлежат (не в основной папке <code>layouts</code>).</p>
+    <p>Также отметьте, что явное указание <code>partial</code> необходимо, когда передаются
+        дополнительные опции, такие как <code>layout</code></p>
+    <h5 class="inside_page_header" id="peredacha-lokalnyh-peremennyh"> Передача локальных
+        переменных</h5>
+    <p>В партиалы также можно передавать локальные переменные, что делает их более мощными и
+        гибкими. Например, можете использовать такую технику для уменьшения дублирования между
+        страницами new и edit, сохранив немного различающееся содержимое:</p>
+    <ul>
+        <li>
+            <p><code>new.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;h1&gt;New zone&lt;/h1&gt;
+&lt;%= render partial: "form", locals: {zone: @zone} %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>edit.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;h1&gt;Editing zone&lt;/h1&gt;
+&lt;%= render partial: "form", locals: {zone: @zone} %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>_form.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for(zone) do |f| %&gt;
+  &lt;p&gt;
+    &lt;b&gt;Zone name&lt;/b&gt;&lt;br&gt;
+    &lt;%= f.text_field :name %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Хотя тот же самый партиал будет рендерен в обоих вьюхах, хелпер Action View submit возвратит
+        “Create Zone” для экшна new и “Update Zone” для экшна edit.</p>
+    <p>Каждый партиал также имеет локальную переменную с именем, как у партиала (без подчеркивания).
+        Можете передать объект в эту локальную переменную через опцию <code>:object</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "customer", object: @new_customer %&gt;
+</pre>
+    </div>
+    <p>В партиале <code>customer</code> переменная <code>customer</code> будет указывать на <code>@new_customer</code>
+        из родительской вьюхи.</p>
+    <p>Если есть экземпляр модели для рендера в партиале, вы можете использовать краткий
+        синтаксис:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render @customer %&gt;
+</pre>
+    </div>
+    <p>Предположим, что переменная <code>@customer</code> содержит экземпляр модели
+        <code>Customer</code>, это использует <code>_customer.html.erb</code> для ее рендера и
+        передаст локальную переменную <code>customer</code> в партиал, к которой будет присвоена
+        переменная экземпляра <code>@customer</code> в родительской вьюхе.</p>
+    <h5 class="inside_page_header" id="rendering-kollektsiy"> Рендеринг коллекций</h5>
+    <p>Партиалы часто полезны для рендеринга коллекций. Когда коллекция передается в партиал через
+        опцию <code>:collection</code>, партиал будет вставлен один раз для каждого члена коллекции:
+    </p>
+    <ul>
+        <li>
+            <p><code>index.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;%= render partial: "product", collection: @products %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>_product.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;p&gt;Product Name: &lt;%= product.name %&gt;&lt;/p&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Когда партиал вызывается с коллекцией во множественном числе, то каждый отдельный экземпляр
+        партиала имеет доступ к члену коллекции, подлежащей рендеру, через переменную с именем
+        партиала. В нашем случает партиал <code>_product</code>, и в партиале <code>_product</code>
+        можете обращаться к <code>product</code> для получения экземпляра, который рендерится.</p>
+    <p>Имеется также сокращение для этого. Предположив, что <code>@products</code> является
+        коллекцией экземпляров <code>product</code>, вы можете просто сделать так в <code>index.html.erb</code>
+        и получить аналогичный результат:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;%= render @products %&gt;
+</pre>
+    </div>
+    <p>Что приведет к такому же результату.</p>
+    <p>Rails определяет имя партиала, изучая имя модели в коллекции. Фактически можете даже создать
+        неоднородную коллекцию и рендерить таким образом, и Rails подберет подходящий партиал для
+        каждого члена коллекции:</p>
+    <ul>
+        <li>
+            <p><code>index.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;h1&gt;Contacts&lt;/h1&gt;
+&lt;%= render [customer1, employee1, customer2, employee2] %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>customers/_customer.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;p&gt;Customer: &lt;%= customer.name %&gt;&lt;/p&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p><code>employees/_employee.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;p&gt;Employee: &lt;%= employee.name %&gt;&lt;/p&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>В этом случае Rails использует партиалы customer или employee по мере необходимости для
+        каждого члена коллекции.</p>
+    <p>В случае, если коллекция пустая, <code>render</code> возвратит nil, поэтому очень просто
+        предоставить альтернативное содержимое.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;h1&gt;Products&lt;/h1&gt;
+&lt;%= render(@products) || "There are no products available." %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="lokalnye-peremennye"> Локальные переменные</h5>
+    <p>Чтобы использовать пользовательские имена локальных переменных в партиале, определите опцию
+        <code>:as</code> в вызове партиала:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", collection: @products, as: :item %&gt;
+</pre>
+    </div>
+    <p>С этим изменением можете получить доступ к экземпляру коллекции <code>@products</code> через
+        локальную переменную <code>item</code> в партиале.</p>
+    <p>Также можно передавать произвольные локальные переменные в любой партиал, который Вы
+        рендерите с помощью опции <code>locals: {}</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", collection: @products,
+           as: :item, locals: {title: "Products Page"} %&gt;
+</pre>
+    </div>
+    <p>В этом случае, партиал имеет доступ к локальной переменной <code>title</code> со значением
+        "Products Page".</p>
+    <div class="info"><p>Rails также создает доступную переменную счетчика в партиале, вызываемом
+        коллекцией, названную по имени члена коллекции с добавленным <code>_counter</code>.
+        Например, если рендерите <code>@products</code>, в партиале можете обратиться к <code>product_counter</code>,
+        который говорит, сколько раз партиал был рендерен. Это не работает в сочетании с опцией
+        <code>as: :value</code>.</p></div>
+    <p>Также можете определить второй партиал, который будет отрендерен между экземплярами главного
+        партиала, используя опцию <code>:spacer_template</code>:</p>
+    <h5 class="inside_page_header" id="promezhutochnye-shablony"> Промежуточные шаблоны</h5>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: @products, spacer_template: "product_ruler" %&gt;
+</pre>
+    </div>
+    <p>Rails отрендерит партиал <code>_product_ruler</code> (без переданных в него данных) между
+        каждой парой партиалов <code>_product</code>.</p>
+    <h5 class="inside_page_header" id="makety-partialov-kollektsiy"> Макеты партиалов коллекций</h5>
+    <p>При рендеренге коллекций также возможно использовать опцию <code>:layout</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: "product", collection: @products, layout: "special_layout" %&gt;
+</pre>
+    </div>
+    <p>Макет будет отрендерен вместе с партиалом для каждого элемента коллекции. Переменные текущего
+        объекта и object_counter также будут доступны в макете тем же образом, как и в партиале.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-vlozhennyh-maketov"> Использование вложенных
+        макетов</h4>
+    <p>Возможно, ваше приложение потребует макет, немного отличающийся от обычного макета
+        приложения, для поддержки одного определенного контроллера. Вместо повторения главного
+        макета и редактирования его, можете выполнить это с помощью вложенных макетов (иногда
+        называемых подшаблонами). Вот пример:</p>
+    <p>Предположим, имеется макет <code>ApplicationController</code>:</p>
+    <ul>
+        <li>
+            <p><code>app/views/layouts/application.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;&lt;%= @page_title or "Page Title" %&gt;&lt;/title&gt;
+  &lt;%= stylesheet_link_tag "layout" %&gt;
+  &lt;style&gt;&lt;%= yield :stylesheets %&gt;&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="top_menu"&gt;Top menu items here&lt;/div&gt;
+  &lt;div id="menu"&gt;Menu items here&lt;/div&gt;
+  &lt;div id="content"&gt;&lt;%= content_for?(:content) ? yield(:content) : yield %&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>На страницах, создаваемых NewsController, вы хотите спрятать верхнее меню и добавить правое
+        меню:</p>
+    <ul>
+        <li>
+            <p><code>app/views/layouts/news.html.erb</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% content_for :stylesheets do %&gt;
+  #top_menu {display: none}
+  #right_menu {float: right; background-color: yellow; color: black}
+&lt;% end %&gt;
+&lt;% content_for :content do %&gt;
+  &lt;div id="right_menu"&gt;Right menu items here&lt;/div&gt;
+  &lt;%= content_for?(:news_content) ? yield(:news_content) : yield %&gt;
+&lt;% end %&gt;
+&lt;%= render template: "layouts/application" %&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Вот и все. Вьюхи News будут использовать новый макет, прячущий верхнее меню и добавляющий
+        новое правое меню в "content" div.</p>
+    <p>Имеется несколько способов получить похожие результаты с различными подшаблонными схемами,
+        используя эту технику. Отметьте, что нет ограничений на уровень вложенности. Можно
+        использовать метод <code>ActionView::render</code> через <code>render template:
+            'layouts/news'</code>, чтобы основать новый макет на основе макета News. Если думаете,
+        что не будете подшаблонить макет <code>News</code>, можете заменить строку <code>content_for?(:news_content)
+            ? yield(:news_content) : yield</code> простым <code>yield</code>.</p>
+
+</body>
+</html>

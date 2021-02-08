@@ -1,0 +1,53 @@
+@font-face {
+    font-family: 'Panton';
+    src: url('fonts/Panton-SemiBold.woff') format('woff'), /* Modern Browsers */
+         url('fonts/Panton-SemiBold.ttf') format('truetype');
+}
+
+* {
+    font-family: 'Panton', sans-serif;
+    padding: 1px;
+}
+
+.main_item, .category_item{
+  transition: 0.2s;
+  min-height: 45px;
+  font-size: 1.2em;
+  height: auto;
+  padding: 8px;
+  width: 100%;
+  background-color: white;
+  outline: none;
+  border: none;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.2);
+  border-radius: 6px;
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.main_item {
+  height: 52px;
+  font-size: 1.3em;
+  padding: 12px;
+}
+
+.category_item:active{
+  background-color: #EEEEEE;
+  padding: 10px;
+}
+
+.main_item:active{
+  background-color: #EEEEEE;
+  padding: 14px;
+}
+
+.lection_item a, .lection_item a:hover{
+	font-size: 16px;
+	color: black;
+}
+
+.goog-te-gadget-simple {
+	margin-left: 4px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}

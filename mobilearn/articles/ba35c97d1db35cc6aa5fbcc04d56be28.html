@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расчет динамического коэффициента при ударной нагрузке</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 49.</strong> Расчет динамического коэффициента при ударной нагрузке.</p>
+    <p><strong>Основные положения</strong></p>
+    <p align="justify">   Явление удара получается в том случае, когда скорость рассматриваемой
+        части конструкции или соприкасающихся с ней частей изменяется в очень короткий период
+        времени.</p>
+    <p align="justify">   При забивке свай тяжелый груз падает с некоторой высоты на верхний торец
+        сваи и погружает ее в грунт; баба останавливается почти мгновенно, вызывая удар. Аналогичные
+        явления происходят при ковке; удар испытывают и проковываемое изделие и шток молота с
+        бойком, так как последний очень быстро останавливается при соприкосновении с изделием. Во
+        время удара между обеими ударяющимися деталями возникают весьма большие взаимные давления.
+        Скорость ударяющего тела за очень короткий промежуток времени изменяется и в частном случае
+        падает до нуля; тело останавливается. Значит, на него от ударяемой детали передаются очень
+        большие ускорения, направленные в сторону, обратную его движению, т. е. передается реакция
+        <img src="http://www.toehelp.ru/theory/sopromat/image001-47.gif">, равная произведению массы
+        ударяющего тела на это ускорение.</p>
+    <p align="justify">   Обозначая это ускорение через а, можно написать, что реакция <img
+            src="http://www.toehelp.ru/theory/sopromat/image002-47.gif">, где <i>Q</i> &#151; вес
+        ударяющего тела. По закону равенства действия и противодействия на ударяемую. часть
+        конструкции передается такая же сила, но обратно направленная (рис.1). Эти силы и вызывают
+        напряжения в обоих телах.</p>
+    <br>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image003-46.gif"><br><br>
+        <b>Рис.1.</b> Расчетная схема ударного нагружения.
+    </center>
+    <p> </p>
+    <p align="justify">   Таким образом, в ударяемой части конструкции возникают такие напряжения,
+        как будто к ней была приложена сила инерции ударяющего тела; мы можем вычислить эти
+        напряжения, рассматривая силу инерции <img
+                src="http://www.toehelp.ru/theory/sopromat/image004-46.gif"> как статическую
+        нагрузку нашей конструкции. Затруднение заключается в вычислении этой силы инерции.
+        Продолжительности удара, т. е. величины того промежутка времени, в течении которого
+        происходит падение скорости до нуля, мы не знаем. Поэтому остается неизвестной величина
+        ускорения <i>а</i>, а стало быть, и силы <img
+                src="http://www.toehelp.ru/theory/sopromat/image005-46.gif">. Таким образом, хотя
+        вычисление напряжений при ударе представляет собой частный случай задачи учета сил инерции,
+        однако для вычисления силы <img src="http://www.toehelp.ru/theory/sopromat/image006-46.gif">
+        и связанных с ней напряжений и деформаций здесь приходится применять иной прием и
+        пользоваться законом сохранения энергии.</p>
+    <p align="justify">   При ударе происходит очень быстрое превращение одного вида энергии в
+        другой: кинетическая энергия ударяющего тела превращается в потенциальную энергию
+        деформации. Выражая эту энергию в функции силы <img
+                src="http://www.toehelp.ru/theory/sopromat/image007-46.gif"> или напряжений, или
+        деформаций получаем возможность вычислить эти величины.</p>
+    <p> </p>
+    <p><strong>Общий прием вычисления динамического коэффициента при ударе.</strong></p>
+    <p align="justify">   Предположим, что очень жесткое тело <i>А</i> весом <i>Q</i>, деформацией
+        которого можно пренебречь, падая с некоторой высоты <i>H</i>, ударяет по другому телу
+        <i>B</i>, опирающемуся на упругую систему <i>С</i> (рис.2). В частном случае это может быть
+        падение груза на конец призматического стержня, другой конец которого закреплен (продольный
+        удар), падение груза на балку, лежащую на опорах (изгибающий удар), и т. п.</p>
+    <br>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image008-45.gif"><br><br>
+        <b>Рис.2.</b> Динамическая модель ударного нагружения.
+    </center>
+    <p> </p>
+    <p align="justify">   В течение очень короткого промежутка времени упругая система <i>С</i>
+        испытает некоторую деформацию. Обозначим через <img
+                src="http://www.toehelp.ru/theory/sopromat/image009-45.gif"> перемещение тела
+        <i>В</i> (местной деформацией которого пренебрежем) в направлении удара. В упомянутых
+        частных случаях при продольном ударе за перемещение <img
+                src="http://www.toehelp.ru/theory/sopromat/image010-45.gif"> соответственно нужно
+        считать продольную деформацию стержня <img
+                src="http://www.toehelp.ru/theory/sopromat/image011-45.gif">, при изгибающем ударе
+        &#151; прогиб балки <img src="http://www.toehelp.ru/theory/sopromat/image012-45.gif"> в
+        ударяемом сечении и т. п. В результате удара в системе <i>С</i> возникнут напряжения <img
+                src="http://www.toehelp.ru/theory/sopromat/image013-45.gif"> (<img
+                src="http://www.toehelp.ru/theory/sopromat/image014-44.gif"> или <img
+                src="http://www.toehelp.ru/theory/sopromat/image015-44.gif">&#151; в зависимости от
+        вида деформации).</p>
+    <p align="justify">   Полагая, что кинетическая энергия <i>Т</i> ударяющего тела полностью
+        переходит в потенциальную энергию <img
+                src="http://www.toehelp.ru/theory/sopromat/image016-43.gif"> деформации упругой
+        системы, можем написать:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image017-43.gif"></p></td>
+            <td><p>(1)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Так как к моменту окончания деформации ударяющее тело пройдет путь <img
+            src="http://www.toehelp.ru/theory/sopromat/image018-41.gif">, то его запас энергии будет
+        измеряться произведенной им работой <img
+                src="http://www.toehelp.ru/theory/sopromat/image019-41.gif"> и будет равен:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image020-41.gif"></p></td>
+            <td><p>(2)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Вычислим теперь <img
+            src="http://www.toehelp.ru/theory/sopromat/image021-41.gif">. При статической деформации
+        потенциальная энергия <img src="http://www.toehelp.ru/theory/sopromat/image022-41.gif">
+        численно равна половине произведения действующей силы на соответствующую деформацию:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image023-41.gif"></p></td>
+            <td><p>(3)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Статическая деформация <img
+            src="http://www.toehelp.ru/theory/sopromat/image024-41.gif"> в ударяемом сечении может
+        быть вычислена по закону Гука, который в общем виде можно записать так:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image025-41.gif"> или <img
+            src="http://www.toehelp.ru/theory/sopromat/image026-40.gif"></p>
+    <p align="justify">   Здесь <i>с </i>&#151; некоторый коэффициент пропорциональности (называемый
+        иногда жесткостью системы); он зависит от свойств материала, формы и размеров тела, вида
+        деформации и положения ударяемого сечения. Так, при простом растяжении или сжатии <img
+                src="http://www.toehelp.ru/theory/sopromat/image027-40.gif">, и <img
+                src="http://www.toehelp.ru/theory/sopromat/image028-40.gif">; при изгибе балки,
+        шарнирно закрепленной по концам, сосредоточенной силой <i>Q</i> посредине пролета <img
+                src="http://www.toehelp.ru/theory/sopromat/image029-38.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image030-37.gif">; и т.д.</p>
+    <p>Таким образом, выражение для энергии может быть переписано так:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image031-36.gif"></p>
+    <p align="justify">   В основу этой формулы положены две предпосылки: а) справедливость закона
+        Гука и б) постепенный &#151; от нуля до окончательного значения &#151; рост силы <i>Q</i>,
+        напряжений <img src="http://www.toehelp.ru/theory/sopromat/image032-34.gif"> и
+        пропорциональных им деформаций <img
+                src="http://www.toehelp.ru/theory/sopromat/image033-34.gif">.</p>
+    <p align="justify">   Опыты с определением модуля упругости по наблюдениям над упругими
+        колебаниями стержней показывают, что и при динамическом действии нагрузок закон Гука
+        остается в силе, и модуль упругости сохраняет свою величину. Что касается характера
+        нарастания напряжений и деформаций, то и при ударе деформация происходит, хотя и быстро, но
+        не мгновенно; <img src="http://www.toehelp.ru/theory/sopromat/image034-33.gif"> постепенно
+        растет в течение очень короткого промежутка времени от нуля до окончательного значения;
+        параллельно росту деформаций возрастают и напряжения <img
+                src="http://www.toehelp.ru/theory/sopromat/image035-33.gif">.</p>
+    <p align="justify">   Реакция системы <i>С</i> на действие упавшего груза <i>Q</i> (назовем ее
+        <img src="http://www.toehelp.ru/theory/sopromat/image036-32.gif">) является следствием
+        развития деформации <img src="http://www.toehelp.ru/theory/sopromat/image037-31.gif">; она
+        растет параллельно <img src="http://www.toehelp.ru/theory/sopromat/image038-29.gif"> от нуля
+        до окончательной, максимальной величины и, если напряжения <img
+                src="http://www.toehelp.ru/theory/sopromat/image039-28.gif"> не превосходят предела
+        пропорциональности материала, связана с ней законом Гука:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image040-28.gif"></p>
+    <p align="justify">где <i>с</i> &#151; упомянутый выше коэффициент пропорциональности,
+        сохраняющий свое значение и при ударе.</p>
+    <p align="justify">   Таким образом, обе предпосылки для правильности формулы (3) принимаются и
+        при ударе. Поэтому можно считать, что вид формулы для <img
+                src="http://www.toehelp.ru/theory/sopromat/image041-28.gif"> при ударе будет тот же,
+        что и при статическом нагружении системы <i>С</i> силой инерции <img
+                src="http://www.toehelp.ru/theory/sopromat/image042-27.gif">, т. е.</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image043-27.gif"></p>
+    <p>(Здесь учтено, что по предыдущему <img
+            src="http://www.toehelp.ru/theory/sopromat/image044-25.gif">.) Подставляя значения
+        <i>Т</i> и <img src="http://www.toehelp.ru/theory/sopromat/image045-25.gif"> в уравнение
+        (1), получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image046-25.gif"></p>
+    <p>или</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image047-24.gif"></p>
+    <p>Отсюда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image048-24.gif"></p>
+    <p align="justify">или, удерживая перед радикалом для определения наибольшей величины деформации
+        системы в направлении удара знак плюс, получаем:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image049-22.gif"></p></td>
+            <td><p>(4)</p></td>
+        </tr>
+    </table>
+    <p>Так как напряжения и усилия по закону Гука пропорциональны деформации, то</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image050-21.gif"></p></td>
+            <td><p>(5)</p></td>
+        </tr>
+        <tr>
+            <td align="center"><p><img src="http://www.toehelp.ru/theory/sopromat/image051-21.gif">
+            </p></td>
+            <td><p>(6)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Из этих формул видно, что величина динамических деформаций, напряжений и
+        усилий зависит от величины статической деформации, т. е. от жесткости и продольных размеров
+        ударяемого тела; ниже это дополнительно будет показано на отдельных примерах. Величина</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><img
+                    src="http://www.toehelp.ru/theory/sopromat/image052-21.gif"></td>
+            <td><p>(7)</p></td>
+        </tr>
+    </table>
+    <p>в данном случае представляет собой динамический коэффициент.</p>
+    <p align="justify">   Заменяя в этой формуле <i>Н</i> на <img
+            src="http://www.toehelp.ru/theory/sopromat/image053-20.gif">, где <img
+            src="http://www.toehelp.ru/theory/sopromat/image054-18.gif"> &#151; скорость ударяющего
+        тела в начальный момент удара, получаем:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image055-18.gif"></p></td>
+            <td><p>(8)</p></td>
+        </tr>
+    </table>
+    <p>Кроме того, так как</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image056-17.gif"></p>
+    <p align="justify">где <img src="http://www.toehelp.ru/theory/sopromat/image057-17.gif">&#151;энергия
+        ударяющего тела к моменту начала удара, то выражение для динамического коэффициента может
+        быть представлено еще и в таком виде:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image058-17.gif"></p></td>
+            <td><p>(9)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Если мы в формулах (4) и (5) положим <img
+            src="http://www.toehelp.ru/theory/sopromat/image059-17.gif">, т. е. просто сразу
+        приложим груз <i>Q</i>, то <img src="http://www.toehelp.ru/theory/sopromat/image060-16.gif">
+        и <img src="http://www.toehelp.ru/theory/sopromat/image061-16.gif">; при внезапном
+        приложении силы <i>Q </i>деформации и напряжения вдвое больше, чем при статическом действии
+        той же силы.</p>
+    <p align="justify">   Наоборот, если высота падения груза <i>Н</i> (или скорость <img
+            src="http://www.toehelp.ru/theory/sopromat/image062-16.gif">) велика по сравнению с
+        деформацией <img src="http://www.toehelp.ru/theory/sopromat/image063-15.gif">, то в
+        подкоренном выражении формул (4) &#151; (8) можно пренебречь единицей по сравнению с
+        величиной отношения <img src="http://www.toehelp.ru/theory/sopromat/image064-14.gif">. Тогда
+        для <img src="http://www.toehelp.ru/theory/sopromat/image065-13.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image066-13.gif"> получаются следующие
+        выражения:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image067-13.gif"> и <img
+                    src="http://www.toehelp.ru/theory/sopromat/image068-13.gif"></p></td>
+            <td><p>(10)</p></td>
+        </tr>
+    </table>
+    <p>При очень большой величине отношения <img
+            src="http://www.toehelp.ru/theory/sopromat/image069-13.gif"> можно пренебречь и
+        единицей, стоящей перед корнем, т. е. написать:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image070-11.gif"> и <img
+                    src="http://www.toehelp.ru/theory/sopromat/image071-11.gif"></p></td>
+            <td><p>(11)</p></td>
+        </tr>
+    </table>
+    <p>Динамический коэффициент в этом случае определяется по формуле</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image072-11.gif"></p></td>
+            <td><p>(12)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Необходимо отметить, что в то время как пренебрежение единицей 2Н в
+        подкоренном выражении допустимо уже при <img
+                src="http://www.toehelp.ru/theory/sopromat/image073-11.gif"> (неточность
+        приближенных формул будет не больше 5%). пренебрежение единицей, стоящей перед корнем,
+        допустимо лишь при очень большой величине отношения <img
+                src="http://www.toehelp.ru/theory/sopromat/image074-11.gif">.</p>
+    <p>Так, например, для того чтобы приближенные формулы (11) и (12) давали погрешность не более
+        10%, отношение <img src="http://www.toehelp.ru/theory/sopromat/image075-11.gif"> должно быть
+        больше 110.</p>
+    <p align="justify">   Формулы <img src="http://www.toehelp.ru/theory/sopromat/image076-11.gif">
+        и <img src="http://www.toehelp.ru/theory/sopromat/image077-11.gif">, в которых <img
+                src="http://www.toehelp.ru/theory/sopromat/image078-11.gif"> выражается через <img
+                src="http://www.toehelp.ru/theory/sopromat/image079-11.gif">, могут быть
+        использованы также для решения задачи о встречном ударе тел, двигающихся с некоторой
+        скоростью, при определении напряжений в цилиндре двигателя внутреннего сгорания, вызванных
+        резким повышением давления газа при вспышке горючей смеси и др. На этом основании их можно
+        считать общими формулами для расчета на удар.</p>
+    <p align="justify">   Обобщая сказанное выше, можем наметить следующий общий прием решения задач
+        на определение напряжений при ударе. Применяя закон сохранения энергии, надо:</p>
+    <p>1) вычислить кинетическую энергию ударяющего тела <i>Т</i>;</p>
+    <p align="justify">2) вычислить потенциальную энергию <img
+            src="http://www.toehelp.ru/theory/sopromat/image080-10.gif"> тел, воспринимающих удар,
+        под нагрузкой их силами инерции при ударе; потенциальная энергия должна быть выражена через
+        напряжение (<img src="http://www.toehelp.ru/theory/sopromat/image081-9.gif">,<img
+                src="http://www.toehelp.ru/theory/sopromat/image082-9.gif">) в каком-либо сечении,
+        через деформацию (удлинение, прогиб) или через силу инерции <img
+                src="http://www.toehelp.ru/theory/sopromat/image083-9.gif"> ударяющего тела;</p>
+    <p align="justify">3) приравнять величины <img
+            src="http://www.toehelp.ru/theory/sopromat/image084-8.gif"> и <i>Т</i> и из полученного
+        уравнения найти или непосредственно динамическое напряжение, или деформацию, а по ней,
+        пользуясь законом Гука, напряжение или силу <img
+                src="http://www.toehelp.ru/theory/sopromat/image085-8.gif"> и соответствующие ей
+        динамические напряжения и деформации.</p>
+    <p align="justify">   Описанный общий прием расчета на удар предполагает, что вся кинетическая
+        энергия ударяющего тела целиком переходит в потенциальную энергию деформации упругой
+        системы. Это предположение не точно. Кинетическая энергия падающего груза частично
+        превращается в тепловую энергию и энергию неупругой деформации основания, на которое
+        опирается система.</p>
+    <p align="justify">   Вместе с тем при высоких скоростях удара деформация за время удара не
+        успевает распространиться на весь объем ударяемого тела и в месте удара возникают
+        значительные местные напряжения, иногда превосходящие предел текучести материала. Так,
+        например, при ударе свинцовым молотком по стальной балке большая часть кинетической энергии
+        превращается в энергию местных деформаций. Подобное же явление может иметь место даже и в
+        том случае, когда скорость удара мала, но жесткость или масса ударяемой конструкции
+        велика.</p>
+    <p align="justify">   Указанные случай соответствуют большим величинам дроби <img
+            src="http://www.toehelp.ru/theory/sopromat/image086-8.gif">. Поэтому можно сказать, что
+        описанный выше метод расчета применим, пока дробь <img
+                src="http://www.toehelp.ru/theory/sopromat/image087-8.gif"> не превышает
+        определенной величины. Более точные исследования показывают, что ошибка не превышает 10%
+        если <img src="http://www.toehelp.ru/theory/sopromat/image088-8.gif">. Так как эта дробь
+        может быть представлена в виде отношения <img
+                src="http://www.toehelp.ru/theory/sopromat/image089-8.gif">, то можно сказать, что
+        изложенный метод применим, пока энергия удара превышает не более чем в 100 раз потенциальную
+        энергию деформации, соответствующую статической нагрузке конструкции весом ударяющего груза.
+        Учет массы ударяемого тела при ударе позволяет несколько расширить пределы применимости
+        этого метода в тех случаях, когда масса ударяемого тела велика.</p>
+    <p>Более точная теория удара излагается в курсах теории упругости.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

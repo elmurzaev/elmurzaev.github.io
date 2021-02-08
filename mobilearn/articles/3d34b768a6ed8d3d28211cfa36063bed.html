@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.17. Подготавливаемый оператор позиционного удаления</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;preparable dynamic delete statement: positioned&gt; ::=
+   DELETE [FROM &lt;table name&gt;]
+   WHERE CURRENT OF &lt;cursor name&gt;</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        Основной смысл появления этого и следующего операторов состоит в том, что сочетание курсора,
+        определенного на динамически подготовленном операторе выборки, и статически задаваемых
+        операторов удаления и модификации по этому курсору, выглядит довольно нелепо. Поэтому в
+        стандарте появились динамически подготавливаемые позиционные операторы удаления и вставки.
+        Естественно, что выполняться они должны с помощью оператора EXECUTE.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

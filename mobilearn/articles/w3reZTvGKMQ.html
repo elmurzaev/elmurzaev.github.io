@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>14. Файлы. Операции с файлами</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Файловый тип данных определяет упорядоченную совокупность однотипных компонент.</span></p>
+<p><span>При работе с файлами выполняются операции ввода-вывода. Операция ввода – это перепись данных с внешнего устройства в память, операция вывода – пересылка данных из памяти на внешнее устройство.</span>
+</p>
+<p><span>Текстовые файлы</span></p>
+<p><span>Для описания таких файлов имеется тип Text:</span></p>
+<p><span>var TF1, TF2: Text;</span></p>
+<p><span>Компонентные файлы</span></p>
+<p><span>Компонентный, или типизированный файл, – это файл с объявленным типом его компонент.</span>
+</p>
+<p><span>type M = File Of T;</span></p>
+<p><span>где М – имя файлового типа;</span></p>
+<p><span>Т – тип компоненты. Операции производятся с помощью процедур.</span></p>
+<p><span>Write(f, X1,X2,…XK)</span></p>
+<p><span>Бестиповые файлы</span></p>
+<p><span>Бестиповые файлы позволяют записывать на диск произвольные участки памяти ЭВМ и считывать их.</span>
+</p>
+<p><span>var f: File;</span></p>
+<p>
+    <span>1. Procedure Assign(var F; FileName: String); Она сопоставляет имя файла с переменной.</span>
+</p>
+<p><span>2. Procedure Close(var F);</span></p>
+<p>
+    <span>Она разрывает связь между файловой переменной и внешним дисковым файлом и закрывает файл.</span>
+</p>
+<p><span>3. Function Eof(var F): Boolean;</span></p>
+<p><span>{Типизированные или нетипизированные файлы}</span></p>
+<p><span>Function Eof[(var F: Text)]: Boolean;</span></p>
+<p><span>{Текстовые файлы}</span></p>
+<p><span>Проверяет на конец файла.</span></p>
+<p><span>4. Procedure Erase(var F);</span></p>
+<p><span>Удаляет внешний файл, связанный с F.</span></p>
+<p><span>5. Function FileSize(var F): Integer;</span></p>
+<p><span>Возвращает размер в байтах файла F.</span></p>
+<p><span>6. Function FilePos(var F): LongInt;</span></p>
+<p><span>Возвращает текущую позицию внутри файла.</span></p>
+<p><span>7. Procedure Reset(var F [: File; RecSize: Word]);</span></p>
+<p><span>Открывает существующий файл.</span></p>
+<p><span>8. Procedure Rewrite(var F: File [; Recsize: Word]);</span></p>
+<p><span>Создает и открывает новый файл.</span></p>
+<p><span>9. Procedure Seek(var F; N: LongInt);</span></p>
+<p><span>Перемещает текущую позицию файла к определенному компоненту.</span></p>
+<p><span>10. Procedure Append(var F: Text);</span></p>
+<p><span>Дозапись.</span></p>
+<p><span>11. Function Eoln[(var F: Text)]: Boolean;</span></p>
+<p><span>Проверяет на конец строки.</span></p>
+<p><span>12. Procedure Read(F, V1 [, V2…, Vn]);</span></p>
+<p><span>{Типизированные и нетипизированные файлы}</span></p>
+<p><span>Procedure Read([var F: Text;] V1 [, V2…, Vn]);</span></p>
+<p><span>{Текстовые файлы}</span></p>
+<p><span>Читает компонент файла в переменную.</span></p>
+<p><span>13. Procedure Readln([var F: Text;] V1 [, V2…, Vn]);</span></p>
+<p><span>Считывает строку символов в файле, включая маркер конца строки, и переходит к началу следующей.</span>
+</p>
+<p><span>14. Function SeekEof[(var F: Text)]: Boolean;</span></p>
+<p><span>Возвращает признак конца файла. Используется только для открытых текстовых файлов.</span>
+</p>
+<p><span>15. Procedure Writeln([var F: Text;] [P1, P2…, Pn]);</span></p>
+<p><span>{Текстовые файлы}</span></p>
+<p><span>Выполняет операцию Write, затем помещает метку конца строки в файл.</span></p>
+</body>
+</html>

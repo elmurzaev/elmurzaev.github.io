@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Инструментарий Active Support</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="instrumentariy-active-support"> Инструментарий Active
+        Support</h2>
+    <p>Active Support — часть ядра Rails, которая предоставляет расширение языка Ruby, утилиты и
+        другие возможности. Она включает инструментарий API, который может использоваться внутри
+        приложения, для отслеживания определенных действий, которые возникают как в коде Ruby, так и
+        внутри приложения Rails и самого фреймворка. Однако, она не ограничена Rails. При
+        необходимости ее можно независимо использовать в других скриптах Ruby если вы желаете.</p>
+    <p>В этом руководстве вы научитесь использовать инструменты Active Support API для отслеживания
+        событий внутри Rails или другого Ruby кода.</p>
+    <p>После прочтения данного руководства вы будете знать:</p>
+    <ul>
+        <li>Какой инструментарий предоставляется.
+        </li>
+        <li>Какие есть хуки внутри фреймворка Rails для инструментария.
+        </li>
+        <li>О добавлении подписчиков к хукам.
+        </li>
+        <li>О построении произвольной реализации инструментария.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="vvedenie-v-instrumentariy"> Введение в инструментарий</h3>
+    <p>Инструментарий API, предоставленный Active Support, позволяет разработчикам создавать хуки,
+        которыми могут пользоваться другие разработчики. Некоторые из них присутствуют в фреймворке
+        Rails, как показано . С этим API, разработчики могут быть оповещены при возникновении
+        определенного события в их приложении или другом коде Ruby.</p>
+    <p>Например, есть хук внутри Active Record который вызывается каждый раз когда Active Record
+        использует запрос SQL к базе данных. На этот хук можно <strong>подписаться</strong> и
+        использовать его для отслеживания количества запросов в течении определенного действия. Есть
+        другой хук, оборачивающий экшны контроллеров. Он может быть использован, например, для
+        отслеживания, как долго выполнялся определенный экшн.</p>
+    <p>Вы даже можете создать свои собственные события внутри приложения, на которые вы потом
+        сможете подписаться.</p>
+    <h3 class="inside_page_header" id="huki-freymvorka-rails"> Хуки фреймворка Rails</h3>
+    <p>Внутри фреймворка Ruby on Rails присутствует множество хуков для обычных событий. Они
+        описываются ниже.</p>
+    <h3 class="inside_page_header" id="action-controller"> Action Controller</h3>
+    <h4 class="inside_page_header" id="write_fragment-action_controller">
+        write_fragment.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Полный ключ</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'posts/1-dashboard-view'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="read_fragment-action_controller">
+        read_fragment.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Полный ключ</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'posts/1-dashboard-view'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="expire_fragment-action_controller">
+        expire_fragment.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Полный ключ</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'posts/1-dashboard-view'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="exist_fragment-action_controller">
+        exist_fragment?.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Полный ключ</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'posts/1-dashboard-view'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="write_page-action_controller">
+        write_page.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:path</code></td>
+            <td>Полный путь</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  path: '/users/1'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="expire_page-action_controller">
+        expire_page.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:path</code></td>
+            <td>Полный путь</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  path: '/users/1'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="start_processing-action_controller">
+        start_processing.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:controller</code></td>
+            <td>Имя контроллера</td>
+        </tr>
+        <tr>
+            <td><code>:action</code></td>
+            <td>Экшн</td>
+        </tr>
+        <tr>
+            <td><code>:params</code></td>
+            <td>Хэш параметров запроса без фильтрации параметров</td>
+        </tr>
+        <tr>
+            <td><code>:format</code></td>
+            <td>html/js/json/xml и.т.д.</td>
+        </tr>
+        <tr>
+            <td><code>:method</code></td>
+            <td>Метод HTTP запроса</td>
+        </tr>
+        <tr>
+            <td><code>:path</code></td>
+            <td>Путь запроса</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  controller: "PostsController",
+  action: "new",
+  params: { "action" =&gt; "new", "controller" =&gt; "posts" },
+  format: :html,
+  method: "GET",
+  path: "/posts/new"
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="process_action-action_controller">
+        process_action.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:controller</code></td>
+            <td>Имя контроллера</td>
+        </tr>
+        <tr>
+            <td><code>:action</code></td>
+            <td>Экшн</td>
+        </tr>
+        <tr>
+            <td><code>:params</code></td>
+            <td>Хэш параметров запроса без фильтрации параметров</td>
+        </tr>
+        <tr>
+            <td><code>:format</code></td>
+            <td>html/js/json/xml и.т.д.</td>
+        </tr>
+        <tr>
+            <td><code>:method</code></td>
+            <td>Метод HTTP запроса</td>
+        </tr>
+        <tr>
+            <td><code>:path</code></td>
+            <td>Путь запроса</td>
+        </tr>
+        <tr>
+            <td><code>:status</code></td>
+            <td>Код статуса HTTP</td>
+        </tr>
+        <tr>
+            <td><code>:view_runtime</code></td>
+            <td>Количество времени, потраченного во вьюхе</td>
+        </tr>
+        <tr>
+            <td><code>:db_runtime</code></td>
+            <td>Время, потраченное на выполнение запросов к БД в мс</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  controller: "PostsController",
+  action: "index",
+  params: {"action" =&gt; "index", "controller" =&gt; "posts"},
+  format: :html,
+  method: "GET",
+  path: "/posts",
+  status: 200,
+  view_runtime: 46.848,
+  db_runtime: 0.157
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="send_file-action_controller">
+        send_file.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:path</code></td>
+            <td>Полный путь к файлу</td>
+        </tr>
+    </table>
+    <div class="info"><p>Дополнительные ключи могут быть добавлены при вызове.</p></div>
+    <h4 class="inside_page_header" id="send_data-action_controller">
+        send_data.action_controller</h4>
+    <p><code>ActionController</code> не имеет какой-либо конкретной информации при загрузке. Все
+        опции передаются через загрузку.</p>
+    <h4 class="inside_page_header" id="redirect_to-action_controller">
+        redirect_to.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:status</code></td>
+            <td>Код HTTP ответа</td>
+        </tr>
+        <tr>
+            <td><code>:location</code></td>
+            <td>URL для переадресации</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  status: 302,
+  location: "http://localhost:3000/posts/new"
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="halted_callback-action_controller">
+        halted_callback.action_controller</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:filter</code></td>
+            <td>Фильтр, прервавший экшн</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  filter: ":halting_filter"
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="action-view"> Action View</h3>
+    <h4 class="inside_page_header" id="render_template-action_view">
+        render_template.action_view</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:identifier</code></td>
+            <td>Полный путь до шаблона</td>
+        </tr>
+        <tr>
+            <td><code>:layout</code></td>
+            <td>Применяемый макет</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  identifier: "/Users/adam/projects/notifications/app/views/posts/index.html.erb",
+  layout: "layouts/application"
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="render_partial-action_view"> render_partial.action_view</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:identifier</code></td>
+            <td>Полный путь до шаблона</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  identifier: "/Users/adam/projects/notifications/app/views/posts/_form.html.erb",
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <h4 class="inside_page_header" id="sql-active_record"> sql.active_record</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:sql</code></td>
+            <td>выражение SQL</td>
+        </tr>
+        <tr>
+            <td><code>:name</code></td>
+            <td>Имя операции</td>
+        </tr>
+        <tr>
+            <td><code>:connection_id</code></td>
+            <td><code>self.object_id</code></td>
+        </tr>
+    </table>
+    <div class="info"><p>Адаптеры будут добавлять свои собственные данные.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  sql: "SELECT \"posts\".* FROM \"posts\" ",
+  name: "Post Load",
+  connection_id: 70307250813140,
+  binds: []
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="identity-active_record"> identity.active_record</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:line</code></td>
+            <td>Главный ключ объекта для идентификации</td>
+        </tr>
+        <tr>
+            <td><code>:name</code></td>
+            <td>Класс записи</td>
+        </tr>
+        <tr>
+            <td><code>:connection_id</code></td>
+            <td><code>self.object_id</code></td>
+        </tr>
+    </table>
+    <h4 class="inside_page_header" id="instantiation-active_record">
+        instantiation.active_record</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td><code>:record_count</code></td>
+            <td>Количество записей</td>
+        </tr>
+        <tr>
+            <td><code>:class_name</code></td>
+            <td>Класс записи</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  record_count: 1,
+  class_name: "User"
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <h4 class="inside_page_header" id="receive-action_mailer"> receive.action_mailer</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:mailer</code></td>
+            <td>Название класса рассыльщика</td>
+        </tr>
+        <tr>
+            <td><code>:message_id</code></td>
+            <td>ID сообщения, создается Mail гемом</td>
+        </tr>
+        <tr>
+            <td><code>:subject</code></td>
+            <td>Тема сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:to</code></td>
+            <td>Адресат(ы) сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:from</code></td>
+            <td>Отправитель сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:bcc</code></td>
+            <td>BCC адреса сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:cc</code></td>
+            <td>CC адреса сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:date</code></td>
+            <td>Дата сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:mail</code></td>
+            <td>Кодированная форма сообщения</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  mailer: "Notification",
+  message_id: "4f5b5491f1774_181b23fc3d4434d38138e5@mba.local.mail",
+  subject: "Rails Guides",
+  to: ["users@rails.com", "ddh@rails.com"],
+  from: ["me@rails.com"],
+  date: Sat, 10 Mar 2012 14:18:09 +0100,
+  mail: "..." # опущено для краткости
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="deliver-action_mailer"> deliver.action_mailer</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:mailer</code></td>
+            <td>Название класса рассыльщика</td>
+        </tr>
+        <tr>
+            <td><code>:message_id</code></td>
+            <td>ID сообщения, создается Mail гемом</td>
+        </tr>
+        <tr>
+            <td><code>:subject</code></td>
+            <td>Тема сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:to</code></td>
+            <td>Адресат(ы) сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:from</code></td>
+            <td>Отправитель сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:bcc</code></td>
+            <td>BCC адреса сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:cc</code></td>
+            <td>CC адреса сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:date</code></td>
+            <td>Дата сообщения</td>
+        </tr>
+        <tr>
+            <td><code>:mail</code></td>
+            <td>Кодированная форма сообщения</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  mailer: "Notification",
+  message_id: "4f5b5491f1774_181b23fc3d4434d38138e5@mba.local.mail",
+  subject: "Rails Guides",
+  to: ["users@rails.com", "ddh@rails.com"],
+  from: ["me@rails.com"],
+  date: Sat, 10 Mar 2012 14:18:09 +0100,
+  mail: "..." # опущено для краткости
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <h4 class="inside_page_header" id="cache_read-active_support"> cache_read.active_support</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ, используемый при хранении</td>
+        </tr>
+        <tr>
+            <td><code>:hit</code></td>
+            <td>Если это чтение успешно</td>
+        </tr>
+        <tr>
+            <td><code>:super_operation</code></td>
+            <td>:fetch добавляется когда чтение используется с <code>#fetch</code>
+            </td>
+        </tr>
+    </table>
+    <h4 class="inside_page_header" id="cache_generate-active_support">
+        cache_generate.active_support</h4>
+    <p>Это событие используется только когда <code>#fetch</code> вызывается с блоком.</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ используемый при хранении</td>
+        </tr>
+    </table>
+    <div class="info"><p>Опции, переданные в вызов, будут объединены с информацией при записи в
+        хранилище.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'name-of-complicated-computation'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="cache_fetch_hit-active_support">
+        cache_fetch_hit.active_support</h4>
+    <p>Это событие используется только когда <code>#fetch</code> вызывается с блоком.</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ, используемый при хранении</td>
+        </tr>
+    </table>
+    <div class="info"><p>Опции, переданные в вызов, будут объединены с информацией.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'name-of-complicated-computation'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="cache_write-active_support"> cache_write.active_support</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ, используемый при хранении</td>
+        </tr>
+    </table>
+    <div class="info"><p>Кеш хранилище может добавить свой ключ.</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'name-of-complicated-computation'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="cache_delete-active_support">
+        cache_delete.active_support</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ, используемый при хранении</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'name-of-complicated-computation'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="cache_exist-active_support"> cache_exist?.active_support</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:key</code></td>
+            <td>Ключ, используемый при хранении</td>
+        </tr>
+    </table>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  key: 'name-of-complicated-computation'
+}
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <h4 class="inside_page_header" id="load_config_initializer-railties">
+        load_config_initializer.railties</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:initializer</code></td>
+            <td>Путь к загруженному инициализатору из <code>config/initializers</code>
+            </td>
+        </tr>
+    </table>
+    <h3 class="inside_page_header" id="rails"> Rails</h3>
+    <h4 class="inside_page_header" id="deprecation-rails"> deprecation.rails</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td><code>:message</code></td>
+            <td>Предупреждение устаревания</td>
+        </tr>
+        <tr>
+            <td><code>:callstack</code></td>
+            <td>Откуда предупреждение пришло</td>
+        </tr>
+    </table>
+    <h3 class="inside_page_header" id="podpiska-na-sobytiya"> Подписка на события</h3>
+    <p>Подписаться на событие просто. Используйте
+        <code>ActiveSupport::Notifications.subscribe</code> с блоком, чтобы слушать любое
+        уведомление.</p>
+    <p>Блок получает следующие аргументы:</p>
+    <ul>
+        <li>Название события
+        </li>
+        <li>Время начала
+        </li>
+        <li>Время окончания
+        </li>
+        <li>Уникальный ID этого события
+        </li>
+        <li>Информация (описывается в предыдущей секции)
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.subscribe "process_action.action_controller" do |name, started, finished, unique_id, data|
+  # Ваши собственные настройки
+  Rails.logger.info "#{name} Received!"
+end
+</pre>
+    </div>
+    <p>Определение всех этих аргументов блока каждый раз может быть утомительно. Можно легко создать
+        <code>ActiveSupport::Notifications::Event</code> из блока аргументов, например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.subscribe "process_action.action_controller" do |*args|
+  event = ActiveSupport::Notifications::Event.new *args
+  event.name      # =&gt; "process_action.action_controller"
+  event.duration  # =&gt; 10 (in milliseconds)
+  event.payload   # =&gt; {:extra=&gt;information}
+  Rails.logger.info "#{event} Received!"
+end
+</pre>
+    </div>
+    <p>В основном вас будет интересовать сама информация. Ниже приведен краткий вариант, как можно
+        получить информацию.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.subscribe "process_action.action_controller" do |*args|
+  data = args.extract_options!
+  data # { extra: :information }
+end
+</pre>
+    </div>
+    <p>Вы можете также подписаться на события, соответствующие регулярному выражению. Это позволит
+        вам подписаться на несколько событий за раз. Вот как можно подписаться на все события <code>ActionController</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.subscribe /action_controller/ do |*args|
+  # Проверка всех событий ActionController
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="sozdanie-polzovatelskogo-sobytiya"> Создание
+        пользовательского события</h3>
+    <p>Добавить свои события очень просто. <code>ActiveSupport::Notifications</code> будет делать
+        всю тяжелую работу за вас. Просто вызовите <code>instrument</code> с <code>name</code>,
+        <code>payload</code> и блоком. Уведомление будет отправлено после возвращения блока. <code>ActiveSupport</code>
+        сгенерирует время старта и окончания и уникальный ID. Все данные переданные в вызов <code>instrument</code>
+        будут выполнены в <code>payload</code>.</p>
+    <p>Пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.instrument "my.custom.event", this: :data do
+  # Создание ваших пользовательских настроек тут
+end
+</pre>
+    </div>
+    <p>Теперь можно слушать это событие:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Notifications.subscribe "my.custom.event" do |name, started, finished, unique_id, data|
+  puts data.inspect # {:this=&gt;:data}
+end
+</pre>
+    </div>
+    <p>Вы должны следовать соглашениям Rails при создании своих событий. Формат:
+        <code>event.library</code>. Если ваше приложение отправляет Tweets, вы должны назвать
+        событие <code>tweet.twitter</code>.</p>
+
+</body>
+</html>

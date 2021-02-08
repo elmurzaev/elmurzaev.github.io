@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расчет балки на упругом основании</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 31.</strong> Расчет балки на упругом основании.</p>
+    <p><strong>Общие понятия.</strong></p>
+    <p align="justify">   К числу статически неопределимых балок может быть отнесена балка на
+        упругом основании. Так называется балка, опирающаяся по всей своей длине (Рис.1) на упругое
+        основание, оказывающее в каждой точке на балку реакцию, пропорциональную <i>у </i>&#151;
+        прогибу балки в этой точке. Коэффициент пропорциональности обозначается буквой <i>k.</i></p>
+    <p align="justify">   Введение предположения о пропорциональности реакций прогибу является
+        приближением, хотя и достаточно близким к действительным условиям.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image001-30.gif"><br><br>
+        <b>Рис.1.</b> Расчетная схема балки на упругом основании.
+    </center>
+    <p> </p>
+    <p align="justify">   Предложение ввести в расчет коэффициент пропорциональности <i>к</i>,
+        именуемый «коэффициентом постели», было впервые сделано русским академиком Николаем
+        Ивановичем Фуссом в 1801 году. Принимая это предположение, получаем, что
+        <i>интенсивность </i>реакции основания в каждой точке сила равна <i>ky</i> и измеряется в
+        единицах силы и длины; размерность коэффициента <i>k</i> при этом будет сила и квадрат
+        длины. Будем считать, что основание оказывает реакцию при прогибах балки как вниз, так и
+        вверх.</p>
+    <p align="justify">   На практике задачи о расчете балки на упругом основании встречаются в
+        железнодорожном деле (рельс, шпала), в строительстве &#151; фундаменты различных сооружений,
+        передающие нагрузку на грунт.</p>
+    <p align="justify">   Статически неопределимой такая балка будет потому, что условие статики&#151;
+        сумма нагрузок равна всей реакции основания &#151; не дает возможности установить <i>распределение</i>
+        этой реакции по длине балки, а значит, вычислить изгибающие моменты и поперечные силы.</p>
+    <p align="justify">   Интенсивность реакции в каждой точке связана с прогибами балки. Поэтому
+        для решения задачи необходимо найти сначала уравнение изогнутой оси <img
+                src="http://www.toehelp.ru/theory/sopromat/image002-30.gif">, а уже затем формулы
+        для вычисления изгибающего момента и поперечной силы. Ход решения оказывается обратным
+        обычному.</p>
+    <p align="justify">   Найдем уравнение изогнутой оси для балки постоянного сечения, лежащей на
+        упругом основании и нагруженной сосредоточенными силами <img
+                src="http://www.toehelp.ru/theory/sopromat/image003-29.gif">... (Рис.1). Начало
+        координат возьмем в любой точке, ось <i>х</i> направим вправо, ось <i>у</i> вертикально
+        вверх. Направление нагрузок вверх будем считать положительным. Напишем обычное
+        дифференциальное уравнение изгиба</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image004-29.gif"></p>
+    <p align="justify">   Так как <i>М(х)</i> нам неизвестен, то постараемся связать прогибы
+        непосредственно с нагрузкой, для этого дифференцируем дважды предыдущее уравнение:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image005-29.gif"></p></td>
+            <td><p>(1)</p></td>
+        </tr>
+    </table>
+    <p>где <i>q(x)&#151;</i>интенсивность сплошной нагрузки, действующей на балку в сечении с
+        абсциссой <i>х</i>.</p>
+    <p align="justify">   Сплошной нагрузкой для нашей балки является лишь реакция упругого
+        основания. Интенсивность ей пропорциональна прогибам; эта нагрузка направлена <i>вверх</i>,
+        т. е. <i>положительна</i>, когда прогибы идут <i>вниз</i>, т. е. отрицательны, и наоборот.
+        Таким образом, эта нагрузка имеет знак, обратный знаку прогибов:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image006-29.gif"></p>
+    <p>Тогда</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image007-29.gif"></p></td>
+            <td><p>(2)</p></td>
+        </tr>
+        <tr>
+            <td align="center"><p><img src="http://www.toehelp.ru/theory/sopromat/image008-29.gif">
+            </p></td>
+            <td><p>(3)</p></td>
+        </tr>
+    </table>
+    <p>Если обозначить <img src="http://www.toehelp.ru/theory/sopromat/image009-29.gif">, то общий
+        интеграл уравнения (25.3) имеет вид: <img
+                src="http://www.toehelp.ru/theory/sopromat/image010-29.gif"> (25.4)</p>
+    <p align="justify">   Постоянные <i>А, В, С, D</i> должны быть определены в каждом частном
+        случае нагрузки и длины балки. Величина <img
+                src="http://www.toehelp.ru/theory/sopromat/image011-29.gif"> имеет измерение
+        обратное длине.</p>
+    <p> </p>
+    <p><strong>Расчет бесконечно длинной балки на упругом основании, загруженной одной силой
+        Р.</strong></p>
+    <p align="justify">   Наиболее просто решается задача об изгибе бесконечно длинной балки,
+        нагруженной одной сосредоточенной силой (Рис.2). Помимо непосредственного практического
+        значения решение этой задачи позволит путем последовательных приближений рассчитывать и
+        балки конечной длины.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image012-29.gif"><br><br>
+        <b>Рис.2.</b> Расчетная схема балки бесконечной длины.
+    </center>
+    <p> </p>
+    <p align="justify">   Начало координат расположим в точке приложения силы <i>Р</i>. Определим
+        постоянные <i>А, В, С</i> и <i>D</i>. Так как вся реакция основания, равная силе Р должна
+        быть конечной величиной, то прогибы балки в точках, бесконечно удаленных от точки приложения
+        силы, должны обращаться в нуль:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image013-29.gif"></p></td>
+            <td><p>(5)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   При бесконечно больших значениях <i>х</i> два вторых слагаемых в правой
+        части формулы (4) обращаются в нуль благодаря множителю <img
+                src="http://www.toehelp.ru/theory/sopromat/image014-28.gif">, два же первых могут
+        обратиться в нуль лишь при</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image015-28.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image016-27.gif"></p>
+    <p>таким образом,</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image017-27.gif"></p></td>
+            <td><p>(6)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Далее, по симметрии нагрузки и реакции основания, касательная к изогнутой
+        оси в точке приложения силы должна идти параллельно оси абсцисс:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image018-25.gif"></p>
+    <p>Дифференцируя (6), получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image019-25.gif"></p>
+    <p>Подставляя в это выражение <img src="http://www.toehelp.ru/theory/sopromat/image020-25.gif">
+        и приравнивая результат нулю, находим:</p>
+    <p><i>D &#151; С</i> = 0 и <i>C=D</i>;</p>
+    <p>таким образом, уравнения будут:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image021-25.gif"></p></td>
+            <td><p>(7)</p></td>
+        </tr>
+        <tr>
+            <td align="center"><p><img src="http://www.toehelp.ru/theory/sopromat/image022-25.gif">
+            </p></td>
+            <td><p>(8)</p></td>
+        </tr>
+    </table>
+    <p align="justify">   Для определения последней постоянной <i>С</i> имеем еще одно уравнение:
+        нам известна величина поперечной силы в начале координат.</p>
+    <p align="justify">   Разрезав балку сечением в точке <i>О</i> справа от силы <i>Р</i> и
+        рассматривая правую часть балки, видим, что поперечная сита в этом сечении равна реакции
+        основания, действующей на <i>правую половину</i> балки со знаком минус; так как реакция
+        направлена <i>вверх</i> (для правой половины) и вся реакция основания равна <i>Р</i>,
+        значит, поперечная сила в сечении при <i>х = 0</i> равна</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image023-25.gif"></p>
+    <p>Но, с другой стороны</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image024-25.gif"></p></td>
+            <td><p>(9)</p></td>
+        </tr>
+    </table>
+    <p>Таким образом,</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><p><img
+                    src="http://www.toehelp.ru/theory/sopromat/image025-25.gif"></p></td>
+            <td><p>(10)</p></td>
+        </tr>
+    </table>
+    <p>Вычисляем, пользуясь (8), <img src="http://www.toehelp.ru/theory/sopromat/image026-24.gif"> и
+        <img src="http://www.toehelp.ru/theory/sopromat/image027-24.gif">:</p>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td align="center" width="90%"><img
+                    src="http://www.toehelp.ru/theory/sopromat/image028-24.gif"></td>
+            <td><p>(11)</p></td>
+        </tr>
+        <tr>
+            <td align="center"><img src="http://www.toehelp.ru/theory/sopromat/image029-22.gif">
+            </td>
+            <td><p>(12)</p></td>
+        </tr>
+    </table>
+    <p>Подставляя (12) в (10) и приравнивая <i>х</i> нулю, получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image030-21.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image031-21.gif"></p>
+    <p>Теперь значения у и ее производных получают вид</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image032-20.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image033-20.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image034-20.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image035-20.gif"></p>
+    <p align="justify">   Таким образом, напряженное состояние и деформации балки на упругом
+        основании всецело определяются нагрузкой и коэффициентом <img
+                src="http://www.toehelp.ru/theory/sopromat/image036-19.gif">, зависящим от
+        соотношения жесткостей балки и упругого основания.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Установка зависимостей для разработки</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="ustanovka-zavisimostey-dlya-razrabotki"> Установка
+        зависимостей для разработки</h2>
+    <p>Это руководство раскрывает, как настроить среду для разработки ядра Ruby on Rails.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как настроить свою машину для разработки Rails
+        </li>
+        <li>Как запустить определенную группу юнит-тестов из тестового набора Rails
+        </li>
+        <li>Как работает часть тестового набора Rails, относящаяся к Active Record
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="prostoy-sposob"> Простой способ</h3>
+    <p>Простейшим и рекомендованным способом получить среду разработки, готовую для
+        программирования, является использование .</p>
+    <h3 class="inside_page_header" id="slozhnyy-sposob"> Сложный способ</h3>
+    <p>В случае, если вы не можете использовать Rails development box, вот шаги для создания среды
+        разработки для ядра Ruby on Rails.</p>
+    <h4 class="inside_page_header" id="ustanovite-git"> Установите Git</h4>
+    <p>Ruby on Rails использует Git для контроля кода. На есть инструкции по установке. Также в сети
+        есть ряд ресурсов, которые помогут познакомиться с Git:</p>
+    <ul>
+        <li> — это интерактивный курс, который научит вас основам.
+        </li>
+        <li> довольно объемная, а также содержит несколько видео с основами Git.
+        </li>
+        <li> научит вас достаточному, чтобы работать с Git.
+        </li>
+        <li> по Git легко повторить.
+        </li>
+        <li> предлагает ссылки на ряд ресурсов по Git.
+        </li>
+        <li> — это целая книга о Git с лицензией Creative Commons.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="kloniruyte-repozitoriy-ruby-on-rails"> Клонируйте репозиторий
+        Ruby on Rails</h4>
+    <p>Перейдите в папку, в которой вы хотите разместить исходный код Ruby on Rails (он создаст свою
+        собственную поддиректорию <code>rails</code>), и запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ git clone git://github.com/rails/rails.git
+$ cd rails
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="nastroyte-i-zapustite-testy"> Настройте и запустите
+        тесты</h4>
+    <p>Тестовый набор должен проходить для любого отправляемого кода. Вне зависимости, пишете ли вы
+        новый код, или проверяете чей-то, вам нужно иметь возможность запускать тесты.</p>
+    <p>Сначала установите SQLite3 и его файлы для разработки для гема <code>sqlite3</code>.
+        Пользователи Mac OS X это могут сделать так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ brew install sqlite3
+</pre>
+    </div>
+    <p>В Ubuntu это делается так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo apt-get install sqlite3 libsqlite3-dev
+</pre>
+    </div>
+    <p>Если у вас Fedora или CentOS, то так</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo yum install sqlite3 sqlite3-devel
+</pre>
+    </div>
+    <p>Если у вас Arch Linux, нужно запустить:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo pacman -S sqlite
+</pre>
+    </div>
+    <p>Для пользователей FreeBSD, это делается так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# pkg install sqlite3
+</pre>
+    </div>
+    <p>Или скомпилируйте порт <code>databases/sqlite3</code>.</p>
+    <p>Получите последнюю версию </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ gem install bundler
+$ gem update bundler
+</pre>
+    </div>
+    <p>и запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bundle install --without db
+</pre>
+    </div>
+    <p>Эта команда установит все зависимости, кроме Ruby-драйверов MySQL и PostgreSQL. К ним мы
+        скоро вернемся.</p>
+    <div class="note"><p>Если вы хотите запустить тесты, использующие memcached, необходимо
+        убедиться, что он у вас установлен и запущен.</p></div>
+    <p>Можно использовать для установки memcached на OS X:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ brew install memcached
+</pre>
+    </div>
+    <p>На Ubuntu можно установить его с помощью apt-get:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo apt-get install memcached
+</pre>
+    </div>
+    <p>Или использовать yum на Fedora или CentOS:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo yum install memcached
+</pre>
+    </div>
+    <p>Если вы запускаете на Arch Linux:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo pacman -S memcached
+</pre>
+    </div>
+    <p>Для пользователей FreeBSD, это делается так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# pkg install memcached
+</pre>
+    </div>
+    <p>Альтернативно можно скомпилировать порт <code>databases/memcached</code>.</p>
+    <p>Теперь, когда установлены зависимости, можно запустить тестовый набор с помощью:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bundle exec rake test
+</pre>
+    </div>
+    <p>Также можно запустить тесты для отдельного компонента, например Action Pack, перейдя в его
+        директорию и запустив ту же самую команду:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd actionpack
+$ bundle exec rake test
+</pre>
+    </div>
+    <p>Если хотите запустить тесты, расположенные в определенной директории, используйте переменную
+        среды <code>TEST_DIR</code>. Например, это запустит тесты только в директории <code>railties/test/generators</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd railties
+$ TEST_DIR=generators bundle exec rake test
+</pre>
+    </div>
+    <p>Можно запустить тесты для определенного файла, используя:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd actionpack
+$ bundle exec ruby -Itest test/template/form_helper_test.rb
+</pre>
+    </div>
+    <p>Или можно запустить отдельный тест в определенном файле:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd actionpack
+$ bundle exec ruby -Itest path/to/test.rb -n test_name
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="nastroyka-active-record"> Настройка Active Record</h4>
+    <p>Тестовый набор Active Record пытается запуститься четыре раза: один для SQLite3, один для
+        каждого из двух гемов MySQL (<code>mysql</code> и <code>mysql2</code>), и один для
+        PostgreSQL. Мы собираемся показать, как настроить среду для них.</p>
+    <div class="warning"><p>Если вы работаете с кодом, вы <em>обязаны</em> убедиться, что тесты
+        проходят как минимум для MySQL, PostgreSQL и SQLite3. Тонкости в различии между различными
+        адаптерами лежали в основе отклонения многих изменений, которые выглядели хорошо, когда их
+        тестировали только на MySQL.</p></div>
+    <h5 class="inside_page_header" id="konfiguratsiya-bazy-dannyh"> Конфигурация базы данных</h5>
+    <p>Тестовый набор Active Record требует пользовательский файл настроек: <code>activerecord/test/config.yml</code>.
+        Пример представлен в <code>activerecord/test/config.example.yml</code>, который можно
+        скопировать и использовать в своей среде.</p>
+    <h5 class="inside_page_header" id="mysql-i-postgresql"> MySQL и PostgreSQL</h5>
+    <p>Чтобы запускать набор для MySQL и PostgreSQL, нам нужны их гемы. Сначала установите серверы,
+        их клиентские библиотеки и их файлы для разработки.</p>
+    <p>На OS X можно выполнить:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ brew install mysql
+$ brew install postgresql
+</pre>
+    </div>
+    <p>Чтобы их запустить, следуйте инструкциям Homebrew.</p>
+    <p>В Ubuntu просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo apt-get install mysql-server libmysqlclient15-dev
+$ sudo apt-get install postgresql postgresql-client postgresql-contrib libpq-dev
+</pre>
+    </div>
+    <p>На Fedora или CentOS просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo yum install mysql-server mysql-devel
+$ sudo yum install postgresql-server postgresql-devel
+</pre>
+    </div>
+    <p>Если вы запускаете на Arch Linux, MySQL больше не поддерживается, поэтому вам нужно вместо
+        него использовать MariaDB (смотрите ):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo pacman -S mariadb libmariadbclient mariadb-clients
+$ sudo pacman -S postgresql postgresql-libs
+</pre>
+    </div>
+    <p>Пользователи FreeBSD должны запустить следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# pkg install mysql56-client mysql56-server
+# pkg install postgresql94-client postgresql94-server
+</pre>
+    </div>
+    <p>Или установить их с помощью портов (они расположены в папке <code>databases</code>). Если у
+        вас затруднения при установке MySQL, обратитесь к
+        .</p>
+    <p>После этого запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rm .bundle/config
+$ bundle install
+</pre>
+    </div>
+    <p>Сперва нам нужно удалить <code>.bundle/config</code>, так как Bundler запоминает, что мы не
+        хотели устанавливать группу "db" (альтернативно вы можете отредактировать этот файл).</p>
+    <p>Чтобы было можно запускать тесты на MySQL, необходимо создать пользователя с именем <code>rails</code>
+        с привилегиями на тестовые базы данных:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ mysql -uroot -p
+mysql&gt; CREATE USER 'rails'@'localhost';
+mysql&gt; GRANT ALL PRIVILEGES ON activerecord_unittest.*
+       to 'rails'@'localhost';
+mysql&gt; GRANT ALL PRIVILEGES ON activerecord_unittest2.*
+       to 'rails'@'localhost';
+mysql&gt; GRANT ALL PRIVILEGES ON inexistent_activerecord_unittest.*
+       to 'rails'@'localhost';
+</pre>
+    </div>
+    <p>и создать тестовые базы данных:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd activerecord
+$ bundle exec rake db:mysql:build
+</pre>
+    </div>
+    <p>Аутентификация PostgreSQL работает по-другому. Чтобы настроить среду разработки для своего
+        аккаунта на Linux или BSD, просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sudo -u postgres createuser --superuser $USER
+</pre>
+    </div>
+    <p>и для OS X:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ createuser --superuser $USER
+</pre>
+    </div>
+    <p>Затем нужно создать тестовые базы данных с помощью</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd activerecord
+$ bundle exec rake db:postgresql:build
+</pre>
+    </div>
+    <p>Можно создать базы данных для обоих PostgreSQL и MySQL с помощью</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd activerecord
+$ bundle exec rake db:create
+</pre>
+    </div>
+    <p>Можно очистить базы данных с помощью</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd activerecord
+$ bundle exec rake db:drop
+</pre>
+    </div>
+    <div class="note"><p>Использование задачи rake для создания тестовых баз данных позволяет
+        убедиться, что они имеют правильные кодировки и сортировки.</p></div>
+    <div class="note"><p>Вы увидите следующее предупреждение (или локализованное предупреждение) при
+        активации расширения HStore в PostgreSQL 9.1.x или ранее: "WARNING: =&gt; is deprecated as
+        an operator".</p></div>
+    <p>Если вы используете другую базу данных, ищите в файле
+        <code>activerecord/test/config.yml</code> или
+        <code>activerecord/test/config.example.yml</code> информацию по соединению по умолчанию.
+        Можно отредактировать <code>activerecord/test/config.yml</code>, чтобы представить другие
+        учетные данные для вашей машины, если необходимо, но, очевидно, вы не должны отправлять
+        такие изменения обратно в Rails.</p>
+
+</body>
+</html>

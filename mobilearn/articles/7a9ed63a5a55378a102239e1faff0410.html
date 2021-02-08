@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>1.1. Определители второго порядка</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+</td>
+<td class="CONTENT" width="100%">
+</td>
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal"><b>Определение.</b>
+        Выражение </p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shapetype id="_x0000_t75"
+                     coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+                     path="m@4@5l@4@11@9@11@9@5xe"
+                     filled="f" stroked="f">
+            <v:stroke joinstyle="miter"/>
+            <v:formulas>
+                <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+                <v:f eqn="sum @0 1 0"/>
+                <v:f eqn="sum 0 0 @1"/>
+                <v:f eqn="prod @2 1 2"/>
+                <v:f eqn="prod @3 21600 pixelWidth"/>
+                <v:f eqn="prod @3 21600 pixelHeight"/>
+                <v:f eqn="sum @0 0 1"/>
+                <v:f eqn="prod @6 1 2"/>
+                <v:f eqn="prod @7 21600 pixelWidth"/>
+                <v:f eqn="sum @8 21600 0"/>
+                <v:f eqn="prod @7 21600 pixelHeight"/>
+                <v:f eqn="sum @10 21600 0"/>
+            </v:formulas>
+            <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+            <o:lock v:ext="edit" aspectratio="t"/>
+        </v:shapetype>
+        <v:shape id="_x0000_i1030" type="#_x0000_t75" style='width:143.25pt;
+ height:33pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image001.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="44"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image002.gif"
+                                   v:shapes="_x0000_i1030" width="191"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+                         DrawAspect="Content" ObjectID="_1072190950">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>называется
+        определителем 2-го порядка.</p>
+    <p class="MsoNormal">Числа <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1031"
+                 type="#_x0000_t75" style='width:71.25pt;height:15pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image003.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image004.gif"
+                                   v:shapes="_x0000_i1031" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1031"
+                         DrawAspect="Content" ObjectID="_1072190951">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>– это элементы
+        определителя. Определитель 2-го порядка имеет две строки и два столбца.
+        Индексы, стоящие внизу соответствующего элемента, означают номер строки и номер
+        столбца определителя, на пересечении которых стоит указанный элемент. Например,
+        элемент <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1032" type="#_x0000_t75"
+                     style='width:15.75pt;height:15pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image005.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="20"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image006.gif"
+                                       v:shapes="_x0000_i1032" width="21"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1032"
+                         DrawAspect="Content" ObjectID="_1072190952">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>стоит в первой строке
+        и втором столбце определителя.</p>
+    <p class="MsoNormal">Элементы <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1033"
+                 type="#_x0000_t75" style='width:33.75pt;height:15pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image007.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image008.gif"
+                                   v:shapes="_x0000_i1033" width="45"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+                         DrawAspect="Content" ObjectID="_1072190953">
+            </o:OLEObject>
+        </xml><![endif]-->называют элементами главной диагонали определителя, а другие
+        два элемента – соответственно элементами побочной диагонали.</p>
+    <p class="MsoNormal"><b>Пример 1.</b>
+        Вычислим определитель</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1034" type="#_x0000_t75"
+                 style='width:131.25pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image009.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image010.gif"
+                                   v:shapes="_x0000_i1034" width="175"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1034"
+                         DrawAspect="Content" ObjectID="_1072190954">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+</td>
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal"><b>Определение.</b>
+        Выражение</p>
+    <p class="MsoNormal">)</p>
+    <p align="left" class="MsoNormal">называется
+        определителем 3-го порядка.</p>
+    <p class="MsoNormal"><b>Пример 2.</b>
+        Вычислить определитель:</p>
+    <p align="center" class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1036" type="#_x0000_t75" style='width:62.25pt;height:47.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image013.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image014.gif"
+                                   v:shapes="_x0000_i1036" width="83"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1036"
+                         DrawAspect="Content" ObjectID="_1072190956">
+            </o:OLEObject>
+        </xml><![endif]--></span>.</p>
+    <p class="MsoNormal"><b>Решение.</b> По
+        определению получим:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1037" type="#_x0000_t75"
+                 style='width:209.25pt;height:40.5pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image015.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="54"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image016.gif"
+                                   v:shapes="_x0000_i1037" width="279"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1037"
+                         DrawAspect="Content" ObjectID="_1072190957">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Если в формуле (1.1) раскрыть определители 2-го порядка и собрать
+        слагаемые с одинаковыми знаками, то имеем:</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1038" type="#_x0000_t75"
+                 style='width:236.25pt;height:30pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image017.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="40"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image018.gif"
+                                   v:shapes="_x0000_i1038" width="315"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1038"
+                         DrawAspect="Content" ObjectID="_1072190958">
+            </o:OLEObject>
+        </xml><![endif]--><span>       </span>(1.2)</p>
+    <p class="MsoNormal">Элементы со знаком плюс и со знаком минус выбираются из определителя,
+        как показано на рисунке:</p>
+    <p class="MsoNormal"><!--[if mso & !supportInlineShapes & supportFields]><span
+            style='mso-element:field-begin;mso-field-lock:yes'></span><span
+            style='mso-spacerun:yes'> </span>SHAPE<span style='mso-spacerun:yes'> 
+</span>\* MERGEFORMAT <span style='mso-element:field-separator'></span><![endif]-->
+        <!--[if gte vml 1]>
+        <v:group
+                id="_x0000_s1108" style='width:201.6pt;height:1in;
+ mso-position-horizontal-relative:char;mso-position-vertical-relative:line'
+                coordorigin="1872,2433" coordsize="4032,1440">
+            <v:oval id="_x0000_s1074" style='position:absolute;left:2529;top:2917;width:63;
+  height:61;flip:y' o:allowincell="f" fillcolor="black"/>
+            <v:line id="_x0000_s1075" style='position:absolute;flip:x' from="2016,2917"
+                    to="3168,3493" o:allowincell="f"/>
+            <v:line id="_x0000_s1076" style='position:absolute;flip:x y' from="2016,2917"
+                    to="2592,3493" o:allowincell="f">
+                <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+                          endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+            </v:line>
+            <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"
+                         path="m,l,21600r21600,l21600,xe">
+                <v:stroke joinstyle="miter"/>
+                <v:path gradientshapeok="t" o:connecttype="rect"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1077" type="#_x0000_t202" style='position:absolute;
+  left:2388;top:3444;width:513;height:429' o:allowincell="f" stroked="f">
+                <v:textbox style='mso-next-textbox:#_x0000_s1077'>
+        <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='text-align:center'><b
+     style='mso-bidi-font-weight:normal'>+</b></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1078" style='position:absolute;flip:y' from="5184,2917"
+  to="5754,3493" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1079" style='position:absolute' from="4464,2917"
+  to="5760,3493" o:allowincell="f"/>
+ <v:shape id="_x0000_s1080" type="#_x0000_t202" style='position:absolute;
+  left:4839;top:3405;width:513;height:429' o:allowincell="f" stroked="f">
+  <v:textbox style='mso-next-textbox:#_x0000_s1080'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='text-align:center'><b
+     style='mso-bidi-font-weight:normal'>-</b></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1082" style='position:absolute' from="1872,2433"
+  to="1872,3642" o:allowincell="f"/>
+ <v:line id="_x0000_s1083" style='position:absolute' from="3456,2433" to="3456,3642"
+  o:allowincell="f"/>
+ <v:line id="_x0000_s1084" style='position:absolute' from="2016,2531" to="3168,3539"
+  o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1085" style='position:absolute;flip:x' from="2016,2531"
+  to="2592,3539" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1086" style='position:absolute' from="2592,2531"
+  to="3168,2963" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1087" style='position:absolute;flip:y' from="2592,2531"
+  to="3168,3539" o:allowincell="f">
+  <v:stroke endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1088" style='position:absolute;flip:x' from="2016,2531"
+  to="3168,2963" o:allowincell="f"/>
+ <v:line id="_x0000_s1089" style='position:absolute' from="4320,2433" to="4320,3720"
+  o:allowincell="f"/>
+ <v:line id="_x0000_s1090" style='position:absolute' from="5904,2433" to="5904,3720"
+  o:allowincell="f"/>
+ <v:line id="_x0000_s1091" style='position:absolute;flip:y' from="4608,2531"
+  to="5781,3531" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1092" style='position:absolute;flip:x y' from="4464,2531"
+  to="5184,3539" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1093" style='position:absolute' from="4464,2531"
+  to="5760,2963" o:allowincell="f"/>
+ <v:line id="_x0000_s1094" style='position:absolute;flip:y' from="4464,2531"
+  to="5178,2963" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><v:line id="_x0000_s1095" style='position:absolute' from="5184,2531"
+  to="5760,3539" o:allowincell="f">
+  <v:stroke startarrow="oval" startarrowwidth="narrow" startarrowlength="short"
+   endarrow="oval" endarrowwidth="narrow" endarrowlength="short"/>
+ </v:line><w:wrap type="none"/>
+ <w:anchorlock/>
+</v:group><![endif]--><img height="99"
+                           src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image019.gif"
+                           v:shapes="_x0000_s1108 _x0000_s1074 _x0000_s1075 _x0000_s1076 _x0000_s1077 _x0000_s1078 _x0000_s1079 _x0000_s1080 _x0000_s1082 _x0000_s1083 _x0000_s1084 _x0000_s1085 _x0000_s1086 _x0000_s1087 _x0000_s1088 _x0000_s1089 _x0000_s1090 _x0000_s1091 _x0000_s1092 _x0000_s1093 _x0000_s1094 _x0000_s1095"
+                           width="271"><!--[if mso & !supportInlineShapes & supportFields]>
+        <v:shape
+                id="_x0000_i1025" type="#_x0000_t75" style='width:201.6pt;height:1in'>
+            <v:imagedata croptop="-65520f" cropbottom="65520f"/>
+        </v:shape><span style='mso-element:field-end'></span><![endif]--></p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">Этот способ вычисления определителя 3-го порядка называется <i>правилом
+        треугольника</i>.</p>
+    <p class="MsoNormal"><b>Пример 3.</b>
+        Вычислить определитель:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1039" type="#_x0000_t75"
+                 style='width:69.75pt;height:47.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image020.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image021.gif"
+                                   v:shapes="_x0000_i1039" width="93"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1039"
+                         DrawAspect="Content" ObjectID="_1072191141">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>по правилу
+        треугольника.</p>
+    <p class="MsoNormal"><b>Решение. </b>Перемножим
+        элементы главной диагонали определителя, затем – элементы, лежащие на параллелях
+        к этой диагонали, и элементы из противоположного угла определителя согласно
+        правилу треугольника. Элементы, входящие в формулу (1.2) со знаком минус строим
+        аналогично, но относительно побочной диагонали.</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1040" type="#_x0000_t75"
+                 style='width:249pt;height:27.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image022.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="37"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image023.gif"
+                                   v:shapes="_x0000_i1040" width="332"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1040"
+                         DrawAspect="Content" ObjectID="_1072191142">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span></p>
+    <p class="MsoNormal"><b>Замечание.</b> Если
+        применить правило треугольника к определителю треугольного вида</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1041" type="#_x0000_t75" style='width:84pt;height:47.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image024.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image025.gif"
+                                   v:shapes="_x0000_i1041" width="112"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1041"
+                         DrawAspect="Content" ObjectID="_1072191143">
+            </o:OLEObject>
+        </xml><![endif]-->,</p>
+    <p align="left" class="MsoNormal">то этот
+        определитель будет равен произведению элементов главной диагонали, то есть <sub>
+            <!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1042" type="#_x0000_t75" style='width:71.25pt;height:15pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image026.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="20"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image027.gif"
+                                       v:shapes="_x0000_i1042" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1042"
+                         DrawAspect="Content" ObjectID="_1072191144">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Определение.</b>
+        Минором элемента определителя 3-го порядка называется определитель 2-го
+        порядка, получающийся из данного определителя вычеркиванием строки и столбца,
+        на пересечении которых стоит данный элемент.</p>
+    <p class="MsoNormal">Минор элемента <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1043"
+                 type="#_x0000_t75" style='width:13.5pt;height:15.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image028.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="21"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image029.gif"
+                                   v:shapes="_x0000_i1043" width="18"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1043"
+                         DrawAspect="Content" ObjectID="_1072191145">
+            </o:OLEObject>
+        </xml><![endif]-->, стоящего на пересечении <i><span lang="EN-US">i</span></i>-й строки и
+        <i><span lang="EN-US">j</span></i>-го столбца определителя, обозначают <i>М</i><i><sub><span
+                lang="EN-US">ij</span></sub>.</i></p>
+    <p class="MsoNormal">Например, для определителя</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1044" type="#_x0000_t75"
+                 style='width:9pt;height:17.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image030.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="23"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image031.gif"
+                                   v:shapes="_x0000_i1044" width="12"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1044"
+                         DrawAspect="Content" ObjectID="_1072191146">
+            </o:OLEObject>
+        </xml><![endif]--><sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1045" type="#_x0000_t75"
+                     style='width:71.25pt;height:47.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image032.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="63"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image033.gif"
+                                       v:shapes="_x0000_i1045" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1045"
+                         DrawAspect="Content" ObjectID="_1072191147">
+            </o:OLEObject>
+        </xml><![endif]--><span>                                                     </span>(1.3)
+    </p>
+    <p class="MsoNormal">миноры:<sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1046" type="#_x0000_t75" style='width:165.75pt;height:30pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image034.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="40"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image035.gif"
+                                   v:shapes="_x0000_i1046" width="221"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1046"
+                         DrawAspect="Content" ObjectID="_1072191148">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Определение. </b>Алгебраическим
+        дополнением элемента определителя 3-го порядка называется минор этого элемента,
+        взятый со знаком плюс, если элемент стоит на пересечении строки и столбца с
+        четной суммой номеров, и со знаком минус, если элемент стоит на пересечении
+        строки и столбца с нечетной суммой номеров.</p>
+    <p class="MsoNormal">Алгебраическое дополнение элемента <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1047" type="#_x0000_t75" style='width:13.5pt;height:14.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image036.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="19"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image037.gif"
+                                   v:shapes="_x0000_i1047" width="18"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1047"
+                         DrawAspect="Content" ObjectID="_1072191150">
+            </o:OLEObject>
+        </xml><![endif]-->обозначают <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1048"
+                     type="#_x0000_t75" style='width:18.75pt;height:15.75pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image038.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="21"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image039.gif"
+                                       v:shapes="_x0000_i1048" width="25"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1048"
+                         DrawAspect="Content" ObjectID="_1072191151">
+            </o:OLEObject>
+        </xml><![endif]-->. Согласно определению:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1049" type="#_x0000_t75" style='width:69.75pt;height:15.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image040.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="21"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image041.gif"
+                                   v:shapes="_x0000_i1049" width="93"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1049"
+                         DrawAspect="Content" ObjectID="_1072191152">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Для определителя 3-го порядка знаки алгебраических
+        дополнений определяются по таблице:</p>
+    <table border="1" cellpadding="0" cellspacing="0" class="MsoNormalTable">
+        <tr>
+            <td width="38">
+                <p class="MsoNormal">+</p>
+            </td>
+            <td width="34">
+                <p class="MsoNormal">-</p>
+            </td>
+            <td width="38">
+                <p class="MsoNormal">+</p>
+            </td>
+        </tr>
+        <tr>
+            <td width="38">
+                <p class="MsoNormal">-</p>
+            </td>
+            <td width="34">
+                <p class="MsoNormal">+</p>
+            </td>
+            <td width="38">
+                <p class="MsoNormal">-</p>
+            </td>
+        </tr>
+        <tr>
+            <td width="38">
+                <p class="MsoNormal">+</p>
+            </td>
+            <td width="34">
+                <p class="MsoNormal">-</p>
+            </td>
+            <td width="38">
+                <p class="MsoNormal">+</p>
+            </td>
+        </tr>
+    </table>
+    <p class="MsoNormal">Например, алгебраическое дополнение
+        элемента <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1050" type="#_x0000_t75"
+                     style='width:33pt;height:15pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image042.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="20"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image043.gif"
+                                       v:shapes="_x0000_i1050" width="44"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1050"
+                         DrawAspect="Content" ObjectID="_1072191153">
+            </o:OLEObject>
+        </xml><![endif]-->определителя (1.3) равно минору этого элемента, взятому со
+        знаком минус:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1051" type="#_x0000_t75"
+                 style='width:132.75pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image044.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image045.gif"
+                                   v:shapes="_x0000_i1051" width="177"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1051"
+                         DrawAspect="Content" ObjectID="_1072191154">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Из определения определителя 3-го порядка вытекает, что </p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1052" type="#_x0000_t75" style='width:135pt;height:15pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image046.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image047.gif"
+                                   v:shapes="_x0000_i1052" width="180"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1052"
+                         DrawAspect="Content" ObjectID="_1072191155">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal"><b>Теорема разложения.</b>
+        Определитель 3-го порядка равен сумме парных произведений элементов какого-либо
+        ряда определителя на их алгебраические дополнения (под рядом понимается строка
+        или столбец).</p>
+    <p class="MsoNormal">Таким образом, имеет место шесть разложений:</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1053" type="#_x0000_t75" style='width:135.75pt;height:89.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image048.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="119"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image049.gif"
+                                   v:shapes="_x0000_i1053" width="181"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1053"
+                         DrawAspect="Content" ObjectID="_1072191156">
+            </o:OLEObject>
+        </xml><![endif]--><span>                             </span>(1.4)</p>
+    <p class="MsoNormal">Можно доказать, что сумма произведений элементов какого-либо
+        ряда определителя на алгебраические дополнения элементов параллельного ряда
+        равна нулю.</p>
+    <p class="MsoNormal"><b>Пример 4. </b>Вычислить
+        определитель</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1054" type="#_x0000_t75" style='width:57pt;height:47.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image050.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image051.gif"
+                                   v:shapes="_x0000_i1054" width="76"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1054"
+                         DrawAspect="Content" ObjectID="_1072191157">
+            </o:OLEObject>
+        </xml><![endif]-->,</p>
+    <p class="MsoNormal">разлагая его по элементам второй строки.</p>
+    <p class="MsoNormal"><b>Решение.</b> Согласно
+        теореме разложения имеем:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1055" type="#_x0000_t75"
+                 style='width:279.75pt;height:30.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image052.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="41"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image053.gif"
+                                   v:shapes="_x0000_i1055" width="373"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1055"
+                         DrawAspect="Content" ObjectID="_1072191158">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+</td>
+
+</body>
+</html>

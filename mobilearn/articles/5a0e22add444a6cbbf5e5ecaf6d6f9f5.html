@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 8. Поразрядные операции</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l8_0">
+    <h1> Введение </h1>
+    <p>
+        Информация в компьютере представляется в двоичной системе (наличие и отсутствие напряжения).
+        Минимальной единицей информации является бит – ноль или единица, ложь или истина, «нет» или
+        «да». Каждый байт состоит из 8 бит. Если число <b>знаковое</b> (<i>signed</i>), то самый
+        левый его бит обозначает знак числа – 0 для положительных чисел и 1 для отрицательных чисел,
+        остальные биты формируют модуль числа (это относится только к целым числам, вещественные
+        числа всегда со знаком). Если число <b>беззнаковое</b> (<i>unsigned</i>), то все биты
+        участвуют в формировании значения, но число может быть только положительным.
+    </p>
+    <p>
+        Положительные целые числа в компьютере представляются в <i>нормальном коде</i> – это обычное
+        представление числа в двоичной системе, а отрицательные – в <i>дополнительном коде</i>. Для
+        получения дополнительного кода берется двоичное представление равного по модулю целого
+        числа, затем все цифры двоичного представления инвертируются (0 переходит в 1, 1 – в 0), при
+        этом получается так называемый обратный код, к которому прибавляется 1 для получения
+        дополнительного кода. Например, нормальный код числа 207 при использовании 2 байт –
+        0000000011001111, а дополнительный код числа -207 – 1111111100110001 (количество цифр в
+        числе существенно!). Если сложить два эти числа, получается 0 (с переносом 1 за старший
+        разряд числа). При сложении различных по модулю положительного и отрицательного чисел
+        получается число в нормальном коде, если результат больше 0, и число в дополнительном коде,
+        если результат меньше 0.
+    </p>
+    <p>
+        Существуют операции, которые работают с битами – можно взять отрицание, применить операции
+        «И» или «ИЛИ». Поразрядные операции применяются к перечислениям и интегральным типами – <i>bool</i>,
+        <i>char</i>, <i>short</i>, <i>int</i> и <i>long</i> (возможно, с модификатором
+        <i>unsigned</i>). Однако нельзя применить эти операции к одному биту, а можно лишь применить
+        одну и ту же операцию <b>ко всем битам переменной</b>.
+    </p></section>
+<section id="l8_1">
+    <h1> 1. Операции «отрицание» ~, «и» &amp;, «или» |, «исключающее или» ^ </h1>
+    <table>
+        <tr>
+            <th> Система счисления</th>
+            <th> А</th>
+            <th> В</th>
+            <th> ~ А</th>
+            <th> А &amp; В</th>
+            <th> А | В</th>
+            <th> А ^ В</th>
+
+        </tr>
+        <tr>
+            <td><i>Десятичная</i></td>
+            <td> 15</td>
+            <td> 85</td>
+            <td> 240/-16</td>
+            <td> 5</td>
+            <td> 95</td>
+            <td> 90</td>
+
+        </tr>
+        <tr>
+            <td><i>Двоичная</i></td>
+            <td> 00001111</td>
+            <td> 01010101</td>
+            <td> 11110000</td>
+            <td> 00000101</td>
+            <td> 01011111</td>
+            <td> 01011010</td>
+
+        </tr>
+        <tr>
+            <td><i>Шестнадцатеричная</i></td>
+            <td> 0f</td>
+            <td> 55</td>
+            <td> f0</td>
+            <td> 05</td>
+            <td> 5f</td>
+            <td> 5a</td>
+
+        </tr>
+    </table>
+    <p>
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a, b, c;
+                c = a &amp; b;
+                c = a ^ b;
+                a |= 0x0f0f0f0f;
+            </td>
+        </tr>
+    </table>
+</section>
+<section id="l8_2">
+    <h1> 2. Операции сдвига </h1>
+    <p>
+        Операции сдвига вправо и сдвига влево сдвигают биты в переменной на заданное количество
+        позиций. Существует три разновидности сдвига:
+    </p>
+    <ul>
+        <li><b>логический</b> – освобождающиеся биты заполняются нулями как при сдвиге вправо, так и
+            при сдвиге влево;
+        </li>
+        <li><b>арифметический</b> – при сдвиге влево освобождающиеся символы заполняются нулями, при
+            сдвиге вправо освобождающиеся биты заполняются значением <i>знакового</i> (самого
+            левого) бита;
+        </li>
+        <li><b>циклический</b> – выдвигаемые биты перемещаются на место освобождающихся.
+        </li>
+    </ul>
+    <p>
+        В языке Ассемблер существуют все три разновидности сдвига, в языке <span>C++</span>, однако,
+        существует только одна операция сдвига влево и одна операция сдвига вправо. При сдвиге влево
+        разницы между арифметическим и логическим сдвигом нет. При сдвиге вправо, если переменная
+        объявлена как беззнаковая (<i>unsigned</i>), выполняется логический сдвиг, если же
+        переменная объявлена как знаковая (по умолчанию), выполняется арифметический сдвиг.
+    </p>
+    <table>
+        <tr>
+            <th rowspan="2"> Система счисления</th>
+            <th rowspan="2"> Число</th>
+            <th colspan="2"> unsigned char</th>
+            <th colspan="2"> signed char</th>
+
+        </tr>
+        <tr>
+            <th> &lt;&lt;</th>
+            <th> &gt;&gt;</th>
+            <th> &lt;&lt;</th>
+            <th> &gt;&gt;</th>
+
+        </tr>
+        <tr>
+            <td><i>Десятичная</i></td>
+            <td> 189/-67</td>
+            <td> 122</td>
+            <td> 94</td>
+            <td> 122</td>
+            <td> -34</td>
+
+        </tr>
+        <tr>
+            <td><i>Двоичная</i></td>
+            <td> 10111101</td>
+            <td> 01111010</td>
+            <td> 01011110</td>
+            <td> 01111010</td>
+            <td> 11011110</td>
+
+        </tr>
+        <tr>
+            <td><i>Шестнадцатеричная</i></td>
+            <td> bd</td>
+            <td> 7a</td>
+            <td> 5e</td>
+            <td> 7a</td>
+            <td> de</td>
+        </tr>
+    </table>
+    <p>
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">unsigned int</span> b;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">a = a &lt;&lt; 2;</td>
+            <td class="commenti">// Сдвиг влево, эквивалентен умножению на 4</td>
+        </tr>
+        <tr>
+            <td class="esempi">a &gt;&gt;= 2;</td>
+            <td class="commenti">// Арифметический сдвиг вправо, деление на 4</td>
+        </tr>
+        <tr>
+            <td class="esempi">b &gt;&gt;= 3;</td>
+            <td class="commenti">// Логический сдвиг вправо, деление на 8</td>
+        </tr>
+    </table>
+</section>
+<section id="l8_3">
+    <h2> 3. Примеры </h2>
+    <p>
+        <b>Пример 1.</b> Функция, считающая количество единичных бит в числе
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> BitCount(<span class="chiavi">int</span> x)
+                { <span class="chiavi">int</span> c;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">unsigned</span> mask = 0x80000000;
+                <span class="chiavi">for</span> (c = 0; x != 0; x &lt;&lt;= 1)
+                <span class="chiavi">if</span> (x &amp; mask) c++;
+                <span class="chiavi">return</span> c;
+                }
+            </td>
+
+            <td class="commenti">// <b>mask</b> – вспомогательная переменная, с помощью которой
+                выделяется один бит из числа за счет того,
+                // что все биты, кроме самого левого, после применения операции <b>&amp;</b> будут
+                равны 0,
+                // а самый левый бит останется без изменений.
+                // Переменная инициализируется 0x80000000,
+                // в которой все биты, кроме самого левого, равны 0.
+            </td>
+        </tr>
+    </table>
+    <p>
+        <b>Пример 2.</b> Функция, устанавливающая заданный бит в 0
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> ClearBit(<span class="chiavi">int</span> x, <span
+                    class="chiavi">int</span> pos)
+                { <span class="chiavi">unsigned</span> mask = 1;
+
+                <span class="chiavi">if</span> (0 &lt;= pos &amp;&amp; pos &lt; 32)
+                <span class="chiavi">return</span> x &amp; (~(mask &lt;&lt; pos));
+                <span class="chiavi">return</span> 0xFFFFFFFF; <span>// В случае ошибки возвращаем число, в котором все биты установлены в 1</span>
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+        <b>Пример 3.</b> Функция, устанавливающая заданный бит в 1
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> SetBit(<span class="chiavi">int</span> x, int pos)
+                { <span class="chiavi">unsigned</span> mask = 1;
+
+                <span class="chiavi">if</span> (0 &lt;= pos &amp;&amp; pos &lt; 32)
+                <span class="chiavi">return</span> x | (mask &lt;&lt; pos);
+                <span class="chiavi">return</span> 0; <span>// В случае ошибки возвращаем число, в котором все биты установлены в 0</span>
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+        <b>Пример 4.</b> Использование поразрядных операций для работы с атрибутами
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;cstdio&gt;
+
+                <span class="chiavi">enum</span> Rights <span>// Перечислитель <i>Rights</i> задаёт имена константам</span>
+                { READ = 1, <span>// Используем степени числа 2 для того,</span>
+                WRITE = 2,
+                <span>// чтобы каждая константа содержала только один единичный бит</span>
+                MODIFY = 4,
+                DELETE = 8,
+                ALL = 15 <span>// Для удобства</span>
+                };
+                <span>// Установка некоторого права</span>
+                <span class="chiavi">void</span> SetRights(<span class="chiavi">unsigned int</span>
+                &amp;user, <span class="chiavi">int</span> r)
+                { user |= r; }
+                <span>// Отмена права</span>
+                <span class="chiavi">void</span> UnsetRights(<span
+                    class="chiavi">unsigned int</span> &amp;user, <span class="chiavi">int</span> r)
+                { user &amp;= ~r; }
+                <span class="chiavi">void</span> main()
+                { <span class="chiavi">unsigned int</span> user1 = 0, user2 = 0;
+
+                SetRights(user1, READ | WRITE); <span>// Используем операцию <b>|</b> для объединения значений</span>
+                SetRights(user2, ALL);
+                UnsetRights(user2, DELETE);
+                <span>// Используем операцию <b>&amp;</b> для проверки</span>
+                <span class="chiavi">if</span> (user1 &amp; READ) printf("User1 can read\n");
+                <span class="chiavi">if</span> (user1 &amp; WRITE) printf("User1 can write\n");
+                <span class="chiavi">if</span> (user1 &amp; MODIFY) printf("User1 can modify\n");
+                <span class="chiavi">if</span> (user1 &amp; DELETE) printf("User1 can delete\n");
+                <span class="chiavi">if</span> (user2 &amp; READ) printf("User2 can read\n");
+                <span class="chiavi">if</span> (user2 &amp; WRITE) printf("User2 can write\n");
+                <span class="chiavi">if</span> (user2 &amp; MODIFY) printf("User2 can modify\n");
+                <span class="chiavi">if</span> (user2 &amp; DELETE) printf("User2 can delete\n");
+                }
+            </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>

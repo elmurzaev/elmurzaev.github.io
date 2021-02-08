@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расчет статически неопределимых систем по допускаемым нагрузкам</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 13.</strong> Расчет статически неопределимых систем по допускаемым
+        нагрузкам.</p>
+    <strong><p>Применение к статически определимым системам.</p></strong>
+    <p align="justify">   В предыдущем изложении методов расчета мы исходили из основного условия
+        прочности <img src="http://www.toehelp.ru/theory/sopromat/image001-15.gif">. Это неравенство
+        требует выбора размеров конструкции с таким расчетом, чтобы наибольшее напряжение в самом
+        опасном месте не превосходило допускаемого.</p>
+    <p align="justify">   Но можно стать на другую точку зрения. Можно задать условие, чтобы
+        действительная нагрузка на всю конструкцию не превосходила некоторой допускаемой величины.
+        Условие это можно выразить таким неравенством:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image002-15.gif"></p>
+    <p align="justify">   За допускаемую нагрузку надо выбрать некоторую <img
+            src="http://www.toehelp.ru/theory/sopromat/image003-14.gif"> часть той нагрузки, при
+        которой конструкция перестанет функционировать правильно, перестанет выполнять свой
+        назначение. Такая нагрузка обычно называется <i>предельной</i>,
+        иногда&#151;<i>разрушающей</i> в широком смысле слова (под разрушением конструкции
+        подразумевают прекращение ее нормальной работы).</p>
+    <p align="justify">   В качестве примера возьмем систему из двух стальных стержней <i>АВ</i> и
+        <i>АС</i>, (рис.1), нагруженных силой <i>P</i>.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image004-14.gif"><br><br>
+        <b>Рис.1.</b> Расчетная схема статически определимой стержневой системы
+    </center>
+    <p> </p>
+    <p>Рассчитывая эту систему обычным путем, найдем усилия <i>N<sub>1</sub></i> = <i>N<sub>2</sub></i>
+        no формуле:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image005-14.gif"></p>
+    <p>(из равновесия узла А). Отсюда площадь каждого из стержней равна:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image006-14.gif"></p>
+    <p>По способу допускаемых нагрузок имеем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image007-14.gif"></p>
+    <p align="justify">   Введя в качестве коэффициента запаса для конструкции в целом ту же
+        величину <i>k</i>, которая была принята в качестве коэффициента запаса для напряжений, мы
+        получим, что величина <img src="http://www.toehelp.ru/theory/sopromat/image008-14.gif"></p>
+    <p>Предельной, опасной величиной <i>P<sub>пр</sub></i> будет та, при которой напряжения в
+        стержнях дойдут до предела текучести:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image009-14.gif"></p>
+    <p>Таким образом, допускаемая величина <i>Р</i> равна:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image010-14.gif"></p>
+    <p>Условие прочности принимает вид</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image011-14.gif"></p>
+    <p>а учитывая, что</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image012-14.gif">,</p>
+    <p>получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image013-14.gif"></p>
+    <p>Отсюда:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image014-13.gif"></p>
+    <p align="justify">   Таким образом, расчет по допускаемым нагрузкам привел в данном случае к
+        тем же результатам, что и расчет по допускаемым напряжениям. Это всегда имеет место для
+        статически определимых конструкций при равномерном распределении напряжений, когда материал
+        по всему сечению используется полностью.</p>
+    <p> </p>
+    <strong><p>Расчет статически неопределимых систем по способу допускаемых нагрузок.</p></strong>
+    <p align="justify">   Совсем другие результаты мы получим, если будем применять способ
+        допускаемых нагрузок к статически неопределимым системам, стержни которых изготовлены из
+        материала, обладающего способностью к большим пластическим деформациям, например из
+        малоуглеродистой стали.</p>
+    <p align="justify">В качестве примера рассмотрим систему из трех стержней, нагруженных силой <i>Q</i>
+        (рис. 2). Пусть все стержни сделаны из малоуглеродистой стали с пределом текучести <img
+                src="http://www.toehelp.ru/theory/sopromat/image015-13.gif">. Длины крайних
+        стержней, как и выше, обозначим <img
+                src="http://www.toehelp.ru/theory/sopromat/image016-13.gif">; длину среднего <img
+                src="http://www.toehelp.ru/theory/sopromat/image017-13.gif">. Допускаемое напряжение
+        <img src="http://www.toehelp.ru/theory/sopromat/image018-12.gif"></p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image019-12.gif"><br><br>
+        <b>Рис.2.</b> Расчетная схема однократно статически неопределимой стержневой системы.
+    </center>
+    <p> </p>
+    <p>Как и раньше, при расчете этой статически неопределимой системы зададимся отношением площадей
+        стержней; примем, что все три стержня будут иметь одинаковую площадь <i>F</i>. Получим:</p>
+    <ol>
+        <li><img src="http://www.toehelp.ru/theory/sopromat/image020-12.gif"></li>
+        <li><img src="http://www.toehelp.ru/theory/sopromat/image021-12.gif"></li>
+        <li><img src="http://www.toehelp.ru/theory/sopromat/image022-12.gif"></li>
+    </ol>
+    <p>Используя закон Гука, получим:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image023-12.gif"></p>
+    <p>Следовательно:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image024-12.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image025-12.gif"></p>
+    <p>Так как <img src="http://www.toehelp.ru/theory/sopromat/image026-12.gif">, средний стержень
+        напряжен больше, чем крайние; поэтому подбор площади сечения F надо произвести по формуле:
+    </p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image027-12.gif"></p>
+    <p>Ту же величину площади надо дать и боковым стержням; в них получается некоторый
+        дополнительный запас.</p>
+    <p>Применим способ допускаемых нагрузок; условием прочности будет:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image028-12.gif"></p>
+    <p align="justify">   Что в данном случае следует понимать под предельной нагрузкой конструкции?
+        Так как конструкция выполнена из материала, имеющего площадку текучести, то, по аналогии с
+        простым растяжением стержня из такого материала, за предельную нагрузку следует взять груз,
+        соответствующий достижению состояния текучести <i>для всей конструкции в целом</i>. Назовем
+        эту нагрузку <img src="http://www.toehelp.ru/theory/sopromat/image029-11.gif">. Пока сила
+        <i>Q</i> не достигла этого значения, для дальнейшей деформации (опускания точки <i>A</i>)
+        требуется возрастание нагрузки. Когда же <i>Q </i>сделается равным <img
+                src="http://www.toehelp.ru/theory/sopromat/image030-10.gif">, дальнейший рост
+        деформаций будет происходить уже без увеличения нагрузки, &#151; конструкция выйдет из
+        строя.</p>
+    <p align="justify">   Для определения величины <img
+            src="http://www.toehelp.ru/theory/sopromat/image031-10.gif"> рассмотрим постепенный ход
+        деформации нашей стержневой системы. Так как средний стержень напряжен сильнее крайних, то в
+        нем раньше, чем в других, напряжение дойдет до предела текучести. Нагрузку, соответствующую
+        этому моменту, обозначим <i>Q<sub>Т</sub></i>; она будет равна:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image032-9.gif"></p>
+    <p>где <img src="http://www.toehelp.ru/theory/sopromat/image033-9.gif"> &#151; усилие в среднем
+        стержне, соответствующее его пределу текучести.</p>
+    <p align="justify">   Напряжения в крайних стержнях, имеющих ту же площадь, в этот момент еще не
+        дойдут до предела текучести, и эти стержни будут упруго сопротивляться дальнейшей
+        деформации. Для того чтобы эта деформация происходила, необходимо дальнейшее увеличение
+        нагрузки до тех пор, пока в <i>крайних</i> стержнях напряжения тоже не дойдут до предела
+        текучести. Лишь тогда будет достигнута предельная грузоподъемность конструкции <img
+                src="http://www.toehelp.ru/theory/sopromat/image034-9.gif">.</p>
+    <p align="justify">   Так как при нагрузке <i>Q<sub>Т</sub></i> напряжения в среднем стержне
+        дойдут уже до предела текучести <img
+                src="http://www.toehelp.ru/theory/sopromat/image035-9.gif">, то при дальнейшем
+        возрастании груза они, а стало быть и усилие <i>N<sub>3</sub></i>, останутся <i>без
+            увеличения</i>. Наша статически неопределимая система превратится в статически
+        определимую, состоящую из двух стержней <i>АВ</i> и <i>АС</i> и нагруженную в точке <i>А</i>
+        силой <i>Q</i>, направленной вниз, и <i>известным </i>усилием <img
+                src="http://www.toehelp.ru/theory/sopromat/image036-8.gif">, равным <img
+                src="http://www.toehelp.ru/theory/sopromat/image037-8.gif"> (Рис.3).</p>
+    <br>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image038-8.gif"><br><br>
+        <b>Рис.3.</b> Эквивалентная статически определимая система
+    </center>
+    <p> </p>
+    <p>Такая схема работы нашей конструкции будет иметь место, пока</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image039-7.gif"></p>
+    <p align="justify">   Для иллюстрации хода деформации рассматриваемой конструкции изобразим
+        графически зависимость между силой <i>Q</i> и перемещением <i>f</i> точки <i>А</i> (Рис. 4).
+        Пока <img src="http://www.toehelp.ru/theory/sopromat/image040-7.gif"> опускание точки
+        <i>А</i> равно удлинению среднего стержня и определяется формулой</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image041-7.gif"></p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image042-7.gif"><br><br>
+        <b>Рис.4.</b> Динамика деформации в зависимости от нагрузочной способности системы
+    </center>
+    <p> </p>
+    <p align="justify">   Как только <i>Q</i> будет заключаться в промежутке <img
+            src="http://www.toehelp.ru/theory/sopromat/image043-7.gif"> перемещение точки <i>А</i>
+        должно быть вычислено, как опускание этого узла в системе двух стержней <i>АС</i> и
+        <i>АВ</i>, нагруженных в точке <i>А</i> силой <img
+                src="http://www.toehelp.ru/theory/sopromat/image044-7.gif"><img
+                src="http://www.toehelp.ru/theory/sopromat/image045-7.gif">. Так как:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image046-7.gif"></p>
+    <p>и, в свою очередь:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image047-7.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image048-7.gif"></p>
+    <p>Отсюда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image049-7.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image050-7.gif"></p>
+    <p align="justify">   Для <i>f<sub>12</sub></i> (на втором участке) получаем уравнение прямой,
+        но уже не проходящей через начало координат. После достижения нагрузкой <i>Q</i> значения
+        <img src="http://www.toehelp.ru/theory/sopromat/image051-7.gif"> напряжения в крайних
+        стержнях достигнут предела текучести, и система будет деформироваться без увеличения
+        нагрузки. График перемещения идет теперь параллельно оси абсцисс.</p>
+    <p align="justify">   Для определения предельной грузоподъемности всей системы <img
+            src="http://www.toehelp.ru/theory/sopromat/image052-7.gif">мы должны для системы двух
+        стержней, нагруженных силой <img src="http://www.toehelp.ru/theory/sopromat/image053-6.gif">,
+        найти то значение <i>Q</i>, при котором напряжения и в крайних стержнях дойдут до предела
+        текучести. Такая задача решена в предыдущем параграфе; подставляя в выражение (<i>а</i>) §
+        26 вместо <i>Р</i> величину <img src="http://www.toehelp.ru/theory/sopromat/image054-4.gif">,
+        получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image055-4.gif"></p>
+    <p>Отсюда</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image056-4.gif"></p>
+    <p>Допускаемая нагрузка будет равна</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image057-4.gif"></p>
+    <p>а учитывая, что</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image058-4.gif">,</p>
+    <p>получаем</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image059-4.gif"></p>
+    <p>Окончательно:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image060-4.gif"></p>
+    <p>и</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image061-4.gif"></p>
+    <p>Эта величина меньше, чем полученная обычным методом расчета, т. е.</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image062-4.gif"></p>
+    <p>При <img src="http://www.toehelp.ru/theory/sopromat/image063-3.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image064-3.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image065-3.gif"> (сталь) получаем: по
+        обычному способу</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image066-3.gif"></p>
+    <p>по способу допускаемых нагрузок:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image067-3.gif"></p>
+    <p align="justify">   Таким образом, метод расчета по допускаемым нагрузкам позволяет
+        спроектировать статически неопределимую систему из материала, обладающего площадкой
+        текучести, <i>экономичнее</i>, чем при расчете по допускаемым, напряжениям. Это понятно: при
+        способе расчета по допускаемым напряжениям мы считали за предельную нагрузку нашей
+        конструкции величину <i>Q<sub>Т</sub></i>, при которой до предела текучести доходил лишь
+        материал среднего стержня, крайние же были недонапряжены. При методе расчета по допускаемым
+        нагрузкам предельная грузоподъемность определяется величиной <img
+                src="http://www.toehelp.ru/theory/sopromat/image068-3.gif">. При нагрузке <img
+                src="http://www.toehelp.ru/theory/sopromat/image069-3.gif"> полностью используется
+        материал всех трех стержней.</p>
+    <p align="justify">   Таким образом, новый метод расчета позволяет реализовать скрытые при
+        старом способе запасы прочности в статически неопределимых системах, добиться повышения их
+        <i>расчетной</i> грузоподъемности и действительной <i>равнопрочности</i> всех частей
+        конструкции. Не представит никаких затруднений распространить этот метод на случай, когда
+        соотношение площадей среднего и крайних стержней не будет равно единице.</p>
+    <p align="justify">   Изложенные выше теоретические соображения проверялись неоднократно на
+        опыте, причем всегда наблюдалась достаточно близкая сходимость величин предельной нагрузки
+        &#151; вычисленной и определенной при эксперименте. Это дает уверенность в правильности
+        теоретических предпосылок метода допускаемых нагрузок.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

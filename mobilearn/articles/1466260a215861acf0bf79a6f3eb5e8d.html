@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Заметки о релизе Ruby on Rails 3.2</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="zametki-o-relize-ruby-on-rails-3-2"> Заметки о релизе Ruby on
+        Rails 3.2</h2>
+    <p>Ключевые новинки в Rails 3.2:</p>
+    <ul>
+        <li>Режим Development стал быстрее
+        </li>
+        <li>Новый Engine для роутинга
+        </li>
+        <li>Автоматические Explain для запросов
+        </li>
+        <li>Тегированное логирование
+        </li>
+    </ul>
+    <p>Эти заметки о релизе покрывают основные обновления. Чтобы узнать о различных багфиксах и
+        изменениях, обратитесь к логам изменений или к в главном репозитории Rails на GitHub.</p>
+    <h3 class="inside_page_header" id="obnovlenie-do-rails-3-2"> Обновление до Rails 3.2</h3>
+    <p>Если обновляете существующее приложение, было бы хорошо иметь перед этим покрытие тестами.
+        Также, до попытки обновиться до Rails 3.2, необходимо сначала обновиться до Rails 3.1 и
+        убедиться, что приложение все еще выполняется так, как нужно. Затем нужно предпринять
+        следующие изменения:</p>
+    <h4 class="inside_page_header" id="rails-3-2-trebuet-kak-minimum-ruby-1-8-7"> Rails 3.2 требует
+        как минимум Ruby 1.8.7</h4>
+    <p>Rails 3.2 требует Ruby 1.8.7 или выше. Поддержка всех прежних версий Ruby была официально
+        прекращена, и следует обновиться как можно быстрее. Rails 3.2 также совместим с Ruby
+        1.9.2.</p>
+    <div class="info"><p>Отметьте, что в Ruby 1.8.7 p248 и p249 имеются ошибки маршализации,
+        ломающие Rails. Хотя в Ruby Enterprise Edition это было исправлено, начиная с релиза
+        1.8.7-2010.02. В ветке 1.9, Ruby 1.9.1 не пригоден к использованию, поскольку он иногда
+        вылетает, поэтому, если хотите использовать 1.9.x перепрыгивайте на 1.9.2 для гладкой
+        работы.</p></div>
+    <h4 class="inside_page_header" id="chto-obnovit-v-prilozhenii"> Что обновить в приложении</h4>
+    <ul>
+        <li>
+            <p>Обновите зависимости в вашем Gemfile</p>
+            <ul>
+                <li>
+                    <code>rails = 3.2.0</code>
+                </li>
+                <li>
+                    <code>sass-rails ~&gt; 3.2.3</code>
+                </li>
+                <li>
+                    <code>coffee-rails ~&gt; 3.2.1</code>
+                </li>
+                <li>
+                    <code>uglifier &gt;= 1.0.3</code>
+                </li>
+            </ul>
+        </li>
+        <li><p>В Rails 3.2 устаревает <code>vendor/plugins</code>, а в Rails 4.0 будет убрано
+            окончательно. Можете начинать перемещать эти плагины, выделяя их в гемы и добавляя в
+            свой Gemfile. Если вы не хотите делать из них гемы, можно их переместить, скажем в
+            <code>lib/my_plugin/*</code>, и добавить соответствующий инициализатор в <code>config/initializers/my_plugin.rb</code>.
+        </p></li>
+        <li>
+            <p>Имеется ряд новых конфигурационных изменений, которые можно добавить в <code>config/environments/development.rb</code>:
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Raise exception on mass assignment protection for Active Record models
+config.active_record.mass_assignment_sanitizer = :strict
+# Log the query plan for queries taking more than this (works
+# with SQLite, MySQL, and PostgreSQL)
+config.active_record.auto_explain_threshold_in_seconds = 0.5
+</pre>
+            </div>
+            <p>Также необходимо добавить конфиг <code>mass_assignment_sanitizer</code> в <code>config/environments/test.rb</code>:
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Raise exception on mass assignment protection for Active Record models
+config.active_record.mass_assignment_sanitizer = :strict
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="chto-obnovit-v-vashih-engine-ah"> Что обновить в ваших
+        engine-ах</h4>
+    <p>Замените код ниже комментариев в <code>script/rails</code> следующим содержимым:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ENGINE_ROOT = File.expand_path('../..', __FILE__)
+ENGINE_PATH = File.expand_path('../../lib/your_engine_name/engine', __FILE__)
+require 'rails/all'
+require 'rails/engine/commands'
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="sozdanie-prilozheniya-rails-3-2"> Создание приложения Rails
+        3.2</h3>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Необходим установленный рубигем 'rails'
+$ rails new myapp
+$ cd myapp
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="storonnie-gemy"> Сторонние гемы</h4>
+    <p>Сейчас Rails использует <code>Gemfile</code> в корне приложения, чтобы определить гемы,
+        требуемые для запуска вашего приложения. Этот <code>Gemfile</code> обрабатывается , который
+        затем устанавливает все зависимости. Он может даже установить все зависимости локально в
+        ваше приложение, и оно не будет зависеть от системных гемов.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="zhivite-na-grani"> Живите на грани</h4>
+    <p><code>Bundler</code> и <code>Gemfile</code> замораживает ваше приложение Rails с помощью
+        новой отдельной команды <code>bundle</code>. Если хотите установить напрямую из репозитория
+        Git, передайте флажок <code>--edge</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp --edge
+</pre>
+    </div>
+    <p>Если у вас есть локальная копия репозитория Rails, и вы хотите создать приложение с ее
+        использованием, передайте флажок <code>--dev</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby /path/to/rails/railties/bin/rails new myapp --dev
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="osnovnye-osobennosti"> Основные особенности</h3>
+    <h4 class="inside_page_header" id="bystryy-rezhim-development-i-routing"> Быстрый режим
+        Development и роутинг</h4>
+    <p>В Rails 3.2 режим development стал ощутимо быстрее. Вдохновившись работой , Rails
+        перезагружает классы только тогда, когда файлы фактически изменились. В больших приложениях
+        наблюдается существенный прирост производительности. Распознавание маршрутов также получило
+        прирост скорости, благодаря новому engine .</p>
+    <h4 class="inside_page_header" id="avtomaticheskie-explain-zaprosov"> Автоматические Explain
+        запросов</h4>
+    <p>Rails 3.2 поставляется с прекрасной возможностью раскрытия запросов, созданных ARel,
+        определив метод <code>explain</code> в <code>ActiveRecord::Relation</code>. Для примера,
+        можно запустить что-то наподобие <code>puts Person.active.limit(5).explain</code> и
+        результат запроса Arel будет раскрыт. Это позволяет проверку правильности индексирования и
+        дальнейшую оптимизацию.</p>
+    <p>Запросы, выполняющиеся более чем пол секунды, <em>автоматически</em> раскрываются в режиме
+        development. Это поведение, разумеется, может быть изменено.</p>
+    <h4 class="inside_page_header" id="tegirovannoe-logirovanie"> Тегированное логирование</h4>
+    <p>При запуске многопользовательского приложения может сильно помочь фильтрация в логе, кто что
+        делал. TaggedLogging в Active Support помогает это сделать точным, помечая строки лога
+        поддоменами, id запросов и чем угодно, что поможет вам отладить такие приложения.</p>
+    <h3 class="inside_page_header" id="dokumentatsiya"> Документация</h3>
+    <p>Начиная с Rails 3.2, руководства по Rails доступны для Kindle, и как бесплатные Kindle
+        Reading Apps для iPad, iPhone, Mac, Android и т.д.</p>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <ul>
+        <li><p>Ускорен режим development за счет перезагрузки классов только при изменении зависимых
+            файлов. Это может быть отключено, если установить <code>config.reload_classes_only_on_change</code>
+            в false.</p></li>
+        <li><p>Новые приложения получают флажок <code>config.active_record.auto_explain_threshold_in_seconds</code>
+            в файлах конфигурации среды. Со значением <code>0.5</code> в <code>development.rb</code>
+            и закомментированным в <code>production.rb</code>. Не упоминается в <code>test.rb</code>.
+        </p></li>
+        <li><p>Добавлена <code>config.exceptions_app</code> для указания приложения для обработки
+            исключений, вызываемого промежуточной программой <code>ShowException</code> при вызове
+            исключения. По умолчанию
+            <code>ActionDispatch::PublicExceptions.new(Rails.public_path)</code>.</p></li>
+        <li><p>Добавлена промежуточная программа <code>DebugExceptions</code>, содержащая
+            особенности, извлеченные из промежуточной программы <code>ShowExceptions</code>.</p>
+        </li>
+        <li><p>Отображает маршруты монтированных engine-ов в <code>rake routes</code>.</p></li>
+        <li>
+            <p>Позволяет изменить порядок загрузки railties с помощью
+                <code>config.railties_order</code> следующим образом:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.railties_order = [Blog::Engine, :main_app, :all]
+</pre>
+            </div>
+        </li>
+        <li><p>Скаффолд возвращает 204 No Content для API запросов без содержимого. Это позволяет
+            скаффолду работать с jQuery "из коробки".</p></li>
+        <li><p>Обновлена промежуточная программа <code>Rails::Rack::Logger</code>, чтобы добавлять
+            любые теги, установленные в <code>config.log_tags</code>, в <code>ActiveSupport::TaggedLogging</code>.
+            Это позволяет легко тегировать строки лога отладочной информацией, такой как поддомен и
+            id запроса -- оба очень полезны при отладке production многопользовательских приложений.
+        </p></li>
+        <li><p>Опции по умолчанию для <code>rails new</code> могут быть установлены в <code>~/.railsrc</code>.
+            Можно указать дополнительные аргументы командной строки, используемые каждый раз при
+            запуске 'rails new', в конфигурационном файле <code>.railsrc</code> в домашней
+            директории.</p></li>
+        <li><p>Добавлен псевдоним <code>d</code> для <code>destroy</code>. Это также работает для
+            engine.</p></li>
+        <li><p>Атрибуты генераторов скаффолда и модели по умолчанию строковые. Это позволяет
+            следующее: <code>rails g scaffold Post title body:text author</code></p></li>
+        <li>
+            <p>Позволяет генераторам скаффолда/модели/миграции принимать модификаторы "index" и
+                "uniq". Например,</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+rails g scaffold Post title:string:index author:uniq price:decimal{7,2}
+</pre>
+            </div>
+            <p>создаст индексы для <code>title</code> и <code>author</code>, причем последний будет
+                уникальным индексом. Некоторые типы, такие как decimal, принимают произвольные
+                опции. В примере <code>price</code> будет столбцом decimal с установленными
+                точностью и масштабом 7 и 2 соответственно.</p>
+        </li>
+        <li><p>Гем Turn был убран из дефолтного Gemfile.</p></li>
+        <li><p>Убран старый генератор плагинов <code>rails generate plugin</code> в пользу команды
+            <code>rails plugin new</code>.</p></li>
+        <li><p>Убрано старое <code>config.paths.app.controller</code> API в пользу <code>config.paths["app/controller"]</code>.
+        </p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li>
+            <code>Rails::Plugin</code> устарел и будет убран в Rails 4.0. Вместо добавления плагинов
+            в <code>vendor/plugins</code>, используйте гемы, или bundler с путем, или зависимости
+            git.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <ul>
+        <li><p>Обновлена версия <code>mail</code> до 2.4.0.</p></li>
+        <li><p>Убрано старое Action Mailer API, которое было объявлено устаревшим в Rails 3.0.</p>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="action-pack"> Action Pack</h3>
+    <h4 class="inside_page_header" id="action-controller"> Action Controller</h4>
+    <ul>
+        <li><p><code>ActiveSupport::Benchmarkable</code> стал модулем по умолчанию для <code>ActionController::Base,</code>
+            таким образом, метод <code>#benchmark</code> снова доступен в контексте контроллера, как
+            это было раньше.</p></li>
+        <li><p>Добавлена опция <code>:gzip</code> в <code>caches_page</code>. Опция по умолчанию
+            может быть настроена глобально с использованием <code>page_cache_compression</code>.</p>
+        </li>
+        <li>
+            <p>Теперь Rails будет использовать ваш макет по умолчанию (такой как
+                "layouts/application") при определенных условий <code>:only</code> и
+                <code>:except</code>, и если они не выполняются.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CarsController
+  layout 'single_car', :only =&gt; :show
+end
+</pre>
+            </div>
+            <p>Rails будет использовать 'layouts/single_car' если запрос придет в экшн
+                <code>:show</code>, и использовать <code>layouts/application</code> (или <code>layouts/cars</code>,
+                если он существует), если запрос придет в любой другой экшн.</p>
+        </li>
+        <li><p><code>form_for</code> изменился и использует <code>#{action}_#{as}</code> как класс
+            css и id, если представлена опция <code>:as</code>. Ранние версии использовали <code>#{as}_#{action}</code>.
+        </p></li>
+        <li><p><code>ActionController::ParamsWrapper</code> на моделях Active Record теперь
+            оборачивают атрибуты <code>attr_accessible</code> только если они существуют. Если нет,
+            будут обернуты только атрибуты, возвращенные методом класса <code>attribute_names</code>.
+            Это устраняет оборачивание вложенных атрибутов при помещении их в
+            <code>attr_accessible</code>.</p></li>
+        <li><p>Пишет в лог "Filter chain halted as CALLBACKNAME rendered or redirected" каждый раз
+            при прерывании предварительного колбэка.</p></li>
+        <li><p>Проведен рефакторинг <code>ActionDispatch::ShowExceptions</code>. Контроллер
+            ответственен за выбор как показывать исключения. В контроллере возможно переопределить
+            <code>show_detailed_exceptions?</code>, чтобы определить, какие запросы должны
+            предоставлять отладочную информацию при ошибках.</p></li>
+        <li><p>Responders теперь возвращают 204 No Content для API запросов без тела запроса (как в
+            новых скаффолдах).</p></li>
+        <li>
+            <p>Проведен рефакторинг куки <code>ActionController::TestCase</code>. Назначаемые куки
+                для тестовых случаев теперь должны использовать <code>cookies[]</code></p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+cookies[:email] = 'user@example.com'
+get :index
+assert_equal 'user@example.com', cookies[:email]
+</pre>
+            </div>
+            <p>Для очистки куки используйте <code>clear</code>.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+cookies.clear
+get :index
+assert_nil cookies[:email]
+</pre>
+            </div>
+            <p>Больше не пишется HTTP_COOKIE и куки сохраняются между запросами, поэтому если нужно
+                манипулировать средой для вашего теста, это нужно сделать до того, как куки будут
+                созданы.</p>
+        </li>
+        <li><p><code>send_file</code> теперь угадывает тип MIME по расширению файла, если не
+            предоставлен <code>:type</code>.</p></li>
+        <li><p>Добавлены записи типов MIME для PDF, ZIP и других форматов.</p></li>
+        <li><p>Позволяет <code>fresh_when/stale?</code> принимать запись вместо хэша опций.</p></li>
+        <li><p>Изменен уровень лога для предупреждения об отсутствующем токене CSRF с
+            <code>:debug</code> до <code>:warn</code>.</p></li>
+        <li><p>По умолчанию ресурсы должны использовать протокол запроса или протокол по умолчанию,
+            если запрос не доступен.</p></li>
+    </ul>
+    <h5 class="inside_page_header" id="ustarevaniya"> Устаревания</h5>
+    <ul>
+        <li>
+            <p>Устарел поиск подразумеваемого макета в контроллерах, чей родитель имеет явно
+                установленный макет:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ApplicationController
+  layout "application"
+end
+class PostsController &lt; ApplicationController
+end
+</pre>
+            </div>
+            <p>В вышеуказанном примере <code>PostsController</code> больше не будет автоматически
+                искать макет posts. Если вам нужна такая функциональность, следует либо убрать
+                <code>layout "application"</code> из <code>ApplicationController</code> или явно
+                установить его в <code>nil</code> в <code>PostsController</code>.</p>
+        </li>
+        <li><p>Устарел <code>ActionController::UnknownAction</code> в пользу <code>AbstractController::ActionNotFound</code>.
+        </p></li>
+        <li><p>Устарел <code>ActionController::DoubleRenderError</code> в пользу <code>AbstractController::DoubleRenderError</code>.
+        </p></li>
+        <li><p>Устарел <code>method_missing</code> в пользу <code>action_missing</code> для
+            отсутствующих экшнов.</p></li>
+        <li><p>Устарели <code>ActionController#rescue_action</code>, <code>ActionController#initialize_template_class</code>
+            и <code>ActionController#assign_shortcuts</code>.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="action-dispatch"> Action Dispatch</h4>
+    <ul>
+        <li><p>Добавлена <code>config.action_dispatch.default_charset</code> для настройки кодировки
+            по умолчанию для <code>ActionDispatch::Response</code>.</p></li>
+        <li><p>Добавлена промежуточная программа <code>ActionDispatch::RequestId</code>, создающая
+            уникальный заголовок X-Request-Id, доступный в отклике, и включает метод <code>ActionDispatch::Request#uuid</code>.
+            Это позволяет легко отслеживать запросы от начала до конца в стеке и идентифицировать
+            отдельные запросы в смешанных логах, наподобие Syslog.</p></li>
+        <li><p>Промежуточная программа <code>ShowExceptions</code> теперь принимает приложение для
+            обработки исключений, ответственное за рендеринг исключения при ошибках приложения.
+            Приложение запускается с копией исключения в
+            <code>env["action_dispatch.exception"]</code>, и с переписанным <code>PATH_INFO</code> в
+            код статуса.</p></li>
+        <li><p>Позволяет настроить отклики rescue с помощью railtie, как в <code>config.action_dispatch.rescue_responses</code>.
+        </p></li>
+    </ul>
+    <h5 class="inside_page_header" id="ustarevaniya"> Устаревания</h5>
+    <ul>
+        <li>Устарела возможность установить кодировку по умолчанию на уровне контроллера, вместо
+            этого используйте новую <code>config.action_dispatch.default_charset</code>.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="action-view"> Action View</h4>
+    <ul>
+        <li>
+            <p>В <code>ActionView::Helpers::FormBuilder</code> добавлена поддержка
+                <code>button_tag</code>. Эта поддержка повторяет поведение по умолчанию <code>submit_tag</code>.
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= form_for @post do |f| %&gt;
+  &lt;%= f.button %&gt;
+&lt;% end %&gt;
+</pre>
+            </div>
+        </li>
+        <li><p>Хелперы дат принимают новую опцию <code>:use_two_digit_numbers =&gt; true</code>,
+            отрисовывающую селект-боксы для месяцев и дней с ведущим нулем без изменения
+            соответствующих value. Для примера, это полезно для отображения дат в стиле ISO 8601,
+            таких как '2011-08-01'.</p></li>
+        <li>
+            <p>Для вашей формы можно предоставить пространство имен для обеспечения уникальности
+                атрибута id у элементов формы. В созданном HTML id пространство имен атрибута будет
+                идти впереди с подчеркиванием.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= form_for(@offer, :namespace =&gt; 'namespace') do |f| %&gt;
+  &lt;%= f.label :version, 'Version' %&gt;:
+  &lt;%= f.text_field :version %&gt;
+&lt;% end %&gt;
+</pre>
+            </div>
+        </li>
+        <li><p>Ограничено количество вариантов для <code>select_year</code> в 1000. Передайте опцию
+            <code>:max_years_allowed</code> для установки своего лимита.</p></li>
+        <li>
+            <p>Теперь <code>content_tag_for</code> и <code>div_for</code> могут принимать коллекцию
+                записей. Они также передадут запись как первый аргумент, если вы вставите получаемый
+                аргумент в блок. Таким образом, вместо этого:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@items.each do |item|
+  content_tag_for(:li, item) do
+     Title: &lt;%= item.title %&gt;
+  end
+end
+</pre>
+            </div>
+            <p>Можно сделать так:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+content_tag_for(:li, @items) do |item|
+  Title: &lt;%= item.title %&gt;
+end
+</pre>
+            </div>
+        </li>
+        <li><p>Добавлен метод хелпера <code>font_path</code>, вычисляющий путь к ресурсу шрифта в
+            <code>public/fonts</code>.</p></li>
+    </ul>
+    <h5 class="inside_page_header" id="ustarevaniya"> Устаревания</h5>
+    <ul>
+        <li>Передача форматов или обработчиков в render :template и тому подобные методы, например
+            <code>render :template =&gt; "foo.html.erb"</code>, устарела. Вместо этого можно
+            предоставить непосредственно :handlers и :formats как опции: <code>render :template =&gt;
+                "foo", :formats =&gt; [:html, :js], :handlers =&gt; :erb</code>.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="sprockets"> Sprockets</h4>
+    <ul>
+        <li>Добавлена конфигурационная опция <code>config.assets.logger</code> для контроля над
+            логированием Sprockets. Установите ее <code>false</code> для отключения логирования, и
+            <code>nil</code> для дефолтного <code>Rails.logger</code>.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <ul>
+        <li><p>Булевы столбцы со значениями 'on' и 'ON' считаются за true.</p></li>
+        <li><p>Когда метод <code>timestamps</code> создает столбцы <code>created_at</code> и <code>updated_at</code>,
+            по умолчанию он их делает non-nullable.</p></li>
+        <li><p>Реализован <code>ActiveRecord::Relation#explain</code>.</p></li>
+        <li><p>Реализован <code>AR::Base.silence_auto_explain</code>, позволяющий пользователю
+            выборочно отключать автоматические EXPLAIN в блоке.</p></li>
+        <li><p>Реализовано логирование автоматического EXPLAIN для медленных запросов. Новый
+            конфигурационный параметр
+            <code>config.active_record.auto_explain_threshold_in_seconds</code> определяет, что
+            рассматривается как медленный запрос. Установите ему nil, чтобы отключить эту
+            возможность. По умолчанию 0.5 в режиме development, и nil в режимах test и production.
+            Rails 3.2 поддерживает эту возможность для SQLite, MySQL (адаптер mysql2) и PostgreSQL.
+        </p></li>
+        <li>
+            <p>Добавлен <code>ActiveRecord::Base.store</code> для определения простых key/value
+                хранилищ с одной колонкой.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  store :settings, accessors: [ :color, :homepage ]
+end
+u = User.new(color: 'black', homepage: '37signals.com')
+u.color                          # Accessor stored attribute
+u.settings[:country] = 'Denmark' # Any attribute, even if not specified with an accessor
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Добавлена возможность запуска миграций только для определенного пространства имен,
+                позволяющая запустить миграции только для одного engine (например, чтобы откатить
+                изменения от engine, чтобы убрать его).</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+rake db:migrate SCOPE=blog
+</pre>
+            </div>
+        </li>
+        <li><p>Миграции, скопированные из engine-ов, теперь помещаются в пространство имен с именем
+            engine, например <code>01_create_posts.blog.rb</code>.</p></li>
+        <li>
+            <p>Реализован метод <code>ActiveRecord::Relation#pluck</code>, возвращающий массив
+                значений столбца непосредственно из лежащей в основе таблицы. Он также работает с
+                сериализованными атрибутами.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.where(:active =&gt; true).pluck(:id)
+# SELECT id from clients where active = 1
+</pre>
+            </div>
+        </li>
+        <li><p>Методы созданных связей создаются в отдельном модуле, чтобы позволить переопределение
+            и компоновку. Для класса с именем MyModel, модель будет называться <code>MyModel::GeneratedFeatureMethods</code>.
+            Он включается в класс модели сразу после модуля
+            <code>generated_attributes_methods</code>, определенного в Active Model, таким образом,
+            методы связей переопределяют методы атрибутов с таким же именем.</p></li>
+        <li>
+            <p>Добавлен <code>ActiveRecord::Relation#uniq</code> для создания уникальных запросов.
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select('DISTINCT name')
+</pre>
+            </div>
+            <p>..может быть записано так:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select(:name).uniq
+</pre>
+            </div>
+            <p>В relation также можно отменить уникальность:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Client.select(:name).uniq.uniq(false)
+</pre>
+            </div>
+        </li>
+        <li><p>Поддержка порядка сортировки по индексу в адаптерах SQLite, MySQL и PostgreSQL.</p>
+        </li>
+        <li>
+            <p>Опция <code>:class_name</code> для связей может принимать символ, в дополнение к
+                строке. Это сделано, чтобы не смущать новичков, и быть последовательными в том
+                факте, что другие опции, такие как <code>:foreign_key</code>, уже допускают символ
+                или строку.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+has_many :clients, :class_name =&gt; :Client # Отметьте, что символ должен начинаться с заглавной буквы
+</pre>
+            </div>
+        </li>
+        <li><p>В режиме development, <code>db:drop</code> также уничтожает тестовую базу данных,
+            чтобы быть симметричной с <code>db:create</code>.</p></li>
+        <li><p>Не чувствительные к регистру валидации уникальности избегают вызов LOWER в MySQL,
+            когда столбец уже использует не чувствительное к регистру сопоставление.</p></li>
+        <li><p>Транзакционные фикстуры выполняются во все активные соединения с базой данных. Можно
+            тестировать модели на различных соединениях без отключения транзакционных фикстур.</p>
+        </li>
+        <li>
+            <p>В Active Record добавлены методы <code>first_or_create</code>,
+                <code>first_or_create!</code>, <code>first_or_initialize</code>. Этот подход лучше,
+                чем старые динамические методы <code>find_or_create_by</code>, поскольку очевиднее,
+                какие аргументы использованы для поиска записи, а какие для ее создания.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.where(:first_name =&gt; "Scarlett").first_or_create!(:last_name =&gt; "Johansson")
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>К объектам Active Record добавлен метод <code>with_lock</code>, начинающий
+                транзакцию, блокирующий объект (пессимистично) и вызывающий блок. Метод принимает
+                один (опциональный) параметр и передает его в <code>lock!</code>.</p>
+            <p>Поэтому возможно написать следующее:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  def cancel!
+    transaction do
+      lock!
+      # ... cancelling logic
+    end
+  end
+end
+</pre>
+            </div>
+            <p>как:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  def cancel!
+    with_lock do
+      # ... cancelling logic
+    end
+  end
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li>
+            <p>Устарело автоматическое закрытие соединений в тредах. Для примера, следующий код
+                устарел:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Thread.new { Post.find(1) }.join
+</pre>
+            </div>
+            <p>Он должен быть изменен, чтобы закрывать соединение с базой данных в конце треда:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Thread.new {
+  Post.find(1)
+  Post.connection.close
+}.join
+</pre>
+            </div>
+            <p>Об этом должны беспокоиться только те, кто в своих приложениях создает треды.</p>
+        </li>
+        <li>
+            <p>Методы <code>set_table_name</code>, <code>set_inheritance_column</code>, <code>set_sequence_name</code>,
+                <code>set_primary_key</code>, <code>set_locking_column</code> устарели. Используйте
+                вместо них методы назначения. Для примера, вместо <code>set_table_name</code>
+                используйте <code>self.table_name=</code>.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Project &lt; ActiveRecord::Base
+  self.table_name = "project"
+end
+</pre>
+            </div>
+            <p>Или определите собственный метод <code>self.table_name</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Post &lt; ActiveRecord::Base
+  def self.table_name
+    "special_" ` super
+  end
+end
+Post.table_name # =&gt; "special_posts"
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-model"> Active Model</h3>
+    <ul>
+        <li><p>Добавлен <code>ActiveModel::Errors#added?</code> для проверки, была ли добавлена
+            определенная ошибка.</p></li>
+        <li><p>Добавлена возможность определить строгие валидации с помощью <code>strict =&gt;
+            true</code>, которые всегда вызывают исключение, когда не проходят.</p></li>
+        <li><p>Представлен mass_assignment_sanitizer как простое API для замены возможности
+            экранизатора. Также поддерживаются возможность экранизатора :logger (по умолчанию) и
+            :strict.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li><p>Устарел <code>define_attr_method</code> в <code>ActiveModel::AttributeMethods</code>,
+            поскольку он использовался только во вспомогательных методах, таких как <code>set_table_name</code>
+            в Active Record, которые сами устарели.</p></li>
+        <li><p>Устарел <code>Model.model_name.partial_path</code> в пользу <code>model.to_partial_path</code>.
+        </p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-resource"> Active Resource</h3>
+    <ul>
+        <li>Отклики перенаправления: 303 See Other и 307 Temporary Redirect теперь ведут себя как
+            301 Moved Permanently и 302 Found.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <ul>
+        <li>
+            <p>Добавлен <code>ActiveSupport:TaggedLogging</code>, который может обернуть любой
+                стандартный класс <code>Logger</code>, чтобы предоставить возможности тегирования.
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+Logger.tagged("BCX") { Logger.info "Stuff" }
+# Logs "[BCX] Stuff"
+Logger.tagged("BCX", "Jason") { Logger.info "Stuff" }
+# Logs "[BCX] [Jason] Stuff"
+Logger.tagged("BCX") { Logger.tagged("Jason") { Logger.info "Stuff" } }
+# Logs "[BCX] [Jason] Stuff"
+</pre>
+            </div>
+        </li>
+        <li><p>Метод <code>beginning_of_week</code> в <code>Date</code>, <code>Time</code> и <code>DateTime</code>
+            принимает опциональный аргумент, представляющий день, в который начинается неделя.</p>
+        </li>
+        <li><p><code>ActiveSupport::Notifications.subscribed</code> предоставляет подписки на
+            события, пока выполняется блок.</p></li>
+        <li><p>Определены новые методы <code>Module#qualified_const_defined?</code>, <code>Module#qualified_const_get</code>
+            и <code>Module#qualified_const_set</code>, являющиеся аналогами соответствующих методов
+            в стандартном API, но принимающие полные имена констант.</p></li>
+        <li><p>Добавлен <code>#deconstantize</code>, дополняющий <code>#demodulize</code> в
+            словообразовании. Он убирает самый правый сегмент в полном имени константы.</p></li>
+        <li><p>Добавлен <code>safe_constantize</code>, преобразующий строку в константу, но
+            возвращающий <code>nil</code> вместо исключения, если константа (или ее часть) не
+            существует.</p></li>
+        <li><p><code>ActiveSupport::OrderedHash</code> теперь помечается как extractable при
+            использовании <code>Array#extract_options!</code>.</p></li>
+        <li><p>Добавлены <code>Array#prepend</code> как псевдоним для <code>Array#unshift</code> и
+            <code>Array#append</code> как псевдоним для <code>Array#&lt;&lt;</code>.</p></li>
+        <li><p>Определение пустой строки для Ruby 1.9 было расширено пробелом Unicode. А также в
+            Ruby 1.8 идеографический пробел U`3000 рассматривается как пробел.</p></li>
+        <li><p>Инфлектор понимает акронимы.</p></li>
+        <li>
+            <p>Добавлены <code>Time#all_day</code>, <code>Time#all_week</code>, <code>Time#all_quarter</code>
+                и <code>Time#all_year</code> как способ создание интервалов.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Event.where(:created_at =&gt; Time.now.all_week)
+Event.where(:created_at =&gt; Time.now.all_day)
+</pre>
+            </div>
+        </li>
+        <li><p>Добавлена <code>instance_accessor: false</code> как опция в <code>Class#cattr_accessor</code>
+            и схожих методах.</p></li>
+        <li><p>Теперь у <code>ActiveSupport::OrderedHash</code> иное поведение для
+            <code>#each</code> и <code>#each_pair</code> при передаче блока, принимающего свои
+            параметры расплющенными.</p></li>
+        <li><p>Добавлен <code>ActiveSupport::Cache::NullStore</code> для использования при
+            разработке и тестировании.</p></li>
+        <li><p>Убран <code>ActiveSupport::SecureRandom</code> в пользу <code>SecureRandom</code> из
+            стандартной библиотеки.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li><p><code>ActiveSupport::Base64</code> устарел в пользу <code>::Base64</code>.</p></li>
+        <li><p><code>ActiveSupport::Memoizable</code> устарел в пользу паттерна запоминания из Ruby.
+        </p></li>
+        <li><p><code>Module#synchronize</code> устарел без какой-либо замены. Пожалуйста,
+            используйте monitor из стандартной библиотеки ruby.</p></li>
+        <li><p>Устарели <code>ActiveSupport::MessageEncryptor#encrypt</code> и <code>ActiveSupport::MessageEncryptor#decrypt</code>.
+        </p></li>
+        <li><p>Устарел <code>ActiveSupport::BufferedLogger#silence</code>. Если хотите приглушить
+            лог в определенном блоке, измените для него уровень лога.</p></li>
+        <li><p>Устарел <code>ActiveSupport::BufferedLogger#open_log</code>. Прежде всего, этот метод
+            не должен быть публичным.</p></li>
+        <li><p>Поведение <code>ActiveSupport::BufferedLogger's</code> в части автоматического
+            создания директории для файла лога устарело. Пожалуйста, убедитесь до инициализации, что
+            директория для файла лога создана.</p></li>
+        <li>
+            <p>Устарел <code>ActiveSupport::BufferedLogger#auto_flushing</code> . Или установите
+                уровень синхронизации на соответствующем файловом дескрипторе следующим образом. Или
+                настройте свою файловую систему. Теперь очистку контролирует кэш файловой системы.
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+f = File.open('foo.log', 'w')
+f.sync = true
+ActiveSupport::BufferedLogger.new f
+</pre>
+            </div>
+        </li>
+        <li><p>Устарел <code>ActiveSupport::BufferedLogger#flush</code>. Установите sync на ваш
+            дескриптор или настройте свою файловую систему.</p></li>
+    </ul>
+
+</body>
+</html>

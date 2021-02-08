@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>24. Различные представления графа</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Для реализации графа в виде списка инцидентности можно использовать следующий тип:</span>
+</p>
+<p><span>Type List = ^S;</span></p>
+<p><span>S = record;</span></p>
+<p><span>inf: Byte;</span></p>
+<p><span>next: List;</span></p>
+<p><span>end;</span></p>
+<p><span>Тогда граф задается следующим образом:</span></p>
+<p><span>Var Gr: array[1..n] of List;</span></p>
+<p><span>Теперь обратимся к процедуре обхода графа. Это вспомогательный алгоритм, который позволяет просмотреть все вершины графа, проанализировать все информационные поля. Если рассматривать обход графа в глубину, то существуют два типа алгоритмов: рекурсивный и нерекурсивный.</span>
+</p>
+<p><span>На языке Pascal процедура обхода в глубину будет выглядеть следующим образом:</span></p>
+<p><span>Procedure Obhod(gr: Graph; k: Byte);</span></p>
+<p><span>Var g: Graph; l: List;</span></p>
+<p><span>Begin</span></p>
+<p><span>nov[k]:= false;</span></p>
+<p><span>g:= gr;</span></p>
+<p><span>While g^.inf &lt;&gt; k do</span></p>
+<p><span>g:= g^.next;</span></p>
+<p><span>l:= g^.smeg;</span></p>
+<p><span>While l &lt;&gt; nil do begin</span></p>
+<p><span>If nov[l^.inf] then Obhod(gr, l^.inf);</span></p>
+<p><span>l:= l^.next;</span></p>
+<p><span>End;</span></p>
+<p><span>End;</span></p>
+<div class="fb2-empty-line"> </div>
+<p><span>Представление графа списком списков</span></p>
+<p><span>Граф можно определить с помощью списка списков следующим образом:</span></p>
+<p><span>Type List = ^Tlist;</span></p>
+<p><span>Tlist = record</span></p>
+<p><span>inf: Byte;</span></p>
+<p><span>next: List;</span></p>
+<p><span>end;</span></p>
+<p><span>Graph = ^TGpaph;</span></p>
+<p><span>TGpaph = record</span></p>
+<p><span>inf: Byte;</span></p>
+<p><span>smeg: List;</span></p>
+<p><span>next: Graph;</span></p>
+<p><span>end;</span></p>
+<div class="fb2-empty-line"> </div>
+<p><span>При обходе графа в ширину мы выбираем произвольную вершину и просматриваем сразу все вершины, смежные с ней.</span>
+</p>
+<p><span>Приведем процедуру обхода графа в ширину на псевдокоде:</span></p>
+<p><span>Procedure Obhod2(v);</span></p>
+<p><span>Begin</span></p>
+<p><span>queue = O;</span></p>
+<p><span>queue &lt;= v;</span></p>
+<p><span>nov[v] = False;</span></p>
+<p><span>While queue &lt;&gt; O do</span></p>
+<p><span>Begin</span></p>
+<p><span>p &lt;= queue;</span></p>
+<p><span>For u in spisok(p) do</span></p>
+<p><span>If nov[u] then</span></p>
+<p><span>Begin</span></p>
+<p><span>nov[u]:= False;</span></p>
+<p><span>queue &lt;= u;</span></p>
+<p><span>End;</span></p>
+<p><span>End;</span></p>
+<p><span>End;</span></p>
+</body>
+</html>

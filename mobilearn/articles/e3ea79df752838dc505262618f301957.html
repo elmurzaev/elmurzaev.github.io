@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Валидации Active Record</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="validatsii-active-record"> Валидации Active Record</h2>
+    <p>Это руководство научит, как осуществлять валидацию состояния объектов до того, как они будут
+        направлены в базу данных, используя особенность валидаций Active Record.</p>
+    <p>После прочтения руководства вы узнаете:</p>
+    <ul>
+        <li>Как использовать встроенные хелперы валидации Active Record
+        </li>
+        <li>Как создавать свои собственные методы валидации
+        </li>
+        <li>Как работать с сообщениями об ошибках, возникающими в процессе валидации
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="obzor-validatsiy"> Обзор валидаций</h3>
+    <p>Вот пример очень простой валидации:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true
+end
+Person.create(name: "John Doe").valid? # =&gt; true
+Person.create(name: nil).valid? # =&gt; false
+</pre>
+    </div>
+    <p>Как видите, наша валидация позволяет узнать, что наш <code>Person</code> не валиден без
+        атрибута <code>name</code>. Второй <code>Person</code> не будет сохранен в базу данных.</p>
+    <p>Прежде чем погрузиться в подробности, давайте поговорим о том, как валидации вписываются в
+        общую картину приложения.</p>
+    <h4 class="inside_page_header" id="zachem-ispolzovat-validatsii"> Зачем использовать
+        валидации?</h4>
+    <p>Валидации используются, чтобы быть уверенными, что только валидные данные сохраняются в вашу
+        базу данных. Например, для вашего приложения может быть важно, что каждый пользователь
+        предоставил валидный электронный и почтовый адреса. Валидации на уровне модели - наилучший
+        способ убедиться, что в базу данных будут сохранены только валидные данные. Они не зависят
+        от базы данных, не могут быть обойдены конечными пользователями и удобны в тестировании и
+        обслуживании. Rails представляет простоту в обслуживании, представляет встроенные хелперы
+        для общих нужд, а также позволяет создавать свои собственные методы валидации.</p>
+    <p>Есть несколько способов валидации данных, прежде чем они будут сохранены в вашу базу данных,
+        включая ограничения, встроенные в базу данных, валидации на клиентской части и валидации на
+        уровне контроллера. Вкратце о плюсах и минусах:</p>
+    <ul>
+        <li>Ограничения базы данных и/или хранимые процедуры делают механизмы валидации зависимыми
+            от базы данных, что делает тестирование и поддержку более трудными. Однако, если ваша
+            база данных используется другими приложениями, валидация на уровне базы данных может
+            безопасно обрабатывать некоторые вещи (такие как уникальность в нагруженных таблицах),
+            которые затруднительно выполнять по другому.
+        </li>
+        <li>Валидации на клиентской части могут быть очень полезны, но в целом ненадежны, если
+            используются в одиночку. Если они используют JavaScript, они могут быть пропущены, если
+            JavaScript отключен в клиентском браузере. Однако, если этот способ комбинировать с
+            другими, валидации на клиентской части могут быть удобным способом предоставить
+            пользователям немедленную обратную связь при использовании вашего сайта.
+        </li>
+        <li>Валидации на уровне контроллера заманчиво делать, но это часто приводит к громоздкости и
+            трудности тестирования и поддержки. Во всех случаях, когда это возможно, держите свои
+            контроллеры 'тощими', тогда с вашим приложением будет приятно работать в долгосрочной
+            перспективе.
+        </li>
+    </ul>
+    <p>Выбирайте их под свои определенные специфичные задачи. Общее мнение команды Rails состоит в
+        том, что валидации на уровне модели - наиболее подходящий вариант во многих случаях.</p>
+    <h4 class="inside_page_header" id="kogda-proishodit-validatsiya"> Когда происходит
+        валидация?</h4>
+    <p>Есть два типа объектов Active Record: те, которые соответствуют строке в вашей базе данных, и
+        те, которые нет. Когда создаете новый объект, например, используя метод <code>new</code>,
+        этот объект еще не привязан к базе данных. Как только вы вызовете <code>save</code>. этот
+        объект будет сохранен в подходящую таблицу базы данных. Active Record использует метод
+        экземпляра <code>new_record?</code> для определения, есть ли уже объект в базе данных или
+        нет. Рассмотрим следующий простой класс Active Record:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+end
+</pre>
+    </div>
+    <p>Можно увидеть, как он работает, взглянув на результат <code>rails console</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+$ bin/rails console
+&gt;&gt; p = Person.new(name: "John Doe")
+=&gt; #&lt;Person id: nil, name: "John Doe", created_at: nil, updated_at: nil&gt;
+&gt;&gt; p.new_record?
+=&gt; true
+&gt;&gt; p.save
+=&gt; true
+&gt;&gt; p.new_record?
+=&gt; false
+</pre>
+    </div>
+    <p>Создание и сохранение новой записи посылает операцию SQL <code>INSERT</code> базе данных.
+        Обновление существующей записи вместо этого посылает операцию SQL <code>UPDATE</code>.
+        Валидации обычно запускаются до того, как эти команды посылаются базе данных. Если любая из
+        валидаций проваливается, объект помечается как недействительный и Active Record не выполняет
+        операцию <code>INSERT</code> или <code>UPDATE</code>. Это помогает избежать хранения
+        невалидного объекта в базе данных. Можно выбирать запуск специфичных валидаций, когда объект
+        создается, сохраняется или обновляется.</p>
+    <div class="warning"><p>Есть разные методы изменения состояния объекта в базе данных. Некоторые
+        методы вызывают валидации, некоторые нет. Это означает, что возможно сохранить в базу данных
+        объект с недействительным статусом, если вы будете не внимательны.</p></div>
+    <p>Следующие методы вызывают валидацию, и сохраняют объект в базу данных только если он
+        валиден:</p>
+    <ul>
+        <li>
+            <code>create</code>
+        </li>
+        <li>
+            <code>create!</code>
+        </li>
+        <li>
+            <code>save</code>
+        </li>
+        <li>
+            <code>save!</code>
+        </li>
+        <li>
+            <code>update</code>
+        </li>
+        <li>
+            <code>update!</code>
+        </li>
+    </ul>
+    <p>Версии с восклицательным знаком (т.е. <code>save!</code>) вызывают исключение, если запись
+        недействительна. Невосклицательные версии не вызывают: <code>save</code> и
+        <code>update</code> возвращают <code>false</code>, <code>create</code> возвращает объект.
+    </p>
+    <h4 class="inside_page_header" id="propusk-validatsiy"> Пропуск валидаций</h4>
+    <p>Следующие методы пропускают валидации, и сохраняют объект в базу данных, независимо от его
+        валидности. Их нужно использовать осторожно.</p>
+    <ul>
+        <li>
+            <code>decrement!</code>
+        </li>
+        <li>
+            <code>decrement_counter</code>
+        </li>
+        <li>
+            <code>increment!</code>
+        </li>
+        <li>
+            <code>increment_counter</code>
+        </li>
+        <li>
+            <code>toggle!</code>
+        </li>
+        <li>
+            <code>touch</code>
+        </li>
+        <li>
+            <code>update_all</code>
+        </li>
+        <li>
+            <code>update_attribute</code>
+        </li>
+        <li>
+            <code>update_column</code>
+        </li>
+        <li>
+            <code>update_columns</code>
+        </li>
+        <li>
+            <code>update_counters</code>
+        </li>
+    </ul>
+    <p>Заметьте, что <code>save</code> также имеет способность пропустить валидации, если передать
+        <code>validate: false</code> как аргумент. Этот способ нужно использовать осторожно.</p>
+    <ul>
+        <li>
+            <code>save(validate: false)</code>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="valid-ili-invalid"><code>valid?</code> или
+        <code>invalid?</code>
+    </h4>
+    <p>Чтобы определить, валиден объект или нет, Rails использует метод <code>valid?</code>. Вы
+        также можете его использовать для себя. <code>valid?</code> вызывает ваши валидации и
+        возвращает true, если ни одной ошибки не было найдено у объекта, иначе false.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true
+end
+Person.create(name: "John Doe").valid? # =&gt; true
+Person.create(name: nil).valid? # =&gt; false
+</pre>
+    </div>
+    <p>После того, как Active Record выполнит валидации, все найденные ошибки будут доступны в
+        методе экземпляра <code>errors.messages</code>, возвращающем коллекцию ошибок. По
+        определению объект валиден, если эта коллекция будет пуста после запуска валидаций.</p>
+    <p>Заметьте, что объект, созданный с помощью <code>new</code> не сообщает об ошибках, даже если
+        технически невалиден, поскольку валидации не запускаются при использовании <code>new</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true
+end
+&gt;&gt; p = Person.new
+# =&gt; #&lt;Person id: nil, name: nil&gt;
+&gt;&gt; p.errors.messages
+# =&gt; {}
+&gt;&gt; p.valid?
+# =&gt; false
+&gt;&gt; p.errors.messages
+# =&gt; {name:["can't be blank"]}
+&gt;&gt; p = Person.create
+# =&gt; #&lt;Person id: nil, name: nil&gt;
+&gt;&gt; p.errors.messages
+# =&gt; {name:["can't be blank"]}
+&gt;&gt; p.save
+# =&gt; false
+&gt;&gt; p.save!
+# =&gt; ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
+&gt;&gt; Person.create!
+# =&gt; ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
+</pre>
+    </div>
+    <p><code>invalid?</code> это просто антипод <code>valid?</code>. Он запускает ваши валидации,
+        возвращая true, если для объекта были добавлены ошибки, и false в противном случае.</p>
+    <h4 class="inside_page_header" id="errors"><code>errors[]</code>
+    </h4>
+    <p>Чтобы проверить, является или нет конкретный атрибут объекта валидным, можно использовать
+        <code>errors[:attribute]</code>, который возвращает массив со всеми ошибками атрибута, когда
+        нет ошибок по определенному атрибуту, возвращается пустой массив.</p>
+    <p>Этот метод полезен только <em>после того</em>, как валидации были запущены, так как он всего
+        лишь исследует коллекцию errors, но сам не вызывает валидации. Он отличается от метода
+        <code>ActiveRecord::Base#invalid?</code>, описанного выше, тем, что не проверяет валидность
+        объекта в целом. Он всего лишь проверяет, какие ошибки были найдены для отдельного атрибута
+        объекта.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true
+end
+&gt;&gt; Person.new.errors[:name].any? # =&gt; false
+&gt;&gt; Person.create.errors[:name].any? # =&gt; true
+</pre>
+    </div>
+    <p>Мы рассмотрим ошибки валидации подробнее в разделе .</p>
+    <h4 class="inside_page_header" id="errors-details-rails-5-0"><code>errors.details</code> (Rails
+        5.0)</h4>
+    <p>Чтобы проверить, какая валидация упала на невалидном атрибуте, можно использовать <code>errors.details[:attribute]</code>.
+        Он возвращает массив хэшей с ключом <code>:error</code>, чтобы получить символ валидатора:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true
+end
+&gt;&gt; person = Person.new
+&gt;&gt; person.valid?
+&gt;&gt; person.errors.details[:name] # =&gt; [{error: :blank}]
+</pre>
+    </div>
+    <p>Использование <code>details</code> с собственным валидатором раскрыто в разделе .</p>
+    <h3 class="inside_page_header" id="validatsionnye-helpery"> Валидационные хелперы</h3>
+    <p>Active Record предлагает множество предопределенных валидационных хелперов, которые вы можете
+        использовать прямо внутри ваших определений класса. Эти хелперы предоставляют общие правила
+        валидации. Каждый раз, когда валидация проваливается, сообщение об ошибке добавляется в
+        коллекцию <code>errors</code> объекта, и это сообщение связывается с атрибутом, который
+        подлежал валидации.</p>
+    <p>Каждый хелпер принимает произвольное количество имен атрибутов, поэтому в одной строке кода
+        можно добавить валидации одинакового вида для нескольких атрибутов.</p>
+    <p>Они все принимают опции <code>:on</code> и <code>:message</code>, которые определяют, когда
+        валидация должна быть запущена, и какое сообщение должно быть добавлено в коллекцию <code>errors</code>,
+        если она провалится. Опция <code>:on</code> принимает одно из значений <code>:create</code>
+        или <code>:update</code>. Для каждого валидационного хелпера есть свое сообщение об ошибке
+        по умолчанию. Эти сообщения используются, если не определена опция <code>:message</code>.
+        Давайте рассмотрим каждый из доступных хелперов.</p>
+    <h4 class="inside_page_header" id="acceptance"><code>acceptance</code>
+    </h4>
+    <p>Этот метод проверяет, что чекбокс в пользовательском интерфейсе был нажат, когда форма была
+        подтверждена. Обычно используется, когда пользователю нужно согласиться с условиями
+        использования вашего приложения, подтвердить, что некоторый текст прочтен, или другой
+        подобной концепции.</p>
+    <p>Эта валидация очень специфична для веб приложений, и ее принятие не нужно записывать
+        куда-либо в базу данных. Если у вас нет поля для него, хелпер всего лишь создаст виртуальный
+        атрибут. Если поле существует в базе данных, опция <code>accept</code> должна быть
+        установлена в <code>true</code>, а иначе эта валидация не будет выполнена.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :terms_of_service, acceptance: true
+end
+</pre>
+    </div>
+    <p>Эта проверка выполнится, только если <code>terms_of_service</code> не <code>nil</code>. Для
+        этого хелпера сообщение об ошибке по умолчанию следующее <em>"must be accepted"</em>.</p>
+    <p>Он может получать опцию <code>:accept</code>, которая определяет значение, которое должно
+        считаться принятым. По умолчанию это "1", но его можно изменить.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :terms_of_service, acceptance: { accept: 'yes' }
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="validates_associated"><code>validates_associated</code>
+    </h4>
+    <p>Этот хелпер можно использовать, когда у вашей модели есть связи с другими моделями, и их
+        также нужно проверить на валидность. Когда вы пытаетесь сохранить свой объект, будет вызван
+        метод <code>valid?</code> для каждого из связанных объектов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Library &lt; ActiveRecord::Base
+  has_many :books
+  validates_associated :books
+end
+</pre>
+    </div>
+    <p>Эта валидация работает со всеми типами связей.</p>
+    <div class="warning"><p>Не используйте <code>validates_associated</code> на обоих концах ваших
+        связей, они будут вызывать друг друга в бесконечном цикле.</p></div>
+    <p>Для <code>validates_associated</code> сообщение об ошибке по умолчанию следующее <em>"is
+        invalid"</em>. Заметьте, что каждый связанный объект имеет свою собственную коллекцию <code>errors</code>;
+        ошибки не добавляются к вызывающей модели.</p>
+    <h4 class="inside_page_header" id="confirmation"><code>confirmation</code>
+    </h4>
+    <p>Этот хелпер можно использовать, если у вас есть два текстовых поля, из которых нужно получить
+        полностью идентичное содержание. Например, вы хотите подтверждение адреса электронной почты
+        или пароля. Эта валидация создает виртуальный атрибут, имя которого равно имени
+        подтверждаемого поля с добавлением "_confirmation".</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :email, confirmation: true
+end
+</pre>
+    </div>
+    <p>В вашем шаблоне вьюхи нужно использовать что-то вроде этого</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= text_field :person, :email %&gt;
+&lt;%= text_field :person, :email_confirmation %&gt;
+</pre>
+    </div>
+    <p>Эта проверка выполняется, только если <code>email_confirmation</code> не равно
+        <code>nil</code>. Чтобы требовать подтверждение, нужно добавить еще проверку на
+        существование проверяемого атрибута (мы рассмотрим <code>presence</code> чуть позже):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :email, confirmation: true
+  validates :email_confirmation, presence: true
+end
+</pre>
+    </div>
+    <p>Также имеется опция <code>:case_sensitive</code>, которую используют, чтобы определить,
+        должно ли ограничение подтверждения быть чувствительным к регистру. Эта опция по умолчанию
+        true. (Rails 5.0)</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :email, confirmation: { case_sensitive: false }
+end
+</pre>
+    </div>
+    <p>По умолчанию сообщение об ошибке для этого хелпера такое <em>"doesn't match
+        confirmation"</em>.</p>
+    <h4 class="inside_page_header" id="exclusion"><code>exclusion</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию того, что значения атрибутов не включены в указанный набор.
+        Фактически, этот набор может быть любым перечисляемым объектом.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Account &lt; ActiveRecord::Base
+  validates :subdomain, exclusion: { in: %w(www us ca jp),
+    message: "%{value} is reserved." }
+end
+</pre>
+    </div>
+    <p>Хелпер <code>exclusion</code> имеет опцию <code>:in</code>, которая получает набор значений,
+        которые не должны приниматься проверяемыми атрибутами. Опция <code>:in</code> имеет
+        псевдоним <code>:within</code>, который используется для тех же целей. Этот пример
+        использует опцию <code>:message</code>, чтобы показать вам, как можно включать значение
+        атрибута.</p>
+    <p>Значение сообщения об ошибке по умолчанию "<em>is reserved</em>".</p>
+    <h4 class="inside_page_header" id="format"><code>format</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию значений атрибутов, тестируя их на соответствие указанному
+        регулярному выражению, которое определяется с помощью опции <code>:with</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Product &lt; ActiveRecord::Base
+  validates :legacy_code, format: { with: /\A[a-zA-Z]+\z/,
+    message: "only allows letters" }
+end
+</pre>
+    </div>
+    <p>Значение сообщения об ошибке по умолчанию "<em>is invalid</em>".</p>
+    <h4 class="inside_page_header" id="inclusion"><code>inclusion</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию значений атрибутов на включение в указанный набор. Фактически
+        этот набор может быть любым перечисляемым объектом.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Coffee &lt; ActiveRecord::Base
+  validates :size, inclusion: { in: %w(small medium large),
+    message: "%{value} is not a valid size" }
+end
+</pre>
+    </div>
+    <p>Хелпер <code>inclusion</code> имеет опцию <code>:in</code>, которая получает набор значений,
+        которые должны быть приняты. Опция <code>:in</code> имеет псевдоним <code>:within</code>,
+        который используется для тех же целей. Предыдущий пример использует опцию
+        <code>:message</code>, чтобы показать вам, как можно включать значение атрибута.</p>
+    <p>Значение сообщения об ошибке по умолчанию для этого хелпера такое "<em>is not included in the
+        list</em>".</p>
+    <h4 class="inside_page_header" id="length"><code>length</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию длины значений атрибутов. Он предлагает ряд опций, с помощью
+        которых вы можете определить ограничения по длине разными способами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, length: { minimum: 2 }
+  validates :bio, length: { maximum: 500 }
+  validates :password, length: { in: 6..20 }
+  validates :registration_number, length: { is: 6 }
+end
+</pre>
+    </div>
+    <p>Возможные опции ограничения длины такие:</p>
+    <ul>
+        <li>
+            <code>:minimum</code> - атрибут не может быть меньше определенной длины.
+        </li>
+        <li>
+            <code>:maximum</code> - атрибут не может быть больше определенной длины.
+        </li>
+        <li>
+            <code>:in</code> (или <code>:within</code>) - длина атрибута должна находиться в
+            указанном интервале. Значение этой опции должно быть интервалом.
+        </li>
+        <li>
+            <code>:is</code> - длина атрибута должна быть равной указанному значению.
+        </li>
+    </ul>
+    <p>Значение сообщения об ошибке по умолчанию зависит от типа выполняемой валидации длины. Можно
+        переопределить эти сообщения, используя опции <code>:wrong_length</code>,
+        <code>:too_long</code> и <code>:too_short</code>, и <code>%{count}</code> как место для
+        вставки числа, соответствующего длине используемого ограничения. Можете использовать опцию
+        <code>:message</code> для определения сообщения об ошибке.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :bio, length: { maximum: 1000,
+    too_long: "%{count} characters is the maximum allowed" }
+end
+</pre>
+    </div>
+    <p>По умолчанию этот хелпер считает символы, но вы можете разбить значение иным способом
+        используя опцию <code>:tokenizer</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Essay &lt; ActiveRecord::Base
+  validates :content, length: {
+    minimum: 300,
+    maximum: 400,
+    tokenizer: lambda { |str| str.split(/\s+/) },
+    too_short: "must have at least %{count} words",
+    too_long: "must have at most %{count} words"
+  }
+end
+</pre>
+    </div>
+    <p>Отметьте, что сообщения об ошибке по умолчанию во множественном числе (т.е., "is too short
+        (minimum is %{count} characters)"). По этой причине, когда <code>:minimum</code> равно 1,
+        следует предоставить собственное сообщение или использовать вместо него <code>presence:
+            true</code>. Когда <code>:in</code> или <code>:within</code> имеют как нижнюю границу 1,
+        следует или предоставить собственное сообщение, или вызвать <code>presence</code> перед
+        <code>length</code>.</p>
+    <h4 class="inside_page_header" id="numericality"><code>numericality</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию того, что ваши атрибуты имеют только числовые значения. По
+        умолчанию, этому будет соответствовать возможный знак первым символом, и следующее за ним
+        целочисленное или с плавающей запятой число. Чтобы определить, что допустимы только
+        целочисленные значения, установите <code>:only_integer</code> в true.</p>
+    <p>Если установить <code>:only_integer</code> в <code>true</code>, тогда будет использоваться
+        регулярное выражение</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+/\A[+-]?\d+\z/
+</pre>
+    </div>
+    <p>для проведения валидации значения атрибута. В противном случае, он будет пытаться
+        конвертировать значение в число, используя <code>Float</code>.</p>
+    <div class="warning"><p>Отметьте, что вышеописанное регулярное выражение позволяет завершающий
+        символ перевода строки</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Player &lt; ActiveRecord::Base
+  validates :points, numericality: true
+  validates :games_played, numericality: { only_integer: true }
+end
+</pre>
+    </div>
+    <p>Кроме <code>:only_integer</code>, хелпер <code>validates_numericality_of</code> также
+        принимает следующие опции для добавления ограничений к приемлемым значениям:</p>
+    <ul>
+        <li>
+            <code>:greater_than</code> - определяет, что значение должно быть больше, чем значение
+            опции. По умолчанию сообщение об ошибке для этой опции такое <em>"must be greater than
+            %{count}"</em>.
+        </li>
+        <li>
+            <code>:greater_than_or_equal_to</code> - определяет, что значение должно быть больше или
+            равно значению опции. По умолчанию сообщение об ошибке для этой опции такое <em>"must be
+            greater than or equal to %{count}"</em>.
+        </li>
+        <li>
+            <code>:equal_to</code> - определяет, что значение должно быть равно значению опции. По
+            умолчанию сообщение об ошибке для этой опции такое <em>"must be equal to %{count}"</em>.
+        </li>
+        <li>
+            <code>:less_than</code> - определяет, что значение должно быть меньше, чем значение
+            опции. По умолчанию сообщение об ошибке для этой опции такое <em>"must be less than
+            %{count}"</em>.
+        </li>
+        <li>
+            <code>:less_than_or_equal_to</code> - определяет, что значение должно быть меньше или
+            равно значению опции. По умолчанию сообщение об ошибке для этой опции такое <em>"must be
+            less than or equal to %{count}"</em>.
+        </li>
+        <li>
+            <code>:odd</code> - определяет, что значение должно быть нечетным, если установлено
+            true. По умолчанию сообщение об ошибке для этой опции такое <em>"must be odd"</em>.
+        </li>
+        <li>
+            <code>:even</code> - определяет, что значение должно быть четным, если установлено true.
+            По умолчанию сообщение об ошибке для этой опции такое <em>"must be even"</em>.
+        </li>
+    </ul>
+    <div class="note"><p>По умолчанию <code>numericality</code> не допускает значения
+        <code>nil</code>. Чтобы их разрешить, можно использовать опцию <code>allow_nil: true</code>.
+    </p></div>
+    <p>По умолчанию сообщение об ошибке <em>"is not a number"</em>.</p>
+    <h4 class="inside_page_header" id="presence"><code>presence</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию того, что определенные атрибуты не пустые. Он использует метод
+        <code>blank?</code> для проверки того, является ли значение или <code>nil</code>, или пустой
+        строкой (это строка, которая или пуста, или состоит из пробелов).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, :login, :email, presence: true
+end
+</pre>
+    </div>
+    <p>Если хотите быть уверенным, что связь существует, нужно проверить, существует ли сам
+        связанный объект, а не внешний ключ, используемый для связи.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+  validates :order, presence: true
+end
+</pre>
+    </div>
+    <p>Для того, чтобы проверять связанные записи, чье присутствие необходимо, нужно определить
+        опцию <code>:inverse_of</code> для связи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  has_many :line_items, inverse_of: :order
+end
+</pre>
+    </div>
+    <p>При проведении валидации существования объекта, связанного отношением <code>has_one</code>
+        или <code>has_many</code>, будет проверено, что объект ни <code>blank?</code>, ни <code>marked_for_destruction?</code>.
+    </p>
+    <p>Так как <code>false.blank?</code> это true, если хотите провести валидацию существования
+        булева поля, нужно использовать одну из следующих валидаций:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+validates :boolean_field_name, inclusion: { in: [true, false] }
+validates :boolean_field_name, exclusion: { in: [nil] }
+</pre>
+    </div>
+    <p>При использовании одной из этих валидаций, вы можете быть уверены, что значение не будет
+        <code>nil</code>, которое в большинстве случаев преобразуется в <code>NULL</code> значение.
+    </p>
+    <h4 class="inside_page_header" id="absence"><code>absence</code>
+    </h4>
+    <p>Этот хелпер проверяет, что указанные атрибуты отсутствуют. Он использует метод
+        <code>present?</code> для проверки, что значение является либо nil, либо пустой строкой (то
+        есть либо нулевой длины, либо состоящей из пробелов).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, :login, :email, absence: true
+end
+</pre>
+    </div>
+    <p>Если хотите убедиться, что отсутствует связь, необходимо проверить, что отсутствует сам
+        связанный объект, а не внешний ключ, используемый для связи.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+  validates :order, absence: true
+end
+</pre>
+    </div>
+    <p>Чтобы проверять связанные объекты, отсутствие которых требуется, для связи необходимо указать
+        опцию <code>:inverse_of</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  has_many :line_items, inverse_of: :order
+end
+</pre>
+    </div>
+    <p>Если проверяете отсутствие объекта, связанного отношением <code>has_one</code> или <code>has_many</code>,
+        он проверит, что объект и не <code>present?</code>, и не
+        <code>marked_for_destruction?</code>.</p>
+    <p>Поскольку <code>false.present?</code> является false, если хотите проверить отсутствие булева
+        поля, следует использовать <code>validates :field_name, exclusion: { in: [true, false]
+            }</code>.</p>
+    <p>По умолчанию сообщение об ошибке <em>"must be blank"</em>.</p>
+    <h4 class="inside_page_header" id="uniqueness"><code>uniqueness</code>
+    </h4>
+    <p>Этот хелпер проводит валидацию того, что значение атрибута уникально, перед тем, как объект
+        будет сохранен. Он не создает условие уникальности в базе данных, следовательно, может
+        произойти так, что два разных подключения к базе данных создадут две записи с одинаковым
+        значением для столбца, который вы подразумеваете уникальным. Чтобы этого избежать, нужно
+        создать индекс unique на оба столбцах в вашей базе данных.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Account &lt; ActiveRecord::Base
+  validates :email, uniqueness: true
+end
+</pre>
+    </div>
+    <p>Валидация производится путем SQL запроса в таблицу модели, поиска существующей записи с тем
+        же значением атрибута.</p>
+    <p>Имеется опция <code>:scope</code>, которую можно использовать для определения одного и более
+        атрибутов, используемых для ограничения проверки уникальности:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Holiday &lt; ActiveRecord::Base
+  validates :name, uniqueness: { scope: :year,
+    message: "should happen once per year" }
+end
+</pre>
+    </div>
+    <p>Если хотите создать ограничение на уровне базы данных, чтобы предотвратить возможные
+        нарушения валидации уникальности с помощью опции <code>:scope</code>, вы должны создать
+        индекс уникальности на обоих столбцах вашей базы данных. Подробнее об индексах для
+        нескольких столбцов смотрите , или примеры ограничений уникальности, относящихся к группе
+        столбцов в .</p>
+    <p>Также имеется опция <code>:case_sensitive</code>, которой можно определить, будет ли
+        ограничение уникальности чувствительно к регистру или нет. Опция по умолчанию равна true.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, uniqueness: { case_sensitive: false }
+end
+</pre>
+    </div>
+    <div class="warning"><p>Отметьте, что некоторые базы данных настроены на выполнение
+        чувствительного к регистру поиска в любом случае.</p></div>
+    <p>По умолчанию сообщение об ошибке <em>"has already been taken"</em>.</p>
+    <h4 class="inside_page_header" id="validates_with"><code>validates_with</code>
+    </h4>
+    <p>Этот хелпер передает запись в отдельный класс для валидации.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GoodnessValidator &lt; ActiveModel::Validator
+  def validate(record)
+    if record.first_name == "Evil"
+      record.errors[:base] &lt;&lt; "This person is evil"
+    end
+  end
+end
+class Person &lt; ActiveRecord::Base
+  validates_with GoodnessValidator
+end
+</pre>
+    </div>
+    <div class="note"><p>Ошибки, добавляемые в <code>record.errors[:base]</code> относятся к
+        состоянию записи в целом, а не к определенному атрибуту.</p></div>
+    <p>Хелпер <code>validates_with</code> принимает класс или список классов для использования в
+        валидации. Для <code>validates_with</code> нет сообщения об ошибке по умолчанию. Следует
+        вручную добавлять ошибки в коллекцию errors записи в классе валидатора.</p>
+    <p>Для применения метода validate, необходимо иметь определенным параметр <code>record</code>,
+        который является записью, проходящей валидацию.</p>
+    <p>Подобно всем другим валидациям, <code>validates_with</code> принимает опции <code>:if</code>,
+        <code>:unless</code> и <code>:on</code>. Если передадите любые другие опции, они будут
+        переданы в класс валидатора как <code>options</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GoodnessValidator &lt; ActiveModel::Validator
+  def validate(record)
+    if options[:fields].any?{|field| record.send(field) == "Evil" }
+      record.errors[:base] &lt;&lt; "This person is evil"
+    end
+  end
+end
+class Person &lt; ActiveRecord::Base
+  validates_with GoodnessValidator, fields: [:first_name, :last_name]
+end
+</pre>
+    </div>
+    <p>Отметьте, что валидатор будет инициализирован <strong>только один раз</strong> на протяжении
+        всего жизненного цикла приложения, а не при каждом запуске валидации, поэтому будьте
+        аккуратнее с использованием переменных экземпляра в нем.</p>
+    <p>Если ваш валидатор настолько сложный, что вы хотите использовать переменные экземпляра,
+        вместо него проще использовать обычные объекты Ruby:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validate do |person|
+    GoodnessValidator.new(person).validate
+  end
+end
+class GoodnessValidator
+  def initialize(person)
+    @person = person
+  end
+  def validate
+    if some_complex_condition_involving_ivars_and_private_methods?
+      @person.errors[:base] &lt;&lt; "This person is evil"
+    end
+  end
+  # ...
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="validates_each"><code>validates_each</code>
+    </h4>
+    <p>Этот хелпер помогает провести валидацию атрибутов с помощью блока кода. Он не имеет
+        предопределенной валидационной функции. Вы должны создать ее, используя блок, и каждый
+        атрибут, указанный в <code>validates_each</code>, будет протестирован в нем. В следующем
+        примере нам не нужны имена и фамилии, начинающиеся с маленькой буквы.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates_each :name, :surname do |record, attr, value|
+    record.errors.add(attr, 'must start with upper case') if value =~ /\A[[:lower:]]/
+  end
+end
+</pre>
+    </div>
+    <p>Блок получает запись, имя атрибута и значение атрибута. Вы можете делать что угодно для
+        проверки валидности данных внутри блока. Если валидация проваливается, следует добавить
+        сообщение об ошибке в модель, которое делает ее невалидной.</p>
+    <h3 class="inside_page_header" id="obschie-optsii-validatsiy"> Общие опции валидаций</h3>
+    <p>Есть несколько общих опций валидаций:</p>
+    <h4 class="inside_page_header" id="allow_nil"><code>:allow_nil</code>
+    </h4>
+    <p>Опция <code>:allow_nil</code> пропускает валидацию, когда проверяемое значение равно <code>nil</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Coffee &lt; ActiveRecord::Base
+  validates :size, inclusion: { in: %w(small medium large),
+    message: "%{value} is not a valid size" }, allow_nil: true
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="allow_blank"><code>:allow_blank</code>
+    </h4>
+    <p>Опция <code>:allow_blank</code> подобна опции <code>:allow_nil</code>. Эта опция пропускает
+        валидацию, если значение атрибута <code>blank?</code>, например <code>nil</code> или пустая
+        строка.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Topic &lt; ActiveRecord::Base
+  validates :title, length: { is: 5 }, allow_blank: true
+end
+Topic.create(title: "").valid?  # =&gt; true
+Topic.create(title: nil).valid? # =&gt; true
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="message"><code>:message</code>
+    </h4>
+    <p>Как мы уже видели, опция <code>:message</code> позволяет определить сообщение, которое будет
+        добавлено в коллекцию <code>errors</code>, когда валидация проваливается. Если эта опция не
+        используется, Active Record будет использовать соответствующие сообщения об ошибках по
+        умолчанию для каждого валидационного хелпера.</p>
+    <h4 class="inside_page_header" id="on"><code>:on</code>
+    </h4>
+    <p>Опция <code>:on</code> позволяет определить, когда должна произойти валидация. Стандартное
+        поведение для всех встроенных валидационных хелперов это запускаться при сохранении (и когда
+        создается новая запись, и когда она обновляется). Если хотите изменить это, используйте
+        <code>on: :create</code>, для запуска валидации только когда создается новая запись, или
+        <code>on: :update</code>, для запуска валидации когда запись обновляется.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  # будет возможно обновить email с дублирующим значением
+  validates :email, uniqueness: true, on: :create
+  # будет возможно создать запись с нечисловым возрастом
+  validates :age, numericality: true, on: :update
+  # по умолчанию (проверяет и при создании, и при обновлении)
+  validates :name, presence: true
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="strogie-validatsii"> Строгие валидации</h3>
+    <p>Также можно определить валидации строгими, чтобы они вызывали <code>ActiveModel::StrictValidationFailed</code>,
+        когда объект невалиден.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: { strict: true }
+end
+Person.new.valid?  # =&gt; ActiveModel::StrictValidationFailed: Name can't be blank
+</pre>
+    </div>
+    <p>Также возможно передать собственное исключение в опцию <code>:strict</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :token, presence: true, uniqueness: true, strict: TokenGenerationException
+end
+Person.new.valid?  # =&gt; TokenGenerationException: Token can't be blank
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="uslovnaya-validatsiya"> Условная валидация</h3>
+    <p>Иногда имеет смысл проводить валидацию объекта только при выполнении заданного условия. Это
+        можно сделать, используя опции <code>:if</code> и <code>:unless</code>, которые принимают
+        символ, строку, <code>Proc</code> или массив. Опцию <code>:if</code> можно использовать,
+        если вы хотите определить, когда валидация <strong>должна</strong> произойти. Если вы хотите
+        определить, когда валидация <strong>не должна</strong> произойти, воспользуйтесь опцией
+        <code>:unless</code>.</p>
+    <h4 class="inside_page_header" id="ispolzovanie-simvola-s-if-i-unless"> Использование символа с
+        <code>:if</code> и <code>:unless</code>
+    </h4>
+    <p>Вы можете связать опции <code>:if</code> и <code>:unless</code> с символом, соответствующим
+        имени метода, который будет вызван перед валидацией. Это наиболее часто используемый
+        вариант.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Order &lt; ActiveRecord::Base
+  validates :card_number, presence: true, if: :paid_with_card?
+  def paid_with_card?
+    payment_type == "card"
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-stroki-s-if-i-unless"> Использование строки с
+        <code>:if</code> и <code>:unless</code>
+    </h4>
+    <p>Также можно использовать строку, которая будет вычислена с использованием <code>eval</code>,
+        и должна содержать валидный код Ruby. Этот вариант следует использовать, если строка
+        содержит действительно короткое условие.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :surname, presence: true, if: "name.nil?"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-proc-s-if-i-unless"> Использование Proc с <code>:if</code>
+        и <code>:unless</code>
+    </h4>
+    <p>Наконец, можно связать <code>:if</code> и <code>:unless</code> с объектом <code>Proc</code>,
+        который будет вызван. Использование объекта <code>Proc</code> дает возможность написать
+        встроенное условие вместо отдельного метода. Этот вариант лучше всего подходит для
+        однострочного кода.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Account &lt; ActiveRecord::Base
+  validates :password, confirmation: true,
+    unless: Proc.new { |a| a.password.blank? }
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="gruppirovka-uslovnyh-validatsiy"> Группировка условных
+        валидаций</h4>
+    <p>Иногда полезно иметь несколько валидаций с одним условием. Это легко достигается с
+        использованием <code>with_options</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  with_options if: :is_admin? do |admin|
+    admin.validates :password, length: { minimum: 10 }
+    admin.validates :email, presence: true
+  end
+end
+</pre>
+    </div>
+    <p>Во все валидации внутри <code>with_options</code> будет автоматически передано условие <code>if:
+        :is_admin?</code>.</p>
+    <h4 class="inside_page_header" id="ob-edinenie-usloviy-validatsii"> Объединение условий
+        валидации</h4>
+    <p>С другой стороны, может использоваться массив, когда несколько условий определяют, должна ли
+        произойти валидация. Более того, в одной и той же валидации можно применить и
+        <code>:if:</code>, и <code>:unless</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Computer &lt; ActiveRecord::Base
+  validates :mouse, presence: true,
+                    if: ["market.retail?", :desktop?],
+                    unless: Proc.new { |c| c.trackpad.present? }
+end
+</pre>
+    </div>
+    <p>Валидация выполнится только тогда, когда все условия <code>:if</code> и ни одно из условий
+        <code>:unless</code> будут вычислены со значением <code>true</code>.</p>
+    <h3 class="inside_page_header" id="vypolnenie-sobstvennyh-validatsiy"> Выполнение собственных
+        валидаций</h3>
+    <p>Когда встроенных валидационных хелперов недостаточно для ваших нужд, можете написать свои
+        собственные валидаторы или методы валидации.</p>
+    <h4 class="inside_page_header" id="sobstvennye-validatory"> Собственные валидаторы</h4>
+    <p>Собственные валидаторы это классы, наследуемые от <code>ActiveModel::Validator</code>. Эти
+        классы должны реализовать метод <code>validate</code>, принимающий запись как аргумент и
+        выполняющий валидацию на ней. Собственный валидатор вызывается с использованием метода
+        <code>validates_with</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class MyValidator &lt; ActiveModel::Validator
+  def validate(record)
+    unless record.name.starts_with? 'X'
+      record.errors[:name] &lt;&lt; ‘Need a name starting with X please!’
+    end
+  end
+end
+ 
+class Person
+  include ActiveModel::Validations
+  validates_with MyValidator
+end
+</pre>
+    </div>
+    <p>Простейшим способом добавить собственные валидаторы для валидации отдельных атрибутов
+        является наследуемость от <code>ActiveModel::EachValidator</code>. В этом случае класс
+        собственного валидатора должен реализовать метод <code>validate_each</code>, принимающий три
+        аргумента: запись, атрибут и значение. Это будут соответствующие экземпляр, атрибут, который
+        будет проверяться и значение атрибута в переданном экземпляре:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class EmailValidator &lt; ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)`[a-z]{2,})\z/i
+      record.errors[attribute] &lt;&lt; (options[:message] || "is not an email")
+    end
+  end
+end
+class Person &lt; ActiveRecord::Base
+  validates :email, presence: true, email: true
+end
+</pre>
+    </div>
+    <p>Как показано в примере, можно объединять стандартные валидации со своими произвольными
+        валидаторами.</p>
+    <h4 class="inside_page_header" id="sobstvennye-metody"> Собственные методы</h4>
+    <p>Также возможно создать методы, проверяющие состояние ваших моделей и добавляющие сообщения в
+        коллекцию <code>errors</code>, когда они невалидны. Затем эти методы следует
+        зарегистрировать, используя метод класса <code>validate</code> (), передав символьные имена
+        валидационных методов.</p>
+    <p>Можно передать более одного символа для каждого метода класса, и соответствующие валидации
+        будут запущены в том порядке, в котором они зарегистрированы.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Invoice &lt; ActiveRecord::Base
+  validate :expiration_date_cannot_be_in_the_past,
+    :discount_cannot_be_greater_than_total_value
+  def expiration_date_cannot_be_in_the_past
+    if expiration_date.present? &amp;&amp; expiration_date &lt; Date.today
+      errors.add(:expiration_date, "can't be in the past")
+    end
+  end
+  def discount_cannot_be_greater_than_total_value
+    errors.add(:discount, "can't be greater than total value") if
+      discount &gt; total_value
+  end
+end
+</pre>
+    </div>
+    <p>По умолчанию такие валидации будут выполнены каждый раз при вызове <code>valid?</code>. Также
+        возможно контролировать, когда выполнять собственные валидации, передав опцию
+        <code>:on</code> в метод <code>validate</code>, с ключами: <code>:create</code> или <code>:update</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Invoice &lt; ActiveRecord::Base
+  validate :active_customer, on: :create
+  def active_customer
+    errors.add(:customer_id, "is not active") unless customer.active?
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="working-with-validation-errors"> Работаем с ошибками
+        валидации</h3>
+    <p>В дополнение к методам <code>valid?</code> и <code>invalid?</code>, раскрытым ранее, Rails
+        предоставляет ряд методов для работы с коллекцией <code>errors</code> и исследования
+        валидности объектов.</p>
+    <p>Предлагаем список наиболее часто используемых методов. Если хотите увидеть список всех
+        доступных методов, обратитесь к документации по <code>ActiveModel::Errors</code>.</p>
+    <h4 class="inside_page_header" id="errors"><code>errors</code>
+    </h4>
+    <p>Возвращает экземпляр класса <code>ActiveModel::Errors</code>, содержащий все ошибки. Каждый
+        ключ это имя атрибута и значение это массив строк со всеми ошибками.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true, length: { minimum: 3 }
+end
+person = Person.new
+person.valid? # =&gt; false
+person.errors.messages
+ # =&gt; {:name=&gt;["can't be blank", "is too short (minimum is 3 characters)"]}
+person = Person.new(name: "John Doe")
+person.valid? # =&gt; true
+person.errors.messages # =&gt; []
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="errors"><code>errors[]</code>
+    </h4>
+    <p><code>errors[]</code> используется, когда вы хотите проверить сообщения об ошибке для
+        определенного атрибута. Он возвращает массив строк со всеми сообщениями об ошибке для
+        заданного атрибута, каждая строка с одним сообщением об ошибке. Если нет ошибок, относящихся
+        к атрибуту, возвратится пустой массив.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true, length: { minimum: 3 }
+end
+person = Person.new(name: "John Doe")
+person.valid? # =&gt; true
+person.errors[:name] # =&gt; []
+person = Person.new(name: "JD")
+person.valid? # =&gt; false
+person.errors[:name] # =&gt; ["is too short (minimum is 3 characters)"]
+person = Person.new
+person.valid? # =&gt; false
+person.errors[:name]
+ # =&gt; ["can't be blank", "is too short (minimum is 3 characters)"]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="errors-add"><code>errors.add</code>
+    </h4>
+    <p>Метод <code>add</code> позволяет добавлять сообщение об ошибке, относящейся к определенному
+        атрибуту. Он принимает в качестве аргументов атрибут и сообщение об ошибке.</p>
+    <p>Метод <code>errors.full_messages</code> (или его эквивалент <code>errors.to_a</code>)
+        возвращает сообщения об ошибках в дружелюбном формате с именем атрибута с прописной буквы,
+        предшествующим каждому сообщению, как показано в следующем примере.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  def a_method_used_for_validation_purposes
+    errors.add(:name, "cannot contain the characters !@#%*()_-+=")
+  end
+end
+person = Person.create(name: "!@#")
+person.errors[:name]
+ # =&gt; ["cannot contain the characters !@#%*()_-+="]
+person.errors.full_messages
+ # =&gt; ["Name cannot contain the characters !@#%*()_-+="]
+</pre>
+    </div>
+    <p>Эквивалентом <code>errors#add</code> является использование <code>&lt;&lt;</code> для
+        добавления сообщения к массиву <code>errors.messages</code> атрибута:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  class Person &lt; ActiveRecord::Base
+    def a_method_used_for_validation_purposes
+      errors.messages[:name] &lt;&lt; "cannot contain the characters !@#%*()_-+="
+    end
+  end
+  person = Person.create(name: "!@#")
+  person.errors[:name]
+   # =&gt; ["cannot contain the characters !@#%*()_-+="]
+  person.errors.to_a
+   # =&gt; ["Name cannot contain the characters !@#%*()_-+="]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="errors-details-rails-5-0"><code>errors.details</code> (Rails
+        5.0)</h4>
+    <p>Можно указать тип валидатора в возвращаемом хэше подробностей об ошибке с помощью метода
+        <code>errors.add</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  def a_method_used_for_validation_purposes
+    errors.add(:name, :invalid_characters)
+  end
+end
+person = Person.create(name: "!@#")
+person.errors.details[:name]
+# =&gt; [{error: :invalid_characters}]
+</pre>
+    </div>
+    <p>Чтобы улучшить подробности об ошибке, добавив, к примеру, недозволенные символы, можно
+        передать дополнительные ключи в <code>errors.add</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  def a_method_used_for_validation_purposes
+    errors.add(:name, :invalid_characters, not_allowed: "!@#%*()_-+=")
+  end
+end
+person = Person.create(name: "!@#")
+person.errors.details[:name]
+# =&gt; [{error: :invalid_characters, not_allowed: "!@#%*()_-+="}]
+</pre>
+    </div>
+    <p>Все встроенные в Rails валидаторы заполняют хэш details соответствующим типом валидатора.</p>
+    <h4 class="inside_page_header" id="errors-base"><code>errors[:base]</code>
+    </h4>
+    <p>Можете добавлять сообщения об ошибках, которые относятся к состоянию объекта в целом, а не к
+        отдельному атрибуту. Этот метод можно использовать, если вы хотите сказать, что объект
+        невалиден, независимо от значений его атрибутов. Поскольку <code>errors[:base]</code>
+        массив, можете просто добавить строку к нему, и она будет использована как сообщение об
+        ошибке.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  def a_method_used_for_validation_purposes
+    errors[:base] &lt;&lt; "This person is invalid because ..."
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="errors-clear"><code>errors.clear</code>
+    </h4>
+    <p>Метод <code>clear</code> используется, когда вы намеренно хотите очистить все сообщения в
+        коллекции <code>errors</code>. Естественно, вызов <code>errors.clear</code> для невалидного
+        объекта фактически не сделает его валидным: сейчас коллекция <code>errors</code> будет
+        пуста, но в следующий раз, когда вы вызовете <code>valid?</code> или любой метод, который
+        пытается сохранить этот объект в базу данных, валидации выполнятся снова. Если любая из
+        валидаций провалится, коллекция <code>errors</code> будет заполнена снова.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true, length: { minimum: 3 }
+end
+person = Person.new
+person.valid? # =&gt; false
+person.errors[:name]
+ # =&gt; ["can't be blank", "is too short (minimum is 3 characters)"]
+person.errors.clear
+person.errors.empty? # =&gt; true
+p.save # =&gt; false
+p.errors[:name]
+ # =&gt; ["can't be blank", "is too short (minimum is 3 characters)"]
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="errors-size"><code>errors.size</code>
+    </h4>
+    <p>Метод <code>size</code> возвращает количество сообщений об ошибке для объекта.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  validates :name, presence: true, length: { minimum: 3 }
+end
+person = Person.new
+person.valid? # =&gt; false
+person.errors.size # =&gt; 2
+person = Person.new(name: "Andrea", email: "andrea@example.com")
+person.valid? # =&gt; true
+person.errors.size # =&gt; 0
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="displaying-validation-errors-in-the-view"> Отображение ошибок
+        валидации во вьюхах</h3>
+    <p>Как только вы создали модель и добавили валидации, если эта модель создается с помощью
+        веб-формы, то вы, возможно хотите отображать сообщение об ошибке, когда одна из валидаций
+        проваливается.</p>
+    <p>Поскольку каждое приложение обрабатывает подобные вещи по-разному, в Rails нет какого-то
+        хелпера вьюхи для непосредственного создания этих сообщений. Однако, благодаря богатому
+        набору методов, Rails в целом дает способ взаимодействия с валидациями, очень просто создать
+        свой собственный. Кроме того, при генерации скаффолда, Rails поместит некоторый ERB в <code>_form.html.erb</code>,
+        созданный для отображения полного списка ошибок этой модели.</p>
+    <p>Допустим, у нас имеется модель, сохраненная в переменную экземпляра <code>@article</code>,
+        это выглядит следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% if @article.errors.any? %&gt;
+  &lt;div id="error_explanation"&gt;
+    &lt;h2&gt;&lt;%= pluralize(@article.errors.count, "error") %&gt; prohibited this article from being saved:&lt;/h2&gt;
+    &lt;ul&gt;
+    &lt;% @article.errors.full_messages.each do |msg| %&gt;
+      &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+    &lt;% end %&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Более того, при использовании хелперов форм Rails для создания форм, когда у поля происходит
+        ошибка валидации, создается дополнительный <code>&lt;div&gt;</code> вокруг содержимого.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;div class="field_with_errors"&gt;
+ &lt;input id="article_title" name="article[title]" size="30" type="text" value=""&gt;
+&lt;/div&gt;
+</pre>
+    </div>
+    <p>Этот div можно стилизовать по желанию. К примеру, скаффолд по умолчанию добавляет это правило
+        CSS:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+.field_with_errors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+</pre>
+    </div>
+    <p>Это означает, что любое поле с ошибкой обведено красной рамкой толщиной 2 пикселя.</p>
+
+</body>
+</html>

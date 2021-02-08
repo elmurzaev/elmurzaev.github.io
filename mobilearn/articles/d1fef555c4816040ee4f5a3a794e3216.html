@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 3. Одномерные и двумерные массивы и их обработка</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l3_1">
+    <h1> 1. Объявление массива </h1>
+    <p>
+        Объявление массива имеет следующий синтаксис:
+        <span class="sint">
+<i>&lt;спецификация типа&gt; &lt;имя&gt;</i> [<i>&lt;константное выражение&gt;</i>];
+<i>&lt;спецификация типа&gt; &lt;имя&gt;</i> [ ];
+</span>
+    </p>
+    <p>
+        Здесь квадратные скобки являются элементом синтаксиса, а не признаком необязательности
+        конструкции.
+    </p>
+    <p>
+        Объявление массива может иметь одну из двух синтаксических форм, указанных выше. Квадратные
+        скобки, следующие за <i>именем</i>, – признак того, что переменная является массивом. <i>Константное
+        выражение</i>, заключенное в квадратные скобки определяет число элементов в массиве. <b>Индексация
+        элементов массива в языке <span>C++</span> начинается с нуля.</b> Таким образом, последний
+        элемент массива имеет индекс на единицу меньше, чем число элементов массива.
+    </p>
+    <p>
+        Во второй синтаксической форме константное выражение в квадратных скобках опущено. Эта форма
+        может быть использована, если в объявлении массива присутствует инициализатор, либо массив
+        объявляется как формальный параметр функции, либо данное объявление является ссылкой на
+        объявление массива где-то в другом месте программы. Однако для многомерного массива может
+        быть опущена <i>только первая размерность</i>.
+    </p>
+    <p id="l3_matrix">Многомерный массив, или массив массивов, объявляется путем задания
+        последовательности константных выражений в квадратных скобках, следующей за <i>именем</i>:
+        <span class="sint">
+<i>&lt;спецификация типа&gt; &lt;имя&gt;</i> [<i>&lt;константное выражение&gt;</i>][<i>&lt;константное выражение&gt;</i>] ... ;
+</span>
+    </p>
+    <p>
+        Каждое <i>константное выражение</i> определяет количество элементов в данном измерении
+        массива, поэтому объявление двумерного массива содержит два константных выражение,
+        трехмерного – три и т.д.
+    </p>
+    <p>
+        Массив может состоять из элементов любого типа, кроме типа и функций, т.е. элементы массива
+        могут иметь , , тип, быть , или <i>массивом</i>.
+    </p>
+    <p><b>Примеры объявлений массивов</b>
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> x[10];
+            </td>
+            <td class="commenti">// Одномерный массив из 10 целых чисел. Индексы меняются от 0 до
+                9.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">double</span> y[2][10];
+            </td>
+            <td class="commenti">// Двумерный массив вещественных чисел из 2 строк и 10 столбцов.
+            </td>
+        </tr>
+    </table>
+</section>
+<section id="l3_2">
+    <h1> 2. Инициализация массивов </h1>
+    <p>
+        Как и простые переменные, массивы могут быть инициализированы при объявлении. Инициализатор
+        для объектов составных типов (каким является массив) состоит из списка инициализаторов,
+        разделенных запятыми и заключенных в фигурные скобки. Каждый инициализатор в списке
+        представляет собой либо константу соответствующего типа, либо, в свою очередь, список
+        инициализаторов. Эта конструкция используется для инициализации многомерных массивов.
+    </p>
+    <p>
+        Наличие списка инициализаторов в объявлении массива позволяет не указывать число элементов
+        по его первой размерности. В этом случае количество элементов в списке инициализаторов и
+        определяет число элементов по первой размерности массива. Тем самым определяется размер
+        памяти, необходимой для хранения массива. Число элементов по остальным размерностям массива,
+        кроме первой, указывать обязательно.
+    </p>
+    <p>
+        Если в списке инициализаторов меньше элементов, чем в массиве, то оставшиеся элементы неявно
+        инициализируются нулевыми значениями. Если же число инициализаторов больше, чем требуется,
+        то выдается сообщение об ошибке.
+    </p>
+    <p><b> Примеры инициализации массивов </b>
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a[3] = {0, 1, 2};
+            </td>
+            <td class="commenti">// Число инициализаторов равно числу элементов</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">double</span> b[5] = {0.1, 0.2, 0.3};
+            </td>
+            <td class="commenti">// Число инициализаторов меньше числа элементов</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> c[ ] = {1, 2, 4, 8, 16};
+            </td>
+
+            <td class="commenti">// Число элементов массива определяется по числу инициализаторов
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> d[2][3] = {{0, 1, 2}, {3, 4, 5}};
+            </td>
+
+            <td class="commenti">// Инициализация двумерного массива. Массив состоит из двух строк,
+                // в каждой из которых по 3 элемента. Элементы первой строки
+                // получают значения 0, 1 и 2, а второй – значения 3, 4 и 5.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> e[3] = {0, 1, 2, 3};
+            </td>
+
+            <td class="commenti">// Ошибка – число инициализаторов больше числа элементов</td>
+        </tr>
+    </table>
+    <p>
+        Обратите внимание, что не существует присваивания массиву, соответствующего описанному выше
+        способу инициализации.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a[3] = {0, 1, 2};
+            </td>
+            <td class="commenti">// Объявление и инициализация</td>
+        </tr>
+        <tr>
+            <td class="esempi">a = {0, 1, 2};</td>
+            <td class="commenti">// Ошибка</td>
+        </tr>
+    </table>
+</section>
+<section id="l3_3">
+    <h1> 3. Работа с массивами </h1>
+    <h2 id="l3_3_1"> 3.1. Доступ к элементу массива </h2>
+    <p>
+        Для доступа к конкретному элементу массива используются так называемые индексные выражения:
+        <span class="sint">
+<i>&lt;имя массива&gt;</i>[<i>&lt;целочисленное выражение&gt;</i>]
+</span>
+    </p>
+    <p>
+        Здесь квадратные скобки являются требованием синтаксисам языка, а не признаком
+        необязательности конструкции.
+    </p>
+    <p>
+        Индекс массива может быть не только константой, но и выражением, которое имеет целочисленный
+        тип, например, <var>a</var>[<var>i</var> + 1] (здесь <var>a</var> должно быть именем ранее
+        объявленного массива, а <var>i</var> – переменной целого типа).
+    </p>
+    <p>
+        Объявление массива и индексное выражение, используемое для доступа к элементу массива, имеют
+        схожий синтаксис. Различаются они по месту в программе. Это особенно важно, когда мы
+        определяем индекс последнего элемента массива. Как было сказано ранее, индексы элементов
+        массива в языке C начинаются с 0, и номер последнего элемента на 1 меньше количества
+        элементов массива. Поэтому если Вы объявили массив <var>x</var> из 10 элементов, Вы не
+        можете написать индексное выражение <var>x</var>[10], т.к. в этом случае Вы пытаетесь
+        обратиться к элементу с индексом 10, которого нет в Вашем массиве. Компилятор не выдаст
+        сообщения об ошибке, но результаты работы такой программы будут непредсказуемы.
+    </p>
+    <p>
+        <b>Имя массива является адресом его начала!</b> Оно имеет тип <i>константный указатель на
+        &lt;тип элементов массива&gt;</i>. Конструкция <var>a</var>[<var>i</var>] эквивалентна
+        <span>*(<var>a</var> + <var>i</var>)</span> <span>(см. ).</span>
+    </p>
+    <p>
+        Для <i>многомерного массива</i> надо указать соответствующее количество индексов в
+        квадратных скобках.
+    </p>
+    <h2 id="l3_3_2"> 3.2. Обработка массивов </h2>
+    <p>
+        Для обработки элементов массива обычно используется оператор пошагового цикла <i>for</i>.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (i = 0;
+            </td>
+
+            <td class="commenti">// Присваиваем счетчику цикла значение индекса первого элемента
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> i &lt; n;</td>
+
+            <td class="commenti">// Условие продолжения цикла – пока значение счетчика меньше
+                количества элементов массива
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> i++)</td>
+
+            <td class="commenti">// Увеличиваем счетчик цикла на 1 для перехода к следующему
+                элементу массива
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> &lt;тело цикла&gt;</td>
+
+            <td class="commenti">// В теле цикла происходит обработка одного элемента массива</td>
+        </tr>
+    </table>
+    <p>
+        Для обработки многомерного массива используется соответствующее количество циклов.
+    </p>
+    <p>
+        Массивы не самодостаточны в том смысле, что не гарантируется хранение информации о
+        количестве элементов вместе с самим массивом. В большинстве реализаций <span>С++</span>
+        отсутствует проверка диапазона индексов для массивов. Таков традиционный низкоуровневый
+        подход к массивам. Более совершенное понятие массива можно реализовать при помощи классов.
+    </p>
+    <p>
+        В С++ массивы тесно связаны с указателями. Имя массива можно использовать в качестве
+        указателя на его первый элемент. Гарантируется осмысленность значения указателя на элемент,
+        следующий за последним элементом массива. Это важно для многих алгоритмов. Но ввиду того,
+        что такой указатель на самом деле не указывает ни на какой элемент массива, его нельзя
+        использовать ни для чтения, ни для записи. Результат получения адреса элемента массива,
+        предшествующего первому, не определён, и такой операции следует избегать.
+    </p>
+    <p>
+        Неявное преобразование имени массива в указатель на его первый элемент широко используется в
+        вызовах функций.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> f(..., <b><span class="chiavi">int</span> x[]</b>,
+                ...) { ... }
+                <span class="chiavi">int</span> f(..., <b><span class="chiavi">int</span> *x</b>,
+                ...) { ... }
+                <span class="chiavi">void</span> main()
+                { <span class="chiavi">int</span> a[10];
+                ...
+            </td>
+
+            <td class="commenti">// Можно использовать любой из двух вариантов</td>
+        </tr>
+        <tr>
+            <td class="esempi"> f(..., <b>a</b>, ...);
+                ...
+                }
+            </td>
+
+            <td class="commenti">// Передаём в функцию <i>f</i> указатель на массив <b>a</b></td>
+        </tr>
+    </table>
+    <p>
+        Неявное преобразование массива в указатель при вызове функции приводит к потере информации о
+        размере массива. Вызываемая функция должна каким-либо образом определить этот размер, чтобы
+        выполнять осмысленные действия.
+    </p>
+    <p>
+        При объявлении многомерного массива как параметра функции можно опустить только первую
+        размерность.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> g(..., <b><span class="chiavi">int</span>
+                x[][10]</b>, ...) { ... }
+            </td>
+
+            <td class="commenti">// Вторая и последующие размерности обязательны</td>
+        </tr>
+    </table>
+    <p>
+        Это ограничение при желании можно обойти. Правда, при этом возникают другие проблемы (см. в
+        конце лекции).
+    </p>
+    <h2 id="l3_3_3">3.3. Ввод/вывод массивов </h2>
+    <p>
+        В языке C нет возможности вводить и выводить весь массив одним оператором ввода/вывода.
+        Можно вводить и выводить только один элемент массива. Следовательно, для того чтобы ввести
+        весь массив, надо использовать цикл.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> a[10], n;
+                printf("Введите количество элементов массива (от 0 до 9): ");
+            </td>
+
+            <td class="commenti">// Объявляем массив и переменную для количества элементов массива
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">scanf("%d", &amp;n);</td>
+
+            <td class="commenti">// Ввод количества элементов массива</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">if</span> (n &lt; 0 || n &gt; 9)
+                { printf("Количество элементов массива должно быть от 0 до 9!\n");
+                <span class="chiavi">return</span>;
+                }
+            </td>
+
+            <td class="commenti">// Если входные данные неверны,
+                // то печатаем соответствующее сообщение и выходим из программы
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (i = 0; i &lt; n; i++)
+            </td>
+
+            <td class="commenti">// Ввод массива по одному элементу</td>
+        </tr>
+        <tr>
+            <td class="esempi"> scanf("%d", &amp;a[i]);</td>
+
+            <td class="commenti">// <b>Можно использовать scanf("%d", a + i)</b></td>
+        </tr>
+    </table>
+    <p>
+        Вывод также осуществляется в цикле.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">for</span> (i = 0; i &lt; n; i++)
+                printf("a[%d] = %3d\n", i + 1, a[i]);
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        В результате на экране мы увидим примерно следующий текст:
+        <span class="sint">
+a[1] =  4
+a[2] = 15
+a[3] = -2
+...
+</span>
+    </p>
+    <h3 id="l3_3_4">3.4. Пример 1. Обработка одномерного массива</h3>
+    <p>
+        Даны три массива разной размерности. Определить в каком массиве больше сумма элементов.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;cstdio&gt;
+                <span class="chiavi">#include</span> &lt;locale.h&gt;
+                <span class="chiavi">const int</span> nmax = 100;
+            </td>
+            <td class="commenti">  </td>
+
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> ArrayInput(<span class="chiavi">int</span> *n, <span
+                    class="chiavi">double</span> x[], <span class="chiavi">char</span> *fname);
+            </td>
+            <td class="commenti">// Функция ввода массива из файла</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">double</span> Sum(<span class="chiavi">double</span> x[], <span
+                    class="chiavi"> int</span> n);
+
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi">char</span> *argv[])
+                { <span class="chiavi">double</span> a[nmax], b[nmax], c[nmax];
+                <span class="chiavi">double</span> sa, sb, sc, max;
+                <span class="chiavi">int</span> na, nb, nc;
+                setlocale(LC_ALL, "rus");
+            </td>
+            <td class="commenti">// Функция поиска суммы элементов массива
+                // Меняем кодировку для консольного приложения
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi" colspan="2"><span class="chiavi">if</span> (argc &lt; 4)
+                { printf("Недостаточно параметров!\n");
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> (!ArrayInput(&amp;na, a, argv[1]))
+                <span class="chiavi">return</span>;
+                <span class="chiavi">if</span> (!ArrayInput(&amp;nb, b, argv[2]))
+                <span class="chiavi">return</span>;
+                <span class="chiavi">if</span> (!ArrayInput(&amp;nc, c, argv[3]))
+                <span class="chiavi">return</span>;
+                sa = Sum(a, na);
+                sb = Sum(b, nb);
+                sc = Sum(c, nc);
+                max = sa;
+                <span class="chiavi">if</span> (sb &gt; max) max = sb;
+                <span class="chiavi">if</span> (sc &gt; max) max = sc;
+                <span class="chiavi">if</span> (sa == max)
+                printf("Массив А имеет максимальную сумму элементов: %9.3lf\n", max);
+                <span class="chiavi">if</span> (sb == max)
+                printf("Массив B имеет максимальную сумму элементов: %9.3lf\n", max);
+                <span class="chiavi">if</span> (sc == max)
+                printf("Массив C имеет максимальную сумму элементов: %9.3lf\n", max);
+                }
+                <span class="chiavi">double</span> Sum(<span class="chiavi">double</span> x[], <span
+                        class="chiavi"> int</span> n)
+                { <span class="chiavi">double</span> s = 0;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; n;
+                i++)
+                s += x[i];
+                <span class="chiavi">return</span> s;
+                }
+                <span class="chiavi">int</span> ArrayInput(<span class="chiavi">int</span> *n, <span
+                        class="chiavi">double</span> x[], <span class="chiavi">char</span> *fname)
+                { FILE *file;
+                <span class="chiavi">if</span> ((file = fopen(fname, "r")) == NULL)
+                { printf("Невозможно открыть файл '%s'\n", fname);
+                <span class="chiavi">return</span> 0;
+                }
+                <span class="chiavi">if</span> (fscanf(file, "%d", n) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", fname);
+                fclose(file);
+                <span class="chiavi">return</span> 0;
+                }
+                <span class="chiavi">if</span> (*n &lt; 0 || *n &gt; nmax)
+                { printf("Кол-во эл-тов массива должно быть от 1 до %d! (файл '%s')\n", nmax,
+                fname);
+                <span class="chiavi">return</span> 0;
+                }
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; *n;
+                i++)
+                <span class="chiavi">if</span> (fscanf(file, "%lf", &amp;x[i]) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", fname);
+                fclose(file);
+                <span class="chiavi">return</span> 0;
+                }
+                fclose(file);
+                <span class="chiavi">return</span> 1;
+                }
+            </td>
+        </tr>
+    </table>
+    <h3 id="l3_3_5">3.5. Пример 2. Обработка двумерного массива</h3>
+    <p>
+        Для каждой строки матрицы проверить наличие нулевых элементов.
+    </p>
+    <h4>Первый способ</h4>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;cstdio&gt;
+                <span class="chiavi">#include</span> &lt;locale.h&gt;
+                <span class="chiavi">const int</span> nmax = 100;
+            </td>
+            <td class="commenti">  </td>
+
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> Zeros(<span class="chiavi">double</span> x[][nmax],
+                <span class="chiavi"> int</span> m,<span class="chiavi"> int</span> n, <span
+                    class="chiavi"> int</span> z[]);
+            </td>
+
+            <td class="commenti">// Функция <i>Zeros</i> формирует одномерный массив, <i>i</i>-ый
+                элемент которого равен 1,
+                // если в <i>i</i>-ой строке есть нулевые элементы, и 0 в противном случае
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi" colspan="2">
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi">char</span> *argv[])
+                { <span class="chiavi">double</span> a[nmax][nmax];
+                <span class="chiavi">int</span> m, n, z[nmax];
+                FILE *file;
+                setlocale(LC_ALL, "rus");
+                <span class="chiavi">if</span> (argc &lt; 2)
+                { printf("Недостаточно параметров!\n");
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> ((file = fopen(argv[1], "r")) == NULL)
+                { printf("Невозможно открыть файл '%s'\n", argv[1]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> (fscanf(file, "%d%d", &amp;m, &amp;n) &lt; 2)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[1]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> (m &lt; 0 || m &gt; nmax || n &lt; 0 || n &gt; nmax)
+                { printf("Количество строк и столбцов матрицы должны быть от 1 до %d!\n", nmax);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; m;
+                i++)
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> j = 0; j &lt; n;
+                j++)
+                <span class="chiavi">if</span> (fscanf(file, "%lf", &amp;a[i][j]) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[1]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                fclose(file);
+                Zeros(a, m, n, z);
+
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; m;
+                i++)
+                <span class="chiavi">if</span> (z[i])
+                printf("В %3d строке есть нулевые элементы\n", i + 1);
+                }
+
+
+                <span class="chiavi">void</span> Zeros(<span class="chiavi">double</span> x[][nmax],
+                <span class="chiavi"> int</span> m, <span class="chiavi">int</span> n, <span
+                    class="chiavi">int</span> z[])
+                { <span class="chiavi">int</span> i, j;
+                <span class="chiavi">for</span> (i = 0; i &lt; m; i++)
+                <span class="chiavi">for</span>(z[i] = 0, j = 0; j &lt; n; j++)
+                <span class="chiavi">if</span> (x[i][j] == 0)
+                { z[i] = 1; <span class="chiavi"> break</span>; }
+                }
+            </td>
+
+        </tr>
+    </table>
+    <h4>Второй способ</h4>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;cstdio&gt;
+                <span class="chiavi">#include</span> &lt;locale.h&gt;
+                <span class="chiavi">const int</span> nmax = 100;
+            </td>
+            <td class="commenti">  </td>
+
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> Zeros(<span class="chiavi">double</span> x[], <span
+                    class="chiavi"> int</span> n);
+
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi">char</span> *argv[])
+                { <span class="chiavi">double</span> a[nmax][nmax];
+                <span class="chiavi">int</span> m, n;
+            </td>
+
+            <td class="commenti">// Функция <i>Zeros</i> обрабатывает одну строку матрицы и
+                возвращает 1,
+                // если в строке есть нулевые элементы, и 0 в противном случае
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"><b>...</b></td>
+            <td class="commenti">// Ввод матрицы (как в первом варианте)</td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">for</span> (<span class="chiavi">int</span> i =
+                0; i &lt; m; i++)
+                <span class="chiavi">if</span> (Zeros(a[i], n))
+            </td>
+            <td class="commenti">// Конструкция a[i] (<b>а</b> является двумерным массивом)
+                // позволяет передать в функцию одну строку двумерного массива
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> printf("В %3d строке есть нулевые элементы\n", i + 1);
+                }
+                <span class="chiavi">int</span> Zeros(<span class="chiavi">double</span> x[], <span
+                        class="chiavi"> int</span> n)
+                { <span class="chiavi">for</span> (<span class="chiavi">int</span> j = 0; j &lt; n;
+                j++)
+                <span class="chiavi">if</span> (x[j] == 0)
+                <span class="chiavi">return</span> 1;
+                <span class="chiavi">return</span> 0;
+                }
+            </td>
+
+            <td class="commenti">  </td>
+        </tr>
+    </table>
+    <h3 id="l3_3_6">3.6. Пример 3. Суммирование элементов матрицы</h3>
+    <p>
+        Даны две матрицы разного размера. Функция <i>Sum</i> находит сумму элементов матрицы, не
+        зависимо от того, что матрицы имеют разное количество столбцов. Обратите внимание, что
+        функция будет выдавать корректный результат, только если используются <b>все</b> объявленные
+        элементы матриц.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;cstdio&gt;
+                <span class="chiavi">#include</span> &lt;locale.h&gt;
+                <span class="chiavi">double</span> Sum(<span class="chiavi">double</span> *x, <span
+                    class="chiavi"> int</span> m, <span class="chiavi"> int</span> n);
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi">char</span> *argv[])
+                { <span class="chiavi">const int</span> na = 4, mb = 3, nb = 5;
+                <span class="chiavi">double</span> a[na][na], b[mb][nb];
+                <span class="chiavi">double</span> sa, sb;
+                FILE *file;
+                setlocale(LC_ALL, "rus");
+                <span class="chiavi">if</span> (argc &lt; 3)
+                { printf("Недостаточно параметров!\n");
+                <span class="chiavi">return</span>;
+                }
+
+                <span class="chiavi">if</span> ((file = fopen(argv[1], "r")) == NULL)
+                { printf("Невозможно открыть файл '%s'\n", argv[1]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; na;
+                i++)
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> j = 0; j &lt; na;
+                j++)
+                <span class="chiavi">if</span> (fscanf(file, "%lf", &amp;a[i][j]) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[1]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                fclose(file);
+                <span class="chiavi">if</span> ((file = fopen(argv[2], "r")) == NULL)
+                { printf("Невозможно открыть файл '%s'\n", argv[2]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; mb;
+                i++)
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> j = 0; j &lt; nb;
+                j++)
+                <span class="chiavi">if</span> (fscanf(file, "%lf", &amp;b[i][j]) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[2]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                fclose(file);
+            </td>
+
+            <td class="commenti">  </td>
+        </tr>
+        <tr>
+            <td class="esempi"> sa = Sum(a[0], na, na);</td>
+
+            <td class="commenti">// <b>a[0]</b> - указатель на первую строку матрицы (и,
+                соответственно, на начало всей матрицы).
+            </td>
+
+        </tr>
+        <tr>
+            <td class="esempi"> sb = Sum(<span class="chiavi">reinterpret_cast</span>&lt;<span
+                    class="chiavi">double</span> *&gt;(b), mb, nb);
+            </td>
+
+            <td class="commenti">// Преобразование без проверки с помощью <i>reinterpret_cast</i>.
+                Просто <b>b</b> нельзя написать -
+                // это вызовет сообщение о невозможности преобразовать матрицу в указатель.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> printf("SumA = %6.2lf\nSumB = %6.2lf\n", sa, sb);
+                }
+                <span class="chiavi">double</span> Sum(<span class="chiavi">double</span> *x, <span
+                        class="chiavi"> int</span> m, <span class="chiavi"> int</span> n)
+                { <span class="chiavi">double</span> s = 0;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; m;
+                i++)
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> j = 0; j &lt; n;
+                j++)
+                s += x[i * n + j];
+                <span class="chiavi">return</span> s;
+                }
+            </td>
+
+            <td class="commenti">  </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>

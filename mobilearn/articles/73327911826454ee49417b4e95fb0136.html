@@ -1,0 +1,4048 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Расширения ядра Active Support</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rasshireniya-yadra-active-support"> Расширения ядра Active
+        Support</h2>
+    <p>Active Support - это компонент Ruby on Rails, отвечающий за предоставление расширений для
+        языка Ruby, утилит и множества других вещей.</p>
+    <p>Он предлагает более ценные функции на уровне языка, нацеленные как на разработку приложений
+        на Rails, так и на разработку самого Ruby on Rails.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Что такое расширения ядра.
+        </li>
+        <li>Как загрузить все расширения.
+        </li>
+        <li>Как подобрать только те расширения, которые вам нужны.
+        </li>
+        <li>Какие расширения предоставляет Active Support.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="kak-zagruzit-rasshireniya-yadra"> Как загрузить расширения
+        ядра</h3>
+    <h4 class="inside_page_header" id="avtonomnyy-active-support"> Автономный Active Support</h4>
+    <p>Для обеспечения минимума влияния, Active Support по умолчанию ничего не загружает. Он разбит
+        на маленькие части, поэтому можно загружать лишь то, что нужно, и имеет некоторые точки
+        входа, которые по соглашению загружают некоторые расширения за раз, или даже все.</p>
+    <p>Таким образом, после обычного require:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'active_support'
+</pre>
+    </div>
+    <p>объекты не будут даже реагировать на <code>blank?</code>. Давайте посмотрим, как загрузить
+        эти определения.</p>
+    <h5 class="inside_page_header" id="podbor-opredeleniy"> Подбор определений</h5>
+    <p>Наиболее легкий способ получить <code>blank?</code> - подцепить файл, который его определяет.
+    </p>
+    <p>Для каждого отдельного метода, определенного как расширение ядра, в этом руководстве имеется
+        заметка, сообщающая, где такой метод определяется. В случае с <code>blank?</code> заметка
+        гласит:</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/blank.rb</code>.</p>
+    </div>
+    <p>Это означает, что это можно затребовать следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'active_support'
+require 'active_support/core_ext/object/blank'
+</pre>
+    </div>
+    <p>Active Support был тщательно пересмотрен и теперь подхватывает только те файлы для загрузки,
+        которые содержат строго необходимые зависимости, если такие имеются.</p>
+    <h5 class="inside_page_header" id="zagruzka-sgruppirovannyh-rasshireniy-yadra"> Загрузка
+        сгруппированных расширений ядра</h5>
+    <p>Следующий уровень - это просто загрузка всех расширений к <code>Object</code>. Как правило,
+        расширения к <code>SomeClass</code> доступны за раз при загрузке <code>active_support/core_ext/some_class</code>.
+    </p>
+    <p>Таким образом, если вы так сделаете, то получите <code>blank?</code>, загрузив все расширения
+        к <code>Object</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'active_support'
+require 'active_support/core_ext/object'
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="zagruzka-vseh-rasshireniy-yadra"> Загрузка всех расширений
+        ядра</h5>
+    <p>Возможно, вы предпочтете загрузить все расширения ядра, вот файл для этого:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'active_support'
+require 'active_support/core_ext'
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="zagruzka-vsego-active-support"> Загрузка всего Active
+        Support</h5>
+    <p>И наконец, если хотите иметь доступным весь Active Support, просто вызовите:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'active_support/all'
+</pre>
+    </div>
+    <p>В действительности это даже не поместит весь Active Support в память, так как некоторые вещи
+        настроены через <code>autoload</code>, поэтому они загружаются только когда используются.
+    </p>
+    <h4 class="inside_page_header" id="active-support-v-prilozhenii-na-ruby-on-rails"> Active
+        Support в приложении на Ruby on Rails</h4>
+    <p>Приложение на Ruby on Rails загружает весь Active Support, кроме случая когда <code>config.active_support.bare</code>
+        равен true. В этом случае приложение загрузит только сам фреймворк и подберет файлы для
+        собственных нужд, и позволит подобрать вам файлы самостоятельно на любом уровне, как описано
+        в предыдущем разделе.</p>
+    <h3 class="inside_page_header" id="rasshireniya-ko-vsem-ob-ektam"> Расширения ко всем
+        объектам</h3>
+    <h4 class="inside_page_header" id="blank-i-present"><code>blank?</code> и <code>present?</code>
+    </h4>
+    <p>Следующие значения рассматриваются как пустые (blank) в приложении на Rails:</p>
+    <ul>
+        <li>
+            <code>nil</code> и <code>false</code>,
+        </li>
+        <li>строки, состоящие только из пробелов (смотрите примечание ниже),
+        </li>
+        <li>пустые массивы и хэши,
+        </li>
+        <li>и любые другие объекты, откликающиеся на <code>empty?</code>, и являющиеся пустыми.
+        </li>
+    </ul>
+    <div class="info"><p>Условие для строк использует учитывающий Unicode символьный класс <code>[:space:]</code>,
+        поэтому, к примеру, U+2029 (разделитель параграфов) рассматривается как пробел.</p></div>
+    <div class="warning"><p>Отметьте, что числа тут не упомянуты, в частности, 0 и 0.0
+        <strong>не</strong> являются пустыми.</p></div>
+    <p>Например, этот метод из
+        <code>ActionController::HttpAuthentication::Token::ControllerMethods</code> использует
+        <code>blank?</code> для проверки, существует ли токен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def authenticate(controller, &amp;login_procedure)
+  token, options = token_and_options(controller.request)
+  unless token.blank?
+    login_procedure.call(token, options)
+  end
+end
+</pre>
+    </div>
+    <p>Метод <code>present?</code> является эквивалентом <code>!blank?</code>. Этот пример взят из
+        <code>ActionDispatch::Http::Cache::Response</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def set_conditional_cache_control!
+  return if self["Cache-Control"].present?
+  ...
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/blank.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="presence"><code>presence</code>
+    </h4>
+    <p>Метод <code>presence</code> возвращает его получателя, если <code>present?</code>, и <code>nil</code>
+        в противном случае. Он полезен для подобных идиом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+host = config[:host].presence || 'localhost'
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/blank.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="duplicable"><code>duplicable?</code>
+    </h4>
+    <p>Некоторые фундаментальные объекты в Ruby являются одноэлементными. Например, в течение
+        жизненного цикла программы число 1 всегда относится к одному экземпляру:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1.object_id                 # =&gt; 3
+Math.cos(0).to_i.object_id  # =&gt; 3
+</pre>
+    </div>
+    <p>Следовательно, нет никакого способа дублировать эти объекты с помощью <code>dup</code> или
+        <code>clone</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+true.dup  # =&gt; TypeError: can't dup TrueClass
+</pre>
+    </div>
+    <p>Некоторые числа, не являющиеся одноэлементными, также не могут быть дублированы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+0.0.clone        # =&gt; allocator undefined for Float
+(2**1024).clone  # =&gt; allocator undefined for Bignum
+</pre>
+    </div>
+    <p>Active Support предоставляет <code>duplicable?</code> для программного запроса к объекту о
+        таком свойстве:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"foo".duplicable? # =&gt; true
+"".duplicable?    # =&gt; true
+0.0.duplicable?   # =&gt; false
+false.duplicable? # =&gt; false
+</pre>
+    </div>
+    <p>По определению все объекты являются <code>duplicable?</code>, кроме объектов <code>nil</code>,
+        <code>false</code>, <code>true</code>, символов, чисел, классов и модулей.</p>
+    <div class="warning"><p>Любой класс может запретить дублирование, убрав <code>dup</code> и
+        <code>clone</code>, или вызвав исключение в них. Таким образом, только <code>rescue</code>
+        может сказать, является ли данный отдельный объект дублируемым. <code>duplicable?</code>
+        зависит от жестко заданного вышеуказанного перечня, но он намного быстрее, чем
+        <code>rescue</code>. Используйте его, только если знаете, что жесткий перечень достаточен в
+        конкретном случае.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/duplicable.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="deep_dup"><code>deep_dup</code>
+    </h4>
+    <p>Метод <code>deep_dup</code> возвращает "глубокую" копию данного объекта. Обычно при вызове
+        <code>dup</code> на объекте, содержащем другие объекты, Ruby не вызывает <code>dup</code>
+        для них, таким образом, он создает мелкую копию объекта. Если, к примеру, у вас имеется
+        массив со строкой, это будет выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+array     = ['string']
+duplicate = array.dup
+duplicate.push 'another-string'
+# объект был дублирован, поэтому элемент был добавлен только в дубликат
+array     # =&gt; ['string']
+duplicate # =&gt; ['string', 'another-string']
+duplicate.first.gsub!('string', 'foo')
+# первый элемент не был дублирован, он будет изменен в обоих массивах
+array     # =&gt; ['foo']
+duplicate # =&gt; ['foo', 'another-string']
+</pre>
+    </div>
+    <p>Как видите, после дублирования экземпляра <code>Array</code>, мы получили другой объект,
+        следовательно мы можем его изменить, и оригинальный объект останется нетронутым. Однако, это
+        не истинно для элементов массива. Поскольку <code>dup</code> не делает "глубокую" копию,
+        строка внутри массива все еще тот же самый объект.</p>
+    <p>Если нужна "глубокая" копия объекта, следует использовать <code>deep_dup</code>. Вот пример:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+array     = ['string']
+duplicate = array.deep_dup
+duplicate.first.gsub!('string', 'foo')
+array     # =&gt; ['string']
+duplicate # =&gt; ['foo']
+</pre>
+    </div>
+    <p>Если объект нельзя дублировать, <code>deep_dup</code> просто возвратит его:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+number = 1
+duplicate = number.deep_dup
+number.object_id == duplicate.object_id   # =&gt; true
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/deep_dup.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="try"><code>try</code>
+    </h4>
+    <p>Когда хотите вызвать метод на объекте, но только, если он не <code>nil</code>, простейшим
+        способом достичь этого является условное выражение, добавляющее ненужный код. Альтернативой
+        является использование <code>try</code>. <code>try</code> похож на <code>Object#send</code>
+        за исключением того, что он возвращает <code>nil</code>, если вызван на <code>nil</code>.
+    </p>
+    <p>Вот пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# without try
+unless @number.nil?
+  @number.next
+end
+# with try
+@number.try(:next)
+</pre>
+    </div>
+    <p>Другим примером является этот код из
+        <code>ActiveRecord::ConnectionAdapters::AbstractAdapter</code>, где <code>@logger</code>
+        может быть <code>nil</code>. Код использует <code>try</code> и избегает ненужной проверки.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def log_info(sql, name, ms)
+  if @logger.try(:debug?)
+    name = '%s (%.1fms)' % [name || 'SQL', ms]
+    @logger.debug(format_log_entry(name, sql.squeeze(' ')))
+  end
+end
+</pre>
+    </div>
+    <p><code>try</code> также может быть вызван не с аргументами, а с блоком, который будет
+        выполнен, если объект не nil:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@person.try { |p| "#{p.first_name} #{p.last_name}" }
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/try.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="class_eval-args-amp-block"><code>class_eval(*args, &amp;block)</code>
+    </h4>
+    <p>Можно вычислить код в контексте экземпляра класса любого объекта, используя
+        <code>class_eval</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Proc
+  def bind(object)
+    block, time = self, Time.current
+    object.class_eval do
+      method_name = "__bind_#{time.to_i}_#{time.usec}"
+      define_method(method_name, &amp;block)
+      method = instance_method(method_name)
+      remove_method(method_name)
+      method
+    end.bind(object)
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/kernel/singleton_class.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="acts_like-duck"><code>acts_like?(duck)</code>
+    </h4>
+    <p>Метод <code>acts_like?</code> предоставляет способ проверки, работает ли некий класс как
+        некоторый другой класс, основываясь на простом соглашении: класс предоставляющий тот же
+        интерфейс, как у <code>String</code> определяет</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def acts_like_string?
+end
+</pre>
+    </div>
+    <p>являющийся всего лишь маркером, его содержимое или возвращаемое значение ничего не значит.
+        Затем, код клиента может безопасно запросить следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+some_klass.acts_like?(:string)
+</pre>
+    </div>
+    <p>В Rails имеются классы, действующие как <code>Date</code> или <code>Time</code> и следующие
+        этому соглашению.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/acts_like.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="to_param"><code>to_param</code>
+    </h4>
+    <p>Все объекты в Rails отвечают на метод <code>to_param</code>, который предназначен для
+        возврата чего-то, что представляет их в строке запроса или как фрагменты URL.</p>
+    <p>По умолчанию <code>to_param</code> просто вызывает <code>to_s</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+7.to_param # =&gt; "7"
+</pre>
+    </div>
+    <p>Возвращаемое значение <code>to_param</code> <strong>не</strong> должно быть экранировано:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Tom &amp; Jerry".to_param # =&gt; "Tom &amp; Jerry"
+</pre>
+    </div>
+    <p>Некоторые классы в Rails переопределяют этот метод.</p>
+    <p>Например, <code>nil</code>, <code>true</code> и <code>false</code> возвращают сами себя.
+        <code>Array#to_param</code> вызывает <code>to_param</code> на элементах и соединяет
+        результат с помощью "/":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[0, true, String].to_param # =&gt; "0/true/String"
+</pre>
+    </div>
+    <p>В частности, система маршрутов Rails вызывает <code>to_param</code> на моделях, чтобы
+        получить значение для заполнения <code>:id</code>. <code>ActiveRecord::Base#to_param</code>
+        возвращает <code>id</code> модели, но можно переопределить этот метод в своих моделях.
+        Например, задав</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User
+  def to_param
+    "#{id}-#{name.parameterize}"
+  end
+end
+</pre>
+    </div>
+    <p>мы получим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+user_path(@user) # =&gt; "/users/357-john-smith"
+</pre>
+    </div>
+    <div class="warning"><p>Контроллерам нужно быть в курсе любых переопределений
+        <code>to_param</code>, поскольку в подобном запросе "357-john-smith" будет значением <code>params[:id]</code>.
+    </p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/to_param.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="to_query"><code>to_query</code>
+    </h4>
+    <p>За исключением хэшей, для заданного неэкранированного <code>ключа</code> этот метод создает
+        часть строки запроса, который связывает с этим ключом то, что возвращает
+        <code>to_param</code>. Например, задав</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User
+  def to_param
+    "#{id}-#{name.parameterize}"
+  end
+end
+</pre>
+    </div>
+    <p>мы получим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+current_user.to_query('user') # =&gt; "user=357-john-smith"
+</pre>
+    </div>
+    <p>Этот метод экранирует все, что требуется: и ключ, и значение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+account.to_query('company[name]')
+# =&gt; "company%5Bname%5D=Johnson+%26+Johnson"
+</pre>
+    </div>
+    <p>поэтому результат готов для использования в строке запроса.</p>
+    <p>Массивы возвращают результат применения <code>to_query</code> к каждому элементу с <code>_key_[]</code>
+        как ключом, и соединяет результат с помощью "&amp;":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[3.4, -45.6].to_query('sample')
+# =&gt; "sample%5B%5D=3.4&amp;sample%5B%5D=-45.6"
+</pre>
+    </div>
+    <p>Хэши также отвечают на <code>to_query</code>, но в другом ключе. Если аргументы не заданы,
+        вызов создает сортированную серию назначений ключ/значение, вызвав
+        <code>to_query(key)</code> на его значениях. Затем он соединяет результат с помощью "&amp;":
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{c: 3, b: 2, a: 1}.to_query # =&gt; "a=1&amp;b=2&amp;c=3"
+</pre>
+    </div>
+    <p>Метод <code>Hash#to_query</code> принимает опциональное пространство имен для ключей:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{id: 89, name: "John Smith"}.to_query('user')
+# =&gt; "user%5Bid%5D=89&amp;user%5Bname%5D=John+Smith"
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/to_query.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="with_options"><code>with_options</code>
+    </h4>
+    <p>Метод <code>with_options</code> предоставляет способ для выделения общих опций в серии
+        вызовов метода.</p>
+    <p>Задав хэш опций по умолчанию, <code>with_options</code> предоставляет прокси на объект в
+        блок. В блоке методы, вызванные на прокси, возвращаются получателю с прикрепленными опциями.
+        Например, имеются такие дублирования:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Account &lt; ActiveRecord::Base
+  has_many :customers, dependent: :destroy
+  has_many :products,  dependent: :destroy
+  has_many :invoices,  dependent: :destroy
+  has_many :expenses,  dependent: :destroy
+end
+</pre>
+    </div>
+    <p>заменяем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Account &lt; ActiveRecord::Base
+  with_options dependent: :destroy do |assoc|
+    assoc.has_many :customers
+    assoc.has_many :products
+    assoc.has_many :invoices
+    assoc.has_many :expenses
+  end
+end
+</pre>
+    </div>
+    <p>Эта идиома также может передавать <em>группировку</em> в reader. Например скажем, что нужно
+        послать письмо, язык которого зависит от пользователя. Где-нибудь в рассыльщике можно
+        сгруппировать кусочки, зависимые от локали, наподобие этих:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+I18n.with_options locale: user.locale, scope: "newsletter" do |i18n|
+  subject i18n.t :subject
+  body    i18n.t :body, user_name: user.name
+end
+</pre>
+    </div>
+    <div class="info"><p>Поскольку <code>with_options</code> перенаправляет вызовы получателю, они
+        могут быть вложены. Каждый уровень вложения объединит унаследованные значения со своими
+        собственными.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/with_options.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="podderzhka-json"> Поддержка JSON</h4>
+    <p>Active Support представляет лучшую реализацию <code>to_json</code>, чем гем <code>json</code>,
+        обычно представленный для объектов Ruby. Это так, потому что некоторые классы, такие как
+        <code>Hash</code>, <code>OrderedHash</code> и <code>Process::Status</code>, нуждаются в
+        специальной обработке для подходящего представления в JSON.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/json.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="peremennye-ekzemplyara"> Переменные экземпляра</h4>
+    <p>Active Support предоставляет несколько методов для облегчения доступа к переменным
+        экземпляра.</p>
+    <h5 class="inside_page_header" id="instance_values"><code>instance_values</code>
+    </h5>
+    <p>Метод <code>instance_values</code> возвращает хэш, который связывает имена переменных
+        экземпляра без "@" с их соответствующими значениями. Ключи являются строками:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C
+  def initialize(x, y)
+    @x, @y = x, y
+  end
+end
+C.new(0, 1).instance_values # =&gt; {"x" =&gt; 0, "y" =&gt; 1}
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/object/instance_variables.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="instance_variable_names"><code>instance_variable_names</code>
+    </h5>
+    <p>Метод <code>instance_variable_names</code> возвращает массив. Каждое имя включает знак "@".
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C
+  def initialize(x, y)
+    @x, @y = x, y
+  end
+end
+C.new(0, 1).instance_variable_names # =&gt; ["@x", "@y"]
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/object/instance_variables.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="otklyuchenie-preduprezhdeniy-i-isklyucheniya"> Отключение
+        предупреждений и исключения</h4>
+    <p>Методы <code>silence_warnings</code> и <code>enable_warnings</code> изменяют значение <code>$VERBOSE</code>
+        на время исполнения блока, и возвращают исходное значение после его окончания:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+silence_warnings { Object.const_set "RAILS_DEFAULT_LOGGER", logger }
+</pre>
+    </div>
+    <p>Отключение исключений также возможно с помощью <code>suppress</code>. Этот метод получает
+        определенное количество классов исключений. Если вызывается исключение на протяжении
+        выполнения блока, и <code>kind_of?</code> соответствует любому аргументу,
+        <code>suppress</code> ловит его и возвращает отключенным. В противном случае исключение не
+        захватывается:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Если пользователь под блокировкой, инкремент теряется, ничего страшного.
+suppress(ActiveRecord::StaleObjectError) do
+  current_user.increment! :visits
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/kernel/reporting.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="in"><code>in?</code>
+    </h4>
+    <p>Условие <code>in?</code> проверяет, включен ли объект в другой объект. Если переданный
+        элемент не отвечает на <code>include?</code>, будет вызвано исключение
+        <code>ArgumentError</code>.</p>
+    <p>Примеры <code>in?</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1.in?([1,2])        # =&gt; true
+"lo".in?("hello")   # =&gt; true
+25.in?(30..50)      # =&gt; false
+1.in?(1)            # =&gt; ArgumentError
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/inclusion.rb</code>.</p>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-module"> Расширения для <code>Module</code>
+    </h3>
+    <h4 class="inside_page_header" id="alias_method_chain"><code>alias_method_chain</code>
+    </h4>
+    <p>Используя чистый Ruby можно обернуть методы в другие методы, это называется <em>сцепление
+        псевдонимов (alias chaining)</em>.</p>
+    <p>Например, скажем, что вы хотите, чтобы params были строками в функциональных тестах, как и в
+        реальных запросах, но также хотите удобно присваивать числа и другие типы значений. Чтобы
+        это осуществить, следует обернуть <code>ActionController::TestCase#process</code> следующим
+        образом в <code>test/test_helper.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActionController::TestCase.class_eval do
+  # сохраняем ссылку на оригинальный метод process
+  alias_method :original_process, :process
+  # теперь переопределяем process и передаем в original_process
+  def process(action, params=nil, session=nil, flash=nil, http_method='GET')
+    params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
+    original_process(action, params, session, flash, http_method)
+  end
+end
+</pre>
+    </div>
+    <p>Таким образом передают работу методы <code>get</code>, <code>post</code> и т.д..</p>
+    <p>В такой технике имеется риск, в случае если <code>:original_process</code> уже есть. Чтобы
+        избежать коллизий, некоторые выбирают определенные метки, характеризующие то, что сцепление
+        означает:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActionController::TestCase.class_eval do
+  def process_with_stringified_params(...)
+    params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
+    process_without_stringified_params(action, params, session, flash, http_method)
+  end
+  alias_method :process_without_stringified_params, :process
+  alias_method :process, :process_with_stringified_params
+end
+</pre>
+    </div>
+    <p>Метод <code>alias_method_chain</code> предоставляет ярлык для такого примера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActionController::TestCase.class_eval do
+  def process_with_stringified_params(...)
+    params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
+    process_without_stringified_params(action, params, session, flash, http_method)
+  end
+  alias_method_chain :process, :stringified_params
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/aliasing.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="atributy"> Атрибуты</h4>
+    <h5 class="inside_page_header" id="alias_attribute"><code>alias_attribute</code>
+    </h5>
+    <p>В атрибутах модели есть ридер (reader), райтер (writer), и условие (predicate). Можно создать
+        псевдоним к атрибуту модели, имеющему соответствующие три метода, за раз. Как и в других
+        создающих псевдоним методах, новое имя - это первый аргумент, а старое имя - второй
+        (мнемоническое правило такое: они идут в том же порядке, как если бы делалось
+        присваивание):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  # Теперь можно обращаться к столбцу email как "login".
+  # Это имеет больше смысла для кода аутентификации.
+  alias_attribute :login, :email
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/aliasing.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="vnutrennie-atributy"> Внутренние атрибуты</h5>
+    <p>При определении атрибута в классе есть риск коллизий подклассовых имен. Это особенно важно
+        для библиотек.</p>
+    <p>Active Support определяет макросы <code>attr_internal_reader</code>, <code>attr_internal_writer</code>
+        и <code>attr_internal_accessor</code>. Они ведут себя подобно встроенным в Ruby коллегам
+        <code>attr_*</code>, за исключением того, что они именуют лежащую в основе переменную
+        экземпляра способом, наиболее снижающим коллизии.</p>
+    <p>Макрос <code>attr_internal</code> - это синоним для <code>attr_internal_accessor</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# библиотека
+class ThirdPartyLibrary::Crawler
+  attr_internal :log_level
+end
+# код клиента
+class MyCrawler &lt; ThirdPartyLibrary::Crawler
+  attr_accessor :log_level
+end
+</pre>
+    </div>
+    <p>В предыдущем примере мог быть случай, что <code>:log_level</code> не принадлежит публичному
+        интерфейсу библиотеки и используется только для разработки. Код клиента, не знающий о
+        потенциальных конфликтах, классифицирует и определяет свой собственный
+        <code>:log_level</code>. Благодаря <code>attr_internal</code> здесь нет коллизий.</p>
+    <p>По умолчанию внутренняя переменная экземпляра именуется с предшествующим подчеркиванием,
+        <code>@_log_level</code> в примере выше. Это настраивается через <code>Module.attr_internal_naming_format</code>,
+        куда можно передать любую строку в формате <code>sprintf</code> с предшествующим
+        <code>@</code> и <code>%s</code> в любом месте, которая означает место, куда вставляется
+        имя. По умолчанию <code>"@_%s"</code>.</p>
+    <p>Rails использует внутренние атрибуты в некоторых местах, например для вьюх:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module ActionView
+  class Base
+    attr_internal :captures
+    attr_internal :request, :layout
+    attr_internal :controller, :template
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/attr_internal.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="atributy-modulya"> Атрибуты модуля</h5>
+    <p>Макросы <code>mattr_reader</code>, <code>mattr_writer</code> и <code>mattr_accessor</code> -
+        это те же самые макросы <code>cattr_*</code>, определенным для класса. Фактически, макросы
+        <code>cattr_*</code> — это всего лишь псевдонимы для макросов <code>mattr_*</code>. Смотрите
+        .</p>
+    <p>Например, их использует механизм зависимостей:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module ActiveSupport
+  module Dependencies
+    mattr_accessor :warnings_on_first_load
+    mattr_accessor :history
+    mattr_accessor :loaded
+    mattr_accessor :mechanism
+    mattr_accessor :load_paths
+    mattr_accessor :load_once_paths
+    mattr_accessor :autoloaded_constants
+    mattr_accessor :explicitly_unloadable_constants
+    mattr_accessor :logger
+    mattr_accessor :log_activity
+    mattr_accessor :constant_watch_stack
+    mattr_accessor :constant_watch_stack_mutex
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/module/attribute_accessors.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="roditeli"> Родители</h4>
+    <h5 class="inside_page_header" id="parent"><code>parent</code>
+    </h5>
+    <p>Метод <code>parent</code> на вложенном именованном модуле возвращает модуль, содержащий его
+        соответствующую константу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module X
+  module Y
+    module Z
+    end
+  end
+end
+M = X::Y::Z
+X::Y::Z.parent # =&gt; X::Y
+M.parent       # =&gt; X::Y
+</pre>
+    </div>
+    <p>Если модуль анонимный или относится к верхнему уровню, <code>parent</code> возвращает <code>Object</code>.
+    </p>
+    <div class="warning"><p>Отметьте, что в этом случае <code>parent_name</code> возвращает <code>nil</code>.
+    </p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/introspection.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="parent_name"><code>parent_name</code>
+    </h5>
+    <p>Метод <code>parent_name</code> на вложенном именованном модуле возвращает полное имя модуля,
+        содержащего его соответствующую константу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module X
+  module Y
+    module Z
+    end
+  end
+end
+M = X::Y::Z
+X::Y::Z.parent_name # =&gt; "X::Y"
+M.parent_name       # =&gt; "X::Y"
+</pre>
+    </div>
+    <p>Для модулей верхнего уровня и анонимных <code>parent_name</code> возвращает <code>nil</code>.
+    </p>
+    <div class="warning"><p>Отметьте, что в этом случае <code>parent</code> возвращает
+        <code>Object</code>.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/introspection.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="parents"><code>parents</code>
+    </h5>
+    <p>Метод <code>parents</code> вызывает <code>parent</code> на получателе и выше, пока не
+        достигнет <code>Object</code>. Цепочка возвращается в массиве, от низшего к высшему:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module X
+  module Y
+    module Z
+    end
+  end
+end
+M = X::Y::Z
+X::Y::Z.parents # =&gt; [X::Y, X, Object]
+M.parents       # =&gt; [X::Y, X, Object]
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/introspection.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="konstanty"> Константы</h4>
+    <p>Метод <code>local_constants</code> возвращает имена констант, которые были определены в
+        модуле получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module X
+  X1 = 1
+  X2 = 2
+  module Y
+    Y1 = :y1
+    X1 = :overrides_X1_above
+  end
+end
+X.local_constants    # =&gt; [:X1, :X2, :Y]
+X::Y.local_constants # =&gt; [:Y1, :X1]
+</pre>
+    </div>
+    <p>Имена возвращаются как символы.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/introspection.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="qualified-constant-names"> Qualified Constant Names</h5>
+    <p>Стандартные методы <code>const_defined?</code>, <code>const_get</code> и
+        <code>const_set</code> принимают простые имена констант. Active Support расширяет это API на
+        передачу полных имен констант.</p>
+    <p>Новые методы - это <code>qualified_const_defined?</code>, <code>qualified_const_get</code> и
+        <code>qualified_const_set</code>. Их аргументами предполагаются полные имена констант
+        относительно получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Object.qualified_const_defined?("Math::PI")       # =&gt; true
+Object.qualified_const_get("Math::PI")            # =&gt; 3.141592653589793
+Object.qualified_const_set("Math::Phi", 1.618034) # =&gt; 1.618034
+</pre>
+    </div>
+    <p>Аргументы могут быть и простыми именами констант:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Math.qualified_const_get("E") # =&gt; 2.718281828459045
+</pre>
+    </div>
+    <p>Эти методы аналогичны их встроенным коллегам. В частности,
+        <code>qualified_constant_defined?</code> принимает опциональный второй аргумент,
+        указывающий, хотите ли вы, чтобы этот метод искал в предках. Этот флажок учитывается для
+        каждой константы в выражении во время прохода.</p>
+    <p>Для примера, дано</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+  X = 1
+end
+module N
+  class C
+    include M
+  end
+end
+</pre>
+    </div>
+    <p><code>qualified_const_defined?</code> ведет себя таким образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+N.qualified_const_defined?("C::X", false) # =&gt; false
+N.qualified_const_defined?("C::X", true)  # =&gt; true
+N.qualified_const_defined?("C::X")        # =&gt; true
+</pre>
+    </div>
+    <p>Как показывает последний пример, второй аргумент по умолчанию true, как и в <code>const_defined?</code>.
+    </p>
+    <p>Для согласованности со встроенными методами принимаются только относительные пути. Абсолютные
+        полные имена констант, такие как <code>::Math::PI</code>, вызывают <code>NameError</code>.
+    </p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/qualified_const.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="reachable"> Reachable</h4>
+    <p>Именованный модуль является достижимым (reachable), если он хранится в своей соответствующей
+        константе. Это означает, что можно связаться с объектом модуля через константу.</p>
+    <p>Это означает, что если есть модуль с названием "M", то существует константа <code>M</code>,
+        которая указывает на него:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+end
+M.reachable? # =&gt; true
+</pre>
+    </div>
+    <p>Но так как константы и модули в действительности являются разъединенными, объекты модуля
+        могут стать недостижимыми:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+end
+orphan = Object.send(:remove_const, :M)
+# Теперь объект модуля это orphan, но у него все еще есть имя.
+orphan.name # =&gt; "M"
+# Нельзя достичь его через константу M, поскольку она даже не существует.
+orphan.reachable? # =&gt; false
+# Давайте определим модуль с именем "M" снова.
+module M
+end
+# Теперь константа M снова существует, и хранит объект
+# модуля с именем "M", но это новый экземпляр.
+orphan.reachable? # =&gt; false
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/reachable.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="anonymous"> Anonymous</h4>
+    <p>Модуль может иметь или не иметь имени:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+end
+M.name # =&gt; "M"
+N = Module.new
+N.name # =&gt; "N"
+Module.new.name # =&gt; nil
+</pre>
+    </div>
+    <p>Можно проверить, имеет ли модуль имя с помощью условия <code>anonymous?</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+end
+M.anonymous? # =&gt; false
+Module.new.anonymous? # =&gt; true
+</pre>
+    </div>
+    <p>Отметьте, что быть недоступным не означает быть анонимным:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module M
+end
+m = Object.send(:remove_const, :M)
+m.reachable? # =&gt; false
+m.anonymous? # =&gt; false
+</pre>
+    </div>
+    <p>хотя анонимный модуль недоступен по определению.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/anonymous.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="peredacha-metoda"> Передача метода</h4>
+    <p>Макрос <code>delegate</code> предлагает простой способ передать методы.</p>
+    <p>Давайте представим, что у пользователей в неком приложении имеется информация о логинах в
+        модели <code>User</code>, но имена и другие данные в отдельной модели <code>Profile</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_one :profile
+end
+</pre>
+    </div>
+    <p>С такой конфигурацией имя пользователя получается через его профиль,
+        <code>user.profile.name</code>, но можно обеспечить прямой доступ как к атрибуту:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_one :profile
+  def name
+    profile.name
+  end
+end
+</pre>
+    </div>
+    <p>Это как раз то, что делает <code>delegate</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_one :profile
+  delegate :name, to: :profile
+end
+</pre>
+    </div>
+    <p>Это короче, и намерения более очевидные.</p>
+    <p>Целевой метод должен быть публичным.</p>
+    <p>Макрос <code>delegate</code> принимает несколько методов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+delegate :name, :age, :address, :twitter, to: :profile
+</pre>
+    </div>
+    <p>При интерполяции в строку опция <code>:to</code> должна стать выражением, применяемым к
+        объекту, метод которого передается. Обычно строка или символ. Такое выражение вычисляется в
+        контексте получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# передает константе Rails
+delegate :logger, to: :Rails
+# передает классу получателя
+delegate :table_name, to: :class
+</pre>
+    </div>
+    <div class="warning"><p>Если опция <code>:prefix</code> установлена <code>true</code> это менее
+        характерно, смотрите ниже.</p></div>
+    <p>По умолчанию, если передача вызывает <code>NoMethodError</code> и цель является
+        <code>nil</code>, выводится исключение. Можно попросить, чтобы возвращался <code>nil</code>
+        с помощью опции <code>:allow_nil</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+delegate :name, to: :profile, allow_nil: true
+</pre>
+    </div>
+    <p>С <code>:allow_nil</code> вызов <code>user.name</code> возвратит <code>nil</code>, если у
+        пользователя нет профиля.</p>
+    <p>Опция <code>:prefix</code> добавляет префикс к имени генерируемого метода. Это удобно, если
+        хотите получить более благозвучное наименование:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+delegate :street, to: :address, prefix: true
+</pre>
+    </div>
+    <p>Предыдущий пример создаст <code>address_street</code>, а не <code>street</code>.</p>
+    <div class="warning"><p>Поскольку в этом случае имя создаваемого метода составляется из имен
+        целевого объекта и целевого метода, опция <code>:to</code> должна быть именем метода.</p>
+    </div>
+    <p>Также может быть настроен произвольный префикс:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+delegate :size, to: :attachment, prefix: :avatar
+</pre>
+    </div>
+    <p>В предыдущем примере макрос создаст <code>avatar_size</code>, а не <code>size</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/delegation.rb</code></p>
+    </div>
+    <h4 class="inside_page_header" id="pereopredelenie-metodov"> Переопределение методов</h4>
+    <p>Бывают ситуации, когда нужно определить метод с помощью <code>define_method</code>, но вы не
+        знаете, существует ли уже метод с таким именем. Если так, то выдается предупреждение, если
+        оно включено. Такое поведение хоть и не ошибочно, но не элегантно.</p>
+    <p>Метод <code>redefine_method</code> предотвращает такое потенциальное предупреждение,
+        предварительно убирая существующий метод, если нужно.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/module/remove_method.rb</code>
+    </p></div>
+    <h3 class="inside_page_header" id="extensions-to-class"> Расширения для <code>Class</code></h3>
+    <h4 class="inside_page_header" id="atributy-klassa"> Атрибуты класса</h4>
+    <h5 class="inside_page_header" id="class_attribute"><code>class_attribute</code>
+    </h5>
+    <p>Метод <code>class_attribute</code> объявляет один или более наследуемых атрибутов класса,
+        которые могут быть переопределены на низшем уровне иерархии:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class A
+  class_attribute :x
+end
+class B &lt; A; end
+class C &lt; B; end
+A.x = :a
+B.x # =&gt; :a
+C.x # =&gt; :a
+B.x = :b
+A.x # =&gt; :a
+C.x # =&gt; :b
+C.x = :c
+A.x # =&gt; :a
+B.x # =&gt; :b
+</pre>
+    </div>
+    <p>Например, <code>ActionMailer::Base</code> определяет:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class_attribute :default_params
+self.default_params = {
+  mime_version: "1.0",
+  charset: "UTF-8",
+  content_type: "text/plain",
+  parts_order: [ "text/plain", "text/enriched", "text/html" ]
+}.freeze
+</pre>
+    </div>
+    <p>К ним также есть доступ, и они могут быть переопределены на уровне экземпляра:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+A.x = 1
+a1 = A.new
+a2 = A.new
+a2.x = 2
+a1.x # =&gt; 1, приходит из A
+a2.x # =&gt; 2, переопределено в a2
+</pre>
+    </div>
+    <p>Создание райтер-метода экземпляра может быть отключено установлением опции <code>:instance_writer</code>
+        в false, как в</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module ActiveRecord
+  class Base
+    class_attribute :table_name_prefix, instance_writer: false
+    self.table_name_prefix = ""
+  end
+end
+</pre>
+    </div>
+    <p>В модели такая опция может быть полезной как способ предотвращения массового назначения для
+        установки атрибута.</p>
+    <p>Создание ридер-метода может быть отключено установлением опции <code>:instance_reader</code>
+        в <code>false</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class A
+  class_attribute :x, instance_reader: false
+end
+A.new.x = 1 # NoMethodError
+</pre>
+    </div>
+    <p>Для удобства <code>class_attribute</code> определяет также условие экземпляра, являющееся
+        двойным отрицанием того, что возвращает ридер экземпляра. В вышеописанном примере оно может
+        вызываться <code>x?</code>.</p>
+    <p>Когда <code>instance_reader</code> равен <code>false</code>, условие экземпляра возвратит
+        <code>NoMethodError</code>, как и метод ридера.</p>
+    <p>Если не нужен предикат, передайте <code>instance_predicate: false</code>, и он не будет
+        определен.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/class/attribute.rb</code></p>
+    </div>
+    <h5 class="inside_page_header" id="cattr_reader-cattr_writer-i-cattr_accessor"><code>cattr_reader</code>,
+        <code>cattr_writer</code> и <code>cattr_accessor</code>
+    </h5>
+    <p>Макросы <code>cattr_reader</code>, <code>cattr_writer</code> и <code>cattr_accessor</code>
+        являются аналогами их коллег <code>attr_*</code>, но для классов. Они инициализируют
+        переменную класса как <code>nil</code>, если она уже существует, и создают соответствующие
+        методы класса для доступа к ней:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class MysqlAdapter &lt; AbstractAdapter
+  # Generates class methods to access @@emulate_booleans.
+  cattr_accessor :emulate_booleans
+  self.emulate_booleans = true
+end
+</pre>
+    </div>
+    <p>Методы экземпляра также создаются для удобства, они всего лишь прокси к атрибуту класса.
+        Таким образом, экземпляры могут менять атрибут класса, но не могут переопределить его, как
+        это происходит в случае с <code>class_attribute</code> (смотрите выше). К примеру, задав</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module ActionView
+  class Base
+    cattr_accessor :field_error_proc
+    @@field_error_proc = Proc.new{ ... }
+  end
+end
+</pre>
+    </div>
+    <p>мы получим доступ к <code>field_error_proc</code> во вьюхах.</p>
+    <p>Также можно передать блок в <code>cattr_*</code> для настройки атрибута со значением по
+        умолчанию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class MysqlAdapter &lt; AbstractAdapter
+  # Создает методы класса для доступа к @@emulate_booleans со значением по умолчанию true.
+  cattr_accessor(:emulate_booleans) { true }
+end
+</pre>
+    </div>
+    <p>Создание ридер-метода экземпляра предотвращается установкой <code>:instance_reader</code> в
+        <code>false</code> и создание райтер-метода экземпляра предотвращается установкой <code>:instance_writer</code>
+        в <code>false</code>. Создание обоих методов предотвращается установкой <code>:instance_accessor</code>
+        в <code>false</code>. Во всех случаях, должно быть не любое ложное значение, а именно <code>false</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module A
+  class B
+    # No first_name instance reader is generated.
+    cattr_accessor :first_name, instance_reader: false
+    # No last_name= instance writer is generated.
+    cattr_accessor :last_name, instance_writer: false
+    # No surname instance reader or surname= writer is generated.
+    cattr_accessor :surname, instance_accessor: false
+  end
+end
+</pre>
+    </div>
+    <p>В модели может быть полезным установить <code>:instance_accessor</code> в <code>false</code>
+        как способ предотвращения массового назначения для установки атрибута.</p>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/class/attribute_accessors.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="subklassy-i-potomki"> Субклассы и потомки</h4>
+    <h5 class="inside_page_header" id="subclasses"><code>subclasses</code>
+    </h5>
+    <p>Метод <code>subclasses</code> возвращает подклассы получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C; end
+C.subclasses # =&gt; []
+class B &lt; C; end
+C.subclasses # =&gt; [B]
+class A &lt; B; end
+C.subclasses # =&gt; [B]
+class D &lt; C; end
+C.subclasses # =&gt; [B, D]
+</pre>
+    </div>
+    <p>Порядок, в котором эти классы возвращаются, не определен.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/class/subclasses.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="descendants"><code>descendants</code>
+    </h5>
+    <p>Метод <code>descendants</code> возвращает все классы, которые являются <tt>&lt;</tt> к его
+        получателю:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class C; end
+C.descendants # =&gt; []
+class B &lt; C; end
+C.descendants # =&gt; [B]
+class A &lt; B; end
+C.descendants # =&gt; [B, A]
+class D &lt; C; end
+C.descendants # =&gt; [B, A, D]
+</pre>
+    </div>
+    <p>Порядок, в котором эти классы возвращаются, не определен.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/class/subclasses.rb</code>.</p>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-string"> Расширения для <code>String</code>
+    </h3>
+    <h4 class="inside_page_header" id="bezopasnost-vyvoda"> Безопасность вывода</h4>
+    <h5 class="inside_page_header" id="motivatsiya"> Мотивация</h5>
+    <p>Вставка данных в шаблоны HTML требует дополнительной заботы. Например, нельзя просто вставить
+        <code>@review.title</code> на страницу HTML. С одной стороны, если заголовок рецензии
+        "Flanagan &amp; Matz rules!" результат не будет правильным, поскольку амперсанд был
+        экранирован как "&amp;amp;". К тому же, в зависимости от вашего приложения может быть
+        большая дыра в безопасности, поскольку пользователи могут внедрить злонамеренный HTML,
+        устанавливающий специально изготовленный заголовок рецензии. Посмотрите подробную информацию
+        о рисках в .</p>
+    <h5 class="inside_page_header" id="bezopasnye-stroki"> Безопасные строки</h5>
+    <p>В Active Support есть концепция <em>(html) безопасных</em> строк. Безопасная строка - это та,
+        которая помечена как подлежащая вставке в HTML как есть. Ей доверяется, независимо от того,
+        была она экранирована или нет.</p>
+    <p>Строки рассматриваются как <em>небезопасные</em> по умолчанию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"".html_safe? # =&gt; false
+</pre>
+    </div>
+    <p>Можно получить безопасную строку из заданной с помощью метода <code>html_safe</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+s = "".html_safe
+s.html_safe? # =&gt; true
+</pre>
+    </div>
+    <p>Важно понять, что <code>html_safe</code> не выполняет какого бы то не было экранирования, это
+        всего лишь утверждение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+s = "&lt;script&gt;...&lt;/script&gt;".html_safe
+s.html_safe? # =&gt; true
+s            # =&gt; "&lt;script&gt;...&lt;/script&gt;"
+</pre>
+    </div>
+    <p>Вы ответственны за обеспечение вызова <code>html_safe</code> на подходящей строке.</p>
+    <p>При присоединении к безопасной строке или с помощью <code>concat</code>/<code>&lt;&lt;</code>,
+        или с помощью <code>+</code>, результат будет безопасной строкой. Небезопасные аргументы
+        экранируются:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"".html_safe + "&lt;" # =&gt; "&amp;lt;"
+</pre>
+    </div>
+    <p>Безопасные аргументы непосредственно присоединяются:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"".html_safe + "&lt;".html_safe # =&gt; "&lt;"
+</pre>
+    </div>
+    <p>Эти методы не должны использоваться в обычных вьюхах. Небезопасные значения автоматически
+        экранируются:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= @review.title %&gt; &lt;%# прекрасно, экранируется, если нужно %&gt;
+</pre>
+    </div>
+    <p>Чтобы вставить что-либо дословно, используйте хелпер <code>raw</code> вместо вызова <code>html_safe</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= raw @cms.current_template %&gt; &lt;%# вставляет @cms.current_template как есть %&gt;
+</pre>
+    </div>
+    <p>или эквивалентно используйте <code>&lt;%==</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%== @cms.current_template %&gt; &lt;%# вставляет @cms.current_template как есть %&gt;
+</pre>
+    </div>
+    <p>Хелпер <code>raw</code> вызывает за вас хелпер <code>html_safe</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def raw(stringish)
+  stringish.to_s.html_safe
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/output_safety.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="preobrazovanie"> Преобразование</h5>
+    <p>Как правило, за исключением разве что соединения, объясненного выше, любой метод, который
+        может изменить строку, даст вам небезопасную строку. Это <code>donwcase</code>,
+        <code>gsub</code>, <code>strip</code>, <code>chomp</code>, <code>underscore</code> и т.д.
+    </p>
+    <p>В случае встроенного преобразования, такого как <code>gsub!</code>, получатель сам становится
+        небезопасным.</p>
+    <div class="info"><p>Бит безопасности всегда теряется, независимо от того, изменило ли что-то
+        преобразование или нет.</p></div>
+    <h5 class="inside_page_header" id="konversiya-i-prinuzhdenie"> Конверсия и принуждение</h5>
+    <p>Вызов <code>to_s</code> на безопасной строке возвратит безопасную строку, но принуждение с
+        помощью <code>to_str</code> возвратит небезопасную строку.</p>
+    <h5 class="inside_page_header" id="kopirovanie"> Копирование</h5>
+    <p>Вызов <code>dup</code> или <code>clone</code> на безопасной строке создаст безопасные строки.
+    </p>
+    <h4 class="inside_page_header" id="remove"><code>remove</code>
+    </h4>
+    <p>Метод <code>remove</code> уберет все совпадения с образцом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Hello World".remove(/Hello /) # =&gt; "World"
+</pre>
+    </div>
+    <p>Также имеется деструктивная версия <code>String#remove!</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/filters.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="squish"><code>squish</code>
+    </h4>
+    <p>Метод <code>String#squish</code> отсекает начальные и конечные пробелы и заменяет каждый ряд
+        пробелов единственным пробелом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+" \n  foo\n\r \t bar \n".squish # =&gt; "foo bar"
+</pre>
+    </div>
+    <p>Также имеется разрушительная версия <code>String#squish!</code>.</p>
+    <p>Отметьте, что он обрабатывает и ASCII, и Unicode пробелы.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/filters.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="truncate"><code>truncate</code>
+    </h4>
+    <p>Метод <code>truncate</code> возвращает копию получателя, сокращенную после заданной <code>длины</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate(20)
+# =&gt; "Oh dear! Oh dear!..."
+</pre>
+    </div>
+    <p>Многоточие может быть настроено с помощью опции <code>:omission</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate(20, omission: '&amp;hellip;')
+# =&gt; "Oh dear! Oh &amp;hellip;"
+</pre>
+    </div>
+    <p>Отметьте, что сокращение берет в счет длину строки omission.</p>
+    <p>Передайте <code>:separator</code> для сокращения строки по естественным разрывам:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate(18)
+# =&gt; "Oh dear! Oh dea..."
+"Oh dear! Oh dear! I shall be late!".truncate(18, separator: ' ')
+# =&gt; "Oh dear! Oh..."
+</pre>
+    </div>
+    <p>Опция <code>:separator</code> может быть регулярным выражением:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate(18, separator: /\s/)
+# =&gt; "Oh dear! Oh..."
+</pre>
+    </div>
+    <p>В вышеуказанных примерах "dear" обрезается сначала, а затем <code>:separator</code>
+        предотвращает это.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/filters.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="truncate_words"><code>truncate_words</code>
+    </h4>
+    <p>Метод <code>truncate_words</code> возвращает копию получателя, сокращенную после заданного
+        количества слов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate_words(4)
+# =&gt; "Oh dear! Oh dear!..."
+</pre>
+    </div>
+    <p>Многоточие может быть настроено с помощью опции <code>:omission</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate_words(4, omission: '&amp;hellip;')
+# =&gt; "Oh dear! Oh dear!&amp;hellip;"
+</pre>
+    </div>
+    <p>Передайте <code>:separator</code> для сокращения строки по естественным разрывам:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate_words(3, separator: '!')
+# =&gt; "Oh dear! Oh dear! I shall be late..."
+</pre>
+    </div>
+    <p>Опция <code>:separator</code> может быть регулярным выражением:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Oh dear! Oh dear! I shall be late!".truncate_words(4, separator: /\s/)
+# =&gt; "Oh dear! Oh dear!..."
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/filters.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="inquiry"><code>inquiry</code>
+    </h4>
+    <p>Метод <code>inquiry</code> конвертирует строку в объект <code>StringInquirer</code>, позволяя
+        красивые проверки.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"production".inquiry.production? # =&gt; true
+"active".inquiry.inactive?       # =&gt; false
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="starts_with-i-ends_with"><code>starts_with?</code> и <code>ends_with?</code>
+    </h4>
+    <p>Active Support определяет псевдонимы <code>String#start_with?</code> и
+        <code>String#end_with?</code> (в связи с особенностями английской морфологии, изменяет
+        глаголы в форму 3 лица):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"foo".starts_with?("f") # =&gt; true
+"foo".ends_with?("o")   # =&gt; true
+</pre>
+    </div>
+    <div class="note"><p>Определены в
+        <code>active_support/core_ext/string/starts_ends_with.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="strip_heredoc"><code>strip_heredoc</code>
+    </h4>
+    <p>Метод <code>strip_heredoc</code> обрезает отступы в heredoc-ах.</p>
+    <p>Для примера в</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+if options[:usage]
+  puts &lt;&lt;-USAGE.strip_heredoc
+    This command does such and such.
+    Supported options are:
+      -h         This message
+      ...
+  USAGE
+end
+</pre>
+    </div>
+    <p>пользователь увидит используемое сообщение, выровненное по левому краю.</p>
+    <p>Технически это выглядит как выделение красной строки в отдельную строку и удаление всех
+        впереди идущих пробелов.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/strip.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="indent"><code>indent</code>
+    </h4>
+    <p>Устанавливает отступы строчкам получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;&lt;EOS.indent(2)
+def some_method
+  some_code
+end
+EOS
+# =&gt;
+  def some_method
+    some_code
+  end
+</pre>
+    </div>
+    <p>Второй аргумент, <code>indent_string</code>, определяет, какую строку использовать для
+        отступа. По умолчанию <code>nil</code>, что сообщает методу самому догадаться на основе
+        первой строчки с отступом, а если такой нет, то использовать пробел.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"  foo".indent(2)        # =&gt; "    foo"
+"foo\n\t\tbar".indent(2) # =&gt; "\t\tfoo\n\t\t\t\tbar"
+"foo".indent(2, "\t")    # =&gt; "\t\tfoo"
+</pre>
+    </div>
+    <p>Хотя <code>indent_string</code> обычно один пробел или табуляция, он может быть любой
+        строкой.</p>
+    <p>Третий аргумент, <code>indent_empty_lines</code>, это флажок, указывающий, должен ли быть
+        отступ для пустых строчек. По умолчанию false.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"foo\n\nbar".indent(2)            # =&gt; "  foo\n\n  bar"
+"foo\n\nbar".indent(2, nil, true) # =&gt; "  foo\n  \n  bar"
+</pre>
+    </div>
+    <p>Метод <code>indent!</code> делает отступы в той же строке.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/indent.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="dostup"> Доступ</h4>
+    <h5 class="inside_page_header" id="at-position"><code>at(position)</code>
+    </h5>
+    <p>Возвращает символ строки на позиции <code>position</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"hello".at(0)  # =&gt; "h"
+"hello".at(4)  # =&gt; "o"
+"hello".at(-1) # =&gt; "o"
+"hello".at(10) # =&gt; nil
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/access.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="from-position"><code>from(position)</code>
+    </h5>
+    <p>Возвращает подстроку строки, начинающуюся с позиции <code>position</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"hello".from(0)  # =&gt; "hello"
+"hello".from(2)  # =&gt; "llo"
+"hello".from(-2) # =&gt; "lo"
+"hello".from(10) # =&gt; nil
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/access.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="to-position"><code>to(position)</code>
+    </h5>
+    <p>Возвращает подстроку строки с начала до позиции <code>position</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"hello".to(0)  # =&gt; "h"
+"hello".to(2)  # =&gt; "hel"
+"hello".to(-2) # =&gt; "hell"
+"hello".to(10) # =&gt; "hello"
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/access.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="first-limit-1"><code>first(limit = 1)</code>
+    </h5>
+    <p>Вызов <code>str.first(n)</code> эквивалентен <code>str.to(n-1)</code>, если <code>n</code>
+        &gt; 0, и возвращает пустую строку для <code>n</code> == 0.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/access.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="last-limit-1"><code>last(limit = 1)</code>
+    </h5>
+    <p>Вызов <code>str.last(n)</code> эквивалентен <code>str.from(-n)</code>, если <code>n</code>
+        &gt; 0, и возвращает пустую строку для <code>n</code> == 0.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/access.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="izmeneniya-slov"> Изменения слов</h4>
+    <h5 class="inside_page_header" id="pluralize"><code>pluralize</code>
+    </h5>
+    <p>Метод <code>pluralize</code> возвращает множественное число его получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"table".pluralize     # =&gt; "tables"
+"ruby".pluralize      # =&gt; "rubies"
+"equipment".pluralize # =&gt; "equipment"
+</pre>
+    </div>
+    <p>Как показывает предыдущий пример, Active Support знает некоторые неправильные множественные
+        числа и неисчислимые существительные. Встроенные правила могут быть расширены в <code>config/initializers/inflections.rb</code>.
+        Этот файл создается командой <code>rails</code> и имеет инструкции в комментариях.</p>
+    <p><code>pluralize</code> также может принимать опциональный параметр <code>count</code>. Если
+        <code>count == 1</code>, будет возвращена единственная форма. Для остальных значений <code>count</code>
+        будет возвращена множественная форма:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"dude".pluralize(0) # =&gt; "dudes"
+"dude".pluralize(1) # =&gt; "dude"
+"dude".pluralize(2) # =&gt; "dudes"
+</pre>
+    </div>
+    <p>Active Record использует этот метод для вычисления имени таблицы по умолчанию,
+        соответствующей модели:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_record/model_schema.rb
+def undecorated_table_name(class_name = base_class.name)
+  table_name = class_name.to_s.demodulize.underscore
+  pluralize_table_names ? table_name.pluralize : table_name
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="singularize"><code>singularize</code>
+    </h5>
+    <p>Противоположность <code>pluralize</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"tables".singularize    # =&gt; "table"
+"rubies".singularize    # =&gt; "ruby"
+"equipment".singularize # =&gt; "equipment"
+</pre>
+    </div>
+    <p>Связи вычисляют имя соответствующего связанного класса по умолчанию используя этот метод:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_record/reflection.rb
+def derive_class_name
+  class_name = name.to_s.camelize
+  class_name = class_name.singularize if collection?
+  class_name
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="camelize"><code>camelize</code>
+    </h5>
+    <p>Метод <code>camelize</code> возвращает его получателя в стиле CamelCase:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"product".camelize    # =&gt; "Product"
+"admin_user".camelize # =&gt; "AdminUser"
+</pre>
+    </div>
+    <p>Как правило, об этом методе думают, как о преобразующем пути в классы Ruby или имена модулей,
+        где слэши разделяют пространства имен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"backoffice/session".camelize # =&gt; "Backoffice::Session"
+</pre>
+    </div>
+    <p>Например, Action Pack использует этот метод для загрузки класса, предоставляющего
+        определенное хранилище сессии:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# action_controller/metal/session_management.rb
+def session_store=(store)
+  @@session_store = store.is_a?(Symbol) ?
+    ActionDispatch::Session.const_get(store.to_s.camelize) :
+    store
+end
+</pre>
+    </div>
+    <p><code>camelize</code> принимает необязательный аргумент, он может быть <code>:upper</code>
+        (по умолчанию) или <code>:lower</code>. С последним первая буква остается прописной:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"visual_effect".camelize(:lower) # =&gt; "visualEffect"
+</pre>
+    </div>
+    <p>Это удобно для вычисления имен методов в языке, следующем такому соглашению, например
+        JavaScript.</p>
+    <div class="info"><p>Как правило можно рассматривать <code>camelize</code> как противоположность
+        <code>underscore</code>, хотя имеются случаи, когда это не так: <code>"SSLError".underscore.camelize</code>
+        возвратит <code>"SslError"</code>. Для поддержки случаев, подобного этому, Active Support
+        предлагает определить акронимы в <code>config/initializers/inflections.rb</code></p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.acronym 'SSL'
+end
+"SSLError".underscore.camelize # =&gt; "SSLError"
+</pre>
+    </div>
+    <p><code>camelize</code> имеет псевдоним <code>camelcase</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="underscore"><code>underscore</code>
+    </h5>
+    <p>Метод <code>underscore</code> идет обратным путем, от CamelCase к путям:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Product".underscore   # =&gt; "product"
+"AdminUser".underscore # =&gt; "admin_user"
+</pre>
+    </div>
+    <p>Также преобразует "::" обратно в "/":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Backoffice::Session".underscore # =&gt; "backoffice/session"
+</pre>
+    </div>
+    <p>и понимает строки, начинающиеся с прописной буквы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"visualEffect".underscore # =&gt; "visual_effect"
+</pre>
+    </div>
+    <p>хотя <code>underscore</code> не принимает никакие аргументы.</p>
+    <p>Автозагрузка классов и модулей Rails использует <code>underscore</code> для вывода
+        относительного пути без расширения файла, определяющего заданную отсутствующую константу:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_support/dependencies.rb
+def load_missing_constant(from_mod, const_name)
+  ...
+  qualified_name = qualified_name_for from_mod, const_name
+  path_suffix = qualified_name.underscore
+  ...
+end
+</pre>
+    </div>
+    <div class="info"><p>Как правило, рассматривайте <code>underscore</code> как противоположность
+        <code>camelize</code>, хотя имеются случаи, когда это не так. Например, <code>"SSLError".underscore.camelize</code>
+        возвратит <code>"SslError"</code>.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="titleize"><code>titleize</code>
+    </h5>
+    <p>Метод <code>titleize</code> озаглавит слова в получателе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"alice in wonderland".titleize # =&gt; "Alice In Wonderland"
+"fermat's enigma".titleize     # =&gt; "Fermat's Enigma"
+</pre>
+    </div>
+    <p><code>titleize</code> имеет псевдоним <code>titlecase</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="dasherize"><code>dasherize</code>
+    </h5>
+    <p>Метод <code>dasherize</code> заменяет подчеркивания в получателе дефисами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"name".dasherize         # =&gt; "name"
+"contact_data".dasherize # =&gt; "contact-data"
+</pre>
+    </div>
+    <p>Сериализатор XML моделей использует этот метод для форматирования имен узлов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_model/serializers/xml.rb
+def reformat_name(name)
+  name = name.camelize if camelize?
+  dasherize? ? name.dasherize : name
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="demodulize"><code>demodulize</code>
+    </h5>
+    <p>Для заданной строки с полным именем константы, <code>demodulize</code> возвращает само имя
+        константы, то есть правой части этого:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Product".demodulize                        # =&gt; "Product"
+"Backoffice::UsersController".demodulize    # =&gt; "UsersController"
+"Admin::Hotel::ReservationUtils".demodulize # =&gt; "ReservationUtils"
+"::Inflections".demodulize                  # =&gt; "Inflections"
+"".demodulize                               # =&gt; ""
+</pre>
+    </div>
+    <p>Active Record к примеру, использует этот метод для вычисления имени столбца кэширования
+        счетчика:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_record/reflection.rb
+def counter_cache_column
+  if options[:counter_cache] == true
+    "#{active_record.name.demodulize.underscore.pluralize}_count"
+  elsif options[:counter_cache]
+    options[:counter_cache]
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="deconstantize"><code>deconstantize</code>
+    </h5>
+    <p>У заданной строки с полным выражением ссылки на константу <code>deconstantize</code> убирает
+        самый правый сегмент, в основном оставляя имя контейнера константы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Product".deconstantize                        # =&gt; ""
+"Backoffice::UsersController".deconstantize    # =&gt; "Backoffice"
+"Admin::Hotel::ReservationUtils".deconstantize # =&gt; "Admin::Hotel"
+</pre>
+    </div>
+    <p>Например, Active Support использует этот метод в <code>Module#qualified_const_set</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def qualified_const_set(path, value)
+  QualifiedConstUtils.raise_if_absolute(path)
+  const_name = path.demodulize
+  mod_name = path.deconstantize
+  mod = mod_name.empty? ? self : qualified_const_get(mod_name)
+  mod.const_set(const_name, value)
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="parameterize"><code>parameterize</code>
+    </h5>
+    <p>Метод <code>parameterize</code> нормализует получателя способом, который может использоваться
+        в красивых URL.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"John Smith".parameterize # =&gt; "john-smith"
+"Kurt Gödel".parameterize # =&gt; "kurt-godel"
+</pre>
+    </div>
+    <p>Фактически результирующая строка оборачивается в экземпляр <code>ActiveSupport::Multibyte::Chars</code>.
+    </p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="tableize"><code>tableize</code>
+    </h5>
+    <p>Метод <code>tableize</code> - это <code>underscore</code> следующий за <code>pluralize</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Person".tableize      # =&gt; "people"
+"Invoice".tableize     # =&gt; "invoices"
+"InvoiceLine".tableize # =&gt; "invoice_lines"
+</pre>
+    </div>
+    <p>Как правило, <code>tableize</code> возвращает имя таблицы, соответствующей заданной модели
+        для простых случаев. В действительности фактическое применение в Active Record не является
+        прямым <code>tableize</code>, так как он также демодулизирует имя класса и проверяет
+        несколько опций, которые могут повлиять на возвращаемую строку.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="classify"><code>classify</code>
+    </h5>
+    <p>Метод <code>classify</code> является противоположностью <code>tableize</code>. Он выдает имя
+        класса, соответствующего имени таблицы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"people".classify        # =&gt; "Person"
+"invoices".classify      # =&gt; "Invoice"
+"invoice_lines".classify # =&gt; "InvoiceLine"
+</pre>
+    </div>
+    <p>Метод понимает правильные имена таблицы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"highrise_production.companies".classify # =&gt; "Company"
+</pre>
+    </div>
+    <p>Отметьте, что <code>classify</code> возвращает имя класса как строку. Можете получить
+        фактический объект класса, вызвав <code>constantize</code> на ней, как объяснено далее.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="constantize"><code>constantize</code>
+    </h5>
+    <p>Метод <code>constantize</code> решает выражение, ссылающееся на константу, в его получателе:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"Fixnum".constantize # =&gt; Fixnum
+module M
+  X = 1
+end
+"M::X".constantize # =&gt; 1
+</pre>
+    </div>
+    <p>Если строка определяет неизвестную константу, или ее содержимое даже не является валидным
+        именем константы, <code>constantize</code> вызывает <code>NameError</code>.</p>
+    <p>Анализ имени константы с помощью <code>constantize</code> начинается всегда с верхнего уровня
+        <code>Object</code>, даже если нет предшествующих "::".</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+X = :in_Object
+module M
+  X = :in_M
+  X                 # =&gt; :in_M
+  "::X".constantize # =&gt; :in_Object
+  "X".constantize   # =&gt; :in_Object (!)
+end
+</pre>
+    </div>
+    <p>Таким образом, в общем случае это не эквивалентно тому, что Ruby сделал бы в том же месте,
+        когда вычислял настоящую константу.</p>
+    <p>Тестовые случаи рассыльщика получают тестируемый рассыльщик из имени класса теста, используя
+        <code>constantize</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# action_mailer/test_case.rb
+def determine_default_mailer(name)
+  name.sub(/Test$/, '').constantize
+rescue NameError =&gt; e
+  raise NonInferrableMailerError.new(name)
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="humanize"><code>humanize</code>
+    </h5>
+    <p>Метод <code>humanize</code> настраивает имя атрибута для отображения конечным пользователям.
+    </p>
+    <p>А в частности выполняет эти преобразования:</p>
+    <ul>
+        <li>Применяет словообразовательные правила к аргументу.
+        </li>
+        <li>Удаляет любые предшествующие знаки подчеркивания.
+        </li>
+        <li>убирает суффикс "_id".
+        </li>
+        <li>Заменяет знаки подчеркивания пробелами.
+        </li>
+        <li>Переводит в нижний регистр все слова, кроме аббревиатур.
+        </li>
+        <li>Озаглавливает первое слово.
+        </li>
+    </ul>
+    <p>Озаглавливание первого слова может быть выключено с помощью установки опционального параметра
+        <code>capitalize</code> в false (по умолчанию true).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"name".humanize                         # =&gt; "Name"
+"author_id".humanize                    # =&gt; "Author"
+"author_id".humanize(capitalize: false) # =&gt; "author"
+"comments_count".humanize               # =&gt; "Comments count"
+"_id".humanize                          # =&gt; "Id"
+</pre>
+    </div>
+    <p>Если "SSL" был определен как аббревиатура:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+'ssl_error'.humanize # =&gt; "SSL error"
+</pre>
+    </div>
+    <p>Метод хелпера <code>full_messages</code> использует <code>humanize</code> как резервный
+        способ для включения имен атрибутов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def full_messages
+  map { |attribute, message| full_message(attribute, message) }
+end
+def full_message
+  attr_name = attribute.to_s.tr('.', '_').humanize
+  attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="foreign_key"><code>foreign_key</code>
+    </h5>
+    <p>Метод <code>foreign_key</code> дает имя столбца внешнего ключа из имени класса. Для этого он
+        демодулизирует, подчеркивает и добавляет "_id":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"User".foreign_key           # =&gt; "user_id"
+"InvoiceLine".foreign_key    # =&gt; "invoice_line_id"
+"Admin::Session".foreign_key # =&gt; "session_id"
+</pre>
+    </div>
+    <p>Передайте аргумент false, если не хотите подчеркивание в "_id":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"User".foreign_key(false) # =&gt; "userid"
+</pre>
+    </div>
+    <p>Связи используют этот метод для вывода внешних ключей, например <code>has_one</code> и <code>has_many</code>
+        делают так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# active_record/associations.rb
+foreign_key = options[:foreign_key] || reflection.active_record.name.foreign_key
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/inflections.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="konvertirovanie"> Конвертирование</h4>
+    <h5 class="inside_page_header" id="to_date-to_time-to_datetime"><code>to_date</code>, <code>to_time</code>,
+        <code>to_datetime</code>
+    </h5>
+    <p>Методы <code>to_date</code>, <code>to_time</code> и <code>to_datetime</code> - в основном
+        удобные обертки около <code>Date._parse</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"2010-07-27".to_date              # =&gt; Tue, 27 Jul 2010
+"2010-07-27 23:37:00".to_time     # =&gt; 2010-07-27 23:37:00 +0200
+"2010-07-27 23:37:00".to_datetime # =&gt; Tue, 27 Jul 2010 23:37:00 +0000
+</pre>
+    </div>
+    <p><code>to_time</code> получает необязательный аргумент <code>:utc</code> или
+        <code>:local</code>, для указания, в какой временной зоне вы хотите время:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+"2010-07-27 23:42:00".to_time(:utc)   # =&gt; 2010-07-27 23:42:00 UTC
+"2010-07-27 23:42:00".to_time(:local) # =&gt; 2010-07-27 23:42:00 +0200
+</pre>
+    </div>
+    <p>По умолчанию <code>:utc</code>.</p>
+    <p>Пожалуйста, обратитесь к документации по <code>Date._parse</code> для детальных подробностей.
+    </p>
+    <div class="info"><p>Все три возвратят <code>nil</code> для пустых получателей.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/string/conversions.rb</code>.
+    </p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-numeric"> Расширения для
+        <code>Numeric</code></h3>
+    <h4 class="inside_page_header" id="bayty"> Байты</h4>
+    <p>Все числа отвечают на эти методы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+bytes
+kilobytes
+megabytes
+gigabytes
+terabytes
+petabytes
+exabytes
+</pre>
+    </div>
+    <p>Они возвращают соответствующее количество байтов, используя конвертирующий множитель
+        1024:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+2.kilobytes   # =&gt; 2048
+3.megabytes   # =&gt; 3145728
+3.5.gigabytes # =&gt; 3758096384
+-4.exabytes   # =&gt; -4611686018427387904
+</pre>
+    </div>
+    <p>Форма в единственном числе является псевдонимом, поэтому можно написать так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1.megabyte # =&gt; 1048576
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/numeric/bytes.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="vremya"> Время</h4>
+    <p>Включает использование вычисления и объявления времени, подобно <code>45.minutes + 2.hours +
+        4.years</code>.</p>
+    <p>Эти методы используют Time#advance для уточнения вычисления дат с использованием from_now,
+        ago, и т. д., а также для сложения или вычитания их результата из объекта Time.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# эквивалент для Time.current.advance(months: 1)
+1.month.from_now
+# эквивалент для Time.current.advance(years: 2)
+2.years.from_now
+# эквивалент для Time.current.advance(months: 4, years: 5)
+(4.months + 5.years).from_now
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/numeric/time.rb</code></p></div>
+    <h4 class="inside_page_header" id="formatirovanie"> Форматирование</h4>
+    <p>Включает форматирование чисел различными способами.</p>
+    <p>Создает строковое представление числа, как телефонного номера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+5551234.to_s(:phone)
+# =&gt; 555-1234
+1235551234.to_s(:phone)
+# =&gt; 123-555-1234
+1235551234.to_s(:phone, area_code: true)
+# =&gt; (123) 555-1234
+1235551234.to_s(:phone, delimiter: " ")
+# =&gt; 123 555 1234
+1235551234.to_s(:phone, area_code: true, extension: 555)
+# =&gt; (123) 555-1234 x 555
+1235551234.to_s(:phone, country_code: 1)
+# =&gt; +1-123-555-1234
+</pre>
+    </div>
+    <p>Создает строковое представление числа, как валюты:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1234567890.50.to_s(:currency)                 # =&gt; $1,234,567,890.50
+1234567890.506.to_s(:currency)                # =&gt; $1,234,567,890.51
+1234567890.506.to_s(:currency, precision: 3)  # =&gt; $1,234,567,890.506
+</pre>
+    </div>
+    <p>Создает строковое представление числа, как процента:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+100.to_s(:percentage)
+# =&gt; 100.000%
+100.to_s(:percentage, precision: 0)
+# =&gt; 100%
+1000.to_s(:percentage, delimiter: '.', separator: ',')
+# =&gt; 1.000,000%
+302.24398923423.to_s(:percentage, precision: 5)
+# =&gt; 302.24399%
+</pre>
+    </div>
+    <p>Создает строковое представление числа с разделенными разрядами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+12345678.to_s(:delimited)                     # =&gt; 12,345,678
+12345678.05.to_s(:delimited)                  # =&gt; 12,345,678.05
+12345678.to_s(:delimited, delimiter: ".")     # =&gt; 12.345.678
+12345678.to_s(:delimited, delimiter: ",")     # =&gt; 12,345,678
+12345678.05.to_s(:delimited, separator: " ")  # =&gt; 12,345,678 05
+</pre>
+    </div>
+    <p>Создает строковое представление числа, округленного с точностью:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+111.2345.to_s(:rounded)                     # =&gt; 111.235
+111.2345.to_s(:rounded, precision: 2)       # =&gt; 111.23
+13.to_s(:rounded, precision: 5)             # =&gt; 13.00000
+389.32314.to_s(:rounded, precision: 0)      # =&gt; 389
+111.2345.to_s(:rounded, significant: true)  # =&gt; 111
+</pre>
+    </div>
+    <p>Создает строковое представление числа, как удобочитаемое количество байт:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+123.to_s(:human_size)            # =&gt; 123 Bytes
+1234.to_s(:human_size)           # =&gt; 1.21 KB
+12345.to_s(:human_size)          # =&gt; 12.1 KB
+1234567.to_s(:human_size)        # =&gt; 1.18 MB
+1234567890.to_s(:human_size)     # =&gt; 1.15 GB
+1234567890123.to_s(:human_size)  # =&gt; 1.12 TB
+</pre>
+    </div>
+    <p>Создает строковое представление числа, как удобочитаемое число словами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+123.to_s(:human)               # =&gt; "123"
+1234.to_s(:human)              # =&gt; "1.23 Thousand"
+12345.to_s(:human)             # =&gt; "12.3 Thousand"
+1234567.to_s(:human)           # =&gt; "1.23 Million"
+1234567890.to_s(:human)        # =&gt; "1.23 Billion"
+1234567890123.to_s(:human)     # =&gt; "1.23 Trillion"
+1234567890123456.to_s(:human)  # =&gt; "1.23 Quadrillion"
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/numeric/conversions.rb</code>.
+    </p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-integer"> Расширения для
+        <code>Integer</code></h3>
+    <h4 class="inside_page_header" id="multiple_of"><code>multiple_of?</code>
+    </h4>
+    <p>Метод <code>multiple_of?</code> тестирует, является ли число множителем аргумента:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+2.multiple_of?(1) # =&gt; true
+1.multiple_of?(2) # =&gt; false
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/integer/multiple.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="ordinal"><code>ordinal</code>
+    </h4>
+    <p>Метод <code>ordinal</code> возвращает суффикс порядковой строки, соответствующей полученному
+        числу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1.ordinal    # =&gt; "st"
+2.ordinal    # =&gt; "nd"
+53.ordinal   # =&gt; "rd"
+2009.ordinal # =&gt; "th"
+-21.ordinal  # =&gt; "st"
+-134.ordinal # =&gt; "th"
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/integer/inflections.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="ordinalize"><code>ordinalize</code>
+    </h4>
+    <p>Метод <code>ordinalize</code> возвращает порядковые строки, соответствующие полученному
+        числу. Для сравнения отметьте, что метод <code>ordinal</code> возвращает
+        <strong>только</strong> строковый суффикс.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+1.ordinalize    # =&gt; "1st"
+2.ordinalize    # =&gt; "2nd"
+53.ordinalize   # =&gt; "53rd"
+2009.ordinalize # =&gt; "2009th"
+-21.ordinalize  # =&gt; "-21st"
+-134.ordinalize # =&gt; "-134th"
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/integer/inflections.rb</code>.
+    </p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-bigdecimal"> Расширения для <code>BigDecimal</code>
+    </h3>
+    <h4 class="inside_page_header" id="to_s"><code>to_s</code>
+    </h4>
+    <p>Метод <code>to_s</code> – это псевдоним для <code>to_formatted_s</code>. Он представляет
+        удобный способ отображать значение BigDecimal в нотации с плавающей запятой:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+BigDecimal.new(5.00, 6).to_s  # =&gt; "5.0"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="to_formatted_s"><code>to_formatted_s</code>
+    </h4>
+    <p>Метод <code>to_formatted_s</code> представляет спецификатор по умолчанию "F". Это означает,
+        что простой вызов <code>to_formatted_s</code> или <code>to_s</code> выведет представление с
+        плавающей запятой вместо инженерной нотации:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+BigDecimal.new(5.00, 6).to_formatted_s  # =&gt; "5.0"
+</pre>
+    </div>
+    <p>а также поддерживаются эти символьные спецификаторы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+BigDecimal.new(5.00, 6).to_formatted_s(:db)  # =&gt; "5.0"
+</pre>
+    </div>
+    <p>Инженерная нотация все еще поддерживается:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+BigDecimal.new(5.00, 6).to_formatted_s("e")  # =&gt; "0.5E1"
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-enumerable"> Расширения для <code>Enumerable</code>
+    </h3>
+    <h4 class="inside_page_header" id="sum"><code>sum</code>
+    </h4>
+    <p>Метод <code>sum</code> складывает элементы перечисления:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[1, 2, 3].sum # =&gt; 6
+(1..100).sum  # =&gt; 5050
+</pre>
+    </div>
+    <p>Сложение применяется только к элементам, откликающимся на <code>+</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[[1, 2], [2, 3], [3, 4]].sum    # =&gt; [1, 2, 2, 3, 3, 4]
+%w(foo bar baz).sum             # =&gt; "foobarbaz"
+{a: 1, b: 2, c: 3}.sum # =&gt; [:b, 2, :c, 3, :a, 1]
+</pre>
+    </div>
+    <p>Сумма пустой коллекции равна нулю по умолчанию, но это может быть настроено:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[].sum    # =&gt; 0
+[].sum(1) # =&gt; 1
+</pre>
+    </div>
+    <p>Если задан блок, <code>sum</code> становится итератором, вкладывающим элементы коллекции и
+        суммирующим возвращаемые значения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(1..5).sum {|n| n * 2 } # =&gt; 30
+[2, 4, 6, 8, 10].sum    # =&gt; 30
+</pre>
+    </div>
+    <p>Сумма пустого получателя также может быть настроена в такой форме:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[].sum(1) {|n| n**3} # =&gt; 1
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="index_by"><code>index_by</code>
+    </h4>
+    <p>Метод <code>index_by</code> создает хэш с элементами перечисления, индексированными по
+        некоторому ключу.</p>
+    <p>Он перебирает коллекцию и передает каждый элемент в блок. Значение, возвращенное блоком,
+        будет ключом для элемента:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+invoices.index_by(&amp;:number)
+# =&gt; {'2009-032' =&gt; &lt;Invoice ...&gt;, '2009-008' =&gt; &lt;Invoice ...&gt;, ...}
+</pre>
+    </div>
+    <div class="warning"><p>Ключи, как правило, должны быть уникальными. Если блок возвратит то же
+        значение для нескольких элементов, для этого ключа не будет построена коллекция. Победит
+        последний элемент.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="many"><code>many?</code>
+    </h4>
+    <p>Метод <code>many?</code> это сокращение для <code>collection.size &gt; 1</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% if pages.many? %&gt;
+  &lt;%= pagination_links %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Если задан необязательный блок <code>many?</code> принимает во внимание только те элементы,
+        которые возвращают true:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@see_more = videos.many? {|video| video.category == params[:category]}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="exclude"><code>exclude?</code>
+    </h4>
+    <p>Условие <code>exclude?</code> тестирует, является ли заданный объект <strong>не</strong>
+        принадлежащим коллекции. Это противоположность встроенного <code>include?</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+to_visit &lt;&lt; node if visited.exclude?(node)
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="without"><code>without</code>
+    </h4>
+    <p>Метод <code>without</code> возвращает копию коллекции с удаленными указанными элементами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+["David", "Rafael", "Aaron", "Todd"].without("Aaron", "Todd") # =&gt; ["David", "Rafael"]
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="pluck"><code>pluck</code>
+    </h4>
+    <p>Метод <code>pluck</code> возвращает массив на основе заданного ключа:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[{ name: "David" }, { name: "Rafael" }, { name: "Aaron" }].pluck(:name) # =&gt; ["David", "Rafael", "Aaron"]
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/enumerable.rb</code>.</p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-array"> Расширения для <code>Array</code>
+    </h3>
+    <h4 class="inside_page_header" id="dostup"> Доступ</h4>
+    <p>Active Support расширяет API массивов для облегчения различных путей доступа к ним. Например,
+        <code>to</code> возвращает подмассив элементов от первого до переданного индекса:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(a b c d).to(2) # =&gt; ["a", "b", "c"]
+[].to(7)          # =&gt; []
+</pre>
+    </div>
+    <p>Подобным образом <code>from</code> возвращает хвост массива от элемента с переданным
+        индексом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(a b c d).from(2)  # =&gt; ["c", "d"]
+%w(a b c d).from(10) # =&gt; []
+[].from(0)           # =&gt; []
+</pre>
+    </div>
+    <p>Методы <code>second</code>, <code>third</code>, <code>fourth</code> и <code>fifth</code>
+        возвращают соответствующие элементы (<code>first</code> является встроенным). Благодаря
+        социальной мудрости и всеобщей позитивной конструктивности, <code>forty_two</code> также
+        доступен.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(a b c d).third # =&gt; "c"
+%w(a b c d).fifth # =&gt; nil
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/access.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="dobavlenie-elementov"> Добавление элементов</h4>
+    <h5 class="inside_page_header" id="prepend"><code>prepend</code>
+    </h5>
+    <p>Этот метод - псевдоним <code>Array#unshift</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(a b c d).prepend('e')  # =&gt; ["e", "a", "b", "c", "d"]
+[].prepend(10)            # =&gt; [10]
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/array/prepend_and_append.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="append"><code>append</code>
+    </h5>
+    <p>Этот метод - псевдоним <code>Array#&lt;&lt;</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(a b c d).append('e')  # =&gt; ["a", "b", "c", "d", "e"]
+[].append([1,2])         # =&gt; [[1, 2]]
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/array/prepend_and_append.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="izvlechenie-optsiy"> Извлечение опций</h4>
+    <p>Когда последний аргумент в вызове метода является хэшем, за исключением, пожалуй, аргумента
+        <code>&amp;block</code>, Ruby позволяет опустить скобки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.exists?(email: params[:email])
+</pre>
+    </div>
+    <p>Этот синтаксический сахар часто используется в Rails для избежания позиционных аргументов
+        там, где их не слишком много, предлагая вместо них интерфейсы, эмулирующие именованные
+        параметры. В частности, очень характерно использовать такой хэш для опций.</p>
+    <p>Если метод ожидает различное количество аргументов и использует <code>*</code> в своем
+        объявлении, однако хэш опций завершает их и является последним элементом массива аргументов,
+        тогда тип теряет свою роль.</p>
+    <p>В этих случаях можно задать хэшу опций отличительную трактовку с помощью <code>extract_options!</code>.
+        Метод проверяет тип последнего элемента массива. Если это хэш, он вырезает его и возвращает,
+        в противном случае возвращает пустой хэш.</p>
+    <p>Давайте рассмотрим пример определения макроса контроллера <code>caches_action</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def caches_action(*actions)
+  return unless cache_configured?
+  options = actions.extract_options!
+  ...
+end
+</pre>
+    </div>
+    <p>Этот метод получает определенное число имен экшнов и необязательный хэш опций как последний
+        аргумент. Вызвав <code>extract_options!</code> получаем хэш опций и убираем его из <code>actions</code>
+        просто и ясно.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/extract_options.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="konvertirovanie"> Конвертирование</h4>
+    <h5 class="inside_page_header" id="to_sentence"><code>to_sentence</code>
+    </h5>
+    <p>Метод <code>to_sentence</code> превращает массив в строку, содержащую выражение,
+        перечисляющее его элементы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w().to_sentence                # =&gt; ""
+%w(Earth).to_sentence           # =&gt; "Earth"
+%w(Earth Wind).to_sentence      # =&gt; "Earth and Wind"
+%w(Earth Wind Fire).to_sentence # =&gt; "Earth, Wind, and Fire"
+</pre>
+    </div>
+    <p>Этот метод принимает три опции:</p>
+    <ul>
+        <li>
+            <code>:two_words_connector</code>: Что используется для массивов с длиной 2. По
+            умолчанию " and ".
+        </li>
+        <li>
+            <code>:words_connector</code>: Что используется для соединения элементов массивов с 3 и
+            более элементами, кроме последних двух. По умолчанию ", ".
+        </li>
+        <li>
+            <code>:last_word_connector</code>: Что используется для соединения последних элементов
+            массива из 3 и более элементов. По умолчанию ", and ".
+        </li>
+    </ul>
+    <p>Умолчания для этих опций могут быть локализованы, их ключи следующие:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Опция</th>
+            <th>Ключ I18n</th>
+        </tr>
+        <tr>
+            <td><code>:two_words_connector</code></td>
+            <td><code>support.array.two_words_connector</code></td>
+        </tr>
+        <tr>
+            <td><code>:words_connector</code></td>
+            <td><code>support.array.words_connector</code></td>
+        </tr>
+        <tr>
+            <td><code>:last_word_connector</code></td>
+            <td><code>support.array.last_word_connector</code></td>
+        </tr>
+    </table>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/conversions.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="to_formatted_s"><code>to_formatted_s</code>
+    </h5>
+    <p>Метод <code>to_formatted_s</code> по умолчанию работает как <code>to_s</code>.</p>
+    <p>Однако, если массив содержит элементы, откликающиеся на <code>id</code>, как аргумент можно
+        передать символ <code>:db</code>. Это обычно используется с коллекциями объектов Active
+        Record. Возвращаемые строки следующие:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[].to_formatted_s(:db)            # =&gt; "null"
+[user].to_formatted_s(:db)        # =&gt; "8456"
+invoice.lines.to_formatted_s(:db) # =&gt; "23,567,556,12"
+</pre>
+    </div>
+    <p>Цифры в примере выше предполагаются пришедшими от соответствующих вызовов <code>id</code>.
+    </p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/conversions.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="to_xml"><code>to_xml</code>
+    </h5>
+    <p>Метод <code>to_xml</code> возвращает строку, содержащую представление XML его получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Contributor.limit(2).order(:rank).to_xml
+# =&gt;
+# &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+# &lt;contributors type="array"&gt;
+#   &lt;contributor&gt;
+#     &lt;id type="integer"&gt;4356&lt;/id&gt;
+#     &lt;name&gt;Jeremy Kemper&lt;/name&gt;
+#     &lt;rank type="integer"&gt;1&lt;/rank&gt;
+#     &lt;url-id&gt;jeremy-kemper&lt;/url-id&gt;
+#   &lt;/contributor&gt;
+#   &lt;contributor&gt;
+#     &lt;id type="integer"&gt;4404&lt;/id&gt;
+#     &lt;name&gt;David Heinemeier Hansson&lt;/name&gt;
+#     &lt;rank type="integer"&gt;2&lt;/rank&gt;
+#     &lt;url-id&gt;david-heinemeier-hansson&lt;/url-id&gt;
+#   &lt;/contributor&gt;
+# &lt;/contributors&gt;
+</pre>
+    </div>
+    <p>Чтобы это сделать, он посылает <code>to_xml</code> к каждому элементу за раз и собирает
+        результаты в корневом узле. Все элементы должны откликаться на <code>to_xml</code>, иначе
+        будет вызвано исключение.</p>
+    <p>По умолчанию имя корневого элемента будет версией имени класса первого элемента во
+        множественном числе, подчеркиваниями и дефисами, при условии что остальные элементы
+        принадлежат этому типу (проверяется с помощью <code>is_a?</code>) и они не хэши. В примере
+        выше это "contributors".</p>
+    <p>Если имеется любой элемент, не принадлежащий типу первого, корневой узел становится
+        "objects":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[Contributor.first, Commit.first].to_xml
+# =&gt;
+# &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+# &lt;objects type="array"&gt;
+#   &lt;object&gt;
+#     &lt;id type="integer"&gt;4583&lt;/id&gt;
+#     &lt;name&gt;Aaron Batalion&lt;/name&gt;
+#     &lt;rank type="integer"&gt;53&lt;/rank&gt;
+#     &lt;url-id&gt;aaron-batalion&lt;/url-id&gt;
+#   &lt;/object&gt;
+#   &lt;object&gt;
+#     &lt;author&gt;Joshua Peek&lt;/author&gt;
+#     &lt;authored-timestamp type="datetime"&gt;2009-09-02T16:44:36Z&lt;/authored-timestamp&gt;
+#     &lt;branch&gt;origin/master&lt;/branch&gt;
+#     &lt;committed-timestamp type="datetime"&gt;2009-09-02T16:44:36Z&lt;/committed-timestamp&gt;
+#     &lt;committer&gt;Joshua Peek&lt;/committer&gt;
+#     &lt;git-show nil="true"&gt;&lt;/git-show&gt;
+#     &lt;id type="integer"&gt;190316&lt;/id&gt;
+#     &lt;imported-from-svn type="boolean"&gt;false&lt;/imported-from-svn&gt;
+#     &lt;message&gt;Kill AMo observing wrap_with_notifications since ARes was only using it&lt;/message&gt;
+#     &lt;sha1&gt;723a47bfb3708f968821bc969a9a3fc873a3ed58&lt;/sha1&gt;
+#   &lt;/object&gt;
+# &lt;/objects&gt;
+</pre>
+    </div>
+    <p>Если получатель является массивом хэшей, корневой узел по умолчанию также "objects":</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[{a: 1, b: 2}, {c: 3}].to_xml
+# =&gt;
+# &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+# &lt;objects type="array"&gt;
+#   &lt;object&gt;
+#     &lt;b type="integer"&gt;2&lt;/b&gt;
+#     &lt;a type="integer"&gt;1&lt;/a&gt;
+#   &lt;/object&gt;
+#   &lt;object&gt;
+#     &lt;c type="integer"&gt;3&lt;/c&gt;
+#   &lt;/object&gt;
+# &lt;/objects&gt;
+</pre>
+    </div>
+    <div class="warning"><p>Если коллекция пустая, корневой элемент по умолчанию "nil-classes".
+        Пример для понимания, корневой элемент для вышеописанного списка распространителей не будет
+        "contributors", если коллекция пустая, а "nil-classes". Можно использовать опцию
+        <code>:root</code>, чтобы обеспечить то, что будет соответствовать корневому элементу.</p>
+    </div>
+    <p>Имя дочерних узлов по умолчанию является именем корневого узла в единственном числе. В
+        вышеописанных примерах мы видели "contributor" и "object'. Опция <code>:children</code>
+        позволяет установить эти имена узлов.</p>
+    <p>По умолчанию билдер XML является свежим экземпляром <code>Builder::XmlMarkup</code>. Можно
+        сконфигурировать свой собственный билдер через опцию <code>:builder</code>. Метод также
+        принимает опции, такие как <code>:dasherize</code> и ему подобные, они перенаправляются в
+        билдер:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Contributor.limit(2).order(:rank).to_xml(skip_types: true)
+# =&gt;
+# &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+# &lt;contributors&gt;
+#   &lt;contributor&gt;
+#     &lt;id&gt;4356&lt;/id&gt;
+#     &lt;name&gt;Jeremy Kemper&lt;/name&gt;
+#     &lt;rank&gt;1&lt;/rank&gt;
+#     &lt;url-id&gt;jeremy-kemper&lt;/url-id&gt;
+#   &lt;/contributor&gt;
+#   &lt;contributor&gt;
+#     &lt;id&gt;4404&lt;/id&gt;
+#     &lt;name&gt;David Heinemeier Hansson&lt;/name&gt;
+#     &lt;rank&gt;2&lt;/rank&gt;
+#     &lt;url-id&gt;david-heinemeier-hansson&lt;/url-id&gt;
+#   &lt;/contributor&gt;
+# &lt;/contributors&gt;
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/conversions.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="oborachivanie"> Оборачивание</h4>
+    <p>Метод <code>Array.wrap</code> оборачивает свои аргументы в массив, кроме случая, когда это
+        уже массив (или подобно массиву).</p>
+    <p>А именно:</p>
+    <ul>
+        <li>Если аргумент <code>nil</code>, возвращается пустой массив.
+        </li>
+        <li>В противном случае, если аргумент откликается на <code>to_ary</code>, он вызывается, и,
+            если значение <code>to_ary</code> не <code>nil</code>, оно возвращается.
+        </li>
+        <li>В противном случае, возвращается массив с аргументом в качестве его первого элемента.
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Array.wrap(nil)       # =&gt; []
+Array.wrap([1, 2, 3]) # =&gt; [1, 2, 3]
+Array.wrap(0)         # =&gt; [0]
+</pre>
+    </div>
+    <p>Этот метод похож на <code>Kernel#Array</code>, но с некоторыми отличиями:</p>
+    <ul>
+        <li>Если аргумент откликается на <code>to_ary</code>, метод вызывается.
+            <code>Kernel#Array</code> начинает пробовать <code>to_a</code>, если вернувшееся
+            значение <code>nil</code>, а <code>Arraw.wrap</code> возвращает массив с этим аргументом
+            в качестве одного элемента в любом случае.
+        </li>
+        <li>Если возвращаемое значение от <code>to_ary</code> и не <code>nil</code>, и не объект
+            <code>Array</code>, <code>Kernel#Array</code> вызывает исключение, в то время как <code>Array.wrap</code>
+            нет, он просто возвращает значение.
+        </li>
+        <li>Он не вызывает <code>to_a</code> на аргументе, если аргумент не откликается на <code>to_ary</code>,
+            то возвращает массив с этим аргументом в качестве одного элемента.
+        </li>
+    </ul>
+    <p>Следующий пункт особенно заметен для некоторых enumerables:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Array.wrap(foo: :bar) # =&gt; [{:foo=&gt;:bar}]
+Array(foo: :bar)      # =&gt; [[:foo, :bar]]
+</pre>
+    </div>
+    <p>Также имеется связанная идиома, использующая оператор расплющивания:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[*object]
+</pre>
+    </div>
+    <p>который в Ruby 1.8 возвращает <code>[nil]</code> для <code>nil</code>, а в противном случае
+        вызывает <code>Array(object)</code>. (Точное поведение в 1.9 пока непонятно)</p>
+    <p>Таким образом, в этом случае поведение различается для <code>nil</code>, а описанная выше
+        разница с <code>Kernel#Array</code> применима к остальным <code>object</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/wrap.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="dublirovanie"> Дублирование</h4>
+    <p>Метод <code>Array#deep_dup</code> дублирует себя и все объекты внутри рекурсивно с помощью
+        метода Active Support <code>Object#deep_dup</code>. Он работает так же, как
+        <code>Array#map</code>, посылая метод <code>deep_dup</code> в каждый объект внутри.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+array = [1, [2, 3]]
+dup = array.deep_dup
+dup[1][2] = 4
+array[1][2] == nil   # =&gt; true
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/deep_dup.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="gruppirovka"> Группировка</h4>
+    <h5 class="inside_page_header" id="in_groups_of-number-fill_with-nil"><code>in_groups_of(number,
+        fill_with = nil)</code>
+    </h5>
+    <p>Метод <code>in_groups_of</code> разделяет массив на последовательные группы определенного
+        размера. Он возвращает массив с группами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[1, 2, 3].in_groups_of(2) # =&gt; [[1, 2], [3, nil]]
+</pre>
+    </div>
+    <p>или вкладывает их по очереди в блок, если он задан:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% sample.in_groups_of(3) do |a, b, c| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= a %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= b %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= c %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Первый пример показывает, как <code>in_groups_of</code> заполняет последнюю группу столькими
+        элементами <code>nil</code>, сколько нужно, чтобы получить требуемый размер. Можно изменить
+        это набивочное значение используя второй необязательный аргумент:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[1, 2, 3].in_groups_of(2, 0) # =&gt; [[1, 2], [3, 0]]
+</pre>
+    </div>
+    <p>Наконец, можно сказать методу не заполнять последнюю группу, передав <code>false</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[1, 2, 3].in_groups_of(2, false) # =&gt; [[1, 2], [3]]
+</pre>
+    </div>
+    <p>Как следствие <code>false</code> не может использоваться как набивочное значение.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/grouping.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="in_groups-number-fill_with-nil"><code>in_groups(number,
+        fill_with = nil)</code>
+    </h5>
+    <p>Метод <code>in_groups</code> разделяет массив на определенное количество групп. Метод
+        возвращает массив с группами:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(1 2 3 4 5 6 7).in_groups(3)
+# =&gt; [["1", "2", "3"], ["4", "5", nil], ["6", "7", nil]]
+</pre>
+    </div>
+    <p>или вкладывает их по очереди в блок, если он передан:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(1 2 3 4 5 6 7).in_groups(3) {|group| p group}
+["1", "2", "3"]
+["4", "5", nil]
+["6", "7", nil]
+</pre>
+    </div>
+    <p>Примеры выше показывают, что <code>in_groups</code> заполняет некоторые группы с помощью
+        заключительного элемента <code>nil</code>, если необходимо. Группа может получить не более
+        одного из этих дополнительных элементов, если он будет, то будет стоять справа. Группы,
+        получившие его, будут всегда последние.</p>
+    <p>Можно изменить это набивочное значение, используя второй необязательный аргумент:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(1 2 3 4 5 6 7).in_groups(3, "0")
+# =&gt; [["1", "2", "3"], ["4", "5", "0"], ["6", "7", "0"]]
+</pre>
+    </div>
+    <p>Также можно сказать методу не заполнять меньшие группы, передав <code>false</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%w(1 2 3 4 5 6 7).in_groups(3, false)
+# =&gt; [["1", "2", "3"], ["4", "5"], ["6", "7"]]
+</pre>
+    </div>
+    <p>Как следствие <code>false</code> не может быть набивочным значением.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/grouping.rb</code>.</p>
+    </div>
+    <h5 class="inside_page_header" id="split-value-nil"><code>split(value = nil)</code>
+    </h5>
+    <p>Метод <code>split</code> разделяет массив разделителем и возвращает получившиеся куски.</p>
+    <p>Если передан блок, разделителями будут те элементы, для которых блок возвратит true:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(-5..5).to_a.split { |i| i.multiple_of?(4) }
+# =&gt; [[-5], [-3, -2, -1], [1, 2, 3], [5]]
+</pre>
+    </div>
+    <p>В противном случае, значение, полученное как аргумент, которое по умолчанию является <code>nil</code>,
+        будет разделителем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+[0, 1, -5, 1, 1, "foo", "bar"].split(1)
+# =&gt; [[0], [-5], [], ["foo", "bar"]]
+</pre>
+    </div>
+    <div class="info"><p>Отметьте в предыдущем примере, что последовательные разделители приводят к
+        пустым массивам.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/array/grouping.rb</code>.</p>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-hash"> Расширения для <code>Hash</code>
+    </h3>
+    <h4 class="inside_page_header" id="konversiya"> Конверсия</h4>
+    <h5 class="inside_page_header" id="to_xml"><code>to_xml</code>
+    </h5>
+    <p>Метод <code>to_xml</code> возвращает строку, содержащую представление XML его получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"foo" =&gt; 1, "bar" =&gt; 2}.to_xml
+# =&gt;
+# &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+# &lt;hash&gt;
+#   &lt;foo type="integer"&gt;1&lt;/foo&gt;
+#   &lt;bar type="integer"&gt;2&lt;/bar&gt;
+# &lt;/hash&gt;
+</pre>
+    </div>
+    <p>Для этого метод в цикле проходит пары и создает узлы, зависимые от <em>value</em>. Для
+        заданной пары <code>key</code>, <code>value</code>:</p>
+    <ul>
+        <li>Если <code>value</code> - хэш, происходит рекурсивный вызов с <code>key</code> как
+            <code>:root</code>.
+        </li>
+        <li>Если <code>value</code> - массив, происходит рекурсивный вызов с <code>key</code> как
+            <code>:root</code> и <code>key</code> в единственном числе как <code>:children</code>.
+        </li>
+        <li>Если <code>value</code> - вызываемый объект, он должен ожидать один или два аргумента. В
+            зависимости от ситуации, вызываемый объект вызывается с помощью хэша
+            <code>options</code> в качестве первого аргумента с <code>key</code> как
+            <code>:root</code>, и <code>key</code> в единственном числе в качестве второго
+            аргумента. Возвращенное значение становится новым узлом.
+        </li>
+        <li>Если <code>value</code> откликается на <code>to_xml</code>, метод вызывается с
+            <code>key</code> как <code>:root</code>.
+        </li>
+        <li>В иных случаях, создается узел с <code>key</code> в качестве тега, со строковым
+            представлением <code>value</code> в качестве текстового узла. Если <code>value</code>
+            является <code>nil</code>, добавляется атрибут "nil", установленный в "true". Кроме
+            случаев, когда существует опция <code>:skip_types</code> со значением true, добавляется
+            атрибут "type", соответствующий следующему преобразованию:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+XML_TYPE_NAMES = {
+  "Symbol"     =&gt; "symbol",
+  "Fixnum"     =&gt; "integer",
+  "Bignum"     =&gt; "integer",
+  "BigDecimal" =&gt; "decimal",
+  "Float"      =&gt; "float",
+  "TrueClass"  =&gt; "boolean",
+  "FalseClass" =&gt; "boolean",
+  "Date"       =&gt; "date",
+  "DateTime"   =&gt; "datetime",
+  "Time"       =&gt; "datetime"
+}
+</pre>
+    </div>
+    <p>По умолчанию корневым узлом является "hash", но это настраивается с помощью опции
+        <code>:root</code>.</p>
+    <p>По умолчанию билдер XML является новым экземпляром <code>Builder::XmlMarkup</code>. Можно
+        настроить свой собственный билдер с помощью опции <code>:builder</code>. Метод также
+        принимает опции, такие как <code>:dasherize</code> и ему подобные, они перенаправляются в
+        билдер.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/conversions.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="ob-edinenie"> Объединение</h4>
+    <p>В Ruby имеется встроенный метод <code>Hash#merge</code>, объединяющий два хэша:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1, b: 1}.merge(a: 0, c: 2)
+# =&gt; {:a=&gt;0, :b=&gt;1, :c=&gt;2}
+</pre>
+    </div>
+    <p>Active Support определяет больше способов объединения хэшей, которые могут быть
+        полезными.</p>
+    <h5 class="inside_page_header" id="reverse_merge-i-reverse_merge"><code>reverse_merge</code> и
+        <code>reverse_merge!</code>
+    </h5>
+    <p>В случае коллизии, в <code>merge</code> побеждает ключ в хэше аргумента. Можно компактно
+        предоставить хэш опций со значением по умолчанию с помощью такой идиомы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+options = {length: 30, omission: "..."}.merge(options)
+</pre>
+    </div>
+    <p>Active Support определяет <code>reverse_merge</code> в случае, если нужна альтернативная
+        запись:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+options = options.reverse_merge(length: 30, omission: "...")
+</pre>
+    </div>
+    <p>И восклицательная версия <code>reverse_merge!</code>, выполняющая объединение на месте:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+options.reverse_merge!(length: 30, omission: "...")
+</pre>
+    </div>
+    <div class="warning"><p>Обратите внимание, что <code>reverse_merge!</code> может изменить хэш в
+        вызывающем методе, что может как быть, так и не быть хорошей идеей.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/reverse_merge.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="reverse_update"><code>reverse_update</code>
+    </h5>
+    <p>Метод <code>reverse_update</code> это псевдоним для <code>reverse_merge!</code>, описанного
+        выше.</p>
+    <div class="warning"><p>Отметьте, что у <code>reverse_update</code> нет восклицательного знака.
+    </p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/reverse_merge.rb</code>.
+    </p></div>
+    <h5 class="inside_page_header" id="deep_merge-i-deep_merge"><code>deep_merge</code> и <code>deep_merge!</code>
+    </h5>
+    <p>Как видите в предыдущем примере, если ключ обнаруживается в обоих хэшах, один из аргументов
+        побеждает.</p>
+    <p>Active Support определяет <code>Hash#deep_merge</code>. В углубленном объединении, если
+        обнаруживается ключ в обоих хэшах, и их значения также хэши, то их <em>merge</em>
+        становиться значением в результирующем хэше:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: {b: 1}}.deep_merge(a: {c: 2})
+# =&gt; {:a=&gt;{:b=&gt;1, :c=&gt;2}}
+</pre>
+    </div>
+    <p>Метод <code>deep_merge!</code> выполняет углубленное объединение на месте.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/deep_merge.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="quot-glubokoe-quot-dublirovanie"> "Глубокое"
+        дублирование</h4>
+    <p>Метод <code>Hash#deep_dup</code> дублирует себя и все ключи и значения внутри рекурсивно с
+        помощью метода Active Support <code>Object#deep_dup</code>. Он работает так же, как <code>Enumerator#each_with_object</code>,
+        посылая метод <code>deep_dup</code> в каждую пару внутри.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hash = { a: 1, b: { c: 2, d: [3, 4] } }
+dup = hash.deep_dup
+dup[:b][:e] = 5
+dup[:b][:d] &lt;&lt; 5
+hash[:b][:e] == nil      # =&gt; true
+hash[:b][:d] == [3, 4]   # =&gt; true
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/object/deep_dup.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="rabota-s-klyuchami"> Работа с ключами</h4>
+    <h5 class="inside_page_header" id="except-i-except"><code>except</code> и <code>except!</code>
+    </h5>
+    <p>Метод <code>except</code> возвращает хэш с убранными ключами, содержащимися в перечне
+        аргументов, если они существуют:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1, b: 2}.except(:a) # =&gt; {:b=&gt;2}
+</pre>
+    </div>
+    <p>Если получатель откликается на <code>convert_key</code>, метод вызывается на каждом из
+        аргументов. Это позволяет <code>except</code> хорошо обращаться с хэшами с индифферентым
+        доступом, например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1}.with_indifferent_access.except(:a)  # =&gt; {}
+{a: 1}.with_indifferent_access.except("a") # =&gt; {}
+</pre>
+    </div>
+    <p>Также имеется восклицательный вариант <code>except!</code>, который убирает ключи в самом
+        получателе.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/except.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="transform_keys-i-transform_keys"><code>transform_keys</code>
+        и <code>transform_keys!</code>
+    </h5>
+    <p>Метод <code>transform_keys</code> принимает блок и возвращает хэш, в котором к каждому из
+        ключей получателя были применены операции в блоке:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, a: :a}.transform_keys { |key| key.to_s.upcase }
+# =&gt; {"" =&gt; nil, "A" =&gt; :a, "1" =&gt; 1}
+</pre>
+    </div>
+    <p>В случае коллизии будет выбрано одно из значений. Выбранное значение не всегда будет одним и
+        тем же для одного и того же хэша:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"a" =&gt; 1, a: 2}.transform_keys { |key| key.to_s.upcase }
+# Результатом будет или
+# =&gt; {"A"=&gt;2}
+# или
+# =&gt; {"A"=&gt;1}
+</pre>
+    </div>
+    <p>Этот метод может помочь, к примеру, при создании специальных преобразований. Например, <code>stringify_keys</code>
+        и <code>symbolize_keys</code> используют <code>transform_keys</code> для выполнения
+        преобразований ключей:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def stringify_keys
+  transform_keys { |key| key.to_s }
+end
+...
+def symbolize_keys
+  transform_keys { |key| key.to_sym rescue key }
+end
+</pre>
+    </div>
+    <p>Также имеется восклицательный вариант <code>transform_keys!</code> применяющий операции в
+        блоке к самому получателю.</p>
+    <p>Кроме этого, можно использовать <code>deep_transform_keys</code> и
+        <code>deep_transform_keys!</code> для выполнения операции в блоке ко всем ключам в заданном
+        хэше и всех хэшах, вложенных в него. Пример результата:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, nested: {a: 3, 5 =&gt; 5}}.deep_transform_keys { |key| key.to_s.upcase }
+# =&gt; {""=&gt;nil, "1"=&gt;1, "NESTED"=&gt;{"A"=&gt;3, "5"=&gt;5}}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/keys.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="stringify_keys-i-stringify_keys"><code>stringify_keys</code>
+        и <code>stringify_keys!</code>
+    </h5>
+    <p>Метод <code>stringify_keys</code> возвращает хэш, в котором ключи получателя приведены к
+        строке. Это выполняется с помощью применения к ним <code>to_s</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, a: :a}.stringify_keys
+# =&gt; {"" =&gt; nil, "a" =&gt; :a, "1" =&gt; 1}
+</pre>
+    </div>
+    <p>В случае коллизии будет выбрано одно из значений. Выбранное значение не всегда будет одним и
+        тем же для одного и того же хэша:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"a" =&gt; 1, a: 2}.stringify_keys
+# Результатом будет или
+# =&gt; {"a"=&gt;2}
+# или
+# =&gt; {"a"=&gt;1}
+</pre>
+    </div>
+    <p>Метод может быть полезным, к примеру, для простого принятия и символов, и строк как опций.
+        Например, <code>ActionView::Helpers::FormHelper</code> определяет:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def to_check_box_tag(options = {}, checked_value = "1", unchecked_value = "0")
+  options = options.stringify_keys
+  options["type"] = "checkbox"
+  ...
+end
+</pre>
+    </div>
+    <p>Вторая строка может безопасно обращаться к ключу "type" и позволяет пользователю передавать
+        или <code>:type</code>, или "type".</p>
+    <p>Также имеется восклицательный вариант <code>stringify_keys!</code>, который приводит к строке
+        ключи в самом получателе.</p>
+    <p>Кроме этого, можно использовать <code>deep_stringify_keys</code> и
+        <code>deep_stringify_keys!</code> для приведения к строке всех ключей в заданном хэше и всех
+        хэшах, вложенных в него. Пример результата:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, nested: {a: 3, 5 =&gt; 5}}.deep_stringify_keys
+# =&gt; {""=&gt;nil, "1"=&gt;1, "nested"=&gt;{"a"=&gt;3, "5"=&gt;5}}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/keys.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="symbolize_keys-i-symbolize_keys"><code>symbolize_keys</code>
+        и <code>symbolize_keys!</code>
+    </h5>
+    <p>Метод <code>symbolize_keys</code> возвращает хэш, в котором ключи получателя приведены к
+        символам там, где это возможно. Это выполняется с помощью применения к ним
+        <code>to_sym</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, "a" =&gt; "a"}.symbolize_keys
+# =&gt; {1=&gt;1, nil=&gt;nil, :a=&gt;"a"}
+</pre>
+    </div>
+    <div class="warning"><p>Отметьте в предыдущем примере, что только один ключ был приведен к
+        символу.</p></div>
+    <p>В случае коллизии будет выбрано одно из значений. Выбранное значение не всегда будет одним и
+        тем же для одного и того же хэша:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"a" =&gt; 1, a: 2}.symbolize_keys
+# Результатом будет или
+# =&gt; {:a=&gt;2}
+# или
+# =&gt; {:a=&gt;1}
+</pre>
+    </div>
+    <p>Метод может быть полезным, к примеру, для простого принятия и символов, и строк как опций.
+        Например, <code>ActionController::UrlRewriter</code> определяет</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def rewrite_path(options)
+  options = options.symbolize_keys
+  options.update(options[:params].symbolize_keys) if options[:params]
+  ...
+end
+</pre>
+    </div>
+    <p>Вторая строка может безопасно обращаться к ключу <code>:params</code> и позволяет
+        пользователю передавать или <code>:params</code>, или "params".</p>
+    <p>Также имеется восклицательный вариант <code>symbolize_keys!</code>, который приводит к
+        символу ключи в самом получателе.</p>
+    <p>Кроме этого, можно использовать <code>deep_symbolize_keys</code> и
+        <code>deep_symbolize_keys!</code> для приведения к символам всех ключей в заданном хэше и
+        всех хэшах, вложенных в него. Пример результата:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{nil =&gt; nil, 1 =&gt; 1, "nested" =&gt; {"a" =&gt; 3, 5 =&gt; 5}}.deep_symbolize_keys
+# =&gt; {nil=&gt;nil, 1=&gt;1, nested:{a:3, 5=&gt;5}}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/keys.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="to_options-i-to_options"><code>to_options</code> и <code>to_options!</code>
+    </h5>
+    <p>Методы <code>to_options</code> и <code>to_options!</code> соответствующие псевдонимы <code>symbolize_keys</code>
+        и <code>symbolize_keys!</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/keys.rb</code>.</p></div>
+    <h5 class="inside_page_header" id="assert_valid_keys"><code>assert_valid_keys</code>
+    </h5>
+    <p>Метод <code>assert_valid_keys</code> получает определенное число аргументов и проверяет,
+        имеет ли получатель хоть один ключ вне этого белого списка. Если имеет, вызывается <code>ArgumentError</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1}.assert_valid_keys(:a)  # passes
+{a: 1}.assert_valid_keys("a") # ArgumentError
+</pre>
+    </div>
+    <p>Active Record не принимает незнакомые опции при создании связей, к примеру. Он реализует
+        такой контроль через <code>assert_valid_keys</code>.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/keys.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="rabota-so-znacheniyami"> Работа со значениями</h4>
+    <h5 class="inside_page_header" id="transform_values"><code>transform_values</code> &amp;&amp;
+        <code>transform_values!</code>
+    </h5>
+    <p>Метод <code>transform_values</code> принимает блок и возвращает хэш, в котором операции из
+        блока были применены к каждому из значений получателя.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{ nil =&gt; nil, 1 =&gt; 1, :x =&gt; :a }.transform_values { |value| value.to_s.upcase }
+# =&gt; {nil=&gt;"", 1=&gt;"1", :x=&gt;"A"}
+</pre>
+    </div>
+    <p>Также имеется восклицательный вариант <code>transform_values!</code>, который применяет
+        операции блока к значениям самого получателя.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/transform_values.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="vyrezanie-slicing"> Вырезание (slicing)</h4>
+    <p>В Ruby есть встроенная поддержка для вырезания строк или массивов. Active Support расширяет
+        вырезание на хэши:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1, b: 2, c: 3}.slice(:a, :c)
+# =&gt; {:c=&gt;3, :a=&gt;1}
+{a: 1, b: 2, c: 3}.slice(:b, :X)
+# =&gt; {:b=&gt;2} # несуществующие ключи игнорируются
+</pre>
+    </div>
+    <p>Если получатель откликается на <code>convert_key</code>, ключи нормализуются:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1, b: 2}.with_indifferent_access.slice("a")
+# =&gt; {:a=&gt;1}
+</pre>
+    </div>
+    <div class="note"><p>Вырезание может быть полезным для экранизации хэшей опций с помощью белого
+        списка ключей.</p></div>
+    <p>Также есть <code>slice!</code>, который выполняет вырезание на месте, возвращая то, что было
+        убрано:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hash = {a: 1, b: 2}
+rest = hash.slice!(:a) # =&gt; {:b=&gt;2}
+hash                   # =&gt; {:a=&gt;1}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/slice.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="izvlechenie-extracting"> Извлечение (extracting)</h4>
+    <p>Метод <code>extract!</code> убирает и возвращает пары ключ/значение, соответствующие заданным
+        ключам.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hash = {:a =&gt; 1, :b =&gt; 2}
+rest = hash.extract!(:a) # =&gt; {:a=&gt;1}
+hash                     # =&gt; {:b=&gt;2}
+</pre>
+    </div>
+    <p>Метод <code>extract!</code> возвращает тот же подкласс Hash, каким является получатель.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+hash = {a: 1, b: 2}.with_indifferent_access
+rest = hash.extract!(:a).class
+# =&gt; ActiveSupport::HashWithIndifferentAccess
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/slice.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="indifferentnyy-dostup"> Индифферентный доступ</h4>
+    <p>Метод <code>with_indifferent_access</code> возвращает <code>ActiveSupport::HashWithIndifferentAccess</code>
+        его получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1}.with_indifferent_access["a"] # =&gt; 1
+</pre>
+    </div>
+    <div class="note"><p>Определено в
+        <code>active_support/core_ext/hash/indifferent_access.rb</code>.</p></div>
+    <h4 class="inside_page_header" id="uplotnenie"> Уплотнение</h4>
+    <p>Методы <code>compact</code> и <code>compact!</code> возвращают хэш без элементов со значением
+        <code>nil</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{a: 1, b: 2, c: nil}.compact # =&gt; {a: 1, b: 2}
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/hash/compact.rb</code>.</p>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-regexp"> Расширения для <code>Regexp</code>
+    </h3>
+    <h4 class="inside_page_header" id="multiline"><code>multiline?</code>
+    </h4>
+    <p>Метод <code>multiline?</code> говорит, имеет ли регулярное выражение установленный флаг
+        <code>/m</code>, то есть соответствует ли точка новым строкам.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+%r{.}.multiline?  # =&gt; false
+%r{.}m.multiline? # =&gt; true
+Regexp.new('.').multiline?                    # =&gt; false
+Regexp.new('.', Regexp::MULTILINE).multiline? # =&gt; true
+</pre>
+    </div>
+    <p>Rails использует этот метод в одном месте, в коде маршрутизации. Регулярные выражения
+        Multiline недопустимы для маршрутных требований, и этот флаг облегчает обеспечение этого
+        ограничения.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def assign_route_options(segments, defaults, requirements)
+  ...
+  if requirement.multiline?
+    raise ArgumentError, "Regexp multiline option not allowed in routing requirements: #{requirement.inspect}"
+  end
+  ...
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/regexp.rb</code>.</p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-range"> Расширения для <code>Range</code>
+    </h3>
+    <h4 class="inside_page_header" id="to_s"><code>to_s</code>
+    </h4>
+    <p>Active Support расширяет метод <code>Range#to_s</code> так, что он понимает необязательный
+        аргумент формата. В настоящий момент имеется только один поддерживаемый формат, отличный от
+        дефолтного, это <code>:db</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(Date.today..Date.tomorrow).to_s
+# =&gt; "2009-10-25..2009-10-26"
+(Date.today..Date.tomorrow).to_s(:db)
+# =&gt; "BETWEEN '2009-10-25' AND '2009-10-26'"
+</pre>
+    </div>
+    <p>Как изображено в примере, формат <code>:db</code> создает SQL условие <code>BETWEEN</code>.
+        Это используется Active Record в его поддержке интервальных значений в условиях.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/range/conversions.rb</code>.</p>
+    </div>
+    <h4 class="inside_page_header" id="include"><code>include?</code>
+    </h4>
+    <p>Методы <code>Range#include?</code> и <code>Range#===</code> говорит, лежит ли некоторое
+        значение между концами заданного экземпляра:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(2..3).include?(Math::E) # =&gt; true
+</pre>
+    </div>
+    <p>Active Support расширяет эти методы так, что аргумент может также быть другим интервалом. В
+        этом случае тестируется, принадлежат ли концы аргумента самому получателю:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(1..10).include?(3..7)  # =&gt; true
+(1..10).include?(0..7)  # =&gt; false
+(1..10).include?(3..11) # =&gt; false
+(1...9).include?(3..9)  # =&gt; false
+(1..10) === (3..7)  # =&gt; true
+(1..10) === (0..7)  # =&gt; false
+(1..10) === (3..11) # =&gt; false
+(1...9) === (3..9)  # =&gt; false
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/range/include_range.rb</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="overlaps"><code>overlaps?</code>
+    </h4>
+    <p>Метод <code>Range#overlaps?</code> говорит, имеют ли два заданных интервала непустое
+        пересечение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+(1..10).overlaps?(7..11)  # =&gt; true
+(1..10).overlaps?(0..7)   # =&gt; true
+(1..10).overlaps?(11..27) # =&gt; false
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/range/overlaps.rb</code>.</p>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-date"> Расширения для <code>Date</code>
+    </h3>
+    <h4 class="inside_page_header" id="vychisleniya"> Вычисления</h4>
+    <div class="note"><p>Все следующие методы определены в <code>active_support/core_ext/date/calculations.rb</code>.
+    </p></div>
+    <div class="info"><p>В следующих методах вычисления имеют крайний случай октября 1582 года,
+        когда дней с 5 по 14 просто не существовало. Это руководство не документирует поведение
+        около этих дней для краткости, достаточно сказать, что они делают то, что от них следует
+        ожидать. Скажем, <code>Date.new(1582, 10, 4).tomorrow</code> возвратит <code>Date.new(1582,
+            10, 15)</code>, и так далее. Смотрите <code>test/core_ext/date_ext_test.rb</code> в
+        тестовом наборе Active Support, чтобы понять ожидаемое поведение.</p></div>
+    <h5 class="inside_page_header" id="date-current"><code>Date.current</code>
+    </h5>
+    <p>Active Support определяет <code>Date.current</code> как сегодняшний день в текущей временной
+        зоне. Он похож на <code>Date.today</code>, за исключением того, что он учитывает временную
+        зону пользователя, если она определена. Он также определяет <code>Date.yesterday</code> и
+        <code>Date.tomorrow</code>, и условия экземпляра <code>past?</code>, <code>today?</code> и
+        <code>future?</code>, все они зависят относительно <code>Date.current</code>.</p>
+    <h5 class="inside_page_header" id="imenovannye-daty"> Именованные даты</h5>
+    <h6 class="inside_page_header" id="prev_year-next_year"><code>prev_year</code>,
+        <code>next_year</code>
+    </h6>
+    <p>В Ruby 1.9 <code>prev_year</code> и <code>next_year</code> возвращают дату с тем же
+        днем/месяцем в предыдущем или следующем году:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 8) # =&gt; Sat, 08 May 2010
+d.prev_year              # =&gt; Fri, 08 May 2009
+d.next_year              # =&gt; Sun, 08 May 2011
+</pre>
+    </div>
+    <p>Если датой является 29 февраля високосного года, возвратится 28-е:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2000, 2, 29) # =&gt; Tue, 29 Feb 2000
+d.prev_year               # =&gt; Sun, 28 Feb 1999
+d.next_year               # =&gt; Wed, 28 Feb 2001
+</pre>
+    </div>
+    <p>У <code>prev_year</code> есть псевдоним <code>last_year</code>.</p>
+    <h6 class="inside_page_header" id="prev_month-next_month"><code>prev_month</code>, <code>next_month</code>
+    </h6>
+    <p>В Ruby 1.9 <code>prev_month</code> и <code>next_month</code> возвращает дату с тем же днем в
+        предыдущем или следующем месяце:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 8) # =&gt; Sat, 08 May 2010
+d.prev_month             # =&gt; Thu, 08 Apr 2010
+d.next_month             # =&gt; Tue, 08 Jun 2010
+</pre>
+    </div>
+    <p>Если такой день не существует, возвращается последний день соответствующего месяца:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2000, 5, 31).prev_month # =&gt; Sun, 30 Apr 2000
+Date.new(2000, 3, 31).prev_month # =&gt; Tue, 29 Feb 2000
+Date.new(2000, 5, 31).next_month # =&gt; Fri, 30 Jun 2000
+Date.new(2000, 1, 31).next_month # =&gt; Tue, 29 Feb 2000
+</pre>
+    </div>
+    <p>У <code>prev_month</code> есть псевдоним <code>last_month</code>.</p>
+    <h6 class="inside_page_header" id="prev_quarter-next_quarter"><code>prev_quarter</code>, <code>next_quarter</code>
+    </h6>
+    <p>Похожи на <code>prev_month</code> и <code>next_month</code>. Возвращают дату с тем же днем в
+        предыдущем или следующем квартале:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+t = Time.local(2010, 5, 8) # =&gt; Sat, 08 May 2010
+t.prev_quarter             # =&gt; Mon, 08 Feb 2010
+t.next_quarter             # =&gt; Sun, 08 Aug 2010
+</pre>
+    </div>
+    <p>Если такой день не существует, возвращается последний день соответствующего месяца:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Time.local(2000, 7, 31).prev_quarter  # =&gt; Sun, 30 Apr 2000
+Time.local(2000, 5, 31).prev_quarter  # =&gt; Tue, 29 Feb 2000
+Time.local(2000, 10, 31).prev_quarter # =&gt; Mon, 30 Oct 2000
+Time.local(2000, 11, 31).next_quarter # =&gt; Wed, 28 Feb 2001
+</pre>
+    </div>
+    <p><code>prev_quarter</code> имеет псевдоним <code>last_quarter</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_week-end_of_week"><code>beginning_of_week</code>,
+        <code>end_of_week</code>
+    </h6>
+    <p>Методы <code>beginning_of_week</code> и <code>end_of_week</code> возвращают даты для начала и
+        конца недели соответственно. Предполагается, что неделя начинается с понедельника, но это
+        может быть изменено переданным аргументом, установив локально для треда <code>Date.beginning_of_week</code>
+        или <code>config.beginning_of_week</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 8)     # =&gt; Sat, 08 May 2010
+d.beginning_of_week          # =&gt; Mon, 03 May 2010
+d.beginning_of_week(:sunday) # =&gt; Sun, 02 May 2010
+d.end_of_week                # =&gt; Sun, 09 May 2010
+d.end_of_week(:sunday)       # =&gt; Sat, 08 May 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_week</code> есть псевдоним <code>at_beginning_of_week</code>, а у <code>end_of_week</code>
+        есть псевдоним <code>at_end_of_week</code>.</p>
+    <h6 class="inside_page_header" id="monday-sunday"><code>monday</code>, <code>sunday</code>
+    </h6>
+    <p>Методы <code>monday</code> и <code>sunday</code> возвращают даты для прошлого понедельника
+        или следующего воскресенья, соответственно.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 8)     # =&gt; Sat, 08 May 2010
+d.monday                     # =&gt; Mon, 03 May 2010
+d.sunday                     # =&gt; Sun, 09 May 2010
+d = Date.new(2012, 9, 10)    # =&gt; Mon, 10 Sep 2012
+d.monday                     # =&gt; Mon, 10 Sep 2012
+d = Date.new(2012, 9, 16)    # =&gt; Sun, 16 Sep 2012
+d.sunday                     # =&gt; Sun, 16 Sep 2012
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="prev_week-next_week"><code>prev_week</code>,
+        <code>next_week</code>
+    </h6>
+    <p><code>next_week</code> принимает символ с днем недели на английском (по умолчанию локальный
+        для треда <code>Date.beginning_of_week</code>, или<code>config.beginning_of_week</code> или
+        <code>:monday</code>) и возвращает дату, соответствующую этому дню на следующей неделе:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 9) # =&gt; Sun, 09 May 2010
+d.next_week              # =&gt; Mon, 10 May 2010
+d.next_week(:saturday)   # =&gt; Sat, 15 May 2010
+</pre>
+    </div>
+    <p><code>prev_week</code> работает аналогично:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d.prev_week              # =&gt; Mon, 26 Apr 2010
+d.prev_week(:saturday)   # =&gt; Sat, 01 May 2010
+d.prev_week(:friday)     # =&gt; Fri, 30 Apr 2010
+</pre>
+    </div>
+    <p>У <code>prev_week</code> есть псевдоним <code>last_week</code>.</p>
+    <p>И <code>next_week</code>, и <code>prev_week</code> работают так, как нужно, когда установлен
+        <code>Date.beginning_of_week</code> или <code>config.beginning_of_week</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_month-end_of_month">
+        <code>beginning_of_month</code>, <code>end_of_month</code>
+    </h6>
+    <p>Методы <code>beginning_of_month</code> и <code>end_of_month</code> возвращают даты для начала
+        и конца месяца:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 9) # =&gt; Sun, 09 May 2010
+d.beginning_of_month     # =&gt; Sat, 01 May 2010
+d.end_of_month           # =&gt; Mon, 31 May 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_month</code> есть псевдоним <code>at_beginning_of_month</code>, а у
+        <code>end_of_month</code> есть псевдоним <code>at_end_of_month</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_quarter-end_of_quarter"><code>beginning_of_quarter</code>,
+        <code>end_of_quarter</code>
+    </h6>
+    <p>Методы <code>beginning_of_quarter</code> и <code>end_of_quarter</code> возвращают даты начала
+        и конца квартала календарного года получателя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 9) # =&gt; Sun, 09 May 2010
+d.beginning_of_quarter   # =&gt; Thu, 01 Apr 2010
+d.end_of_quarter         # =&gt; Wed, 30 Jun 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_quarter</code> есть псевдоним <code>at_beginning_of_quarter</code>, а у
+        <code>end_of_quarter</code> есть псевдоним <code>at_end_of_quarter</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_year-end_of_year"><code>beginning_of_year</code>,
+        <code>end_of_year</code>
+    </h6>
+    <p>Методы <code>beginning_of_year</code> и <code>end_of_year</code> возвращают даты начала и
+        конца года:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.new(2010, 5, 9) # =&gt; Sun, 09 May 2010
+d.beginning_of_year      # =&gt; Fri, 01 Jan 2010
+d.end_of_year            # =&gt; Fri, 31 Dec 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_year</code> есть псевдоним <code>at_beginning_of_year</code>, а у <code>end_of_year</code>
+        есть псевдоним <code>at_end_of_year</code>.</p>
+    <h5 class="inside_page_header" id="drugie-vychisleniya-dat"> Другие вычисления дат</h5>
+    <h6 class="inside_page_header" id="years_ago-years_since"><code>years_ago</code>, <code>years_since</code>
+    </h6>
+    <p>Метод <code>years_ago</code> получает число лет и возвращает ту же дату, но на столько лет
+        назад:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.new(2010, 6, 7)
+date.years_ago(10) # =&gt; Wed, 07 Jun 2000
+</pre>
+    </div>
+    <p><code>years_since</code> перемещает вперед по времени:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.new(2010, 6, 7)
+date.years_since(10) # =&gt; Sun, 07 Jun 2020
+</pre>
+    </div>
+    <p>Если такая дата не найдена, возвращается последний день соответствующего месяца:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2012, 2, 29).years_ago(3)     # =&gt; Sat, 28 Feb 2009
+Date.new(2012, 2, 29).years_since(3)   # =&gt; Sat, 28 Feb 2015
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="months_ago-months_since"><code>months_ago</code>, <code>months_since</code>
+    </h6>
+    <p>Методы <code>months_ago</code> и <code>months_since</code> работают аналогично, но для
+        месяцев:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 4, 30).months_ago(2)   # =&gt; Sun, 28 Feb 2010
+Date.new(2010, 4, 30).months_since(2) # =&gt; Wed, 30 Jun 2010
+</pre>
+    </div>
+    <p>Если такой день не существует, возвращается последний день соответствующего месяца:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 4, 30).months_ago(2)    # =&gt; Sun, 28 Feb 2010
+Date.new(2009, 12, 31).months_since(2) # =&gt; Sun, 28 Feb 2010
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="weeks_ago"><code>weeks_ago</code>
+    </h6>
+    <p>Метод <code>weeks_ago</code> работает аналогично для недель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 5, 24).weeks_ago(1)    # =&gt; Mon, 17 May 2010
+Date.new(2010, 5, 24).weeks_ago(2)    # =&gt; Mon, 10 May 2010
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="advance"><code>advance</code>
+    </h6>
+    <p>Более обычным способом перепрыгнуть на другие дни является <code>advance</code>. Этот метод
+        получает хэш с ключами <code>:years</code>, <code>:months</code>, <code>:weeks</code>,
+        <code>:days</code>, и возвращает дату, передвинутую на столько, сколько указывают
+        существующие ключи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.new(2010, 6, 6)
+date.advance(years: 1, weeks: 2)  # =&gt; Mon, 20 Jun 2011
+date.advance(months: 2, days: -2) # =&gt; Wed, 04 Aug 2010
+</pre>
+    </div>
+    <p>Отметьте в предыдущем примере, что приросты могут быть отрицательными.</p>
+    <p>Для выполнения вычисления метод сначала приращивает года, затем месяцы, затем недели, и
+        наконец дни. Порядок важен применительно к концам месяцев. Скажем, к примеру, мы в конце
+        февраля 2010 и хотим переместиться на один месяц и один день вперед.</p>
+    <p>Метод <code>advance</code> передвигает сначала на один месяц, и затем на один день, результат
+        такой:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 2, 28).advance(months: 1, days: 1)
+# =&gt; Sun, 29 Mar 2010
+</pre>
+    </div>
+    <p>Если бы мы делали по другому, результат тоже был бы другой:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 2, 28).advance(days: 1).advance(months: 1)
+# =&gt; Thu, 01 Apr 2010
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="izmenyayuschiesya-komponenty"> Изменяющиеся компоненты</h5>
+    <p>Метод <code>change</code> позволяет получить новую дату, которая идентична получателю, за
+        исключением заданного года, месяца или дня:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 12, 23).change(year: 2011, month: 11)
+# =&gt; Wed, 23 Nov 2011
+</pre>
+    </div>
+    <p>Метод не толерантен к несуществующим датам, если изменение невалидно, вызывается <code>ArgumentError</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(2010, 1, 31).change(month: 2)
+# =&gt; ArgumentError: invalid date
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="dlitelnosti"> Длительности</h5>
+    <p>Длительности могут добавляться и вычитаться из дат:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = Date.current
+# =&gt; Mon, 09 Aug 2010
+d + 1.year
+# =&gt; Tue, 09 Aug 2011
+d - 3.hours
+# =&gt; Sun, 08 Aug 2010 21:00:00 UTC +00:00
+</pre>
+    </div>
+    <p>Это переводится в вызовы <code>since</code> или <code>advance</code>. Для примера мы получим
+        правильный прыжок в реформе календаря:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.new(1582, 10, 4) + 1.day
+# =&gt; Fri, 15 Oct 1582
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="vremennye-metki"> Временные метки</h5>
+    <div class="info"><p>Следующие методы возвращают объект <code>Time</code>, если возможно, в
+        противном случае <code>DateTime</code>. Если установлено, учитывается временная зона
+        пользователя.</p></div>
+    <h6 class="inside_page_header" id="beginning_of_day-end_of_day"><code>beginning_of_day</code>,
+        <code>end_of_day</code>
+    </h6>
+    <p>Метод <code>beginning_of_day</code> возвращает временную метку для начала дня (00:00:00):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.new(2010, 6, 7)
+date.beginning_of_day # =&gt; Mon Jun 07 00:00:00 +0200 2010
+</pre>
+    </div>
+    <p>Метод <code>end_of_day</code> возвращает временную метку для конца дня (23:59:59):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.new(2010, 6, 7)
+date.end_of_day # =&gt; Mon Jun 07 23:59:59 +0200 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_day</code> есть псевдонимы <code>at_beginning_of_day</code>, <code>midnight</code>,
+        <code>at_midnight</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_hour-end_of_hour"><code>beginning_of_hour</code>,
+        <code>end_of_hour</code>
+    </h6>
+    <p>Метод <code>beginning_of_hour</code> возвращает временную метку в начале часа (hh:00:00):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = DateTime.new(2010, 6, 7, 19, 55, 25)
+date.beginning_of_hour # =&gt; Mon Jun 07 19:00:00 +0200 2010
+</pre>
+    </div>
+    <p>Метод <code>end_of_hour</code> возвращает временную метку в конце часа (hh:59:59):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = DateTime.new(2010, 6, 7, 19, 55, 25)
+date.end_of_hour # =&gt; Mon Jun 07 19:59:59 +0200 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_hour</code> есть псевдоним <code>at_beginning_of_hour</code>.</p>
+    <h6 class="inside_page_header" id="beginning_of_minute-end_of_minute">
+        <code>beginning_of_minute</code>, <code>end_of_minute</code>
+    </h6>
+    <p>Метод <code>beginning_of_minute</code> возвращает временную метку в начале минуты (hh:mm:00):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = DateTime.new(2010, 6, 7, 19, 55, 25)
+date.beginning_of_minute # =&gt; Mon Jun 07 19:55:00 +0200 2010
+</pre>
+    </div>
+    <p>Метод <code>end_of_minute</code> возвращает временную метку в конце минуты (hh:mm:59):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = DateTime.new(2010, 6, 7, 19, 55, 25)
+date.end_of_minute # =&gt; Mon Jun 07 19:55:59 +0200 2010
+</pre>
+    </div>
+    <p>У <code>beginning_of_minute</code> есть псевдоним <code>at_beginning_of_minute</code>.</p>
+    <div class="info"><p><code>beginning_of_hour</code>, <code>end_of_hour</code>, <code>beginning_of_minute</code>
+        и <code>end_of_minute</code> реализованы для <code>Time</code> и <code>DateTime</code>, но
+        <strong>не</strong> для <code>Date</code>, так как у экземпляра <code>Date</code> не имеет
+        смысла спрашивать о начале или окончании часа или минуты.</p></div>
+    <h6 class="inside_page_header" id="ago-since"><code>ago</code>, <code>since</code>
+    </h6>
+    <p>Метод <code>ago</code> получает количество секунд как аргумент и возвращает временную метку,
+        имеющую столько секунд до полуночи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.current # =&gt; Fri, 11 Jun 2010
+date.ago(1)         # =&gt; Thu, 10 Jun 2010 23:59:59 EDT -04:00
+</pre>
+    </div>
+    <p>Подобным образом <code>since</code> двигается вперед:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+date = Date.current # =&gt; Fri, 11 Jun 2010
+date.since(1)       # =&gt; Fri, 11 Jun 2010 00:00:01 EDT -04:00
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-datetime"> Расширения для
+        <code>DateTime</code></h3>
+    <div class="warning"><p><code>DateTime</code> не знает о правилах DST (переходов на летнее
+        время) и некоторые из этих методов сталкиваются с крайними случаями, когда переход на и с
+        летнего времени имеет место. К примеру, <code>seconds_since_midnight</code> может не
+        возвратить настоящее значение для таких дней.</p></div>
+    <h4 class="inside_page_header" id="vychisleniya"> Вычисления</h4>
+    <div class="note"><p>Все нижеследующие методы определены в <code>active_support/core_ext/date_time/calculations.rb</code>.
+    </p></div>
+    <p>Класс <code>DateTime</code> является подклассом <code>Date</code>, поэтому загрузив <code>active_support/core_ext/date/calculations.rb</code>
+        вы унаследуете эти методы и их псевдонимы, за исключением того, что они будут всегда
+        возвращать дату и время:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+yesterday
+tomorrow
+beginning_of_week (at_beginning_of_week)
+end_of_week (at_end_of_week)
+monday
+sunday
+weeks_ago
+prev_week (last_week)
+next_week
+months_ago
+months_since
+beginning_of_month (at_beginning_of_month)
+end_of_month (at_end_of_month)
+prev_month (last_month)
+next_month
+beginning_of_quarter (at_beginning_of_quarter)
+end_of_quarter (at_end_of_quarter)
+beginning_of_year (at_beginning_of_year)
+end_of_year (at_end_of_year)
+years_ago
+years_since
+prev_year (last_year)
+next_year
+</pre>
+    </div>
+    <p>Следующие методы переопределены, поэтому <strong>не</strong> нужно загружать <code>active_support/core_ext/date/calculations.rb</code>
+        для них:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+beginning_of_day (midnight, at_midnight, at_beginning_of_day)
+end_of_day
+ago
+since (in)
+</pre>
+    </div>
+    <p>С другой стороны, <code>advance</code> и <code>change</code> также определяются и
+        поддерживают больше опций, чем было сказано .</p>
+    <p>Следующие методы реализованы только в
+        <code>active_support/core_ext/date_time/calculations.rb</code>, так как они имеют смысл
+        только при использовании с экземпляром <code>DateTime</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+beginning_of_hour (at_beginning_of_hour)
+end_of_hour
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="imenovannye-datetime"> Именованные Datetime</h5>
+    <h6 class="inside_page_header" id="datetime-current"><code>DateTime.current</code>
+    </h6>
+    <p>Active Support определяет <code>DateTime.current</code> похожим на
+        <code>Time.now.to_datetime</code>, за исключением того, что он учитывает временную зону
+        пользователя, если она определена. Он также определяет условия экземпляра <code>past?</code>
+        и <code>future?</code> относительно <code>DateTime.current</code>.</p>
+    <h5 class="inside_page_header" id="drugie-rasshireniya"> Другие расширения</h5>
+    <h6 class="inside_page_header" id="seconds_since_midnight"><code>seconds_since_midnight</code>
+    </h6>
+    <p>Метод <code>seconds_since_midnight</code> возвращает число секунд, прошедших с полуночи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = DateTime.current     # =&gt; Mon, 07 Jun 2010 20:26:36 +0000
+now.seconds_since_midnight # =&gt; 73596
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="utc"><code>utc</code>
+    </h6>
+    <p>Метод <code>utc</code> выдает те же дату и время получателя, выраженную в UTC.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = DateTime.current # =&gt; Mon, 07 Jun 2010 19:27:52 -0400
+now.utc                # =&gt; Mon, 07 Jun 2010 23:27:52 +0000
+</pre>
+    </div>
+    <p>У этого метода также есть псевдоним <code>getutc</code>.</p>
+    <h6 class="inside_page_header" id="utc"><code>utc?</code>
+    </h6>
+    <p>Условие <code>utc?</code> говорит, имеет ли получатель UTC как его временную зону:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = DateTime.now # =&gt; Mon, 07 Jun 2010 19:30:47 -0400
+now.utc?           # =&gt; false
+now.utc.utc?       # =&gt; true
+</pre>
+    </div>
+    <h6 class="inside_page_header" id="date-time-advance"><code>advance</code>
+    </h6>
+    <p>Более обычным способом перейти к другим дате и времени является <code>advance</code>. Этот
+        метод получает хэш с ключами <code>:years</code>, <code>:months</code>, <code>:weeks</code>,
+        <code>:days</code>, <code>:hours</code>, <code>:minutes</code> и <code>:seconds</code>, и
+        возвращает дату и время, передвинутые на столько, на сколько указывают существующие ключи.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = DateTime.current
+# =&gt; Thu, 05 Aug 2010 11:33:31 +0000
+d.advance(years: 1, months: 1, days: 1, hours: 1, minutes: 1, seconds: 1)
+# =&gt; Tue, 06 Sep 2011 12:34:32 +0000
+</pre>
+    </div>
+    <p>Этот метод сначала вычисляет дату назначения, передавая <code>:years</code>,
+        <code>:months</code>, <code>:weeks</code> и <code>:days</code> в <code>Date#advance</code>,
+        описанный . После этого, он корректирует время, вызвав <code>since</code> с количеством
+        секунд, на которое нужно передвинуть. Этот порядок обоснован, другой порядок мог бы дать
+        другие дату и время в некоторых крайних случаях. Применим пример в <code>Date#advance</code>,
+        и расширим его, показав обоснованность порядка, применимого к битам времени.</p>
+    <p>Если сначала передвинуть биты даты (относительный порядок вычисления, показанный ранее), а
+        затем биты времени, мы получим для примера следующее вычисление:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d = DateTime.new(2010, 2, 28, 23, 59, 59)
+# =&gt; Sun, 28 Feb 2010 23:59:59 +0000
+d.advance(months: 1, seconds: 1)
+# =&gt; Mon, 29 Mar 2010 00:00:00 +0000
+</pre>
+    </div>
+    <p>но если мы вычисляем обратным способом, результат будет иным:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+d.advance(seconds: 1).advance(months: 1)
+# =&gt; Thu, 01 Apr 2010 00:00:00 +0000
+</pre>
+    </div>
+    <div class="warning"><p>Поскольку <code>DateTime</code> не знает о переходе на летнее время,
+        можно получить несуществующий момент времени без каких либо предупреждений или ошибок об
+        этом.</p></div>
+    <h5 class="inside_page_header" id="izmenenie-komponentov"> Изменение компонентов</h5>
+    <p>Метод <code>change</code> позволяет получить новые дату и время, которая идентична
+        получателю, за исключением заданных опций, включающих <code>:year</code>,
+        <code>:month</code>, <code>:day</code>, <code>:hour</code>, <code>:min</code>,
+        <code>:sec</code>, <code>:offset</code>, <code>:start</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = DateTime.current
+# =&gt; Tue, 08 Jun 2010 01:56:22 +0000
+now.change(year: 2011, offset: Rational(-6, 24))
+# =&gt; Wed, 08 Jun 2011 01:56:22 +0600
+</pre>
+    </div>
+    <p>Если часы обнуляются, то минуты и секунды тоже (если у них не заданы значения):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now.change(hour: 0)
+# =&gt; Tue, 08 Jun 2010 00:00:00 +0000
+</pre>
+    </div>
+    <p>Аналогично, если минуты обнуляются, то секунды тоже (если у них не задано значение):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now.change(min: 0)
+# =&gt; Tue, 08 Jun 2010 01:00:00 +0000
+</pre>
+    </div>
+    <p>Этот метод не принимает несуществующие даты, если изменение невалидно, вызывается <code>ArgumentError</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+DateTime.current.change(month: 2, day: 30)
+# =&gt; ArgumentError: invalid date
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="dlitelnosti"> Длительности</h5>
+    <p>Длительности могут добавляться и вычитаться из даты и времени:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = DateTime.current
+# =&gt; Mon, 09 Aug 2010 23:15:17 +0000
+now + 1.year
+# =&gt; Tue, 09 Aug 2011 23:15:17 +0000
+now - 1.week
+# =&gt; Mon, 02 Aug 2010 23:15:17 +0000
+</pre>
+    </div>
+    <p>Это переводится в вызовы <code>since</code> или <code>advance</code>. Для примера выполним
+        корректный переход во время календарной реформы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+DateTime.new(1582, 10, 4, 23) + 1.hour
+# =&gt; Fri, 15 Oct 1582 00:00:00 +0000
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-time"> Расширения для <code>Time</code>
+    </h3>
+    <h4 class="inside_page_header" id="vychisleniya"> Вычисления</h4>
+    <div class="note"><p>Все следующие методы определены в <code>active_support/core_ext/time/calculations.rb</code>.
+    </p></div>
+    <p>Active Support добавляет к <code>Time</code> множество методов, доступных для
+        <code>DateTime</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+past?
+today?
+future?
+yesterday
+tomorrow
+seconds_since_midnight
+change
+advance
+ago
+since (in)
+beginning_of_day (midnight, at_midnight, at_beginning_of_day)
+end_of_day
+beginning_of_hour (at_beginning_of_hour)
+end_of_hour
+beginning_of_week (at_beginning_of_week)
+end_of_week (at_end_of_week)
+monday
+sunday
+weeks_ago
+prev_week (last_week)
+next_week
+months_ago
+months_since
+beginning_of_month (at_beginning_of_month)
+end_of_month (at_end_of_month)
+prev_month (last_month)
+next_month
+beginning_of_quarter (at_beginning_of_quarter)
+end_of_quarter (at_end_of_quarter)
+beginning_of_year (at_beginning_of_year)
+end_of_year (at_end_of_year)
+years_ago
+years_since
+prev_year (last_year)
+next_year
+</pre>
+    </div>
+    <p>Это аналоги. Обратитесь к их документации в предыдущих разделах, но примите во внимание
+        следующие различия:</p>
+    <ul>
+        <li>
+            <code>change</code> принимает дополнительную опцию <code>:usec</code>.
+        </li>
+        <li>
+            <code>Time</code> понимает летнее время (DST), поэтому вы получите правильные вычисления
+            времени как тут:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Time.zone_default
+# =&gt; #&lt;ActiveSupport::TimeZone:0x7f73654d4f38 @utc_offset=nil, @name="Madrid", ...&gt;
+# В Барселоне, 2010/03/28 02:00 +0100 становится 2010/03/28 03:00 +0200 благодаря переходу на летнее время.
+t = Time.local(2010, 3, 28, 1, 59, 59)
+# =&gt; Sun Mar 28 01:59:59 +0100 2010
+t.advance(seconds: 1)
+# =&gt; Sun Mar 28 03:00:00 +0200 2010
+</pre>
+    </div>
+    <ul>
+        <li>Если <code>since</code> или <code>ago</code> перепрыгивает на время, которое не может
+            быть выражено с помощью <code>Time</code>, вместо него возвращается объект <code>DateTime</code>.
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="time-current"><code>Time.current</code>
+    </h5>
+    <p>Active Support определяет <code>Time.current</code> как сегодняшний день в текущей временной
+        зоне. Он похож на <code>Time.now</code>, за исключением того, что он учитывает временную
+        зону пользователя, если она определена. Он также определяет условия экземпляра
+        <code>past?</code>, <code>today?</code> и <code>future?</code>, все они относительны к
+        <code>Time.current</code>.</p>
+    <p>При осуществлении сравнения Time с использованием методов, учитывающих временную зону
+        пользователя, убедитесь, что используете <code>Time.current</code> вместо
+        <code>Time.now</code>. Есть случаи, когда временная зона пользователя может быть в будущем
+        по сравнению с временной зоной системы, в которой по умолчанию используется
+        <code>Time.now</code>. Это означает, что <code>Time.now.to_date</code> может быть равным
+        <code>Date.yesterday</code>.</p>
+    <h5 class="inside_page_header" id="all_day-all_week-all_month-all_quarter-i-all_year"><code>all_day</code>,
+        <code>all_week</code>, <code>all_month</code>, <code>all_quarter</code> и
+        <code>all_year</code>
+    </h5>
+    <p>Метод <code>all_day</code> возвращает интервал, представляющий целый день для текущего
+        времени.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = Time.current
+# =&gt; Mon, 09 Aug 2010 23:20:05 UTC +00:00
+now.all_day
+# =&gt; Mon, 09 Aug 2010 00:00:00 UTC +00:00..Mon, 09 Aug 2010 23:59:59 UTC +00:00
+</pre>
+    </div>
+    <p>Аналогично <code>all_week</code>, <code>all_month</code>, <code>all_quarter</code> и <code>all_year</code>
+        служат целям создания временных интервалов.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = Time.current
+# =&gt; Mon, 09 Aug 2010 23:20:05 UTC +00:00
+now.all_week
+# =&gt; Mon, 09 Aug 2010 00:00:00 UTC +00:00..Sun, 15 Aug 2010 23:59:59 UTC +00:00
+now.all_week(:sunday)
+# =&gt; Sun, 16 Sep 2012 00:00:00 UTC +00:00..Sat, 22 Sep 2012 23:59:59 UTC +00:00
+now.all_month
+# =&gt; Sat, 01 Aug 2010 00:00:00 UTC +00:00..Tue, 31 Aug 2010 23:59:59 UTC +00:00
+now.all_quarter
+# =&gt; Thu, 01 Jul 2010 00:00:00 UTC +00:00..Thu, 30 Sep 2010 23:59:59 UTC +00:00
+now.all_year
+# =&gt; Fri, 01 Jan 2010 00:00:00 UTC +00:00..Fri, 31 Dec 2010 23:59:59 UTC +00:00
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="konstruktory-time"> Конструкторы Time</h4>
+    <p>Active Support определяет <code>Time.current</code> как <code>Time.zone.now</code>, если у
+        пользователя определена временная зона, а иначе <code>Time.now</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Time.zone_default
+# =&gt; #&lt;ActiveSupport::TimeZone:0x7f73654d4f38 @utc_offset=nil, @name="Madrid", ...&gt;
+Time.current
+# =&gt; Fri, 06 Aug 2010 17:11:58 CEST +02:00
+</pre>
+    </div>
+    <p>Как и у <code>DateTime</code>, условия <code>past?</code> и <code>future?</code> выполняются
+        относительно <code>Time.current</code>.</p>
+    <p>Если время, подлежащее конструированию лежит за рамками, поддерживаемыми <code>Time</code> на
+        запущенной платформе, usecs отбрасываются и вместо этого возвращается объект
+        <code>DateTime</code>.</p>
+    <h5 class="inside_page_header" id="dlitelnosti"> Длительности</h5>
+    <p>Длительности могут быть добавлены и вычтены из объектов времени:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+now = Time.current
+# =&gt; Mon, 09 Aug 2010 23:20:05 UTC +00:00
+now + 1.year
+#  =&gt; Tue, 09 Aug 2011 23:21:11 UTC +00:00
+now - 1.week
+# =&gt; Mon, 02 Aug 2010 23:21:11 UTC +00:00
+</pre>
+    </div>
+    <p>Это переводится в вызовы <code>since</code> или <code>advance</code>. Для примера выполним
+        корректный переход во время календарной реформы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Time.utc(1582, 10, 3) + 5.days
+# =&gt; Mon Oct 18 00:00:00 UTC 1582
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-file"> Расширения для <code>File</code>
+    </h3>
+    <h4 class="inside_page_header" id="atomic_write"><code>atomic_write</code>
+    </h4>
+    <p>С помощью метода класса <code>File.atomic_write</code> можно записать в файл способом,
+        предотвращающим от просмотра недописанного содержимого.</p>
+    <p>Имя файла передается как аргумент, и в метод вкладываются обработчики файла, открытого для
+        записи. Как только блок выполняется, <code>atomic_write</code> закрывает файл и завершает
+        свою работу.</p>
+    <p>Например, Action Pack использует этот метод для записи активных файлов кэша, таких как <code>all.css</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+File.atomic_write(joined_asset_path) do |cache|
+  cache.write(join_asset_file_contents(asset_paths))
+end
+</pre>
+    </div>
+    <p>Для выполнения этого <code>atomic_write</code> создает временный файл. Фактически код в блоке
+        пишет в этот файл. При выполнении временный файл переименовывается, что является атомарной
+        операцией в системах POSIX. Если целевой файл существует, <code>atomic_write</code>
+        перезаписывает его и сохраняет владельцев и права. Однако в некоторых случаях <code>atomic_write</code>
+        не может изменить владельца или права на файл, эта ошибка отлавливается и пропускается,
+        позволяя файловой системе убедиться, что файл доступен для необходимых действий.</p>
+    <div class="note"><p>Благодаря операции chmod, выполняемой <code>atomic_write</code>, если у
+        целевого файла установлен ACL, то этот ACL будет пересчитан/изменен.</p></div>
+    <div class="warning"><p>Отметьте, что с помощью <code>atomic_write</code> нельзя дописывать.</p>
+    </div>
+    <p>Вспомогательный файл записывается в стандартной директории для временных файлов, но можно
+        передать эту директорию как второй аргумент.</p>
+    <div class="note"><p>Определено в <code>active_support/core_ext/file/atomic.rb</code>.</p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-marshal"> Расширения для
+        <code>Marshal</code></h3>
+    <h4 class="inside_page_header" id="load"><code>load</code>
+    </h4>
+    <p>Active Support добавляет поддержку постоянной автозагрузки для <code>load</code>.</p>
+    <p>Например, хранилище кэша в файле десериализует следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+File.open(file_name) { |f| Marshal.load(f) }
+</pre>
+    </div>
+    <p>Если закэшированные данные обращаются к константе, которая неизвестна в данный момент,
+        включается механизм автозагрузки и, если он успешен, перевыполняется десериализация.</p>
+    <div class="warning"><p>Если аргумент <code>IO</code>, необходимо, чтобы он отвечал на <code>rewind</code>,
+        чтобы быть способным на повтор. Обычные файлы отвечают на <code>rewind</code>.</p></div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/marshal.rb</code>.</p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-nameerror"> Расширения для
+        <code>NameError</code></h3>
+    <p>Active Support добавляет <code>missing_name?</code> к <code>NameError</code>, который
+        тестирует было ли исключение вызвано в связи с тем, что имя было передано как аргумент.</p>
+    <p>Имя может быть задано как символ или строка. Символ тестируется как простое имя константы,
+        строка - как полное имя константы.</p>
+    <div class="info"><p>Символ может представлять полное имя константы как <code>:"ActiveRecord::Base"</code>,
+        такое поведение для символов определено для удобства, а не потому, что такое возможно
+        технически.</p></div>
+    <p>К примеру, когда вызывается экшн <code>ArticlesController</code>, Rails пытается оптимистично
+        использовать <code>ArticlesHelper</code>. Это нормально, когда не существует модуля хелпера,
+        поэтому если вызывается исключение для этого имени константы, оно должно молчать. Но в
+        случае, если <code>articles_helper.rb</code> вызывает <code>NameError</code> благодаря
+        неизвестной константе, оно должно быть перевызвано. Метод <code>missing_name?</code>
+        предоставляет способ проведения различия в этих двух случаях:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def default_helper_module!
+  module_name = name.sub(/Controller$/, '')
+  module_path = module_name.underscore
+  helper module_path
+rescue LoadError =&gt; e
+  raise e unless e.is_missing? "helpers/#{module_path}_helper"
+rescue NameError =&gt; e
+  raise e unless e.missing_name? "#{module_name}Helper"
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/name_error.rb</code>.</p></div>
+    <h3 class="inside_page_header" id="rasshireniya-dlya-loaderror"> Расширения для
+        <code>LoadError</code></h3>
+    <p>Active Support добавляет <code>is_missing?</code> к <code>LoadError</code>.</p>
+    <p>Для заданного имени пути <code>is_missing?</code> тестирует, будет ли вызвано исключение
+        из-за определенного файла (за исключением файлов с расширением ".rb").</p>
+    <p>Например, когда вызывается экшн <code>ArticlesController</code>, Rails пытается загрузить
+        <code>articles_helper.rb</code>, но этот файл может не существовать. Это нормально, модуль
+        хелпера не обязателен, поэтому Rails умалчивает ошибку загрузки. Но может быть случай, что
+        модуль хелпера существует, и в свою очередь требует другую библиотеку, которая отсутствует.
+        В этом случае Rails должен вызвать исключение. Метод <code>is_missing?</code> предоставляет
+        способ проведения различия в этих двух случаях:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def default_helper_module!
+  module_name = name.sub(/Controller$/, '')
+  module_path = module_name.underscore
+  helper module_path
+rescue LoadError =&gt; e
+  raise e unless e.is_missing? "helpers/#{module_path}_helper"
+rescue NameError =&gt; e
+  raise e unless e.missing_name? "#{module_name}Helper"
+end
+</pre>
+    </div>
+    <div class="note"><p>Определено в <code>active_support/core_ext/load_error.rb</code>.</p></div>
+
+</body>
+</html>

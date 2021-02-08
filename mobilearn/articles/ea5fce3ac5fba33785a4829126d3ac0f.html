@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Руководство по обновлению Ruby on Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rukovodstvo-po-obnovleniyu-ruby-on-rails"> Руководство по
+        обновлению Ruby on Rails</h2>
+    <p>Это руководство раскрывает шаги, которые нужно сделать, чтобы обновить свое приложение на
+        новую версию Ruby on Rails. Эти шаги также доступны в отдельных руководствах по релизам.</p>
+    <h3 class="inside_page_header" id="obschiy-sovet"> Общий совет</h3>
+    <p>Перед попыткой обновить существующее приложение, сперва следует убедиться, что есть хорошая
+        причина для обновления. Нужно соблюсти баланс между несколькими факторами: необходимостью в
+        новых особенностях, увеличением сложности в поиске поддержки для старого кода, доступностью
+        вашего времени и навыков - это только некоторые из многих.</p>
+    <h4 class="inside_page_header" id="testovoe-pokrytie"> Тестовое покрытие</h4>
+    <p>Лучшим способом убедиться, что ваше приложение продолжает работать после обновления, это
+        иметь хорошее тестовое покрытие до начала обновления. Если у вас нет автоматических тестов,
+        проверяющих большую часть вашего приложения, тогда нужно потратить время, проверяя все
+        части, которые изменились. В случае обновления Rails это означает каждый отдельный кусок
+        функционала приложения. Пожалейте себя и убедитесь в хорошем тестовом покрытии <em>до</em>
+        начала обновления.</p>
+    <h4 class="inside_page_header" id="versii-ruby"> Версии Ruby</h4>
+    <p>В основном Rails использует последние выпущенные версии Ruby:</p>
+    <ul>
+        <li>Rails 5 требует Ruby 2.2.2 или новее.
+        </li>
+        <li>Rails 4 предпочитает Ruby 2.0 и требует Ruby 1.9.3 или новее.
+        </li>
+        <li>Rails 3.2.x это последняя ветка с поддержкой Ruby 1.8.7.
+        </li>
+        <li>Rails 3 и выше требует Ruby 1.8.7 или выше. Поддержка всех прежних версий Ruby была
+            официально прекращена. Следует обновиться как можно быстрее.
+        </li>
+    </ul>
+    <div class="info"><p>В Ruby 1.8.7 p248 и p249 имеются ошибки маршализации, ломающие Rails. Хотя
+        в Ruby Enterprise Edition это было исправлено, начиная с релиза 1.8.7-2010.02. В ветке 1.9,
+        Ruby 1.9.1 не пригоден к использованию, поскольку он иногда вылетает, поэтому, если хотите
+        использовать 1.9.x перепрыгивайте сразу на 1.9.3 для гладкой работы.</p></div>
+    <h4 class="inside_page_header" id="zadacha-rake"> Задача Rake</h4>
+    <p>Rails предоставляет задачу rake <code>rails:update</code>. После обновления версии Rails в
+        Gemfile, запустите эту задачу rake. Она поможет вам с созданием новых файлов и изменением
+        старых файлов в интерактивной сессии.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake rails:update
+   identical  config/boot.rb
+       exist  config
+    conflict  config/routes.rb
+Overwrite /myapp/config/routes.rb? (enter "h" for help) [Ynaqdh]
+       force  config/routes.rb
+    conflict  config/application.rb
+Overwrite /myapp/config/application.rb? (enter "h" for help) [Ynaqdh]
+       force  config/application.rb
+    conflict  config/environment.rb
+...
+</pre>
+    </div>
+    <p>Не забывайте просматривать разницу, чтобы увидеть какие-либо неожидаемые изменения.</p>
+    <h3 class="inside_page_header" id="upgrading-from-rails-4-2-to-rails-5-0"> Обновление с Rails
+        4.2 на Rails 5.0</h3>
+    <h4 class="inside_page_header" id="preryvanie-tsepochek-kolbekov-vozvraschaya-false"> Прерывание
+        цепочек колбэков, возвращая <code>false</code>
+    </h4>
+    <p>В Rails 4.2 в Active Record и Active Model, когда колбэк 'before' возвращает
+        <code>false</code>, вся цепочка цепочка колбэков прерывалась. Другими словами, последующие
+        колбэки 'before' не выполнялись, как и действие, обернутое в колбэки.</p>
+    <p>В Rails 5.0, возврат <code>false</code> колбэком Active Record или Active Model не будет
+        иметь этого побочного эффекта прерывания цепочки колбэков. Вместо этого, цепочки колбэков
+        должны быть явно прерваны вызовом <code>throw(:abort)</code>.</p>
+    <p>При обновлении с Rails 4.2 на Rails 5.0, возврат <code>false</code> в этих типах колбэков все
+        еще будет прерывать цепочку колбэков, но вы получите предостережение об устаревании об этом
+        грядущем изменении.</p>
+    <p>Когда вы будете готовы, можно переключиться на новое поведение и убрать предостережение об
+        устаревании, добавив следующую конфигурацию в <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+ActiveSupport.halt_callback_chains_on_return_false = false
+</pre>
+    </div>
+    <p>Отметим, что эта опция не влияет на колбэки Active Support, так как они никогда не
+        прерывались в зависимости от возвращаемого значения.</p>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header"
+        id="activejob-teper-po-umolchaniyu-nasleduetsya-ot-applicationjob"> ActiveJob теперь по
+        умолчанию наследуется от ApplicationJob</h4>
+    <p>В Rails 4.2 ActiveJob наследуется от <code>ActiveJob::Base</code>. В Rails 5.0 это поведение
+        было изменено на наследование от <code>ApplicationJob</code>.</p>
+    <p>При обновлении с Rails 4.2 на Rails 5.0 необходимо создать файл
+        <code>application_job.rb</code> в <code>app/jobs/</code> со следующим содержимым:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+class ApplicationJob &lt; ActiveJob::Base
+end
+</pre>
+    </div>
+    <p>Затем убедитесь, что все классы задач наследуются от него.</p>
+    <p>За подробностями обратитесь к .</p>
+    <h3 class="inside_page_header" id="upgrading-from-rails-4-1-to-rails-4-2"> Обновление с Rails
+        4.1 на Rails 4.2</h3>
+    <h4 class="inside_page_header" id="web-console"> Web Console</h4>
+    <p>Сначала добавьте <code>gem 'web-console', '~&gt; 2.0'</code> в группу
+        <code>:development</code> своего Gemfile и запустите <code>bundle install</code> (он не
+        включится при обновлении Rails). Как только он будет установлен, можно просто оставлять
+        обращение к хелперу консоли (т.е., <code>&lt;%= console %&gt;</code>) в любой вьюхе, в
+        которой вы ее хотите включить. Консоль также предоставляется на любой странице ошибок в
+        среде development.</p>
+    <h4 class="inside_page_header" id="responders"> Responders</h4>
+    <p>Метод <code>respond_with</code> и метод класса <code>respond_to</code> были извлечены в гем
+        <code>responders</code>. Для их использования просто добавьте <code>gem 'responders', '~&gt;
+            2.0'</code> в свой Gemfile. Вызовы <code>respond_with</code> и <code>respond_to</code>
+        (на уровне класса) больше не будут работать без подключения гема <code>responders</code> к
+        зависимостям:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/controllers/users_controller.rb
+class UsersController &lt; ApplicationController
+  respond_to :html, :json
+  def show
+    @user = User.find(params[:id])
+    respond_with @user
+  end
+end
+</pre>
+    </div>
+    <p>Метод экземпляра <code>respond_to</code> не затронут и не требует дополнительного гема:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/controllers/users_controller.rb
+class UsersController &lt; ApplicationController
+  def show
+    @user = User.find(params[:id])
+    respond_to do |format|
+      format.html
+      format.json { render json: @user }
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Подробнее смотрите .</p>
+    <h4 class="inside_page_header" id="obrabotka-oshibok-v-tranzaktsionnyh-kolbekah"> Обработка
+        ошибок в транзакционных колбэках</h4>
+    <p>В настоящий момент Active Record замалчивает ошибки, вызванные в колбэках <code>after_rollback</code>
+        или <code>after_commit</code>, и только пишет их в логи. В следующей версии эти ошибки
+        больше не будут замалчиваться. Вместо этого ошибки будут распространяться обычным образом,
+        как в других колбэках Active
+        Record.</p>
+    <p>При определении колбэка <code>after_rollback</code> или <code>after_commit</code> вы получите
+        предупреждение об устаревании об этом предстоящем изменении. Когда будете готовы, можно
+        будет переключиться на новое поведение и убрать предупреждение об устаревании с помощью
+        следующей настройки в вашем <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+config.active_record.raise_in_transactional_callbacks = true
+</pre>
+    </div>
+    <p>Подробнее смотрите в и .</p>
+    <h4 class="inside_page_header" id="uporyadochivanie-testovyh-sluchaev"> Упорядочивание тестовых
+        случаев</h4>
+    <p>В Rails 5.0 тестовые случаи будут по умолчанию запускаться в случайном порядке. В
+        предвкушении этого изменения Rails 4.2 представил новую конфигурационную опцию <code>active_support.test_order</code>
+        для явного указания упорядочивания тестов. Это позволит вам или заблокировать текущее
+        поведение, установив этой опции <code>:sorted</code>, или переключиться на будущее
+        поведение, установив этой опции <code>:random</code>.</p>
+    <p>Если не установить значение для этой опции, будет сформировано сообщение об устаревании.
+        Чтобы его избежать, добавьте следующую строчку в своей тестовой среде:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/environments/test.rb
+Rails.application.configure do
+  config.active_support.test_order = :sorted # или `:random`, если хотите
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="serializovannye-atributy"> Сериализованные атрибуты</h4>
+    <p>При использовании произвольного кодировщика (например, <code>serialize :metadata, JSON</code>),
+        назначение <code>nil</code> сериализованному атрибуту сохранит его в базу данных как <code>NULL</code>,
+        вместо того, чтобы пропустить значение <code>nil</code> через кодировщик (например, <code>"null"</code>
+        при использовании кодировщика <code>JSON</code>).</p>
+    <h4 class="inside_page_header" id="uroven-loga-v-production"> Уровень лога в Production</h4>
+    <p>В Rails 5 по умолчанию уровень лога для среды production будет изменен на <code>:debug</code>
+        (с <code>:info</code>). Для сохранения текущего уровня по умолчанию, добавьте следующую
+        строчку в свой <code>production.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Установите `:info`, соответствующий текущему значению по умолчанию, или
+# ecnfyjdbnt `:debug` для переключения в будущее значение по умолчанию.
+config.log_level = :info
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="after_bundle-v-shablonah-rails"><code>after_bundle</code> в
+        шаблонах Rails</h4>
+    <p>Если у вас есть шаблон Rails, добавляющий все файлы в систему контроля версии, у него не
+        получится добавить сгенерированные binstubs, так как это происходит до Bundler:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# template.rb
+generate(:scaffold, "person name:string")
+route "root to: 'people#index'"
+rake("db:migrate")
+git :init
+git add: "."
+git commit: %Q{ -m 'Initial commit' }
+</pre>
+    </div>
+    <p>Теперь можно обернуть вызовы <code>git</code> в блок <code>after_bundle</code>. Он запустится
+        после того, как будут сгенерированы binstubs.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# template.rb
+generate(:scaffold, "person name:string")
+route "root to: 'people#index'"
+rake("db:migrate")
+after_bundle do
+  git :init
+  git add: "."
+  git commit: %Q{ -m 'Initial commit' }
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sanitayzer-html-v-rails"> Санитайзер HTML в Rails</h4>
+    <p>Появился выбор для санации фрагментов HTML в вашем приложении. Старый подход сканирования
+        html официально устарел в пользу .</p>
+    <p>Это означает, что методы <code>sanitize</code>, <code>sanitize_css</code>,
+        <code>strip_tags</code> и <code>strip_links</code> теперь реализованы по-новому.</p>
+    <p>Новый санитайзер внутри использует . Loofah, в свою очередь, использует Nokogiri, который
+        является оберткой для парсеров, написанных на C и Java, таким образом, санирование должно
+        стать быстрее, вне зависимости от того, на какой версии Ruby она запущена.</p>
+    <p>Новая версия обновляет <code>sanitize</code> таким образом, что он может принимать <code>Loofah::Scrubber</code>
+        для мощной очистки. .</p>
+    <p>Также добавлены два новых скрабера: <code>PermitScrubber</code> и <code>TargetScrubber</code>.
+        Подробнее читайте в .</p>
+    <p>Документация для <code>PermitScrubber</code> и <code>TargetScrubber</code> объясняет, как
+        можно получить полный контроль над тем, когда и как элементы должны быть отброшены.</p>
+    <p>Если вашему приложению необходима реализация старого санитайзера, включите <code>rails-deprecated_sanitizer</code>
+        в свой Gemfile:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'rails-deprecated_sanitizer'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="testirovanie-dom-v-rails"> Тестирование DOM в Rails</h4>
+    <p> (содержащий методы, такие как <code>assert_tag</code>), в пользу методов
+        <code>assert_select</code> из модуля <code>SelectorAssertions</code>, который был извлечен в
+        .</p>
+    <h4 class="inside_page_header" id="maskirovka-tokenov-autentifikatsii"> Маскировка токенов
+        аутентификации</h4>
+    <p>В целях уменьшения атак SSL, <code>form_authenticity_token</code> теперь маскируется так, что
+        он изменяется с каждым запросом. Таким образом, токены проверяются демаскируясь, а затем
+        дешифруясь. Как последствие, любые стратегии проверки запросов из не-rails форм, которые
+        полагались на статичный для сессии токен CSRF, должны принять это во внимание.</p>
+    <h4 class="inside_page_header" id="action-mailer"> Action Mailer</h4>
+    <p>Раньше вызов метода рассыльщика на классе рассыльщика приводил к непосредственному запуску
+        соответствующего метода экземпляра. С представлением Active Job и
+        <code>#deliver_later</code>, это больше не так. В Rails 4.2 вызов методов экземпляра
+        откладывается, пока не будут вызваны методы <code>deliver_now</code> или
+        <code>deliver_later</code>. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Notifier &lt; ActionMailer::Base
+  def notify(user, ...)
+    puts "Called"
+    mail(to: user.email, ...)
+  end
+end
+mail = Notifier.notify(user, ...) # Notifier#notify в этом месте пока еще не вызван
+mail = mail.deliver_now           # Напишет "Called"
+</pre>
+    </div>
+    <p>Это не должно привести к каким-либо значимым изменениям для большинства приложений. Однако,
+        если вам необходимо синхронно запустить некоторые не рассылающие методы, и раньше вы
+        полагались на синхронное проксирующее поведение, вам следует объявить их как методы
+        класса:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Notifier &lt; ActionMailer::Base
+  def self.broadcast_notifications(users, ...)
+    users.each { |user| Notifier.notify(user, ...) }
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="podderzhka-vneshnih-klyuchey"> Поддержка внешних ключей</h4>
+    <p>DSL миграций был расширен поддержкой определений внешнего ключа. Если вы использовали гем
+        Foreigner, рассмотрите его удаление. Отметьте, что поддержка внешних ключей в Rails это
+        подмножество Foreigner. Это означает, что не каждое определение Foreigner может быть
+        полностью заменено его аналогом DSL миграций Rails.</p>
+    <p>Процедура миграции следующая:</p>
+    <ul>
+        <li>убрать <code>gem "foreigner"</code> из Gemfile.
+        </li>
+        <li>запустить <code>bundle install</code>.
+        </li>
+        <li>запустить <code>bin/rake db:schema:dump</code>.
+        </li>
+        <li>убедиться, что <code>db/schema.rb</code> содержит каждое определение внешнего ключа с
+            необходимыми опциями.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="upgrading-from-rails-4-0-to-rails-4-1"> Обновление с Rails
+        4.0 на Rails 4.1</h3>
+    <h4 class="inside_page_header" id="zaschita-csrf-ot-vneshnih-tegov-lt-script-gt"> Защита CSRF от
+        внешних тегов <code>&lt;script&gt;</code>
+    </h4>
+    <p>Или, "а-а-а-а, почему мои тесты падают!!!?", или "мой виджет <code>&lt;script&gt;</code>
+        сломался!!"</p>
+    <p>Защита от подделки межсайтовых запросов (CSRF) сейчас также покрывает GET запросы с откликами
+        JavaScript. Это предотвращает посторонним сайтам ссылаться на ваши Javascript с помощью тега
+        <code>&lt;script&gt;</code> для извлечения конфиденциальных данных.</p>
+    <p>Это означает, что ваши функциональные и интеграционные тесты, использующие</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get :index, format: :js
+</pre>
+    </div>
+    <p>теперь будут вызывать защиту CSRF. Переключитесь на</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+xhr :get, :index, format: :js
+</pre>
+    </div>
+    <p>чтобы явно тестировать <code>XmlHttpRequest</code>.</p>
+    <p>Note: Ваши собственные теги <code>&lt;script&gt;</code> трактуются как межсайтовые и по
+        умолчанию также блокируются. Если вы действительно хотите загружать JavaScript в тегах
+        <code>&lt;script&gt;</code>, теперь нужно явно отключить защиту CSRF для этого экшна.</p>
+    <h4 class="inside_page_header" id="spring"> Spring</h4>
+    <p>Если хотите использовать Spring в качестве прелоадера своего приложения, вам необходимо:</p>
+    <ul>
+        <li>Добавить <code>gem 'spring', group: :development</code> в свой <code>Gemfile</code>.
+        </li>
+        <li>Установить spring с помощью <code>bundle install</code>.
+        </li>
+        <li>Прокачать свои binstub с помощью <code>bundle exec spring binstub --all</code>.
+        </li>
+    </ul>
+    <div class="note"><p>Пользовательские задачи rake по умолчанию будут запущены в окружении <code>development</code>.
+        Если хотите запускать их в других средах, проконсультируйтесь со .</p></div>
+    <h4 class="inside_page_header" id="config-secrets-yml"><code>config/secrets.yml</code>
+    </h4>
+    <p>Если хотите использовать новое соглашение по хранению секретных данных вашего приложения в
+        <code>secrets.yml</code>, вам необходимо:</p>
+    <ul>
+        <li>
+            <p>Создать файл <code>secrets.yml</code> в директории <code>config</code> со следующим
+                содержимым:</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+development:
+  secret_key_base:
+test:
+  secret_key_base:
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+</pre>
+            </div>
+        </li>
+        <li><p>Использовать существующий <code>secret_key_base</code> из инициализатора <code>secret_token.rb</code>,
+            чтобы установить переменную среды SECRET_KEY_BASE для всех пользователей, под которыми
+            запускается приложение Rails в среде production. Альтернативно, можно просто скопировать
+            существующий <code>secret_key_base</code> из инициализатора <code>secret_token.rb</code>
+            в <code>secrets.yml</code> в секцию <code>production</code>, заменив '&lt;%=
+            ENV["SECRET_KEY_BASE"] %&gt;'.</p></li>
+        <li><p>Убрать инициализатор <code>secret_token.rb</code>.</p></li>
+        <li><p>Использовать <code>rake secret</code> для генерации ключей для секций <code>development</code>
+            и <code>test</code>.</p></li>
+        <li><p>Перезапустить сервер.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="izmeneniya-v-testovom-helpere"> Изменения в тестовом
+        хелпере</h4>
+    <p>Если ваш тестовый хелпер содержит вызов <code>ActiveRecord::Migration.check_pending!</code>,
+        его можно убрать. Проверка теперь выполняется автоматически при <code>require
+            'rails/test_help'</code>, хотя наличие этой строчки в вашим хелпере ничему не навредит.
+    </p>
+    <h4 class="inside_page_header" id="cookies-serializer"> Сериализатор куки</h4>
+    <p>Приложения, созданные до Rails 4.1, используют <code>Marshal</code> для сериализации значений
+        куки при хранении подписанных и зашифрованных куки. Если хотите использовать новый,
+        основанный на <code>JSON</code>, формат, можно добавить файл инициализатора со следующим
+        содержимым:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.config.action_dispatch.cookies_serializer = :hybrid
+</pre>
+    </div>
+    <p>Он прозрачно мигрирует ваши существующие куки, сериализованные <code>Marshal</code>, в новый
+        формат, основанный на <code>JSON</code>.</p>
+    <p>При использовании сериализатора <code>:json</code> или <code>:hybrid</code>, следует иметь в
+        виду, что не все объекты Ruby могут быть сериализованы в JSON. Например, объекты
+        <code>Date</code> и <code>Time</code> будут сериализованы как строки, и у хэшей ключи будут
+        преобразованы в строки.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CookiesController &lt; ApplicationController
+  def set_cookie
+    cookies.encrypted[:expiration_date] = Date.tomorrow # =&gt; Thu, 20 Mar 2014
+    redirect_to action: 'read_cookie'
+  end
+  def read_cookie
+    cookies.encrypted[:expiration_date] # =&gt; "2014-03-20"
+  end
+end
+</pre>
+    </div>
+    <p>Советуем хранить в куки только простые данные (строки и числа). Если необходимо хранить
+        сложные объекты. необходимо производить эти преобразования вручную при чтении значений в
+        последующих запросах.</p>
+    <p>При использовании хранения сессии в куки, все вышесказанное также применяется к хэшам <code>session</code>
+        и <code>flash</code>.</p>
+    <h4 class="inside_page_header" id="izmenilas-struktura-flash"> Изменилась структура Flash</h4>
+    <p>Ключи сообщении Flash . К ним по прежнему можно получить доступ с помощью символа или строки.
+        Итерация по flash будет всегда возвращать строковые ключи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+flash["string"] = "a string"
+flash[:symbol] = "a symbol"
+# Rails &lt; 4.1
+flash.keys # =&gt; ["string", :symbol]
+# Rails &gt;= 4.1
+flash.keys # =&gt; ["string", "symbol"]
+</pre>
+    </div>
+    <p>Убедитесь, что вы сравниваете ключи сообщений Flash со строками.</p>
+    <h4 class="inside_page_header" id="changes-in-json-handling"> Изменения в обработке JSON</h4>
+    <p>Есть несколько важных изменений в обработке JSON в Rails 4.1.</p>
+    <h5 class="inside_page_header" id="ubran-multijson"> Убран MultiJSON</h5>
+    <p>MultiJSON потерял и был убран из Rails.</p>
+    <p>Если ваше приложение сейчас непосредственно зависит от MultiJSON, у вас несколько
+        вариантов:</p>
+    <ul>
+        <li><p>Добавьте 'multi_json' в свой Gemfile. Отметьте, что это может что-нибудь сломать в
+            будущем</p></li>
+        <li><p>Уйти от MultiJSON в пользу использования вместо него <code>obj.to_json</code> и
+            <code>JSON.parse(str)</code></p></li>
+    </ul>
+    <div class="warning"><p>Нельзя просто заменить <code>MultiJson.dump</code> и <code>MultiJson.load</code>
+        на <code>JSON.dump</code> и <code>JSON.load</code>. Эти API гема JSON означают сериализацию
+        и десериализацию произвольных объектов Ruby, и, в основном, .</p></div>
+    <h5 class="inside_page_header" id="sovmestimost-s-gemom-json"> Совместимость с гемом JSON</h5>
+    <p>Исторически у Rails есть несколько проблем совместимости с гемом JSON. Использование <code>JSON.generate</code>
+        и <code>JSON.dump</code> в приложении Rails могло вызвать неожиданные ошибки.</p>
+    <p>Rails 4.1 исправил эти проблемы, изолировав свой собственный кодер от гема JSON. API гема
+        JSON будет функционировать, как обычно, но у него не будет доступа к особенностям,
+        специфичным для Rails. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class FooBar
+  def as_json(options = nil)
+    { foo: 'bar' }
+  end
+end
+&gt;&gt; FooBar.new.to_json # =&gt; "{\"foo\":\"bar\"}"
+&gt;&gt; JSON.generate(FooBar.new, quirks_mode: true) # =&gt; "\"#&lt;FooBar:0x007fa80a481610&gt;\""
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="novyy-koder-json"> Новый кодер JSON</h5>
+    <p>Кодер JSON в Rails 4.1 был переписан, чтобы воспользоваться преимуществами гема JSON. Для
+        большинства приложений это незаметное изменение. Однако, как часть переписывания, следующие
+        особенности были убраны из кодера:</p>
+    <ul>
+        <li>Обнаружение кольцевых структур данных
+        </li>
+        <li>Поддержка хука <code>encode_json</code>
+        </li>
+        <li>Опция для кодирования объектов <code>BigDecimal</code> как числа, вместо строк
+        </li>
+    </ul>
+    <p>Если ваше приложение зависит от одной из этих особенностей, их можно вернуть, добавив гем
+        в свой Gemfile.</p>
+    <h5 class="inside_page_header" id="predstavlenie-v-json-ob-ektov-time"> Представление в JSON
+        объектов Time</h5>
+    <p><code>#as_json</code> для объектов с компонентом времени (<code>Time</code>,
+        <code>DateTime</code>, <code>ActiveSupport::TimeWithZone</code>) теперь возвращает по
+        умолчанию с точностью до миллисекунд. Если необходимо сохранить старое поведение без
+        миллисекунд, добавьте следующее в инициализатор:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+ActiveSupport::JSON::Encoding.time_precision = 0
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-return-v-inlayn-blokah-kolbekov"> Использование
+        <code>return</code> в инлайн блоках колбэков</h4>
+    <p>Раньше Rails разрешал инлайн блокам колбэков использовать <code>return</code> таким образом:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ReadOnlyModel &lt; ActiveRecord::Base
+  before_save { return false } # ПЛОХО
+end
+</pre>
+    </div>
+    <p>Это поведение никогда явно не поддерживалось. В связи с изменением внутри <code>ActiveSupport::Callbacks</code>,
+        оно более недопустимо в Rails 4.1. Использование выражения <code>return</code> в инлайн
+        блоке колбэка вызовет <code>LocalJumpError</code> при выполнении колбэка.</p>
+    <p>Использование <code>return</code> в инлайн блоке колбэка может быть отрефакторено на
+        вычисление возвращаемого значения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ReadOnlyModel &lt; ActiveRecord::Base
+  before_save { false } # ХОРОШО
+end
+</pre>
+    </div>
+    <p>Как вариант, если предпочтителен <code>return</code>, рекомендуется явно вызывать метод:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ReadOnlyModel &lt; ActiveRecord::Base
+  before_save :before_save_callback # ХОРОШО
+  private
+    def before_save_callback
+      return false
+    end
+end
+</pre>
+    </div>
+    <p>Это изменение применяется к большинству мест в Rails, где используются колбэки, включая
+        колбэки Active Record и Active Model, а также фильтры в Action
+        Controller (т.е. <code>before_action</code>).</p>
+    <p>Подробности смотрите в .</p>
+    <h4 class="inside_page_header" id="metody-opredelennye-v-fiksturah-active-record"> Методы,
+        определенные в фикстурах Active Record</h4>
+    <p>Rails 4.1 вычисляет ERB каждой фикстуры в отдельном контексте, поэтому хелпер-методы,
+        определенные в фикстуре, не будут доступны в других фикстурах.</p>
+    <p>Хелпер-методы, используемые в нескольких фикстурах, должны быть определены в модулях,
+        подключаемых в новом <code>ActiveRecord::FixtureSet.context_class</code>, в
+        <code>test_helper.rb</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module FixtureFileHelpers
+  def file_sha(path)
+    Digest::SHA2.hexdigest(File.read(Rails.root.join('test/fixtures', path)))
+  end
+end
+ActiveRecord::FixtureSet.context_class.include FixtureFileHelpers
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="obespechenie-dostupnyh-lokaley-i18n"> Обеспечение доступных
+        локалей I18n</h4>
+    <p>Сейчас Rails 4.1 устанавливает по умолчанию для опции I18n
+        <code>enforce_available_locales</code> <code>true</code>. Это означает, что он убедится, что
+        все локали, переданные в него, должны быть объявлены в списке <code>available_locales</code>.
+    </p>
+    <p>Чтобы это отключить (и позволить I18n принимать <em>любые</em> локали), добавьте следующую
+        конфигурацию в свое приложение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.i18n.enforce_available_locales = false
+</pre>
+    </div>
+    <p>Отметьте, что эта опция была добавлена как мера безопасности, чтобы обеспечить, что
+        пользовательская информация не может использоваться как информация о локали, если она не
+        была ранее известна. Следовательно, рекомендуется на отключать эту опцию, если у вас нет
+        весомых причин так делать.</p>
+    <h4 class="inside_page_header" id="mutiruyuschie-metody-vyzyvaemye-na-relation"> Мутирующие
+        методы, вызываемые на Relation</h4>
+    <p>У <code>Relation</code> больше нет мутирующих методов, таких как <code>#map!</code> и <code>#delete_if</code>.
+        Преобразовывайте в массив, вызывая <code>#to_a</code>, перед использованием этих методов.
+    </p>
+    <p>Это предназначено для предотвращения странных багов и непонятностей в коде, вызывающем
+        мутирующие методы непосредственно на <code>Relation</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Вместо этого
+Author.where(name: 'Hank Moody').compact!
+# Теперь нужно делать так
+authors = Author.where(name: 'Hank Moody').to_a
+authors.compact!
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="changes-on-default-scopes"> Изменения в скоупах по
+        умолчанию</h4>
+    <p>Скоупы по умолчанию больше не переопределяются присоединенными условиями.</p>
+    <p>В прежних версиях, при определении в модели <code>default_scope</code>, он переопределялся
+        присоединенными условиями на то же поле. Теперь он мержится, как и любой другой скоуп.</p>
+    <p>Раньше:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  default_scope { where state: 'pending' }
+  scope :active, -&gt; { where state: 'active' }
+  scope :inactive, -&gt; { where state: 'inactive' }
+end
+User.all
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending'
+User.active
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'active'
+User.where(state: 'inactive')
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'inactive'
+</pre>
+    </div>
+    <p>После:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  default_scope { where state: 'pending' }
+  scope :active, -&gt; { where state: 'active' }
+  scope :inactive, -&gt; { where state: 'inactive' }
+end
+User.all
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending'
+User.active
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending' AND "users"."state" = 'active'
+User.where(state: 'inactive')
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending' AND "users"."state" = 'inactive'
+</pre>
+    </div>
+    <p>Чтобы получить предыдущее поведение, необходимо явно убрать условие
+        <code>default_scope</code> с помощью <code>unscoped</code>, <code>unscope</code>, <code>rewhere</code>
+        или <code>except</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  default_scope { where state: 'pending' }
+  scope :active, -&gt; { unscope(where: :state).where(state: 'active') }
+  scope :inactive, -&gt; { rewhere state: 'inactive' }
+end
+User.all
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'pending'
+User.active
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'active'
+User.inactive
+# SELECT "users".* FROM "users" WHERE "users"."state" = 'inactive'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rendering-content-from-string"> Рендеринг содержимого из
+        строки</h4>
+    <p>Rails 4.1 предоставляет опции <code>:plain</code>, <code>:html</code> и <code>:body</code>
+        для <code>render</code>. Эти опции теперь являются предпочтительным способом рендеринга
+        основанного на строке содержимого, так как позволяет указать, какой тип содержимого вы
+        хотите отослать в качестве отклика.</p>
+    <ul>
+        <li>
+            <code>render :plain</code> установит тип содержимого <code>text/plain</code>
+        </li>
+        <li>
+            <code>render :html</code> установит тип содержимого <code>text/html</code>
+        </li>
+        <li>
+            <code>render :body</code> <em>не</em> установит заголовок типа содержимого.
+        </li>
+    </ul>
+    <p>С точки зрения безопасности, если не ожидается какой-либо разметки в теле отклика, следует
+        использовать <code>render :plain</code>, так как большинство браузеров будет экранировать
+        небезопасное содержимое вашего отклика.</p>
+    <p>Использование <code>render :text</code> будет объявлено устаревшим в будущих версиях.
+        Пожалуйста, начинайте использовать более точные опции <code>:plain</code>,
+        <code>:html</code> и <code>:body</code>. Использование <code>render :text</code> может
+        вызвать риски безопасности, так как содержимое посылается как <code>text/html</code>.</p>
+    <h4 class="inside_page_header" id="tipy-dannyh-json-i-hstore-v-postgresql"> типы данных json и
+        hstore в PostgreSQL</h4>
+    <p>Rails 4.1 связывает столбцы <code>json</code> и <code>hstore</code> с Ruby <code>Hash</code>
+        со строковыми ключами.
+        В прежних версиях использовался <code>HashWithIndifferentAccess</code>. Это означает, что
+        доступ по символу больше не поддерживается. Это также касается <code>store_accessors</code>,
+        основанного на столбцах <code>json</code> или <code>hstore</code>. Убедитесь, что правильно
+        используете строковые ключи.</p>
+    <h4 class="inside_page_header" id="yavnoe-ispolzovanie-bloka-dlya-activesupport-callbacks">
+        Явное использование блока для <code>ActiveSupport::Callbacks</code>
+    </h4>
+    <p>Rails 4.1 теперь ожидает, что будет передан явный блок при вызове <code>ActiveSupport::Callbacks.set_callback</code>.
+        Это изменение пришло из <code>ActiveSupport::Callbacks</code>, который был существенно
+        переписан для релиза 4.1.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Раньше в Rails 4.0
+set_callback :save, :around, -&gt;(r, &amp;block) { stuff; result = block.call; stuff }
+# Теперь в Rails 4.1
+set_callback :save, :around, -&gt;(r, block) { stuff; result = block.call; stuff }
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="upgrading-from-rails-3-2-to-rails-4-0"> Обновление с Rails
+        3.2 на Rails 4.0</h3>
+    <p>Если версия Rails вашего приложения сейчас старше чем 3.2.x, следует сперва обновиться до
+        Rails 3.2, перед попыткой обновиться до Rails 4.0.</p>
+    <p>Следующие изменения предназначены для обновления вашего приложения на Rails 4.0.</p>
+    <h4 class="inside_page_header" id="http-patch"> HTTP PATCH</h4>
+    <p>Rails 4 теперь использует <code>PATCH</code> в качестве основного метода HTTP для обновлений,
+        когда в <code>config/routes.rb</code> объявлен RESTful-ресурс. Экшн <code>update</code> все
+        еще используется, и запросы <code>PUT</code> также будут направлены к экшну
+        <code>update</code>. Поэтому, если вы используйте только стандартные RESTful-маршруты, не
+        нужно делать никаких изменений:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :users
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @user do |f| %&gt;
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UsersController &lt; ApplicationController
+  def update
+    # No change needed; PATCH will be preferred, and PUT will still work.
+  end
+end
+</pre>
+    </div>
+    <p>Однако, необходимо сделать изменение, если вы используете <code>form_for</code> для
+        обновления ресурса в сочетании с произвольным маршрутом с использованием метода
+        <code>PUT</code> HTTP:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :users, do
+  put :update_name, on: :member
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for [ :update_name, @user ] do |f| %&gt;
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UsersController &lt; ApplicationController
+  def update_name
+    # Требуется изменение; form_for попытается использовать несуществующий маршрут PATCH.
+  end
+end
+</pre>
+    </div>
+    <p>Если экшн не используется в публичном API, и можно без проблем изменить метод HTTP, можно
+        обновить маршрут для использования <code>patch</code> вместо <code>put</code>:</p>
+    <p>Запросы <code>PUT</code> к <code>/users/:id</code> в Rails 4 направляются к
+        <code>update</code>, как и раньше. Поэтому, если ваше API получит настоящие PUT запросы, они
+        будут работать.
+        Роутер также направит запросы <code>PATCH</code> к <code>/users/:id</code> в экшн <code>update</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :users do
+  patch :update_name, on: :member
+end
+</pre>
+    </div>
+    <p>Если экшн используется в публичном API, и вы не можете изменить используемый метод HTTP,
+        можно обновить форму для использования метода <code>PUT</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for [ :update_name, @user ], method: :put do |f| %&gt;
+</pre>
+    </div>
+    <p>Подробнее о PATCH, и почему это изменение было сделано, смотрите в блоге Rails.</p>
+    <h5 class="inside_page_header" id="zametka-o-tipah-media"> Заметка о типах медиа</h5>
+    <p>Корректировка для метода <code>PATCH</code> . Один из таких форматов . Хотя Rails не
+        поддерживает JSON Patch, такую поддержку легко добавить:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# в вашем контроллере
+def update
+  respond_to do |format|
+    format.json do
+      # выполнить частичное обновление
+      @article.update params[:post]
+    end
+    format.json_patch do
+      # выполнить сложное изменение
+    end
+  end
+end
+# В config/initializers/json_patch.rb:
+Mime::Type.register 'application/json-patch+json', :json_patch
+</pre>
+    </div>
+    <p>Так как JSON Patch только недавно был добавлен в RFC, пока еще нет множества замечательных
+        библиотек Ruby. Один из имеющихся гемов от Aaron Patterson, но в нем еще нет полной
+        поддержки нескольких последних изменений в спецификации.</p>
+    <h3 class="inside_page_header" id="upgrading-from-rails-3-2-to-rails-4-0"> Обновление с Rails
+        3.2 на Rails 4.0</h3>
+    <div class="note"><p>This section is a work in progress.</p></div>
+    <p>Если версия Rails вашего приложения сейчас старше чем 3.2.x, следует сперва обновиться до
+        Rails 3.2, перед попыткой обновиться до Rails 4.0.</p>
+    <p>Следующие изменения предназначены для обновления вашего приложения на Rails 4.0.</p>
+    <h4 class="inside_page_header" id="gemfile"> Gemfile</h4>
+    <p>Rails 4.0 убрал группу <code>assets</code> из Gemfile. Вам нужно убрать эту строчку из
+        Gemfile перед обновлением. Также следует обновить файл приложения (<code>config/application.rb</code>):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
+Bundler.require(*Rails.groups)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vendor-plugins"> vendor/plugins</h4>
+    <p>Rails 4.0 больше не поддерживает загрузку плагинов из <code>vendor/plugins</code>. Следует
+        переместить любые плагины, извлекая их в гемы и помещая их в Gemfile. Если решаете не делать
+        гемы, можно переместить их, скажем, в <code>lib/my_plugin/*</code> и добавить
+        соответствующий инициализатор в <code>config/initializers/my_plugin.rb</code>.</p>
+    <h4 class="inside_page_header" id="active-record"> Active Record</h4>
+    <ul>
+        <li><p>Rails 4.0 убрал identity map из Active Record, из-за . Если вы вручную включали это в
+            своем приложении, нужно убрать соответствующую настройку, так как от нее больше не будет
+            эффекта: <code>config.active_record.identity_map</code>.</p></li>
+        <li><p>Метод <code>delete</code> в связях коллекции может получать аргументы
+            <code>Fixnum</code> или <code>String</code> в качестве id записей, кроме самих записей,
+            так же, как делает метод <code>destroy</code>. Раньше он вызывал <code>ActiveRecord::AssociationTypeMismatch</code>
+            для таких аргументов. Начиная с Rails 4.0, <code>delete</code> пытается автоматически
+            найти записи, соответствующие переданным id, до их удаления.</p></li>
+        <li><p>В Rails 4.0, когда переименовывается столбец или таблица, относящиеся к ним индексы
+            также переименовываются. Если у вас есть миграции, переименовывающие индексы – они
+            больше не нужны.</p></li>
+        <li><p>Rails 4.0 изменил <code>serialized_attributes</code> и <code>attr_readonly</code>
+            быть только методами класса. Не следует использовать методы экземпляра, так как они
+            устарели. Следует заменить их на методы класса, т.е.
+            <code>self.serialized_attributes</code> на <code>self.class.serialized_attributes</code>.
+        </p></li>
+        <li><p>При использовании кодировщика по умолчанию, назначение <code>nil</code>
+            сериализованному атрибуту сохранит его в базу данных как <code>NULL</code>, вместо
+            пропуска значения <code>nil</code> через YAML (<code>"--- \n...\n"</code>).</p></li>
+        <li><p>Rails 4.0 убрал особенность <code>attr_accessible</code> и
+            <code>attr_protected</code> в пользу. Для более гладкого процесса обновления можно
+            использовать .</p></li>
+        <li><p>Если вы не используете Protected Attributes, можно удалить опции, относящиеся к этому
+            гему, такие как <code>whitelist_attributes</code> или
+            <code>mass_assignment_sanitizer</code>.</p></li>
+        <li><p>Rails 4.0 требует, чтобы скоупы использовали вызываемый объект, такой как Proc или
+            lambda:</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  scope :active, where(active: true)
+  # becomes
+  scope :active, -&gt; { where active: true }
+</pre>
+    </div>
+    <ul>
+        <li><p>В Rails 4.0 устарели <code>ActiveRecord::Fixtures</code> в пользу <code>ActiveRecord::FixtureSet</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActiveRecord::TestCase</code> в пользу <code>ActiveSupport::TestCase</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел API поиска, основанного на хэше. Это означает, что методы,
+            которые раньше принимали "finder options", больше так не делают. Например, <code>Book.find(:all,
+                conditions: { name: '1984' })</code> устарел в пользу <code>Book.where(name:
+                '1984')</code></p></li>
+        <li>
+            <p>Все динамические методы, кроме <code>find_by_...</code> and <code>find_by_...!</code>,
+                устарели. Вот как можно внести изменения:</p>
+            <ul>
+                <li>
+                    <code>find_all_by_...</code> становится <code>where(...)</code>.
+                </li>
+                <li>
+                    <code>find_last_by_...</code> становится <code>where(...).last</code>.
+                </li>
+                <li>
+                    <code>scoped_by_...</code> становится <code>where(...)</code>.
+                </li>
+                <li>
+                    <code>find_or_initialize_by_...</code> становится <code>find_or_initialize_by(...)</code>.
+                </li>
+                <li>
+                    <code>find_or_create_by_...</code> становится
+                    <code>find_or_create_by(...)</code>.
+                </li>
+            </ul>
+        </li>
+        <li><p>Отметьте, что <code>where(...)</code> возвращает relation, а не массив, как старые
+            методы поиска. Если вы ожидаете массив, используйте <code>where(...).to_a</code>.</p>
+        </li>
+        <li><p>Эти эквивалентные методы могут выполнять не идентичный SQL с предыдущей
+            реализацией.</p></li>
+        <li><p>Чтобы включить старые методы поиска, можно использовать .</p></li>
+        <li><p>Rails 4.0 изменил соединительную таблицу по умолчанию для связей <code>has_and_belongs_to_many</code>,
+            удаляя общий префикс из имени второй таблицы. Любая существующая связь <code>has_and_belongs_to_many</code>
+            между моделями с общим префиксом должна быть указана опция <code>join_table</code>.
+            Например:</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+CatalogCategory &lt; ActiveRecord::Base
+  has_and_belongs_to_many :catalog_products, join_table: 'catalog_categories_catalog_products'
+end
+CatalogProduct &lt; ActiveRecord::Base
+  has_and_belongs_to_many :catalog_categories, join_table: 'catalog_categories_catalog_products'
+end
+</pre>
+    </div>
+    <ul>
+        <li>Отметьте, что префикс также принимает во внимание пространства имен, поэтому связи между
+            <code>Catalog::Category</code> и <code>Catalog::Product</code> или <code>Catalog::Category</code>
+            и <code>CatalogProduct</code> также необходимо обновить.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="active-resource"> Active Resource</h4>
+    <p>Rails 4.0 извлек Active Resource в отдельный гем. Если вам все еще нужна эта особенность,
+        можете добавить в своем Gemfile.</p>
+    <h4 class="inside_page_header" id="active-model"> Active Model</h4>
+    <ul>
+        <li><p>Rails 4.0 изменил то, как прикрепляются ошибки с помощью <code>ActiveModel::Validations::ConfirmationValidator</code>.
+            Теперь, когда не проходят валидации подтверждения, ошибка будет прикреплена к <code>:#{attribute}_confirmation</code>
+            вместо <code>attribute</code>.</p></li>
+        <li><p>Rails 4.0 изменил значение по умолчанию для <code>ActiveModel::Serializers::JSON.include_root_in_json</code>
+            на <code>false</code>. Теперь сериализаторы Active Model и объекты Active Record имеют
+            одинаковое значение по умолчанию. Это означает, что вы можете закомментировать или
+            убрать следующую опцию в файле <code>config/initializers/wrap_parameters.rb</code>:</p>
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Disable root element in JSON by default.
+# ActiveSupport.on_load(:active_record) do
+#   self.include_root_in_json = false
+# end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="action-pack"> Action Pack</h4>
+    <ul>
+        <li>Rails 4.0 представил <code>ActiveSupport::KeyGenerator</code>, и использует его, как
+            основу для генерации и проверки подписанных куки (среди прочего). Существующие
+            подписанные куки, сгенерированные с помощью Rails 3.x будут прозрачно обновлены, если вы
+            оставите существующий <code>secret_token</code> и добавите новый
+            <code>secret_key_base</code>.
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  # config/initializers/secret_token.rb
+  Myapp::Application.config.secret_token = 'existing secret token'
+  Myapp::Application.config.secret_key_base = 'new secret key base'
+</pre>
+    </div>
+    <p>Отметьте, что вы должны обождать с установкой <code>secret_key_base</code>, пока 100%
+        пользователей на перейдет на Rails 4.x, и вы точно не будете уверены, что не придется
+        откатиться к Rails 3.x. Это так, потому что куки, подписанные на основе нового <code>secret_key_base</code>
+        в Rails 4.x, обратно несовместимы с Rails 3.x. Можно спокойно оставить существующий <code>secret_token</code>,
+        не устанавливать новый <code>secret_key_base</code> и игнорировать предупреждения, пока вы
+        не будете полностью уверены, что обновление полностью завершено.</p>
+    <p>Если вы полагаетесь на возможность внешних приложений или JavaScript читать подписанные куки
+        сессии вашего приложения Rails (или подписанные куки в целом), вам не следует устанавливать
+        <code>secret_key_base</code>, пока вы не избавитесь от этой проблемы.</p>
+    <ul>
+        <li>Rails 4.0 шифрует содержимое основанной на куки сессии, если был установлен <code>secret_key_base</code>.
+            Rails 3.x подписывал, но не шифровал содержимое основанной на куки сессии. Подписанные
+            куки "безопасны", так как проверяется, что они были созданы приложением, и защищены от
+            взлома. Однако, содержимое может быть просмотрено пользователем, и шифрование
+            содержимого устраняет эту заботу без значительного снижения производительности.
+        </li>
+    </ul>
+    <p>Подробнее читайте в о переходе на подписанные куки сессии.</p>
+    <ul>
+        <li><p>Rails 4.0 убрал опцию <code>ActionController::Base.asset_path</code>. Используйте
+            особенность файлопровода (assets pipeline).</p></li>
+        <li><p>В Rails 4.0 устарела опция <code>ActionController::Base.page_cache_extension</code>.
+            Используйте вместо нее <code>ActionController::Base.default_static_extension</code>.</p>
+        </li>
+        <li><p>Rails 4.0 убрал кэширование страниц и экшнов из Action Pack. Необходимо добавить гем
+            <code>actionpack-action_caching</code> для использования <code>caches_action</code> и
+            <code>actionpack-page_caching</code> для использования <code>caches_pages</code> в
+            контроллерах.</p></li>
+        <li><p>Rails 4.0 убрал парсер параметров XML. Следует добавить гем <code>actionpack-xml_parser</code>,
+            если вам требуется эта особенность.</p></li>
+        <li><p>Rails 4.0 изменил набор поиска <code>layout</code> по умолчанию с помощью символов
+            или проков, возвращающих nil. Чтобы получить поведение "без макета", возвращайте false
+            вместо nil.</p></li>
+        <li><p>Rails 4.0 изменил клиент memcached по умолчанию с <code>memcache-client</code> на
+            <code>dalli</code>. Чтобы обновиться, просто добавьте <code>gem 'dalli'</code> в свой
+            <code>Gemfile</code>.</p></li>
+        <li><p>В Rails 4.0 устарели методы <code>dom_id</code> и <code>dom_class</code> в
+            контроллерах (они нужны только во вьюхах). Вам следует включить модуль <code>ActionView::RecordIdentifier</code>
+            в контроллерах, требующих эту особенность.</p></li>
+        <li><p>В Rails 4.0 устарела опция <code>:confirm</code> для хелпера <code>link_to</code>.
+            Вместо нее следует полагаться на атрибут data (т.е. <code>data: { confirm: 'Are you
+                sure?' }</code>). Это устаревание также затрагивает хелперы, основанные на этом
+            (такие как <code>link_to_if</code> или <code>link_to_unless</code>).</p></li>
+        <li><p>Rails 4.0 изменил работу <code>assert_generates</code>,
+            <code>assert_recognizes</code> и <code>assert_routing</code>. Теперь все эти операторы
+            контроля вызывают <code>Assertion</code> вместо
+            <code>ActionController::RoutingError</code>.</p></li>
+        <li><p>Rails 4.0 вызывает <code>ArgumentError</code>, если определены коллизии в именах
+            маршрутов. Это может быть вызвано как явно определенными именованными маршрутами, либо
+            методом <code>resources</code>. Вот два примера, которые вызывают коллизию маршрутов с
+            именем <code>example_path</code>:</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  get 'one' =&gt; 'test#example', as: :example
+  get 'two' =&gt; 'test#example', as: :example
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  resources :examples
+  get 'clashing/:id' =&gt; 'test#example', as: :example
+</pre>
+    </div>
+    <p>В первом случае можно просто избежать использование одинакового имени для нескольких
+        маршрутов. Во втором следует использовать опции <code>only</code> или <code>except</code>,
+        представленные методом <code>resources</code>, чтобы ограничить создаваемые маршруты, о чем
+        подробно описано в .</p>
+    <ul>
+        <li>Rails 4.0 также изменил способ отрисовки маршрутов с символами unicode. Теперь можно
+            непосредственно отрисовывать символы unicode character. Если вы уже отрисовываете такие
+            маршруты, их нужно изменить, например:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get Rack::Utils.escape('こんにちは'), controller: 'welcome', action: 'index'
+</pre>
+    </div>
+    <p>станет</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get 'こんにちは', controller: 'welcome', action: 'index'
+</pre>
+    </div>
+    <ul>
+        <li>Rails 4.0 требует, чтобы маршруты, использующие <code>match</code> указывали метод
+            запроса. Например:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  # Rails 3.x
+  match '/' =&gt; 'root#index'
+  # станет
+  match '/' =&gt; 'root#index', via: :get
+  # или
+  get '/' =&gt; 'root#index'
+</pre>
+    </div>
+    <ul>
+        <li>В Rails 4.0 убрана промежуточная программа
+            <code>ActionDispatch::BestStandardsSupport</code>, <code>&lt;!DOCTYPE html&gt;</code>
+            уже включает режим стандартов в соответствии с , а заголовок ChromeFrame был перемещен в
+            <code>config.action_dispatch.default_headers</code>.
+        </li>
+    </ul>
+    <p>Помните, что вы также должны убрать все упоминания промежуточной программы из кода своего
+        приложения, например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Вызовет исключение
+config.middleware.insert_before(Rack::Lock, ActionDispatch::BestStandardsSupport)
+</pre>
+    </div>
+    <p>Также найдите в своих настройках сред
+        <code>config.action_dispatch.best_standards_support</code>, и уберите эту строчку, если она
+        есть.</p>
+    <ul>
+        <li><p>В Rails 4.0 при прекомпиляции ресурсов не будут больше автоматически копироваться
+            не-JS/CSS ресурсы из <code>vendor/assets</code> и <code>lib/assets</code>. Разработчики
+            приложений Rails и engine-ов должны поместить эти ресурсы в <code>app/assets</code> или
+            настроить <code>config.assets.precompile</code>.</p></li>
+        <li><p>В Rails 4.0 вызывается <code>ActionController::UnknownFormat</code>, когда экшн не
+            обрабатывает формат запроса. По умолчанию исключение обрабатывается, откликаясь с
+            помощью 406 Not Acceptable, но теперь это можно переопределить. В Rails 3 всегда
+            возвращался 406 Not Acceptable. Без возможности переопределения.</p></li>
+        <li><p>В Rails 4.0 вызывается характерное исключение <code>ActionDispatch::ParamsParser::ParseError</code>,
+            когда <code>ParamsParser</code> не сможет спарсить параметры запроса. Вам нужно ловить
+            это исключение, вместо низкоуровневого <code>MultiJson::DecodeError</code>, например.
+        </p></li>
+        <li><p>В Rails 4.0 <code>SCRIPT_NAME</code> правильно вкладывается, когда engine монтируется
+            в приложении, находящемся на префиксе URL. Больше не нужно устанавливать <code>default_url_options[:script_name]</code>,
+            чтобы работать с переписанными префиксами URL.</p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::Integration</code> в пользу <code>ActionDispatch::Integration</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::IntegrationTest</code> в пользу <code>ActionDispatch::IntegrationTest</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::PerformanceTest</code> в пользу <code>ActionDispatch::PerformanceTest</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::AbstractRequest</code> в пользу <code>ActionDispatch::Request</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::Request</code> в пользу <code>ActionDispatch::Request</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::AbstractResponse</code> в пользу <code>ActionDispatch::Response</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::Response</code> в пользу <code>ActionDispatch::Response</code>.
+        </p></li>
+        <li><p>В Rails 4.0 устарел <code>ActionController::Routing</code> в пользу <code>ActionDispatch::Routing</code>.
+        </p></li>
+    </ul>
+    <h4 class="inside_page_header" id="active-support"> Active Support</h4>
+    <p>Rails 4.0 убрал псевдоним <code>j</code> для <code>ERB::Util#json_escape</code>, так как
+        <code>j</code> уже используется для <code>ActionView::Helpers::JavaScriptHelper#escape_javascript</code>.
+    </p>
+    <h4 class="inside_page_header" id="poryadok-zagruzki-helperov"> Порядок загрузки хелперов</h4>
+    <p>В Rails 4.0 изменился порядок, в котором загружались хелперы из более чем одной директории.
+        Ранее они собирались, а затем сортировались по алфавиту. После обновления на Rails 4.0,
+        хелперы будут сохранять порядок загружаемых директорий и будут сортироваться по алфавиту
+        только в пределах каждой директории. Если вы явно не используете параметр
+        <code>helpers_path</code>, Это изменение повлияет только на способ загрузки хелперов из
+        engine-ов. Если вы полагаетесь на порядок загрузки, следует проверить, что после обновления
+        доступны правильные методы. Если хотите изменить порядок, в котором загружаются engine,
+        Можно использовать метод <code>config.railties_order=</code>.</p>
+    <h4 class="inside_page_header" id="active-record-observer-i-action-controller-sweeper"> Active
+        Record Observer и Action Controller Sweeper</h4>
+    <p><code>ActiveRecord::Observer</code> и <code>ActionController::Caching::Sweeper</code> были
+        извлечены в гем <code>rails-observers</code>. Следует добавить гем
+        <code>rails-observers</code>, если вам нужны эти особенности.</p>
+    <h4 class="inside_page_header" id="sprockets-rails"> sprockets-rails</h4>
+    <ul>
+        <li>
+            <code>assets:precompile:primary</code> и <code>assets:precompile:all</code> были убраны.
+            Используйте вместо них <code>assets:precompile</code>.
+        </li>
+        <li>Опция <code>config.assets.compress</code> должна быть изменена на <code>config.assets.js_compressor</code>,
+            например, так:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.js_compressor = :uglifier
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sass-rails"> sass-rails</h4>
+    <ul>
+        <li>
+            <code>asset_url</code> с двумя аргументами устарел. Например: <code>asset-url("rails.png",
+            image)</code> стал <code>asset-url("rails.png")</code>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="obnovlenie-s-rails-3-1-na-rails-3-2"> Обновление с Rails 3.1
+        на Rails 3.2</h3>
+    <p>Если версия Rails вашего приложения сейчас старше чем 3.1.x, следует сперва обновиться до
+        Rails 3.1, перед попыткой обновиться до Rails 3.2.</p>
+    <p>Следующие изменения предназначены для обновления вашего приложения на последнюю версию 3.2.x
+        Rails.</p>
+    <h4 class="inside_page_header" id="gemfile"> Gemfile</h4>
+    <p>Сделайте следующие изменения в своем <code>Gemfile</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'rails', '3.2.21'
+group :assets do
+  gem 'sass-rails',   '~&gt; 3.2.6'
+  gem 'coffee-rails', '~&gt; 3.2.2'
+  gem 'uglifier',     '&gt;= 1.0.3'
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environments-development-rb">
+        config/environments/development.rb</h4>
+    <p>Имеется ряд новых конфигурационных настроек, которые следует добавить в среде
+        development:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Raise exception on mass assignment protection for Active Record models
+config.active_record.mass_assignment_sanitizer = :strict
+# Log the query plan for queries taking more than this (works
+# with SQLite, MySQL, and PostgreSQL)
+config.active_record.auto_explain_threshold_in_seconds = 0.5
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environments-test-rb">
+        config/environments/test.rb</h4>
+    <p>Также должна быть добавлена конфигурационная настройка <code>mass_assignment_sanitizer</code>
+        в <code>config/environments/test.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Raise exception on mass assignment protection for Active Record models
+config.active_record.mass_assignment_sanitizer = :strict
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vendor-plugins"> vendor/plugins</h4>
+    <p>В Rails 3.2 устаревает <code>vendor/plugins</code>, а в Rails 4.0 будет убрана полностью.
+        Хотя это и не требуется строго при обновлении на Rails 3.2, можно начать перемещать любые
+        плагины, извлекая их в гемы и помещая их в Gemfile. Если решаете не делать гемы, можно
+        переместить их, скажем, в <code>lib/my_plugin/*</code> и добавить соответствующий
+        инициализатор в <code>config/initializers/my_plugin.rb</code>.</p>
+    <h4 class="inside_page_header" id="active-record"> Active Record</h4>
+    <p>Опция <code>:dependent =&gt; :restrict</code> была убрана из <code>belongs_to</code>. Если
+        хотите предотвратить удаление объекта, если имеются какие-либо связанные объекты, можно
+        установить <code>:dependent =&gt; :destroy</code> и возвращать <code>false</code> после
+        проверки существования связи из любого кколбэка на destroy связанного объекта.</p>
+    <h3 class="inside_page_header" id="obnovlenie-s-rails-3-0-na-rails-3-1"> Обновление с Rails 3.0
+        на Rails 3.1</h3>
+    <p>Если версия Rails вашего приложения сейчас старше чем 3.0.x, следует сперва обновиться до
+        Rails 3.0, перед попыткой обновиться до Rails 3.1.</p>
+    <p>Следующие изменения предназначены для обновления вашего приложения на Rails 3.1.12, последнюю
+        версию 3.1.x Rails.</p>
+    <h4 class="inside_page_header" id="gemfile"> Gemfile</h4>
+    <p>Сделайте следующие изменения в своем <code>Gemfile</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'rails', '3.1.12'
+gem 'mysql2'
+# Needed for the new asset pipeline
+group :assets do
+  gem 'sass-rails',   '~&gt; 3.1.7'
+  gem 'coffee-rails', '~&gt; 3.1.1'
+  gem 'uglifier',     '&gt;= 1.0.3'
+end
+# jQuery is the default JavaScript library in Rails 3.1
+gem 'jquery-rails'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-application-rb"> config/application.rb</h4>
+    <p>Файлопровод (asset pipeline) требует следующих добавлений:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.enabled = true
+config.assets.version = '1.0'
+</pre>
+    </div>
+    <p>Если ваше приложение использует маршрут "/assets" для ресурса, можно изменить префикс,
+        используемый для файлов, чтобы избежать конфликтов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Defaults to '/assets'
+config.assets.prefix = '/asset-files'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environments-development-rb">
+        config/environments/development.rb</h4>
+    <p>Уберите настройку для RJS <code>config.action_view.debug_rjs = true</code>.</p>
+    <p>Добавьте эти настройки, если вы включили файлопровод:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Do not compress assets
+config.assets.compress = false
+# Expands the lines which load the assets
+config.assets.debug = true
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environments-production-rb">
+        config/environments/production.rb</h4>
+    <p>Снова, большая часть изменений относится к файлопроводу. Подробнее о них можно прочитать в
+        руководстве по .</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Compress JavaScripts and CSS
+config.assets.compress = true
+# Don't fallback to assets pipeline if a precompiled asset is missed
+config.assets.compile = false
+# Generate digests for assets URLs
+config.assets.digest = true
+# Defaults to Rails.root.join("public/assets")
+# config.assets.manifest = YOUR_PATH
+# Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
+# config.assets.precompile += %w( search.js )
+# Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+# config.force_ssl = true
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environments-test-rb">
+        config/environments/test.rb</h4>
+    <p>Можно увеличить производительность тестов, добавив следующее в среде test:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Configure static asset server for tests with Cache-Control for performance
+config.public_file_server.enabled = true
+config.public_file_server.headers = {
+  'Cache-Control' =&gt; 'public, max-age=3600'
+}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-initializers-wrap_parameters-rb">
+        config/initializers/wrap_parameters.rb</h4>
+    <p>Добавьте эти файлы со следующим содержимым, если хотите оборачивать параметры во вложенный
+        хэш. Для новых приложений это включено по умолчанию.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Be sure to restart your server when you modify this file.
+# This file contains settings for ActionController::ParamsWrapper which
+# is enabled by default.
+# Enable parameter wrapping for JSON. You can disable this by setting :format to an empty array.
+ActiveSupport.on_load(:action_controller) do
+  wrap_parameters format: [:json]
+end
+# Disable root element in JSON by default.
+ActiveSupport.on_load(:active_record) do
+  self.include_root_in_json = false
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-initializers-session_store-rb">
+        config/initializers/session_store.rb</h4>
+    <p>Необходимо изменить ключ сессии на другой, или удалить все сессии:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# in config/initializers/session_store.rb
+AppName::Application.config.session_store :cookie_store, key: 'SOMETHINGNEW'
+</pre>
+    </div>
+    <p>или</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:sessions:clear
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ubrat-optsii-cache-i-concat-v-resursnyh-helperah-vo-vyuhah">
+        Убрать опции :cache и :concat в ресурсных хелперах во вьюхах</h4>
+    <ul>
+        <li>Вместе с Asset Pipeline опции :cache и :concat больше не используются, удалите их из
+            вьюх.
+        </li>
+    </ul>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Переходные процессы в линейных электрических цепях</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td id="contents">
+    <h1>8. Переходные процессы в линейных электрических цепях</h1>
+    <h2 align="Center"><font color="#6A2C9E">8.1. Общая характеристика переходных процессов</font>
+    </h2>
+    <font size="4"><p align="justify">       В электрических цепях возможны включения и отключения
+        отдельных ветвей, короткие замыкания участков цепи, различного рода переключения. Любые
+        изменения в электрических цепях можно представить в виде переключений или коммутаций.
+        Характер коммутации указывается в схеме с помощью рубильника со стрелкой. По направлению
+        стрелки можно судить, замыкается или размыкается рубильник.       При коммутации в цепи
+        возникают переходные процессы, т.е. процессы перехода токов и напряжений от одного
+        установившегося значения к другому.     Изменения  токов  и напряжений  вызывают   
+        одновременное  изменение  энергии электрического и магнитного полей, связанных с элементами
+        цепи - емкостями и индуктивностями. Однако энергия электрического поля и энергия магнитного
+        поля могут изменяться только непрерывно, так как скачкообразное изменение потребовало бы от
+        источника бесконечно большой мощности. На этом рассуждении основаны законы коммутации. </p>
+        <p align="justify">      <font color="indianred"><b><i> Первый закон</i></b></font>. В любой
+            ветви с индуктивностью ток не может изменяться скачком и в момент коммутации сохраняет
+            то значение, которое он имел непосредственно перед моментом коммутации </p>
+        <p align="Center">i<sub>L</sub> (0<sub>+</sub>) = i<sub>L</sub> (0<sub>-</sub>),</p>     
+        где  i<sub>L</sub> (0<sub>+</sub>) - ток в ветви с индуктивностью в момент коммутации, сразу
+        после коммутации. Знак "+" в формуле обычно не записывается. Время переходного процесса
+        отсчитывается от момента коммутации;              i<sub>L</sub> (0<sub>-</sub>) - ток в
+        индуктивности непосредственно перед коммутацией. <p align="justify">      <font
+                color="indianred"><b><i> Второй закон</i></b></font>. Напряжение на емкости сразу
+            после коммутации сохраняет то значение, которое оно имело непосредственно перед моментом
+            коммутации. </p>
+        <p align="Center">u<sub>C</sub> (0<sub>+</sub>) = u<sub>C</sub> (0<sub>-</sub>),</p>     
+        где  u<sub>C</sub> (0<sub>+</sub>) - напряжение на емкости в момент коммутации;            
+         u<sub>C</sub> (0<sub>-</sub>) - напряжение на емкости непосредственно перед моментом
+        коммутации. <p align="justify">      Допущения, применяемые при анализе переходных
+            процессов. </p>
+        <ol>
+            <li>Полагают, что переходный процесс длится бесконечно большое время.</li>
+            <li>Считают, что замыкание и размыкание рубильника происходит мгновенно, без образования
+                электрической дуги.
+            </li>
+            <li>Принимают, что к моменту коммутации предыдущие переходные процессы в цепи
+                закончились.
+            </li>
+        </ol>
+        <p align="justify">    В соответствии с классическим методом расчета, переходный ток в ветви
+            схемы представляют в виде суммы принужденного и свободного токов. </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_370.gif">.</p> 
+            где  i<sub>пр</sub>(t) - принужденный ток, определяется в установившемся режиме после
+        коммутации. Этот ток создается внешним источником питания. Если в цепь включен источник
+        постоянной ЭДС, принужденный ток будет постоянным, если в цепи действует источник
+        синусоидальной ЭДС, принужденный ток изменяется по периодическому, синусоидальному закону;  
+                   i<sub>св</sub>(t) - свободный ток, определяется в схеме после коммутации, из
+        которой исключен внешний источник питания. Свободный ток создается внутренними источниками
+        питания: ЭДС самоиндукции индуктивности или напряжением заряженной емкости. <p
+                align="justify">      Свободный ток определяют по формуле: </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_371.gif">.</p> 
+            Количество слагаемых в формуле равно числу реактивных элементов (индуктивностей и
+        емкостей) в схеме.       P<sub>1</sub>, P<sub>2</sub> - корни характеристического уравнения.
+              А<sub>1</sub>, А<sub>2</sub> - постоянные интегрирования, определяются с помощью
+        начальных условий.       Начальные условия - это переходные токи и напряжения в момент
+        коммутации, в момент времени t, равный нулю.       Начальные условия могут быть независимыми
+        или зависимыми.       Независимыми называют начальные условия, подчиняющиеся законам
+        коммутации, законам постепенного, непрерывного изменения. Это напряжение на емкости
+        u<sub>c</sub>(0) и ток в ветви с индуктивностью i<sub>L</sub>(0) в момент коммутации.      
+        Остальные начальные условия: напряжение и ток в ветви с сопротивлением u<sub>R</sub>(0)   и
+           i<sub>R</sub>(0), напряжение на индуктивности u<sub>L</sub>(0) , ток в ветви с емкостью i<sub>C</sub>(0)
+        - это зависимые начальные условия. Они не подчиняются законам коммутации и могут изменяться
+        скачком. <h2 align="Center"><font color="#6A2C9E">8.2. Переходные процессы в цепях с одним
+            реактивным элементом </font></h2>
+        <p align="justify">       <font color="indianred"><b><i> Короткое замыкание в R-L
+            цепи</i></b></font></p>
+        <p align="justify">       На рис. 8.1 изображена электрическая цепь, в которой включен
+            источник постоянной ЭДС. В результате коммутации рубильник замыкается и образуется
+            замкнутый на себя R-L контур. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_372.gif">
+                   До коммутации по индуктивности протекал ток                     <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_373.gif">  
+                 Этот ток создавал постоянное магнитное поле в индуктивной катушке.                
+               Рис. 8.1 </p>
+        <p align="justify">        Определим закон изменения тока в индуктивности после коммутации.
+                    В соответствии с классическим методом </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_374.gif"></p>
+        <p align="justify">        Принужденный ток после коммутации замыкается через рубильник,
+            имеющий нулевое сопротивление, и через индуктивность не протекает. Индуктивный ток имеет
+            только свободную составляющую </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_375.gif"></p>
+        <p align="justify">        Магнитное поле, исчезая, индуктирует в индуктивной катушке ЭДС
+            самоиндукции. Свободный ток в R-C контуре существует за счет этой электродвижущей силы.
+                    Запишем уравнение для свободного тока в R-L контуре, используя второй закон
+            Кирхгофа. </p>
+        <p align="Center">       <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_376.gif">       
+               (8.1) </p>
+        <p align="justify">       Ищем решение этого уравнения в виде экспоненты </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_377.gif">. </p>
+        <p align="justify">       Производная </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_378.gif">. </p>
+        <p align="justify">       Подставим значения свободного тока и производной тока в уравнение
+            (8.1) </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_379.gif">   
+             (8.2) </p>
+        <p align="justify">       Уравнение (8.2), полученное из уравнения (8.1), называется
+            характеристическим. </p>
+        <p align="justify">       <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_380.gif"> -
+            корень характеристического уравнения. </p>
+        <p align="justify">       <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_381.gif"> -
+            постоянная времени переходного процесса, измеряется в секундах.        Постоянная
+            времени &#964; - это интервал времени, за который переходный ток уменьшается в   e раз.
+        </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_382.gif">. </p>
+        <p align="justify">       Постоянную интегрирования А определяем с помощью начального
+            условия. </p>
+        <p align="justify">       В соответствии с первым законом коммутации, </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_383.gif">. </p>
+        <p align="justify">       Получим    <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_385.gif"></p>
+        <p align="justify">       Напряжение на индуктивности <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_386.gif">. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_387.gif">
+                   На рис. 8.2 изображены кривые переходного тока в ветви с индуктивностью и
+            переходного напряжения на индуктивности. Переходный ток и напряжение по экспоненте
+            стремятся к нулю.        В инженерных расчетах полагают, что через интервал времени,
+            равный (4 &#247; 5)&#964;, переходный процесс заканчивается.            Рис. 8.2</p>
+        <p align="justify">       <font color="indianred"><b><i> Подключение R-L цепи к источнику
+            постоянной ЭДС</i></b></font></p>
+        <p align="justify">       В схеме на рис. 8.3 до коммутации рубильник разомкнут. В
+            результате коммутации рубильник замыкается и подключает R-L цепь к источнику постоянной
+            ЭДС. Определим закон изменения тока i(t). </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_388.gif">. </p>
+        <p align="justify">       Принужденный ток в установившемся режиме после коммутации </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_389.gif">. </p>
+        <p align="justify">       В свободном режиме из схемы исключен внешний источник питания.
+            Схема на рис. 8.3 без источника ЭДС ничем не отличается от схемы на </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_390.gif">
+                 Свободный ток определяется по формуле      <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_391.gif">.  
+               Запишем значение переходного тока для момента      коммутации, (t = 0).  <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_392.gif">,  
+               откуда <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_393.gif">.  
+                           Рис. 8.3 </p>
+        <p align="justify">       До коммутации рубильник был разомкнут, и ток в схеме отсутствовал.
+                   Сразу после коммутации ток в индуктивности остается равным нулю. </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_394.gif">. </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_395.gif">. </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_396.gif">. </p>
+        <p align="justify">       Напряжение на индуктивности </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_397.gif">. </p>
+        <p align="justify">     На рис. 8.4 изображены кривые переходного, принужденного, свободного
+            токов и переходного напряжения на индуктивности. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_398.gif">
+                 Свободный ток и напряжение на индуктивности плавно уменьшаются до нуля. В момент
+            коммутации свободный и принужденный токи одинаковы по абсолютной величине.    
+             Переходный ток начинается при включении с нуля, затем возрастает, приближаясь к
+            установившемуся постоянному значению.                  Рис. 8.4 </p>
+        <p align="justify">       <font color="indianred"><b><i> Короткое замыкание в R-C
+            цепи</i></b></font></p>
+        <p align="justify">     В схеме на рис. 8.5 в результате коммутации рубильник замыкается, и
+            образуется замкнутый на себя R-C контур.        До коммутации емкость полностью
+            зарядилась до напряжения, равного ЭДС источника питания, то есть u<sub>c</sub>(0-) = E.
+            После коммутации емкость полностью разряжается, следовательно, принужденный ток в R-C
+            цепи и принужденное напряжение на конденсаторе равны нулю. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_399.gif">
+                 В цепи существует только свободный ток за счет напряжения заряженного конденсатора.
+                 Запишем для R-C контура уравнение по второму закону Кирхгофа                   <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_400.gif">.  
+                           Рис. 8.5 </p>
+        <p align="justify">     Ток через конденсатор       <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_401.gif">. </p>
+        <p align="justify">     Получим дифференциальное уравнение </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_402.gif">.      
+                   (8.3) </p>
+        <p align="justify">     Решение этого уравнения   <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_504.gif">. </p>
+        <p align="justify">     Подставим значение свободного напряжения и производной от
+            напряжения </p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_505.gif">  в
+            уравнение (8.3). </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_506.gif">. </p>
+        <p align="justify">     Уравнение <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_507.gif">
+            называется характеристическим. </p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_508.gif"> -
+            корень характеристического уравнения; </p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_509.gif"> -
+            постоянная времени переходного процесса; </p>
+        <p align="justify">      <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_510.gif"></p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_511.gif"></p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_513.gif"></p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_514.gif"></p>
+        <p align="justify">     <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_515.gif"></p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_517.gif">
+                 Переходный ток и переходное напряжение на конденсаторе по показательному закону
+            уменьшаются до нуля (рис. 8.6).                  Рис. 8.6 </p>
+        <p align="justify">       <font color="indianred"><b><i> Подключение R-C цепи к источнику
+            постоянной ЭДС</i></b></font></p>
+        <p align="justify">       Полагаем, что до коммутации конденсатор не заряжен, напряжение на
+            нем u<sub>c</sub>(0-) = 0.       В результате коммутации рубильник замыкается, и
+            конденсатор полностью заряжается (рис. 8.7).        Принужденное напряжение на емкости
+            равно ЭДС источника питания u<sub>c<sub>пр</sub></sub>= E. </p>
+        <p align="justify">       Переходное напряжение </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_403.gif">. </p>
+        <p align="justify">       В момент коммутации <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_404.gif">. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_405.gif">
+                 Постоянная интегрирования      <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_406.gif">.  
+               В соответствии со вторым законом коммутации      <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_407.gif">.  
+               <img src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_408.gif">.  
+                           Рис. 8.7 </p>
+        <p align="justify">       Переходное напряжение </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_409.gif">. </p>
+        <p align="justify">       Переходный ток </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_410.gif">. </p>
+        <p align="Left"><img align="LEFT" border="0"
+                             src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_411.gif">
+                 Кривые напряжений и тока изображены на рис. 8.8.                  Рис. 8.8 </p>
+        <p>
+        </p>
+        <h2 align="Center"><font color="#6A2C9E">8.3. Переходные процессы в цепях с двумя
+            реактивными элементами </font></h2>
+        <font size="4"><p align="justify">     При последовательном соединении сопротивления R,
+            катушки индуктивности L и конденсатора С образуется электрический R-L-C контур (рис.
+            8.9).        Дифференциальное уравнение для тока в контуре </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_412.gif">.
+            </p>
+            <p align="justify">       После дифференцирования по t и деления на L получим </p>
+            <p align="Center">              <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_413.gif">.  
+                     (8.4) </p>
+            <p align="Left"><img align="LEFT" border="0"
+                                 src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_414.gif">
+                     Решение уравнения (8.4) равно сумме принужденной и свободной составляющих    
+                            <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_415.gif">.
+                     В нашем случае принужденная составляющая переходного тока равна нулю, так как в
+                схеме имеется емкость, являющаяся разрывом цепи для постоянного тока.              
+                   Рис. 8.9 </p>
+            <p align="justify">       Свободная составляющая является общим решением уравнения </p>
+            <p align="Center">              <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_416.gif">. 
+                     (8.5) </p>
+            <p align="justify">       Пусть     <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_417.gif">, 
+                 
+                 <img src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_418.gif">, 
+                    <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_419.gif">.
+            </p>
+            <p align="justify">     После подстановки этих выражений в уравнение (8.5) получим
+                характеристическое уравнение      </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_420.gif">.
+            </p>
+            <p align="justify">       Характеристическое уравнение имеет два корня </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_421.gif">,
+            </p>
+            <p align="justify">       где <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_422.gif"> -
+                коэффициент затухания; </p>
+            <p align="justify">              <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_423.gif"> -
+                угловая резонансная частота контура без потерь. </p>
+            <p align="justify">       Получим </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_424.gif">.
+            </p>
+            <p align="justify">       Вид корней зависит от отношения </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_425.gif">,
+            </p>
+            <p align="justify">       где <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_426.gif"> -
+                характеристическое или волновое сопротивление контура; </p>
+            <p align="justify">              <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_427.gif"> -
+                добротность контура. </p>
+            <p align="justify">       <font color="indianred"><b><i> Колебательный
+                режим</i></b></font></p>
+            <p align="justify">     Наиболее важен часто встречающийся случай, когда корни
+                P<sub>1,2</sub> - комплексные сопряженные с отрицательной вещественной частью,
+                свободная составляющая имеет вид затухающих колебаний. В этом случае </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_428.gif">,  
+                    <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_429.gif">,
+                     <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_430.gif">,
+                     <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_431.gif">,
+            </p>
+            <p align="justify">       где  <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_432.gif">-
+                угловая частота собственных колебаний в контуре; </p>
+            <p align="justify">              <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_433.gif"> -
+                период собственных колебаний. </p>
+            <p align="justify">       <font color="indianred"><b><i> Ток в цепи</i></b></font></p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_434.gif">, 
+                   (8.6)</p>
+            <p align="justify">       где А и &#966; - постоянные интегрирования. </p>
+            <p align="justify">      До коммутации ток в индуктивности равен нулю, сразу после
+                коммутации остается равным нулю </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_435.gif">.
+            </p>
+            <p align="justify">       Чтобы определить две постоянные интегрирования, необходимо
+                иметь два начальных условия и составить два уравнения. Напряжение на
+                индуктивности </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_436.gif">. 
+                   (8.7) </p>
+            <p align="justify">     где <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_437.gif"> -
+                напряжение на индуктивности в момент коммутации, является зависимым начальным
+                условием. Составим уравнение по второму закону Кирхгофа для момента коммутации,
+                чтобы определить зависимое начальное условие <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_437.gif">.
+            </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_438.gif">.
+            </p>
+            <p align="justify">       До коммутации конденсатор был не заряжен, поэтому </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_439.gif">.
+            </p>
+            <p align="justify">      Подставляя в (8.6) и (8.7) t = 0 и используя независимое и
+                зависимое начальные условия, получим систему уравнений </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_440.gif">   
+                 (8.8) </p>
+            <p align="justify">       Решив систему (8.8), определим </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_441.gif">
+            </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_442.gif">.
+            </p>
+            <p align="Left"><img align="LEFT" border="0"
+                                 src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_443.gif">
+                     На рис. 8.10 приведена кривая изменения тока в контуре при подключении к нему
+                источника постоянной ЭДС. Из рисунка видно, что колебания в контуре затухают по
+                показательному закону из-за потерь электрической энергии в сопротивлении R.
+                Затухание происходит тем медленнее, чем меньше коэффициент затухания &#945; .      
+                       Рис. 8.10 </p>
+            <p align="justify">        Постоянная времени переходного процесса <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_444.gif">.
+            </p>
+            <p align="justify">     При малом коэффициенте затухания величина &#969;<sub>С</sub>
+                незначительно отличается от резонансной частоты &#969;<sub>0</sub>.    
+                Относительное  затухание колебаний  характеризуется  декрементом затухания,
+                представляющим отношение мгновенных значений тока через один период. </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_445.gif">.
+            </p>
+            <p align="justify">       Натуральный логарифм этого оператора носит название
+                логарифмического декремента затухания </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_446.gif">.
+            </p>
+            <p align="justify">       Для контура с небольшим затуханием, когда <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_447.gif">
+            </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_448.gif">
+            </p>
+            <p align="justify">     Апериодический режим в R-L-C контуре наблюдается при большом
+                затухании, когда <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_449.gif">.
+                В этом случае корни P<sub>1,2</sub> вещественные, отрицательные, различные. </p>
+            <p align="justify">       Свободный ток определяется по формуле </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_450.gif">. 
+                   (8.9) </p>
+            <p align="justify">       Напряжение на индуктивности </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_451.gif">. 
+                   (8.10) </p>
+            <p align="justify">     Подставив в уравнение (8.9) и (8.10) t = 0 и используя
+                независимое и зависимое условия, получим систему уравнений </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_452.gif">
+            </p>
+            <p align="justify">       Решив эту систему, определим постоянные интегрирования </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_453.gif">.
+            </p>
+            <p align="justify">       Выражение для тока в контуре </p>
+            <p align="Center"><img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_454.gif">
+            </p>
+            <p align="justify"> состоит из положительной, медленно затухающей экспоненты с
+                коэффициентом затухания P<sub>1</sub> и отрицательной, быстро затухающей экспоненты
+                P<sub>2</sub> (рис. 8.11). </p>
+            <p align="Left"><img align="LEFT" border="0"
+                                 src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_455.gif">
+                     Ток получается неколебательным, он не принимает отрицательных значений, то есть
+                не меняет своего направления.      На границе между колебательным и апериодическим
+                режимом при                         <img
+                        src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_456.gif">
+                наблюдается предельный случай апериодического процесса.            Рис. 8.11 </p>
+            <p>
+            </p>
+            <div>
+            </div>
+
+
+        </font></font>
+</td>
+
+</body>
+</html>

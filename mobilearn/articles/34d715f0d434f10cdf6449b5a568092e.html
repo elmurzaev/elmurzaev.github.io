@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Примеры использования ЗБЧ Чебышёва</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<div class="example">
+    <b>Пример 55. </b>
+    Монета подбрасывается 10000 раз. Оценим вероятность того, что
+    частота выпадения герба отличается от половины более чем на 0,01.
+    <p>Требуется оценить
+        <img align="absmiddle" height="45"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imga1469.gif" width="163">, где <img
+                align="bottom" height="17"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1470.gif" width="61">, <img
+                align="absmiddle" height="21"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1471.gif" width="100"> &#151;
+        число выпадений герба, а
+        <img align="middle" height="19"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1168.gif" width="16"> &#151; ,
+        каждая из которых имеет
+        с параметром 1/2 и равна
+        единице, если при соответствующем подбрасывании выпал герб, и нулю иначе.
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1472.gif" width="168">, искомая
+        оценка сверху
+        выглядит так:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="57"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imga1473.gif"
+                           width="410"></p>
+    <p>Иначе говоря, позволяет заключить,
+        что в среднем не более чем в четверти случаев при 10000 подбрасываниях
+        монеты частота выпадения герба будет отличаться от 1/2 на одну сотую или больше.
+        Мы увидим, насколько это грубая оценка, когда познакомимся с
+        .
+    </p>
+</div>
+<div class="example">
+    <b>Пример 56. </b>
+    Пусть <img align="absmiddle" height="18"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1222.gif" width="72"> &#151;
+    последовательность , которых ограничены одной и той же постоянной
+    <img align="absmiddle" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img419.gif"
+         width="16">, а любых двух <img align="absmiddle" height="19"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1168.gif"
+                                        width="16"> и <img align="absmiddle" height="20"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1309.gif"
+                                                           width="17">  (<img align="absmiddle"
+                                                                              height="18"
+                                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img362.gif"
+                                                                              width="40">), не
+    являющихся соседними в последовательности,
+    равны нулю. эта последовательность ЗБЧ?
+    <p>Воспользуемся подходящим неравенством в
+        и :
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="57"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imga1474.gif"
+                           width="266"><span class="quad"></span></p>
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="69"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1475.gif" width="360"></td>
+            <td align="right" width="30">(26)</td>
+        </tr>
+    </table>
+    <p>
+        Но при <img align="absmiddle" height="19"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1476.gif" width="40"> по
+        условию <img align="absmiddle" height="21"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1477.gif" width="109"> для
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1478.gif" width="70">.
+        Следовательно, все в равенстве равны нулю,
+        кроме, может быть, <img align="absmiddle" height="20"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1479.gif"
+                                width="80">, <img align="absmiddle" height="20"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1480.gif"
+                                                  width="80">, ..., <img align="absmiddle"
+                                                                         height="20"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1481.gif"
+                                                                         width="100"> (их ровно <img
+            align="absmiddle" height="17"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img33.gif" width="43"> штука).
+    </p>
+    <p>Оценим каждую из них, используя тот факт, что
+        по модулю :
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1482.gif"
+                           width="305">
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="69"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1483.gif"
+                           width="437"></p>
+    <p>Получаем, что последовательность <img align="absmiddle" height="18"
+                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1484.gif"
+                                             width="77"> , так как
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="47"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imga1485.gif"
+                           width="561"></p>
+</div>
+<p>
+</p>
+<p>
+</p>
+</body>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.3. Оператор получения информации из области дескриптора SQL</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;get descriptor statement&gt; ::=
+   GET DESCRIPTOR &lt;descriptor name&gt;
+  &lt;get descriptor information&gt;
+&lt;get descriptor information&gt; ::=
+  &lt;get count&gt;
+ ( VALUE &lt;item number&gt;
+  &lt;get item information&gt;
+ ({&lt;comma&gt; &lt;get item information&gt;}...]
+&lt;get count&gt; ::=
+  &lt;simple target specification 1&gt;
+  &lt;equals operator&gt; COUNT
+&lt;get item information&gt; ::=
+  &lt;simple target specification 2&gt;
+  &lt;equals operator&gt;
+  &lt;descriptor item name&gt;
+&lt;item number&gt; ::= &lt;simple value specification&gt;
+&lt;simple target specification 1&gt; ::= &lt;simple target specification&gt;
+&lt;simple target specification 2&gt; ::= &lt;simple target specification&gt;
+&lt;descriptor item name&gt; ::=
+   TYPE
+ ( LENGHT
+ ( OCTET_LENGHT
+ ( RETURNED_LENGHT
+ ( RETURNED_OCTET_LENGHT
+ ( PRECISION
+ ( SCALE
+ ( DATETIME_INTERVAL_CODE
+ ( DATATIME_INTERVAL_PRECISION
+ ( NULLABLE
+ ( INDICATOR
+ ( DATA
+ ( NAME
+ ( UNNAMED
+ ( COLLATION_CATALOG
+ ( COLLATION_SCHEMA
+ ( COLLATION_NAME
+ ( CHARACTER_SET_CATALOG
+ ( CHARACTER_SET_SCHEMA
+ ( CHARACTER_SET_NAME
+&lt;simple target specification&gt; ::=
+  &lt;parameter name&gt;
+( &lt;embedded variable name&gt;</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        Оператор GET DESCRIPTOR служит для выборки описательной информации, ранее размещенной в
+        дескрипторе с помощью оператора DESCRIBE. За одно выполнение оператора можно получить либо
+        число заполненных элементов дескриптора (COUNT), либо информацию, содержащуюся в одном из
+        заполненных элементов.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

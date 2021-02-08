@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Анализ электрических цепей постоянного тока с одним источником энергии</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td id="contents">
+    <h1>3. Анализ электрических цепей постоянного тока с одним источником энергии</h1>
+    <h2 align="Center"> 3.1. Расчет электрических цепей постоянного тока с одним источником методом
+        свертывания </h2>
+    <font size="4"><p align="justify">    В соответствии с методом свертывания, отдельные участки
+        схемы упрощают и постепенным преобразованием приводят схему к одному эквивалентному
+        (входному) сопротивлению, включенному к зажимам источника. Схема упрощается с помощью замены
+        группы последовательно или параллельно соединенных сопротивлений одним, эквивалентным по
+        сопротивлению. Определяют ток в упрощенной схеме, затем возвращаются к исходной схеме и
+        определяют в ней токи. Рассмотрим схему на рис. 3.1. Пусть известны величины сопротивлений
+        R1, R2, R3, R4, R5, R6, ЭДС Е. Необходимо определить токи в ветвях схемы. . </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_59.gif"> Рис.
+            3.1 Рис. 3.2 Сопротивления R4 и R5 соединены последовательно, а сопротивление R6 -
+            параллельно с ними, поэтому их эквивалентное сопротивление </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_60.gif"></p>
+        <p align="justify">       После проведенных преобразований схема принимает вид, показанный
+            на рис. 3.2, а эквивалентное сопротивление всей цепи </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_61.gif"></p>
+        <p align="justify"> Ток I1 в неразветвленной части схемы определяется по формуле: </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_62.gif"></p>
+        <p align="justify">      Найдем токи I2 и I3 в схеме на рис. 3.2 по формулам: </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_63.gif"></p>
+        <p align="justify">   I3 = I1 - I2 - формула получается из уравнения, составленного по
+            первому закону Кирхгофа: </p>
+        <p align="Center">I<sub>1</sub> - I<sub>2</sub> - I<sub>3</sub> = 0. </p>
+        <p align="justify">     Переходим к исходной схеме на рис. 3.1 и определим токи в ней по
+            формулам: </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_64.gif"></p>
+        <p align="justify">         I6 = I3 - I4 (в соответствии с первым законом Кирхгофа I3 - I4 -
+            I6 =0). </p>
+        <h2 align="Center"> 3.2. Расчет электрических цепей постоянного тока с одним источником
+            методом подобия или методом пропорциональных величин </h2>
+        <p align="justify">       Возьмем электрическую схему на рис. 3.1, зададимся произвольным
+            значением тока<img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_73.gif"> Ч в
+            сопротивлении R6, наиболее удаленном от источника питания. По заданному току <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_73.gif"> и
+            сопротивлению R6 определим напряжение <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_74.gif">.
+            Далее определим: </p>
+        <p align="justify"></p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_65.gif">,   <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_66.gif">, </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_67.gif">,   <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_68.gif">, </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_69.gif">;   <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_70.gif">. </p>
+        <p align="justify">       Находим значение ЭДС </p>
+        <p align="Center"><img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_71.gif">. </p>
+        <p align="justify">        Найденное значение ЭДС <img
+                src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_75.gif">
+            отличается от заданной величины ЭДС Е.        Вычислим коэффициент подобия <img
+                    src="http://www.normalizator.com/manuals/lessons/matusko/images/ris_72.gif">.
+            Умножим на него полученные при расчете значения токов и напряжений, находим
+            действительные значения токов цепи. </p>
+        <p>
+        </p>
+        <div>
+        </div>
+
+
+    </font>
+</td>
+
+</body>
+</html>

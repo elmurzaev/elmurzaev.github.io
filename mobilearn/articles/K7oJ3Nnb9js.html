@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>32. Виртуальные методы</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Метод становится виртуальным, если за его объявлением в типе объекта стоит новое зарезервированное слово virtual. Если объявляется метод в родительском типе как virtual, то все методы с аналогичными именами в дочерних типах также должны объявляться виртуальными во избежание ошибки компилятора.</span>
+</p>
+<p>
+    <span>Ниже приведены объекты из примера платежной ведомости, должным образом виртуализированные:</span>
+</p>
+<p><span>tyрe</span></p>
+<p><span>PEmрloyee = ^TEmployee;</span></p>
+<p><span>TEmployee = object</span></p>
+<p><span>Name, Title: string[25];</span></p>
+<p><span>Rate: Real;</span></p>
+<p><span>constructor Init (AName, ATitle: String; ARate: Real);</span></p>
+<p><span>function GetPayAmount: Real; virtual;</span></p>
+<p><span>function GetName: String;</span></p>
+<p><span>function GetTitle: String;</span></p>
+<p><span>function GetRate: Real;</span></p>
+<p><span>рrocedure Show; virtual;</span></p>
+<p><span>end;</span></p>
+<p><span>PHourly = ^THourly;</span></p>
+<p><span>THourly = object(TEmployee);</span></p>
+<p><span>Time: Integer;</span></p>
+<p><span>constructor Init (AName, ATitle: String; ARate: Real;</span></p>
+<p><span>Time: Integer);</span></p>
+<p><span>function GetPayAmount: Real; virtual;</span></p>
+<p><span>function GetTime: Integer;</span></p>
+<p><span>end;</span></p>
+<p><span>PSalaried = ^TSalaried;</span></p>
+<p><span>TSalaried = object(TEmployee);</span></p>
+<p><span>function GetPayAmount: Real; virtual;</span></p>
+<p><span>end;</span></p>
+<p><span>PCommissioned = ^TCommissioned;</span></p>
+<p><span>TCommissioned = object(Salaried);</span></p>
+<p><span>Commission: Real;</span></p>
+<p><span>SalesAmount: Real;</span></p>
+<p><span>constructor Init (AName, ATitle: String; ARate,</span></p>
+<p><span>ACommission, ASalesAmount: Real);</span></p>
+<p><span>function GetPayAmount: Real; virtual;</span></p>
+<p><span>end;</span></p>
+<div class="fb2-empty-line"> </div>
+<p><span>Конструктор является специальным типом процедуры, которая выполняет некоторую установочную работу для механизма виртуальных методов. Более того, конструктор должен вызываться перед вызовом любого виртуального метода. Вызов виртуального метода без предварительного вызова конструктора может привести к блокированию системы, а у компилятора нет способа проверить порядок вызова методов.</span>
+</p>
+<p><span>Каждый тип объекта, имеющий виртуальные методы, обязан иметь конструктор.</span></p>
+<p><span>Конструктор должен вызываться перед вызовом любого другого виртуального метода. Вызов виртуального метода без предыдущего обращения к конструктору может вызвать блокировку системы, и компилятор не сможет проверить порядок, в котором вызываются методы.</span>
+</p>
+</body>
+</html>

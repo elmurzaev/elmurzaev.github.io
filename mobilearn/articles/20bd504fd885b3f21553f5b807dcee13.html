@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Основы Action Mailer</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="osnovy-action-mailer"> Основы Action Mailer</h2>
+    <p>Это руководство представит вам все, что нужно для того, чтобы посылать и получать электронную
+        почту в вашем приложении, и раскроет множество внутренних методов Action Mailer. Оно также
+        раскроет, как тестировать ваши рассыльщики.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как отправлять и получать письма в приложении Rails.
+        </li>
+        <li>Как создавать и редактировать класс Action Mailer и вьюху рассыльщика.
+        </li>
+        <li>Как настраивать Action Mailer для своей среды.
+        </li>
+        <li>Как тестировать свои классы Action Mailer.
+        </li>
+    </ul>
+    <p>Action Mailer позволяет отправлять электронные письма из вашего приложения, используя классы
+        и вьюхи рассыльщика. Рассыльщики работают подобно контроллерам. Они наследуются от <code>ActionMailer::Base</code>,
+        и находятся в <code>app/mailers</code>, и связываются со вьюхами, находящимися в <code>app/views</code>.
+    </p>
+    <h3 class="inside_page_header" id="otpravka-elektronnoy-pochty"> Отправка электронной почты</h3>
+    <p>Этот раздел представляет пошаговое руководство по созданию рассыльщика и его вьюх.</p>
+    <h4 class="inside_page_header" id="poshagovoe-rukovodstvo-po-sozdaniyu-rassylschika"> Пошаговое
+        руководство по созданию рассыльщика</h4>
+    <h5 class="inside_page_header" id="sozdaem-rassylschik"> Создаем рассыльщик</h5>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate mailer UserMailer
+create  app/mailers/user_mailer.rb
+create  app/mailers/application_mailer.rb
+invoke  erb
+create    app/views/user_mailer
+create    app/views/layouts/mailer.text.erb
+create    app/views/layouts/mailer.html.erb
+invoke  test_unit
+create    test/mailers/user_mailer_test.rb
+create    test/mailers/previews/user_mailer_preview.rb
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/mailers/application_mailer.rb
+class ApplicationMailer &lt; ActionMailer::Base
+  default from: "from@example.com"
+  layout 'mailer'
+end
+# app/mailers/user_mailer.rb
+class UserMailer &lt; ApplicationMailer
+end
+</pre>
+    </div>
+    <p>Как видите, можно генерировать рассыльщик одним из генератором Rails. Рассыльщики
+        концептуально похожи на контроллеры, таким образом мы получим рассыльщик, директорию для
+        вьюх и тест.</p>
+    <p>Если не хотите использовать генератор, можно создать свой файл в app/mailers, просто
+        убедитесь, что он унаследован от <code>ActionMailer::Base</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class MyMailer &lt; ActionMailer::Base
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="redaktiruem-rassylschik"> Редактируем рассыльщик</h5>
+    <p>Рассыльщики очень похожи на контроллеры Rails. У них также есть методы, называемые "экшнами",
+        и они используют вьюхи для структурирования содержимого. В то время, когда контроллер
+        создает содержимое, например HTML, для возврата его на клиент, рассыльщик создает сообщение
+        для доставки по электронной почте.</p>
+    <p><code>app/mailers/user_mailer.rb</code> содержит пустой рассыльщик:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+end
+</pre>
+    </div>
+    <p>Давайте добавим метод, названный <code>welcome_email</code>, который будет посылать email на
+        зарегистрированный адрес email пользователя:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  default from: 'notifications@example.com'
+  def welcome_email(user)
+    @user = user
+    @url  = 'http://example.com/login'
+    mail(to: @user.email, subject: 'Welcome to My Awesome Site')
+  end
+end
+</pre>
+    </div>
+    <p>Вот краткое описание элементов, представленных в этом методе. Для полного списка всех
+        доступных опций, обратитесь к .</p>
+    <ul>
+        <li>Хэш <code>default</code> - это хэш значений по умолчанию для любых рассылаемых вами
+            email из этого рассыльщика. В этом случае мы присваиваем заголовку <code>:from</code>
+            значение для всех сообщений в этом классе. Это может быть переопределено для отдельного
+            письма.
+        </li>
+        <li>
+            <code>mail</code> - фактическое сообщение email, куда мы передаем заголовки
+            <code>:to</code> и <code>:subject</code>.
+        </li>
+    </ul>
+    <p>Как и в контроллере, любые переменные экземпляра, определенные в методе, будут доступны для
+        использования во вьюхе.</p>
+    <h5 class="inside_page_header" id="sozdaem-vyuhu-rassylschika"> Создаем вьюху рассыльщика</h5>
+    <p>Создадим файл, названный <code>welcome_email.html.erb</code> в
+        <code>app/views/user_mailer/</code>. Это будет шаблоном, используемым для email,
+        форматированным в HTML:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content='text/html; charset=UTF-8' http-equiv='Content-Type' /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Welcome to example.com, &lt;%= @user.name %&gt;&lt;/h1&gt;
+    &lt;p&gt;
+      You have successfully signed up to example.com,
+      your username is: &lt;%= @user.login %&gt;.&lt;br&gt;
+    &lt;/p&gt;
+    &lt;p&gt;
+      To login to the site, just follow this link: &lt;%= @url %&gt;.
+    &lt;/p&gt;
+    &lt;p&gt;Thanks for joining and have a great day!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+    </div>
+    <p>Давайте также создадим текстовую часть для этого email. Не все клиенты предпочитают письма
+        HTML, и рассылка обоих является лучшей практикой. Для этого создайте файл с именем <code>welcome_email.text.erb</code>
+        в <code>app/views/user_mailer/</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+Welcome to example.com, &lt;%= @user.name %&gt;
+===============================================
+You have successfully signed up to example.com,
+your username is: &lt;%= @user.login %&gt;.
+To login to the site, just follow this link: &lt;%= @url %&gt;.
+Thanks for joining and have a great day!
+</pre>
+    </div>
+    <p>Теперь при вызове метода <code>mail</code>, Action Mailer обнаружит два шаблона (text и HTML)
+        и автоматически создаст <code>multipart/alternative</code> email.</p>
+    <h5 class="inside_page_header" id="vyzov-rassylschika"> Вызов рассыльщика</h5>
+    <p>Рассыльщики - это всего лишь другой способ отрендерить вьюху. Вместо рендеринга вьюхи и
+        отсылки ее по протоколу HTTP, они всего лишь вместо этого отправляют ее по протоколам email.
+        Благодаря этому имеет смысл, чтобы контроллер сказал рассыльщику отослать письмо тогда,
+        когда пользователь был успешно создан.</p>
+    <p>Настройка этого до безобразия проста.</p>
+    <p>Во первых, давайте создадим простой скаффолд <code>User</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold user name email login
+$ bin/rake db:migrate
+</pre>
+    </div>
+    <p>Теперь, когда у нас есть модель user, с которой мы играем, надо всего лишь отредактировать
+        <code>app/controllers/users_controller.rb</code>, чтобы поручить <code>UserMailer</code>
+        доставлять email каждому вновь созданному пользователю, изменив экшн <code>create</code> и
+        вставив вызов <code>UserMailer.welcome_email</code> сразу после того, как пользователь был
+        успешно сохранен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UsersController &lt; ApplicationController
+  # POST /users
+  # POST /users.json
+  def create
+    @user = User.new(params[:user])
+    respond_to do |format|
+      if @user.save
+        # Сказать UserMailer отослать приветственное письмо после сохранения
+        UserMailer.welcome_email(@user).deliver_later
+        format.html { redirect_to(@user, notice: 'User was successfully created.') }
+        format.json { render json: @user, status: :created, location: @user }
+      else
+        format.html { render action: 'new' }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Поведением Active Job по умолчанию является запуск заданий ':inline'.
+        Поэтому можно использовать <code>deliver_later</code> для отсылки писем прямо сейчас, а если
+        позже решите отправлять письма в фоновой задаче, вам нужно будет всего лишь настроить Active
+        Job для использования бэкенда очередей (Sidekiq, Resque и т.п.).</p></div>
+    <p>Если хотите отправлять письма прямо сейчас в любом случае (например, из крона) просто
+        вызовите <code>deliver_now</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class SendWeeklySummary
+  def run
+    User.find_each do |user|
+      UserMailer.weekly_summary(user).deliver_now
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Метод <code>welcome_email</code> возвращает объект <code>ActionMailer::MessageDelivery</code>,
+        которому затем можно сказать <code>deliver_now</code> или <code>deliver_later</code>, чтобы
+        он сам себя отослал. Объект <code>ActionMailer::MessageDelivery</code> — это всего лишь
+        обертка для <code>Mail::Message</code>. Если хотите исследовать, изменить или еще что-то
+        сделать с объектом <code>Mail::Message</code>, к нему можно получить доступ с помощью метода
+        <code>message</code> на объекте <code>ActionMailer::MessageDelivery</code>.</p>
+    <h4 class="inside_page_header" id="avtomaticheskoe-kodirovanie-znacheniy-zagolovka">
+        Автоматическое кодирование значений заголовка</h4>
+    <p>Action Mailer осуществляет автоматическое кодирование многобитных символов в заголовках и
+        телах.</p>
+    <p>Для более сложных примеров, таких, как определение альтернативных кодировок или самокодировок
+        текста, обратитесь к библиотеке .</p>
+    <h4 class="inside_page_header" id="complete-list-of-action-mailer-user-settable-attributes">
+        Полный перечень методов Action Mailer</h4>
+    <p>Имеется всего три метода, необходимых для рассылки почти любых сообщений email:</p>
+    <ul>
+        <li>
+            <code>headers</code> - Определяет любой заголовок email. Можно передать хэш пар имен и
+            значений полей заголовка, или можно вызвать <code>headers[:field_name] = 'value'</code>
+        </li>
+        <li>
+            <code>attachments</code> - Позволяет добавить вложения в ваш email. Например, <code>attachments['file-name.jpg']
+            = File.read('file-name.jpg')</code>
+        </li>
+        <li>
+            <code>mail</code> - Фактически отсылает сам email. Можете передать в
+            <code>headers</code> хэш к методу <code>mail</code> как параметр, <code>mail</code>
+            затем создаст email, или чистый текст, или multipart, в зависимости от определенных вами
+            шаблонов email.
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="dobavlenie-vlozheniy"> Добавление вложений</h5>
+    <p>В Action Mailer очень просто добавить вложения.</p>
+    <ul>
+        <li>
+            <p>Передайте имя файла и содержимое, и Action Mailer и автоматически определят
+                mime_type, установят кодировку и создадут вложение.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+attachments['filename.jpg'] = File.read('/path/to/filename.jpg')
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p> Когда будет вызван метод <code>mail</code>, он пошлет multipart email с правильно вложенным
+        вложением, верхний уровень будет <code>multipart/mixed</code>, и первая часть будет <code>multipart/alternative</code>,
+        содержащая чистый текст и сообщения HTML.</p>
+    <div class="note"><p>Mail автоматически кодирует вложение в Base64. Если хотите что-то иное,
+        закодируйте свое содержимое и передайте в кодированном содержимом, и укажите кодировку в
+        хэше в методе <code>attachments</code>.</p></div>
+    <ul>
+        <li>
+            <p>Передайте имя файла и определите заголовки и содержимое, и Action Mailer и Mail будут
+                использовать переданные вами настройки.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+encoded_content = SpecialEncode(File.read('/path/to/filename.jpg'))
+attachments['filename.jpg'] = {
+  mime_type: 'application/x-gzip',
+  encoding: 'SpecialEncoding',
+  content: encoded_content
+}
+</pre>
+            </div>
+        </li>
+    </ul>
+    <div class="note"><p>Если указать кодировку, Mail будет полагать, что ваше содержимое уже
+        кодировано в ней и не попытается кодировать в Base64.</p></div>
+    <h5 class="inside_page_header" id="sozdanie-vstroennyh-vlozheniy"> Создание встроенных
+        вложений</h5>
+    <p>Action Mailer 3.0 создает встроенные вложения, которые вовлекали множество хаков в версиях до
+        3.0, более просто и обычно, так, как и должно было быть.</p>
+    <ul>
+        <li>
+            <p>Сперва, чтобы сказать Mail превратить вложения во встроенные вложения, надо всего
+                лишь вызвать <code>#inline</code> на методе attachments в вашем рассыльщике:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def welcome
+  attachments.inline['image.jpg'] = File.read('/path/to/image.jpg')
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Затем, во вьюхе можно просто сослаться на <code>attachments</code> как хэш и
+                определить, какое вложение хотите отобразить, вызвав <code>url</code> на нем и затем
+                передать результат в метод <code>image_tag</code>:</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;Hello there, this is our image&lt;/p&gt;
+&lt;%= image_tag attachments['image.jpg'].url %&gt;
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Так как это стандартный вызов <code>image_tag</code>, можно передать хэш опций после
+                URL вложения, как это делается для любого другого изображения:</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;Hello there, this is our image&lt;/p&gt;
+&lt;%= image_tag attachments['image.jpg'].url, alt: 'My Photo', class: 'photos' %&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="rassylka-email-neskolkim-poluchatelyam"> Рассылка Email
+        нескольким получателям</h5>
+    <p>Возможно отослать email одному и более получателям в одном письме (например, информируя всех
+        админов о новой регистрации пользователя), настроив список адресов email в ключе
+        <code>:to</code>. Перечень email может быть массивом или отдельной строкой с адресами,
+        разделенными запятыми.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class AdminMailer &lt; ApplicationMailer
+  default to: Proc.new { Admin.pluck(:email) },
+          from: 'notification@example.com'
+  def new_registration(user)
+    @user = user
+    mail(subject: "New User Signup: #{@user.email}")
+  end
+end
+</pre>
+    </div>
+    <p>Тот же формат может быть использован для назначения получателей копии (Cc:) и скрытой копии
+        (Bcc:), при использовании ключей <tt>:cc</tt> и <tt>:bcc</tt> соответственно.</p>
+    <h5 class="inside_page_header" id="rassylka-email-s-imenem"> Рассылка Email с именем</h5>
+    <p>Иногда хочется показать имена людей вместо их электронных адресов, при получении ими email.
+        Фокус в том, что формат адреса email следующий <code>"Full Name" &lt;email&gt;</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def welcome_email(user)
+  @user = user
+  email_with_name = %("#{@user.name}" &lt;#{@user.email}&gt;)
+  mail(to: email_with_name, subject: 'Welcome to My Awesome Site')
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vyuhi-rassylschika"> Вьюхи рассыльщика</h4>
+    <p>Вьюхи рассыльщика расположены в директории <code>app/views/name_of_mailer_class</code>.
+        Определенная вьюха рассыльщика известна классу, поскольку у нее имя такое же, как у метода
+        рассыльщика. Так, в нашем примере, вьюха рассыльщика для метода <code>welcome_email</code>
+        будет в <code>app/views/user_mailer/welcome_email.html.erb</code> для версии HTML и <code>welcome_email.text.erb</code>
+        для обычной текстовой версии.</p>
+    <p>Чтобы изменить вьюху рассыльщика по умолчанию для вашего экшна, сделайте так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  default from: 'notifications@example.com'
+  def welcome_email(user)
+    @user = user
+    @url  = 'http://example.com/login'
+    mail(to: @user.email,
+         subject: 'Welcome to My Awesome Site',
+         template_path: 'notifications',
+         template_name: 'another')
+  end
+end
+</pre>
+    </div>
+    <p>В этом случае он будет искать шаблон в <code>app/views/notifications</code> с именем <code>another</code>.
+        Также можно определить массив путей для <code>template_path</code>, и они будут искаться в
+        указанном порядке.</p>
+    <p>Если желаете большей гибкости, также возможно передать блок и рендерить определенный шаблон
+        или даже рендерить вложенный код или текст без использования файла шаблона:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  default from: 'notifications@example.com'
+  def welcome_email(user)
+    @user = user
+    @url  = 'http://example.com/login'
+    mail(to: @user.email,
+         subject: 'Welcome to My Awesome Site') do |format|
+      format.html { render 'another_template' }
+      format.text { render text: 'Render text' }
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Это отрендерит шаблон 'another_template.html.erb' для HTML части и использует 'Render text'
+        для текстовой части. Команда <code>render</code> та же самая, что используется в Action
+        Controller, поэтому можете использовать те же опции, такие как <code>:text</code>, <code>:inline</code>
+        и т.д.</p>
+    <h4 class="inside_page_header" id="makety-action-mailer"> Макеты Action Mailer</h4>
+    <p>Как и во вьюхах контроллера, можно также иметь макеты рассыльщика. Имя макета должно быть
+        таким же, как у вашего рассыльщика, таким как <code>user_mailer.html.erb</code> и <code>user_mailer.text.erb</code>,
+        чтобы автоматически распознаваться вашим рассыльщиком как макет.</p>
+    <p>Чтобы задействовать другой файл, вызовите <code>layout</code> в своем рассыльщике:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  layout 'awesome' # использовать awesome.(html|text).erb как макет
+end
+</pre>
+    </div>
+    <p>Подобно вьюхам контроллера, используйте <code>yield</code> для рендеринга вьюхи внутри
+        макета.</p>
+    <p>Также можно передать опцию <code>layout: 'layout_name'</code> в вызов render в формате блока,
+        чтобы определить различные макеты для различных форматов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  def welcome_email(user)
+    mail(to: user.email) do |format|
+      format.html { render layout: 'my_layout' }
+      format.text
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Отрендерит часть в HTML, используя файл <code>my_layout.html.erb</code>, и текстовую часть с
+        обычным файлом <code>user_mailer.text.erb</code>, если он существует.</p>
+    <h4 class="inside_page_header" id="predprosmotr-pisem"> Предпросмотр писем</h4>
+    <p>Предпросмотр Action Mailer предоставляет способ увидеть, как выглядят письма, посетив
+        специальный URL, который отображает их. В приведенном выше примере, класс предпросмотра для
+        <code>UserMailer</code> должен называться <code>UserMailerPreview</code> и находится в
+        <code>test/mailers/previews/user_mailer_preview</code>. Чтобы увидеть предпросмотр <code>welcome_email</code>,
+        реализуйте метод с таким же именем и вызовом <code>UserMailer.welcome_email</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailerPreview &lt; ActionMailer::Preview
+  def welcome_email
+    UserMailer.welcome_email(User.first)
+  end
+end
+</pre>
+    </div>
+    <p>Тогда предпросмотр будет доступно по адресу .</p>
+    <p>Если вы поменяете что-то в <code>app/views/user_mailer/welcome_email.html.erb</code> или в
+        самом рассыльщике, это автоматически перезагрузится и отрендерится, таким образом, вы можете
+        увидеть новые стили мгновенно. Список для предпросмотра также доступен по адресу .</p>
+    <p>По умолчанию, классы предпросмотра находятся в <code>test/mailers/previews</code>.
+        Это может быть изменено, используя опцию <code>preview_path</code>. Например, если вы хотите
+        изменить это на <code>lib/mailer_previews</code>, вы можете указать в <code>config/application.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_mailer.preview_path = "#{Rails.root}/lib/mailer_previews"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="sozdaem-url-vo-vyuhah-action-mailer"> Создаем URL во вьюхах
+        Action Mailer</h4>
+    <p>В отличие от контроллеров, экземпляр рассыльщика не может использовать какой-либо контекст
+        относительно входящего запроса, поэтому необходимо предоставить параметр <code>:host</code>
+        самостоятельно.</p>
+    <p>Так как <code>:host</code> обычно одинаковый для всего приложения, его можно настроить
+        глобально в <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_mailer.default_url_options = { host: 'example.com' }
+</pre>
+    </div>
+    <p>В связи с таким поведением в письме нельзя использовать любые хелперы <code>*_path</code>.
+        Вместо них можно использовать связанные хелперы <code>*_url</code>. Например, вместо
+        использования</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= link_to 'welcome', welcome_path %&gt;
+</pre>
+    </div>
+    <p>Нужно использовать:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= link_to 'welcome', welcome_url %&gt;
+</pre>
+    </div>
+    <p>При использовании полного URL ваши ссылки в письмах будут работать.</p>
+    <h5 class="inside_page_header" id="sozdanie-url-s-pomoschyu-url_for"> Создание URL с помощью
+        <code>url_for</code>
+    </h5>
+    <p><code>url_for</code> генерирует полный URL по умолчанию в шаблонах.</p>
+    <p>Если вы не настроили опцию <code>:host</code> глобально, убедитесь, что передали ее в <code>url_for</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= url_for(host: 'example.com',
+            controller: 'welcome',
+            action: 'greeting') %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="sozdanie-url-s-pomoschyu-imenovannyh-marshrutov"> Создание
+        URL с помощью именованных маршрутов</h5>
+    <p>У клиентов email отсутствует веб контекст, таким образом у путей нет базового URL для
+        формирования полного веб адреса. Поэтому следует всегда использовать только вариант "_url"
+        именованных маршрутных хелперов.</p>
+    <p>Если вы не настроили опцию <code>:host</code> глобально, убедитесь, что передали ее в
+        маршрутный хелпер.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= user_url(@user, host: 'example.com') %&gt;
+</pre>
+    </div>
+    <div class="note"><p>не <code>GET</code> ссылки требуют
+        и не будут работать в шаблонах рассыльщика. Они будут заменятся на простые <code>GET</code>
+        запросы.</p></div>
+    <h4 class="inside_page_header" id="dobavlenie-kartinok-vo-vyuhah-action-mailer"> Добавление
+        картинок во вьюхах Action Mailer</h4>
+    <p>В отличие от контроллеров, экземпляр рассыльщика не может использовать какой-либо контекст
+        относительно входящего запроса, поэтому необходимо предоставить параметр
+        <code>:asset_host</code> самостоятельно.</p>
+    <p>Так как <code>:asset_host</code> обычно одинаковый для всего приложения, его можно настроить
+        глобально в <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_mailer.asset_host = 'http://example.com'
+</pre>
+    </div>
+    <p>Теперь вы можете отображать картинки внутри вашего письма.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= image_tag 'image.jpg' %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rassylka-multipart-email"> Рассылка multipart email</h4>
+    <p>Action Mailer автоматически посылает multipart email, если имеются разные шаблоны для одного
+        и того же экшна. Таким образом, для нашего примера UserMailer, если есть <code>welcome_email.text.erb</code>
+        и <code>welcome_email.html.erb</code> в <code>app/views/user_mailer</code>, то Action Mailer
+        автоматически пошлет multipart email с версиями HTML и текстовой, настроенными как разные
+        части.</p>
+    <p>Порядок, в котором части будут вставлены, определяется <code>:parts_order</code> в методе
+        <code>ActionMailer::Base.default</code>.</p>
+    <h4 class="inside_page_header" id="rassylka-pisem-s-dinamicheskimi-optsiyami-dostavki"> Рассылка
+        писем с динамическими опциями доставки</h4>
+    <p>Если хотите переопределить опции доставки по умолчанию (т.е. данные SMTP) во время доставки
+        писем, можно использовать <code>delivery_method_options</code> в экшне рассыльщика.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  def welcome_email(user, company)
+    @user = user
+    @url  = user_url(@user)
+    delivery_options = { user_name: company.smtp_user,
+                         password: company.smtp_password,
+                         address: company.smtp_host }
+    mail(to: @user.email,
+         subject: "Please see the Terms and Conditions attached",
+         delivery_method_options: delivery_options)
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rassylka-pisem-bez-renderinga-shablona"> Рассылка писем без
+        рендеринга шаблона</h4>
+    <p>Бывают ситуации, когда вы хотите пропустить шаг рендеринга шаблона и предоставить тело
+        письма, как строку. Это достигается с использованием опции <code>:body</code>. В таком
+        случае, не забудьте добавить опцию <code>:content_type</code>. Иначе Rails использует по
+        умолчанию <code>text/plain</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  def welcome_email(user, email_body)
+    mail(to: user.email,
+         body: email_body,
+         content_type: "text/html",
+         subject: "Already rendered!")
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="poluchenie-elektronnoy-pochty"> Получение электронной
+        почты</h3>
+    <p>Получение и парсинг электронной почты с помощью Action Mailer может быть довольно сложным
+        делом. До того, как электронная почта достигнет ваше приложение на Rails, нужно настроить
+        вашу систему, чтобы каким-то образом направлять почту в приложение, которому нужно быть
+        следящим за ней. Таким образом, чтобы получать электронную почту в приложении на Rails,
+        нужно:</p>
+    <ul>
+        <li><p>Реализовать метод <code>receive</code> в вашем рассыльщике.</p></li>
+        <li><p>Настроить ваш почтовый сервер для направления почты от адресов, желаемых к получению
+            вашим приложением, в <code>/path/to/app/bin/rails runner
+                'UserMailer.receive(STDIN.read)'</code>.</p></li>
+    </ul>
+    <p>Как только метод, названный <code>receive</code>, определяется в каком-либо рассыльщике,
+        Action Mailer будет парсить сырую входящую почту в объект email, декодировать его, создавать
+        экземпляр нового рассыльщика и передавать объект email в метод экземпляра рассыльщика <code>receive</code>.
+        Вот пример:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  def receive(email)
+    page = Page.find_by(address: email.to.first)
+    page.emails.create(
+      subject: email.subject,
+      body: email.body
+    )
+    if email.has_attachments?
+      email.attachments.each do |attachment|
+        page.attachments.create({
+          file: attachment,
+          description: email.subject
+        })
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="kolbeki-action-mailer"> Колбэки Action Mailer</h3>
+    <p>Action Mailer позволяет определить <code>before_action</code>, <code>after_action</code> и
+        <code>around_action</code>.</p>
+    <ul>
+        <li><p>Фильтры могут быть определены в блоке или символом с именем метода рассыльщика,
+            подобно контроллерам.</p></li>
+        <li><p><code>before_action</code> можно использовать для заполнения объекта mail значениями
+            по умолчанию, <code>delivery_method_options</code> или вставки заголовков по умолчанию и
+            вложений.</p></li>
+        <li><p><code>after_action</code> можно использовать для подобной настройки, как и в <code>before_action</code>,
+            но используя переменные экземпляра, установленные в экшне рассыльщика.</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class UserMailer &lt; ApplicationMailer
+  after_action :set_delivery_options,
+               :prevent_delivery_to_guests,
+               :set_business_headers
+  def feedback_message(business, user)
+    @business = business
+    @user = user
+    mail
+  end
+  def campaign_message(business, user)
+    @business = business
+    @user = user
+  end
+  private
+    def set_delivery_options
+      # Тут у вас есть доступ к экземпляру mail и переменным экземпляра
+      # @business и @user
+      if @business &amp;&amp; @business.has_smtp_settings?
+        mail.delivery_method.settings.merge!(@business.smtp_settings)
+      end
+    end
+    def prevent_delivery_to_guests
+      if @user &amp;&amp; @user.guest?
+        mail.perform_deliveries = false
+      end
+    end
+    def set_business_headers
+      if @business
+        headers["X-SMTPAPI-CATEGORY"] = @business.code
+      end
+    end
+end
+</pre>
+    </div>
+    <ul>
+        <li>Фильтры рассыльщика прерывают дальнейшую обработку, если body установлено в не-nil
+            значение.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="ispolzovanie-helperov-action-mailer"> Использование хелперов
+        Action Mailer</h3>
+    <p>Action Mailer теперь всего лишь наследуется от <code>AbstractController</code>, поэтому у вас
+        есть доступ к тем же общим хелперам, как и в Action Controller.</p>
+    <h3 class="inside_page_header" id="action-mailer-configuration"> Настройка Action Mailer</h3>
+    <p>Следующие конфигурационные опции лучше всего делать в одном из файлов среды разработки
+        (environment.rb, production.rb, и т.д...)</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Конфигурация</th>
+            <th>Описание</th>
+        </tr>
+        <tr>
+            <td><code>logger</code></td>
+            <td>logger используется для создания информации на ходу, если возможно. Можно установить
+                как <code>nil</code> для отсутствия логирования. Совместим как с <code>Logger</code>
+                в Ruby, так и с логгером <code>Log4r</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>smtp_settings</code></td>
+            <td>Позволяет подробную настройку для метода доставки <code>:smtp</code>:
+                <ul>
+                    <li>
+                        <code>:address</code> - Позволяет использовать удаленный почтовый сервер.
+                        Просто измените его изначальное значение "localhost".
+                    </li>
+                    <li>
+                        <code>:port</code> - В случае, если ваш почтовый сервер не работает с 25
+                        портом, можете изменить его.
+                    </li>
+                    <li>
+                        <code>:domain</code> - Если необходимо определить домен HELO, это можно
+                        сделать здесь.
+                    </li>
+                    <li>
+                        <code>:user_name</code> - Если почтовый сервер требует аутентификацию,
+                        установите имя пользователя этой настройкой.
+                    </li>
+                    <li>
+                        <code>:password</code> - Если почтовый сервер требует аутентификацию,
+                        установите пароль этой настройкой.
+                    </li>
+                    <li>
+                        <code>:authentication</code> - Если почтовый сервер требует аутентификацию,
+                        здесь нужно определить тип аутентификации. Это один из символов
+                        <code>:plain</code> (будет отправлять пароль в открытом виде),
+                        <code>:login</code> (будет отправлять пароль закодированным Base64) или
+                        <code>:cram_md5</code> (сочетает в себе механизм Challenge/Response для
+                        обмена информацией и криптографический алгоритм Message Digest 5 хэширования
+                        важной информации)
+                    </li>
+                    <li>
+                        <code>:enable_starttls_auto</code> - Определяет, включен ли STARTTLS в вашем
+                        SMTP сервере и будет использовать это. По умолчанию, <code>true</code>.
+                    </li>
+                    <li>
+                        <code>:openssl_verify_mode</code> - При использовании TLS, вы можете
+                        установить, как OpenSSL проверяет сертификат. Это действительно полезно,
+                        если вам нужно производить проверку самостоятельно созданного и/или
+                        группового сертификата. Вы можете использовать название проверяющей
+                        константы OpenSSL ('none', 'peer', 'client_once', 'fail_if_no_peer_cert')
+                        или непосредственно константу (<code>OpenSSL::SSL::VERIFY_NONE</code>,
+                        <code>OpenSSL::SSL::VERIFY_PEER</code>, ...).
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>sendmail_settings</code></td>
+            <td>Позволяет переопределить опции для метода доставки <code>:sendmail</code>.
+                <ul>
+                    <li>
+                        <code>:location</code> - Расположение исполняемого sendmail. По умолчанию
+                        <code>/usr/sbin/sendmail</code>.
+                    </li>
+                    <li>
+                        <code>:arguments</code> - Аргументы командной строки. По умолчанию <code>-i
+                        -t</code>.
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>raise_delivery_errors</code></td>
+            <td>Должны ли быть вызваны ошибки, если email не может быть доставлен. Это работает,
+                если внешний сервер email настроен на немедленную доставку.
+            </td>
+        </tr>
+        <tr>
+            <td><code>delivery_method</code></td>
+            <td>Определяет метод доставки. Возможные значения:
+                <ul>
+                    <li>
+                        <code>:smtp</code> (по умолчанию), может быть настроен с помощью <code>config.action_mailer.smtp_settings</code>.
+                    </li>
+                    <li>
+                        <code>:sendmail</code>, может быть настроен с помощью <code>config.action_mailer.sendmail_settings</code>.
+                    </li>
+                    <li>
+                        <code>:file</code>: сохраняет письма в файлы; может быть настроен с помощью
+                        <code>config.action_mailer.file_settings</code>.
+                    </li>
+                    <li>
+                        <code>:test</code>: сохраняет письма в массив <code>ActionMailer::Base.deliveries</code>.
+                    </li>
+                </ul>
+                Подробнее смотрите в .
+            </td>
+        </tr>
+        <tr>
+            <td><code>perform_deliveries</code></td>
+            <td>Определяет, должны ли методы deliver_* фактически выполняться. По умолчанию должны,
+                но это можно отключить для функционального тестирования.
+            </td>
+        </tr>
+        <tr>
+            <td><code>deliveries</code></td>
+            <td>Содержит массив всех электронных писем, отправленных через Action Mailer с помощью
+                delivery_method :test. Очень полезно для юнит- и функционального тестирования.
+            </td>
+        </tr>
+        <tr>
+            <td><code>default_options</code></td>
+            <td>Позволит вам установить значения по умолчанию для опций метода <code>mail</code>
+                (<code>:from</code>, <code>:reply_to</code> и т.д.).
+            </td>
+        </tr>
+    </table>
+    <p>Подробное описание возможных конфигураций смотрите в нашего руководства по конфигурированию
+        приложений Rails.</p>
+    <h4 class="inside_page_header" id="primer-nastroyki-action-mailer"> Пример настройки Action
+        Mailer</h4>
+    <p>Примером может быть добавление следующего в подходящий файл <code>config/environments/$RAILS_ENV.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_mailer.delivery_method = :sendmail
+# Defaults to:
+# config.action_mailer.sendmail_settings = {
+#   location: '/usr/sbin/sendmail',
+#   arguments: '-i -t'
+# }
+config.action_mailer.perform_deliveries = true
+config.action_mailer.raise_delivery_errors = true
+config.action_mailer.default_options = {from: 'no-reply@example.com'}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="nastroyka-action-mailer-dlya-gmail"> Настройка Action Mailer
+        для Gmail</h4>
+    <p>Action Mailer теперь использует , теперь это сделать просто, нужно добавить в файл <code>config/environments/$RAILS_ENV.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  address:              'smtp.gmail.com',
+  port:                 587,
+  domain:               'example.com',
+  user_name:            '&lt;username&gt;',
+  password:             '&lt;password&gt;',
+  authentication:       'plain',
+  enable_starttls_auto: true  }
+</pre>
+    </div>
+    <div class="note"><p>15 июля 2014 Google усилили и теперь блокируют попытки от приложений,
+        которые они сочтут небезопасными. Вы можете изменить ваши настройки gmail , чтобы позволить
+        попытки, или использовать другой почтовый провайдер (ESP, email service provider) для
+        отправки почты, заменив выше 'smtp.gmail.com' на адрес вашего провайдера.</p></div>
+    <h3 class="inside_page_header" id="testirovanie-rassylschika"> Тестирование рассыльщика</h3>
+    <p>Подробные инструкции, как тестировать ваши рассыльщики, можно найти в </p>
+    <h3 class="inside_page_header" id="perehvat-pisem"> Перехват писем</h3>
+    <p>Бывают ситуации, когда необходимо отредактировать письмо до его отправки. К счастью, Action
+        Mailer предоставляет хуки для перехвата каждого письма. Можно зарегистрировать перехватчик
+        для внесения изменений в сообщения писем перед тем, как они будут переданы агентам
+        доставки.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class SandboxEmailInterceptor
+  def self.delivering_email(message)
+    message.to = ['sandbox@example.com']
+  end
+end
+</pre>
+    </div>
+    <p>Чтобы перехватчик начал работать, его необходимо зарегистрировать с помощью фреймворка Action
+        Mailer. Это можно сделать в файле инициализатора <code>config/initializers/sandbox_email_interceptor.rb</code>
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+if Rails.env.staging?
+  ActionMailer::Base.register_interceptor(SandboxEmailInterceptor)
+end
+</pre>
+    </div>
+    <div class="note"><p>Вышеприведенный пример использует пользовательское окружение по имени
+        "staging" для сервера, похожего на production, но для целей тестирования. Подробнее о
+        пользовательских окружениях в Rails можно прочитать в .</p></div>
+
+</body>
+</html>

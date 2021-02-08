@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>16.2. Язык модулей</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <p>
+        Структура модуля SQL в стандарте SQL/89 определяется следующими синтаксическими правилами:
+    </p>
+    <pre>&lt;module&gt; ::=
+   &lt;module name clause&gt;
+   &lt;language clause&gt;
+   &lt;module autorization clause&gt;
+  [&lt;declare cursor&gt;...]
+  &lt; procedure &gt;  ...
+&lt;module name clause&gt; ::= MODULE [&lt;module name&gt;]
+&lt;language clause&gt; ::= LANGUAGE { COBOL | FORTRAN | PASCAL | PLI }
+&lt;module autorization clause&gt; ::=
+   AUTHORIZATION &lt;module autorization identifier&gt;
+&lt;module autorization identifier&gt; ::= &lt;autorization identifier&gt;</pre>
+    <p>
+        Существенно, что каждый модуль SQL ориентирован на использование в программах, написанных на
+        конкретном языке программирования. Если в модуле присутствуют процедуры работы с курсорами,
+        то все курсоры должны быть специфицированы в начале модуля. Заметим, что объявление курсора
+        не погружается в какую-либо процедуру, поскольку это описательный, а не выполняемый оператор
+        SQL.
+    </p>
+    <h5></h5>
+    <p>
+        Процедуры в модуле SQL определяются следующими синтаксическими конструкциями:
+    </p>
+    <pre>&lt;procedure&gt; ::=
+   PROCEDURE &lt;procedure name&gt;
+   &lt;parameter declaration&gt;...;
+   &lt;SQL statment&gt;;
+&lt;parameter declaration&gt;::=
+  &lt;parameter name&gt; &lt;data type&gt;
+| &lt;SQLCODE parameter&gt;
+&lt;SQLCODE parameter&gt; ::= SQLCODE
+&lt;SQL statement&gt; ::=
+  &lt;close statement&gt;
+| &lt;commit statement&gt;
+| &lt;delete statement positioned&gt;
+| &lt;delete statement searched&gt;
+| &lt;fetch statement&gt;
+| &lt;insert statement&gt;
+| &lt;open statement&gt;
+| &lt;rollback statement&gt;
+| &lt;select statement&gt;
+| &lt;update statement positioned&gt;
+| &lt;update statement searched&gt;</pre>
+    <p>
+        Имена всех процедур в одном модуле должны быть различны. Любое имя параметра, содержащегося
+        в операторе SQL процедуры, должно быть специфицировано в разделе объявления параметров.
+        Число фактических параметров при вызове процедуры должно совпадать с числом формальных
+        параметров, указанных при ее объявлении. Список формальных параметров каждой процедуры
+        должен содержать ровно один параметр SQLCODE (код ответа процедуры; возможные значения кодов
+        ответа стандартизованы, но некоторые из них определяются в реализации).
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

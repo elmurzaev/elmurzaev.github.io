@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>§ 4. Произвольные системы линейных уравнений</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Введем матрицу системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1204" type="#_x0000_t75" style='width:101.25pt;height:63.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image336.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="85"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image337.gif"
+                                   v:shapes="_x0000_i1204" width="135"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1204"
+                         DrawAspect="Content" ObjectID="_1072191312">
+            </o:OLEObject>
+        </xml><![endif]--><span lang="EN-US"></span></p>
+    <p class="MsoNormal">и матрицы <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1205" type="#_x0000_t75" style='width:39pt;height:60pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image338.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image339.gif"
+                                   v:shapes="_x0000_i1205" width="52"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1205"
+                         DrawAspect="Content" ObjectID="_1072191313">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1206" type="#_x0000_t75" style='width:38.25pt;height:60pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image340.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="80"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image341.gif"
+                                       v:shapes="_x0000_i1206" width="51"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1206"
+                         DrawAspect="Content" ObjectID="_1072191314">
+            </o:OLEObject>
+        </xml><![endif]-->. Пусть <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1207"
+                     type="#_x0000_t75" style='width:41.25pt;height:12pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image342.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="16"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image343.gif"
+                                       v:shapes="_x0000_i1207" width="55"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1207"
+                         DrawAspect="Content" ObjectID="_1072191315">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Представим систему (1.10) в виде матричного уравнения АХ=В.
+        Это легко проверить, перемножив матрицы А и Х. </p>
+    <p class="MsoNormal">Действительно, </p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1208" type="#_x0000_t75"
+                 style='width:126.75pt;height:57.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image344.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="77"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image345.gif"
+                                   v:shapes="_x0000_i1208" width="169"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1208"
+                         DrawAspect="Content" ObjectID="_1072191316">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1209" type="#_x0000_t75"
+                 style='width:158.25pt;height:59.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image346.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="79"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image347.gif"
+                                   v:shapes="_x0000_i1209" width="211"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1209"
+                         DrawAspect="Content" ObjectID="_1072191317">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Решим теперь матричное уравнение А·Х=В. Умножим обе части
+        уравнения на матрицу А<sup>-1</sup> слева. Тогда А<sup>-1</sup>·А·Х = А<sup>-1</sup>·В,
+        а так как </p>
+    <p class="MsoNormal">А<sup>-1</sup>·А=Е, то имеем Е·Х=А<sup>-1</sup>·В
+        и, наконец, </p>
+    <p align="right" class="MsoNormal">Х = А<sup>-1</sup>·В<span>                                                         </span>(1.12)
+    </p>
+    <p class="MsoNormal"><b>Пример 17.</b>
+        Матричным методом решить систему уравнений</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1210" type="#_x0000_t75" style='width:73.5pt;height:42.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image348.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="57"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image349.gif"
+                                   v:shapes="_x0000_i1210" width="98"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1210"
+                         DrawAspect="Content" ObjectID="_1072191318">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b> Вычислим
+        определитель матрицы А.</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1211" type="#_x0000_t75" style='width:109.5pt;height:47.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image350.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="63"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image351.gif"
+                                   v:shapes="_x0000_i1211" width="146"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1211"
+                         DrawAspect="Content" ObjectID="_1072191319">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">то есть матрица А невырожденная.
+        Построим обратную матрицу А<sup>-1</sup>. Вычислим алгебраические дополнения
+        элементов матрицы А:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1212" type="#_x0000_t75" style='width:248.25pt;height:87.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image352.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="117"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image353.gif"
+                                   v:shapes="_x0000_i1212" width="331"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1212"
+                         DrawAspect="Content" ObjectID="_1072191321">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Следовательно, </p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1213" type="#_x0000_t75" style='width:90pt;height:42pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image354.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="56"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image355.gif"
+                                   v:shapes="_x0000_i1213" width="120"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1213"
+                         DrawAspect="Content" ObjectID="_1072191322">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="MsoNormal">Находим теперь решение системы по формуле (1.12).</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1214" type="#_x0000_t75" style='width:257.25pt;height:49.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image356.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="66"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image357.gif"
+                                   v:shapes="_x0000_i1214" width="343"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1214"
+                         DrawAspect="Content" ObjectID="_1072191323">
+            </o:OLEObject>
+        </xml><![endif]--><sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1215" type="#_x0000_t75"
+                     style='width:128.25pt;height:44.25pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image358.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="59"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image359.gif"
+                                       v:shapes="_x0000_i1215" width="171"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1215"
+                         DrawAspect="Content" ObjectID="_1072191324">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>то есть <i><span lang="EN-US">x</span></i> = 3, <i><span
+                lang="EN-US">y</span></i> = 1, <i><span lang="EN-US">z</span></i> = -1.</p>
+</td>
+<td class="CONTENT" width="100%">
+</td>
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Пусть задана система m линейных уравнений с n неизвестными
+        общего вида</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1216" type="#_x0000_t75"
+                 style='width:127.5pt;height:62.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image360.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="83"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image361.gif"
+                                   v:shapes="_x0000_i1216" width="170"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1216"
+                         DrawAspect="Content" ObjectID="_1072191325">
+            </o:OLEObject>
+        </xml><![endif]--><span>                                   </span>(1.13)</p>
+    <p class="MsoNormal">или, в матричной форме, А·Х = В,</p>
+    <p class="MsoNormal">где <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1217" type="#_x0000_t75" style='width:177.75pt;height:60pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image362.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image363.gif"
+                                   v:shapes="_x0000_i1217" width="237"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1217"
+                         DrawAspect="Content" ObjectID="_1072191326">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Если В=0, то система называется однородной, в противном
+        случае она называется неоднородной.</p>
+    <p class="MsoNormal">Решением системы называется совокупность значений
+        неизвестных <i>х</i><sub>1</sub><i>=&#945;</i><sub>1</sub><i>,
+            х</i><sub>2</sub><i>=&#945;</i><sub>2</sub><i>, …, х</i><i><sub><span
+                lang="EN-US">n</span></sub>=</i><i><span lang="EN-US">&#945;<sub>n</sub></span>,</i>
+        при подстановке которых все уравнения
+        системы обращаются в равенства.</p>
+    <p class="MsoNormal">Система, имеющая хоть одно решение, называется совместной.</p>
+    <p class="MsoNormal">Система, не имеющая ни одного решения, называется несовместной.</p>
+    <p class="MsoNormal">Система, имеющая единственное решение, называется определенной.</p>
+    <p class="MsoNormal">Система, имеющая более одного решения, называется неопределенной.</p>
+    <p class="MsoNormal">Назовем расширенной матрицей системы матрицу, полученную из
+        А добавлением к ней столбца свободных членов системы:</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1218" type="#_x0000_t75" style='width:113.25pt;height:63pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image364.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image365.gif"
+                                   v:shapes="_x0000_i1218" width="151"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1218"
+                         DrawAspect="Content" ObjectID="_1072191327">
+            </o:OLEObject>
+        </xml><![endif]--><span><span>                                       </span></span>(1.14)
+    </p>
+    <p class="MsoNormal">Так как каждый минор матрицы <i>А</i> является и минором матрицы<sub>
+        <!--[if gte vml 1]>
+        <v:shape id="_x0000_i1219"
+                 type="#_x0000_t75" style='width:8.25pt;height:10.5pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image366.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="14"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image367.gif"
+                                   v:shapes="_x0000_i1219" width="11"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1219"
+                         DrawAspect="Content" ObjectID="_1072191328">
+            </o:OLEObject>
+        </xml><![endif]-->, но не наоборот, то <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1220"
+                     type="#_x0000_t75" style='width:52.5pt;height:16.5pt' o:ole=""
+                     fillcolor="window">
+                <v:imagedata src="obj.files/image368.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="22"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image369.gif"
+                                       v:shapes="_x0000_i1220" width="70"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1220"
+                         DrawAspect="Content" ObjectID="_1072191329">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+</td>
+
+</body>
+</html>

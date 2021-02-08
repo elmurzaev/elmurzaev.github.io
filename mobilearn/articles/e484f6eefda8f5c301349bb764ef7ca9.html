@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Условная вероятность</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<div class="example">
+    <b>Пример 18. </b>
+    Игральная кость подбрасывается один раз. Известно, что выпало
+    более трёх очков. Какова вероятность того, что выпало
+    чётное число очков?
+    <p>Зная, что выпало более трёх очков, мы можем сузить
+        множество всех возможных элементарных исходов
+        до трёх одинаково вероятных исходов:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img372.gif" width="97">, из которых
+        событию
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img373.gif" width="268">
+        благоприятствуют ровно два:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img374.gif" width="81">.
+        Поэтому <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img375.gif" width="90">.
+    </p>
+    <p>Посмотрим на вопрос с точки зрения первоначального эксперимента.
+        Пространство элементарных исходов при одном подбрасывании кубика
+        состоит из шести точек: <img align="absmiddle" height="20"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img64.gif"
+                                     width="147">.
+        Слова &#171;известно, что выпало более трёх очков&#187; означают, что
+        в эксперименте произошло событие <img align="absmiddle" height="20"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img376.gif"
+                                              width="99">.
+        Слова &#171;какова при этом вероятность того, что выпало
+        чётное число очков?&#187; означают, что нас интересует, в какой
+        доле случаев при осуществлении <img align="bottom" height="14"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                            width="17"> происходит и <img align="bottom" height="14"
+                                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                          width="15">.
+        Вероятность события <img align="bottom" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                 width="15">, вычисленную в предположении, что о результате
+        эксперимента уже что-то известно (событие <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                       width="17"> произошло), мы будем обозначать
+        через <img align="absmiddle" height="20"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img377.gif" width="61">.
+    </p>
+    <p><img class="right" height="92" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/condit.gif"
+            width="137">Мы хотим найти, какую часть составляют исходы, благоприятствующие <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+            width="15"> внутри <img align="bottom" height="14"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                    width="17"> (т.е. одновременно <img align="bottom" height="14"
+                                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                        width="15"> и <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+            width="17">), среди
+        исходов, благоприятствующих <img align="bottom" height="14"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                         width="17">.
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img378.gif" width="248">
+    </p>
+    <p>Мы пришли к выражению, которое можно считать определением условной вероятности.</p>
+</div>
+<p>
+</p>
+<div class="lemma">
+    <b>Определение 18. </b>
+    <i class="incide">Условной вероятностью</i> события <img align="bottom" height="14"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                             width="15"> при условии, что произошло
+    событие
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+         width="17">, называется число
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img379.gif" width="159">
+    </p>Условная вероятность определена только в случае,
+    когда <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img380.gif" width="73">.
+</div>
+<div class="text">
+    Это определение бывает полезно использовать не для вычисления условной
+    вероятности, а для последовательного вычисления вероятности
+    нескольким событиям случиться одновременно, если известны
+    соответствующие условные вероятности. А именно,
+    справедливы следующие &#171;теоремы умножения вероятностей&#187;.
+</div>
+<div class="teor">
+    <b>Теорема 6. </b>
+    Если <img align="absmiddle" height="20"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img380.gif" width="73"> и <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img381.gif"
+        width="72">, то
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img382.gif" width="313">
+    </p>
+</div>
+<div class="teor">
+    <b>Теорема 7. </b> Для любых событий <img align="absmiddle" height="18"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img331.gif"
+                                              width="84"> верно равенство:
+    <p class="CENTER"><img align="absmiddle" height="29"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img383.gif" width="516">
+    </p>
+    <p>если все участвующие в нём условные
+        вероятности определены.</p>
+</div>
+<div class="exer">
+    <b>Упражнение 21. </b>
+    Доказать методом математической индукции.
+</div>
+<div class="exer">
+    <b>Упражнение 22. </b>
+    Доказать, что все условные вероятности в определены тогда и только тогда, когда
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img384.gif"
+         width="145">.
+</div>
+<p>
+</p>
+<p>
+</p>
+</body>
+
+</body>
+</html>

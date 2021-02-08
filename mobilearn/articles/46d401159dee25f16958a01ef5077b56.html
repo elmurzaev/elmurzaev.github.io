@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>4.3. Метод Гаусса</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Пусть требуется решить систему АХ=В. Над строками расширенной
+        матрицы произведем элементарные преобразования, приводящие ее к виду, когда
+        ниже элементов <i>а</i><sub>11</sub>, <i>а</i><sub>22</sub>, …, <i>а</i><i><sub><span
+                lang="EN-US">rr</span></sub></i> будут стоять нули. Этот вид
+        матрицы будем называть трапециевидным.</p>
+    <p class="MsoNormal">Отметим, что все преобразования, приводимые над строками расширенной
+        матрицы, проводятся над соответствующими уравнениями данной системы, а, как
+        известно, в таком случае получают равносильную данной систему уравнений.</p>
+    <p class="MsoNormal">Итак, преобразуем матрицу</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1232" type="#_x0000_t75" style='width:104.25pt;height:58.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image391.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="78"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image392.gif"
+                                   v:shapes="_x0000_i1232" width="139"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1232"
+                         DrawAspect="Content" ObjectID="_1072191342">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">к виду <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1233" type="#_x0000_t75" style='width:145.5pt;height:93.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image393.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="125"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image394.gif"
+                                   v:shapes="_x0000_i1233" width="194"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1233"
+                         DrawAspect="Content" ObjectID="_1072191343">
+            </o:OLEObject>
+        </xml><![endif]-->.<span>                                                </span>(1.17)</p>
+    <p class="MsoHeader"><span>Матрица
+(1.17) является расширенной матрицей укороченной системы</span></p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1234" type="#_x0000_t75"
+                 style='width:205.5pt;height:96pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image395.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="128"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image396.gif"
+                                   v:shapes="_x0000_i1234" width="274"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1234"
+                         DrawAspect="Content" ObjectID="_1072191344">
+            </o:OLEObject>
+        </xml><![endif]--><span>                </span>1.18)</p>
+    <p class="MsoNormal">Система (1.18) эквивалентна исходной системе.</p>
+    <p class="MsoNormal">Если хотя бы одно из чисел <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1235" type="#_x0000_t75" style='width:39.75pt;height:14.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image397.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="19"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image398.gif"
+                                   v:shapes="_x0000_i1235" width="53"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1235"
+                         DrawAspect="Content" ObjectID="_1072191345">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>отлично от нуля, то
+        система (1.18) несовместна и вместе с ней несовместна исходная система.</p>
+    <p class="MsoNormal">Если же <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1236"
+                 type="#_x0000_t75" style='width:60pt;height:13.5pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image399.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="18"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image400.gif"
+                                   v:shapes="_x0000_i1236" width="80"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1236"
+                         DrawAspect="Content" ObjectID="_1072191346">
+            </o:OLEObject>
+        </xml><![endif]-->, то из укороченной системы получаем базисные неизвестные,
+        перенеся в правые части укороченных уравнений свободные неизвестные.</p>
+    <p class="MsoNormal"><b>
+    <p> </p></b></p>
+    <p class="MsoNormal"><b>Пример 18.</b> Решить
+        систему</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1237" type="#_x0000_t75" style='width:110.25pt;height:60pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image401.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image402.gif"
+                                   v:shapes="_x0000_i1237" width="147"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1237"
+                         DrawAspect="Content" ObjectID="_1072191347">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b> Выпишем
+        расширенную матрицу системы и произведем элементарные преобразования:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1238" type="#_x0000_t75" style='width:170.25pt;height:59.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image403.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="79"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image404.gif"
+                                   v:shapes="_x0000_i1238" width="227"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1238"
+                         DrawAspect="Content" ObjectID="_1072191348">
+            </o:OLEObject>
+        </xml><![endif]-->.</p>
+    <p class="a1"><span>Умножим первую строку полученной
+матрицы на -2 и прибавим ко второй, затем – к третьей строке, а потом из
+последней строки вычтем первую.</span></p>
+    <p class="MsoNormal">Тогда имеем</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1239" type="#_x0000_t75"
+                 style='width:207.75pt;height:63pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image405.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image406.gif"
+                                   v:shapes="_x0000_i1239" width="277"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1239"
+                         DrawAspect="Content" ObjectID="_1072191349">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1240" type="#_x0000_t75" style='width:89.25pt;height:60pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image407.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image408.gif"
+                                   v:shapes="_x0000_i1240" width="119"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1240"
+                         DrawAspect="Content" ObjectID="_1072191350">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">Умножим третью строку на –6 и прибавим ее к последней:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1241" type="#_x0000_t75" style='width:171pt;height:54.75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image409.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="73"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image410.gif"
+                                   v:shapes="_x0000_i1241" width="228"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1241"
+                         DrawAspect="Content" ObjectID="_1072191351">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">Полученная матрица является расширенной матрицей системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1242" type="#_x0000_t75" style='width:124.5pt;height:58.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image411.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="78"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image412.gif"
+                                   v:shapes="_x0000_i1242" width="166"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1242"
+                         DrawAspect="Content" ObjectID="_1072191352">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Эта система совместна, так как <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1243" type="#_x0000_t75" style='width:67.5pt;height:15pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image413.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image414.gif"
+                                   v:shapes="_x0000_i1243" width="90"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1243"
+                         DrawAspect="Content" ObjectID="_1072191353">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>Очевидно, решение
+        системы единственно, так как ранг матрицы равен числу неизвестных.</p>
+    <p class="MsoNormal">Решим систему. Из последнего уравнения <i>х</i><sub>4</sub>=-1. Поставляя
+        <i>х</i><sub>4</sub>
+        в следующее уравнение, получим <i>х</i><sub>3</sub>=1.
+        Далее, подставляя <i>х</i><sub>3</sub> и <i>х</i><sub>4</sub> во второе уравнение,
+        получим <i>х</i><sub>2</sub>=0 и, наконец, <i>х</i><sub>1</sub>=-2. Итак,
+        <i>х</i><sub>1</sub>= -2, <i>х</i><sub>2</sub>=0,
+        <i>х</i><sub>3</sub>=1,<i>х</i><sub>4</sub>=-1.</p>
+    <p class="MsoNormal"><b>Пример 19.</b>
+        Исследовать совместность системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1244" type="#_x0000_t75" style='width:105.75pt;height:63pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image415.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="84"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image416.gif"
+                                   v:shapes="_x0000_i1244" width="141"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1244"
+                         DrawAspect="Content" ObjectID="_1072191354">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b>
+        Произведем элементарные преобразования расширенной матрицы системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1245" type="#_x0000_t75" style='width:95.25pt;height:65.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image417.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="87"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image418.gif"
+                                   v:shapes="_x0000_i1245" width="127"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1245"
+                         DrawAspect="Content" ObjectID="_1072191355">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Первую строку матрицы умножим на –1 и прибавим ее к остальным
+        строкам. Получим</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1246" type="#_x0000_t75" style='width:108pt;height:60pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image419.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="80"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image420.gif"
+                                   v:shapes="_x0000_i1246" width="144"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1246"
+                         DrawAspect="Content" ObjectID="_1072191356">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Вторую строку полученной матрицы сложим с третьей строкой, а
+        затем, умножив ее на 2, сложим с последней:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1247" type="#_x0000_t75" style='width:195pt;height:61.5pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image421.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="82"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image422.gif"
+                                   v:shapes="_x0000_i1247" width="260"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1247"
+                         DrawAspect="Content" ObjectID="_1072191357">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Ранг матрицы системы равен двум, а ранг расширенной – трем.
+        Следовательно, система несовместна.</p>
+    <p class="MsoNormal"><b>Пример 20.</b>
+        Исследовать совместность и найти общее решение системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1248" type="#_x0000_t75" style='width:142.5pt;height:61.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image423.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="82"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image424.gif"
+                                   v:shapes="_x0000_i1248" width="190"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1248"
+                         DrawAspect="Content" ObjectID="_1072191358">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b>
+        Произведем элементарные преобразования расширенной матрицы системы</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1249" type="#_x0000_t75" style='width:104.25pt;height:66pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image425.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="88"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image426.gif"
+                                   v:shapes="_x0000_i1249" width="139"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1249"
+                         DrawAspect="Content" ObjectID="_1072191360">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Умножив первую строку матрицы на –3, сложим ее со второй и
+        третьей строками, а, умножив на –2, сложим ее с четвертой строкой.</p>
+    <p class="MsoNormal">Тогда имеем</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1250" type="#_x0000_t75" style='width:126.75pt;height:61.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image427.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="82"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image428.gif"
+                                   v:shapes="_x0000_i1250" width="169"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1250"
+                         DrawAspect="Content" ObjectID="_1072191361">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Сложим теперь вторую строку этой матрицы с третьей и вычтем
+        ее из четвертой:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1251" type="#_x0000_t75"
+                 style='width:226.5pt;height:64.5pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image429.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="86"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image430.gif"
+                                   v:shapes="_x0000_i1251" width="302"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1251"
+                         DrawAspect="Content" ObjectID="_1072191362">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Так как расширенная матрица системы <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1252" type="#_x0000_t75" style='width:12.75pt;height:15pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image431.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="20"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image432.gif"
+                                   v:shapes="_x0000_i1252" width="17"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1252"
+                         DrawAspect="Content" ObjectID="_1072191363">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>и матрица системы <i>А</i> содержат три ненулевых строки, то
+        <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1253" type="#_x0000_t75" style='width:66pt;height:14.25pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image433.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="19"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image434.gif"
+                                       v:shapes="_x0000_i1253" width="88"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1253"
+                         DrawAspect="Content" ObjectID="_1072191364">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>Система совместна и,
+        так как ранг матрицы <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1254" type="#_x0000_t75"
+                     style='width:18pt;height:12pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image435.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="16"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image436.gif"
+                                       v:shapes="_x0000_i1254" width="24"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1254"
+                         DrawAspect="Content" ObjectID="_1072191365">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>меньше числа
+        неизвестных системы, то система имеет множество решений.</p>
+    <p class="MsoNormal">Выберем в качестве базисного минора </p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1255" type="#_x0000_t75"
+                 style='width:68.25pt;height:45pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image437.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="60"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image438.gif"
+                                   v:shapes="_x0000_i1255" width="91"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1255"
+                         DrawAspect="Content" ObjectID="_1072191366">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>Тогда неизвестные <i>х</i><sub>2</sub>, <i>х</i><sub>3</sub>,
+        <i>х</i><sub>4</sub>
+        – базисные, а <i>х</i><sub>1</sub> и <i>х</i><sub>5</sub> – свободные. Укороченная
+        система имеет вид</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1256" type="#_x0000_t75" style='width:151.5pt;height:48.75pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image439.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="65"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image440.gif"
+                                   v:shapes="_x0000_i1256" width="202"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1256"
+                         DrawAspect="Content" ObjectID="_1072191367">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Положим <i>х</i><sub>1</sub>=<i>с</i><sub>1</sub>, <i>х</i><sub>5</sub>=<i>с</i><sub>2</sub>.
+        Тогда система примет вид</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1257" type="#_x0000_t75" style='width:161.25pt;height:50.25pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image441.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="67"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image442.gif"
+                                   v:shapes="_x0000_i1257" width="215"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1257"
+                         DrawAspect="Content" ObjectID="_1072191368">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Так как <i>х</i><sub>4</sub>=0,
+        то из второго уравнения этой системы <i>х</i><sub>3</sub>=3-4<i>с</i><sub>2</sub>.</p>
+    <p class="MsoNormal">Подставляя х<sub>4</sub> и х<sub>3</sub> в первое уравнение,
+        получим</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1258" type="#_x0000_t75" style='width:123pt;height:42.75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image443.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="57"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image444.gif"
+                                   v:shapes="_x0000_i1258" width="164"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1258"
+                         DrawAspect="Content" ObjectID="_1072191369">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Следовательно, общее решение исходной системы имеет вид</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1259" type="#_x0000_t75" style='width:105pt;height:76.5pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image445.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="102"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image446.gif"
+                                   v:shapes="_x0000_i1259" width="140"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1259"
+                         DrawAspect="Content" ObjectID="_1072191370">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+</td>
+
+</body>
+</html>

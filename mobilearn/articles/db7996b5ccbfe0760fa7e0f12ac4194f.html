@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>16.3. Встроенный SQL</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <p>
+        Поскольку в стандарте SQL/89 не специфицированы (даже в приложениях) правила встраивания SQL
+        в язык Си, мы приведем только общие синтаксические правила встраивания, используемые для
+        любого языка. Это поможет оценить "степень стандартности" конкретной реализации.
+    </p>
+    <pre>&lt;embedded SQL statement&gt; ::=
+  &lt;SQL prefix&gt;
+{ &lt;declare cursor&gt;
+| &lt;embedded exception declaration&gt;
+| &lt;SQL statement&gt;}
+ [&lt;SQL terminator&gt;]
+&lt;SQL prefix&gt; ::= EXEC SQL
+&lt;SQL terminator&gt; ::= END EXEC | ;
+&lt;embedded SQL declare section&gt; ::=
+  &lt;embedded SQL begin declare&gt;
+ (&lt;host variable definition&gt;...]
+  &lt;embedded SQL end declare&gt;
+&lt;embedded SQL begin declare&gt; ::=
+  &lt;SQL prefix&gt; BEGIN DECLARE SECTION [&lt;SQL terminator&gt;]
+&lt;embedded SQL end declare&gt; ::=
+  &lt;SQL prefix&gt; END DECLARE SECTION [&lt;SQL terminator&gt;]
+&lt;embedded variable name&gt; ::= :&lt;host identifier&gt;
+&lt;embedded exception declaration&gt; ::=
+   WHENEVER &lt;condition&gt; &lt;exception action&gt;
+&lt;condition&gt; ::= SQLERROR | NOT FOUND
+&lt;exception action&gt; ::= CONTINUE | &lt;go to&gt;
+&lt;go to&gt; ::= { GOTO | GO TO } &lt;target&gt;
+&lt;target&gt; ::= :&lt;host identifier&gt; | &lt;unsigned integer&gt;</pre>
+    <p>
+        Встраиваемые операторы SQL, включая объявления курсора, а также разделы объявления
+        исключительных ситуаций и переменных основной программы, должны быть окружены скобками EXEC
+        SQL и END EXEC. Объявление курсора должно встречаться текстуально раньше любого оператора,
+        ссылающегося на этот курсор. Все переменные основной программы, используемые во встроенных
+        операторах SQL, должны быть объявлены в текстуально предшествующем этому оператору разделе
+        объявления переменных основной программы. При этом синтаксис объявления переменной
+        соответствует синтаксису основного языка программирования, но имени переменной предшествует
+        двоеточие.
+    </p>
+    <p>
+        Механизм обработки исключительных ситуаций в SQL/89 исключительно прост (можно сказать,
+        примитивен). Можно задавать реакцию на возникновение двух видов условий: SQLERROR - это
+        условие появления в переменной SQLCODE после выполнения встроенного оператора отрицательного
+        значения; NOT FOUND - условие появления в SQLCODE значения +100 (этот код означает
+        исчерпание курсора). Реакция может состоять в выполнении безусловного перехода на метку
+        основной программы (действие GO TO), или отсутствовать (действие CONTINUE). Срабатывает тот
+        оператор определения реакции на исключительную ситуацию, который текстуально ближе от начала
+        программы к данному оператору SQL.
+    </p>
+    <p>
+        Заметим, что во многих реализациях поддерживается два вида кодов ответа при выполнении
+        операторов SQL (встроенных или взятых из модуля): через переменную SQLCODE с кодами ответа,
+        представляемыми целыми числами и через переменную SQLSTATE с кодами ответа, кодируемыми
+        десятичными числами, представленными в текстовой форме. Имеется тенденция к переходу на
+        использование только механизма SQLSTATE, но в стандартных реализациях должен поддерживаться
+        механизм SQLCODE.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

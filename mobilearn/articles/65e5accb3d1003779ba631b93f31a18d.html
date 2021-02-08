@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 6. Перечислимый тип. Структуры. Объединения</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l6_1">
+    <h1>1. Перечислимый тип </h1>
+    <p>
+        <b>Перечислимый тип</b> задаёт тип, который является подмножеством целого типа.
+    </p>
+    <p>
+        Объявление переменной перечислимого типа задаёт имя переменной и определяет список
+        именованных констант, называемый списком перечисления:
+        <span class="sint">
+enum [<i>&lt;тег&gt;</i>] {<i>&lt;список перечисления&gt;</i>} <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+enum  <i>&lt;тег&gt;</i>   <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+</span>
+    </p>
+    <p>
+        <span class="sint"><i>Тег</i></span> предназначен для различения нескольких перечислимых
+        типов, объявленных в одной программе.
+    </p>
+    <p>
+        <span class="sint">Список перечисления</span> содержит одну или более конструкций вида:
+        <span class="sint">
+<i>&lt;идентификатор&gt;</i> [= <i>&lt;константное выражение&gt;</i>]
+</span>
+    </p>
+    <p>
+        Конструкции в списке разделяются запятыми. Каждый <i>идентификатор</i> именует элемент
+        списка перечисления. По умолчанию, если не задано <i>константное выражение</i>, первому
+        элементу присваивается значение 0, следующему элементу – значение 1 и т.д.
+    </p>
+    <p>
+        Запись <span><span class="sint">= &lt;константное выражение&gt;</span></span> изменяет
+        умалчиваемую последовательность значений. Элемент, идентификатор которого предшествует
+        записи <span><span class="sint">= &lt;константное выражение&gt;</span></span>, принимает
+        значение, задаваемое этим константным выражением. Константное выражение должно иметь тип и
+        может быть как положительным, так и отрицательным. Следующий элемент списка получает
+        значение, равное <span><span class="sint">&lt;константное выражение&gt; + 1</span></span>,
+        если только его значение не задаётся явно другим константным
+        выражением.
+    </p>
+    <p>
+        В списке перечисления могут содержаться элементы, которым сопоставлены одинаковые значения,
+        однако каждый идентификатор в списке должен быть уникальным. Кроме того, идентификатор
+        элемента списка перечисления должен быть отличным от идентификаторов элементов всех
+        остальных списков перечислений, а также от других идентификаторов.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">enum</span> Weekdays {SA, SU, MO, TU, WE, TH, FR};
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">enum</span> Weekdays {SA, SU = 0, MO, TU, WE, TH, FR};
+            </td>
+            <td class="commenti">// SA и SU имеют одинаковое значение</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> main()
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">enum</span> Weekdays d1 = SA, d2 = SU, d3 =
+                WE, d4;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = 2;</td>
+            <td class="commenti">// Ошибка!</td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = d1 + d2;</td>
+            <td class="commenti">// Ошибка!</td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = (<span class="chiavi">enum</span> Weekdays)(d1 + d2);</td>
+            <td class="commenti">// Можно, но результат</td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = (<span class="chiavi">enum</span> Weekdays)(d1 - d2);</td>
+            <td class="commenti">// может не попасть</td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = (<span class="chiavi">enum</span> Weekdays)(TH * FR);</td>
+            <td class="commenti">// в область определения</td>
+        </tr>
+        <tr>
+            <td class="esempi"> d4 = (<span class="chiavi">enum</span> Weekdays)(WE / TU);</td>
+            <td class="commenti">// перечисления</td>
+        </tr>
+        <tr>
+            <td class="esempi"> }</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+</section>
+<section id="l6_2">
+    <h1>2. Структуры </h1>
+    <p>
+        <b>Структура</b> позволяет объединить в одном объекте совокупность значений, которые могут
+        иметь различные типы. Однако в языке С реализован очень ограниченный набор операций над
+        структурами как единым целым: передача функции в качестве аргумента, возврат в качестве
+        значения функции, получение адреса. Можно присваивать одну структуру другой, если они имеют
+        одинаковый тип.
+    </p>
+    <p id="l6_struct_def">
+        Объявление структуры задает имя структурного типа и/или последовательность объявлений
+        переменных, называемых элементами структуры. Эти элементы могут иметь различные типы.
+        <span class="sint">
+struct [<i>&lt;тег&gt;</i>] {<i>&lt;список объявлений элементов&gt;</i>} <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+struct  <i>&lt;тег&gt;</i>   <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+</span>
+    </p>
+    <p>
+        <i>Тег</i> предназначен для различения нескольких структур, объявленных в одной программе.
+    </p>
+    <p>
+        Список объявлений элементов представляет собой последовательность из одного или более
+        объявлений переменных. Каждая переменная, объявленная в этом списке, называется <i>элементом
+        структуры</i>. Особенность синтаксиса объявлений элементов структуры состоит в том, что они
+        не могут содержать и . Элементы структуры могут иметь , либо быть , , или структурой.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span></td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">char</span> str[50];</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">int</span> a, b;</td>
+            <td class="commenti">// Объявляем структуру, не задавая тег</td>
+        </tr>
+        <tr>
+            <td class="esempi"> } s;</td>
+            <td class="commenti">// и сразу же объявляем переменную</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">char</span> str[50];</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">int</span> a, b;</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> };</td>
+            <td class="commenti">// Объявляем структуру с тегом <i>S</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S s;
+            </td>
+            <td class="commenti">// Объявляем переменную</td>
+        </tr>
+    </table>
+    <p>
+        Элемент структуры не может быть структурой того же типа, в которой он содержится. Однако он
+        может быть указателем на тип структуры, в которую он входит. Размер указателя стандартный,
+        поэтому компилятор знает, сколько памяти потребуется под указатель. Для работы с указателем
+        надо знать размер типа, на который он указывает, но к моменту работы с указателем структура
+        будет полностью объявлена, и, следовательно, размер её будет известен.
+    </p>
+    <p>
+        Идентификаторы элементов структуры должны различаться между собой. Идентификаторы элементов
+        разных структур могут совпадать.
+    </p>
+    <p id="l6_struct_ini">
+        Для <b>инициализации</b> структуры, как и других составных типов, надо записать список
+        инициализаторов через запятую в фигурных скобках.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S s = {"Str", 0, 1};
+            </td>
+            <td class="commenti">// Используем тег <i>S</i>, объявленный в предыдущем примере</td>
+        </tr>
+    </table>
+    <p id="l6_scelta">
+        Выбор элемента структуры осуществляется с помощью одной из следующих конструкций:
+        <span class="sint">
+&lt;переменная&gt; <b>.</b> &lt;идентификатор элемента структуры&gt;
+&lt;указатель&gt; <b>-&gt;</b> &lt;идентификатор элемента структуры&gt;
+</span>
+    </p>
+    <p>
+        Выражение выбора элемента позволяет получить доступ к элементу структуры. Выражение имеет
+        значение и тип выбранного элемента.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S s, *p = &amp;s;
+            </td>
+            <td class="commenti">// Объявляем переменную <b>s</b> и указатель <b>p</b>, в который
+                заносим адрес переменной <b>s</b></td>
+        </tr>
+        <tr>
+            <td class="esempi">s.a = 10;</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">p-&gt;b = 20;</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p>
+        Две структуры являются разными типами, даже если их объявления полностью совпадают.
+    </p>
+    <h3 id="l6_2_1">2.1. Пример</h3>
+    <p>
+        Вводим массив структур и осуществляем поиск по <b>любой</b> совокупности параметров.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">#include</span> &lt;string.h&gt;
+                <span class="chiavi">#include</span> &lt;conio.h&gt;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S
+            </td>
+            <td class="commenti">// Объявляем структуру, состоящую</td>
+        </tr>
+        <tr>
+            <td class="esempi"> { <span class="chiavi">char</span> str[21];
+                <span class="chiavi">int</span> a;
+                };
+            </td>
+            <td class="commenti">// из строки и целого числа</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S s[10];
+            </td>
+            <td class="commenti">// Объявляем массив структур</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi"> char</span> *argv[])
+                { <span class="chiavi">int</span> n, a, i, check = 0;
+            </td>
+            <td class="commenti">
+                // Переменная <b>а</b> содержит число, которое будет сравниваться с полем структуры
+                <i>а</i>.
+                // Переменная <b>check</b> указывает, нужно ли использовать этот параметр для
+                поиска.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">char</span> str[21] = "";</td>
+            <td class="commenti">// Переменная <b>str</b> содержит строку, которая будет
+                сравниваться с полем структуры <i>str</i>.
+                // Если переменная <b>str</b> содержит пустую строку, этот параметр не используется
+                для поиска.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi"> FILE *in, *out;
+                <span class="chiavi">char</span> ans;
+                <span class="chiavi">if</span> (argc &lt; 3)
+                { printf("Too few arguments.\n"); <span class="chiavi">return</span>; }
+                <span class="chiavi">if</span> ((in = fopen(argv[1], "r")) == NULL)
+                { printf("It is impossible to open file '%s'.\n", argv[1]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> ((out = fopen(argv[2], "w")) == NULL)
+                { printf("It is impossible to open file '%s'.\n", argv[2]);
+                fclose(in); <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">for</span> (n = 0; !feof(in); n++)
+                fscanf(in, "%s%d", s[n].str, &amp;s[n].a);
+                fclose(in);
+                printf("Use Str for search? "); ans = getche();
+                <span class="chiavi">if</span> (ans == 'y' || ans == 'Y')
+                { printf("\nInput string for search: "); scanf("%s",str); }
+                printf("Use A for search? "); ans = getche();
+                <span class="chiavi">if</span> (ans == 'y' || ans == 'Y')
+                { check = 1; printf("\nInput A: "); scanf("%d", &amp;a); }
+                <span class="chiavi">for</span> (i = 0; i &lt; n; i++)
+            </td>
+
+            <td class="esempi"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">if</span> ((!*str || strcmp(str, s[i].str) == 0)
+                &amp;&amp;
+                (!check || a == s[i].a))
+                fprintf(out, "%-30s %3d\n", s[i].str, s[i].a);
+                fclose(out);
+                }
+            </td>
+
+            <td class="commenti">// Данное условие проверяет содержимое структуры на равенство
+                параметрам поиска,
+                // учитывая необходимость сравнения с этим параметром
+            </td>
+        </tr>
+    </table>
+</section>
+<section id="l6_3">
+    <h1>3. Объединения </h1>
+    <p>
+        <b>Объединение</b> позволяет в разные моменты времени хранить в одном объекте значения
+        разных типов. В процессе объявления объединения с ним ассоциируется набор типов значений,
+        которые могут храниться в данном объединении. В каждый момент времени объединение может
+        хранить значение только одного типа из набора. Контроль над тем, какого типа значение
+        хранится в данный момент в объединении, возлагается на программиста.
+        <span class="sint">
+union [<i>&lt;тег&gt;</i>] {<i>&lt;список объявлений элементов&gt;</i>} <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+union  <i>&lt;тег&gt;</i>   <i>&lt;описатель&gt;</i> [, <i>&lt;описатель&gt;</i> ...];
+</span>
+    </p>
+    <p>
+        <i>Тег</i> предназначен для различения нескольких объединений, объявленных в одной
+        программе.
+    </p>
+    <p>
+        Память, которая выделяется переменной типа <i>объединение</i>, определяется размером
+        наиболее длинного элемента объединения. Все элементы объединения размещаются в одной и той
+        же области памяти с одного и того же адреса. Значение текущего элемента объединения
+        теряется, когда другому элементу объединения присваивается значение.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">void</span> main()
+                { <span class="chiavi"> union</span>
+                { <span class="chiavi">float</span> f;
+                <span class="chiavi">long int</span> i;
+                } u;
+                printf("Input float number: "); scanf("%f", &amp;u.f);
+                printf("Internal: %08x\n\n", u.i);
+                }
+            </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 11. Специальные функции-члены класса (конструкторы, деструкторы,
+        преобразования)</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l11_1">
+    <h1> 1. Конструкторы </h1>
+    <p>
+        Функция-член класса с тем же именем, что и у класса, называется <b>конструктором</b>. Она
+        используется для построения этого класса. Конструктор не должен возвращать никакого
+        значения, даже .
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex(<span class="chiavi">double</span> r, <span class="chiavi">double</span> m)
+                <b>:</b> r(r), m(m) {}
+                <b>...</b>
+                };
+            </td>
+        </tr>
+    </table>
+    <p>
+        Если класс имеет конструктор, все объекты этого класса будут проинициализированы. Если
+        конструктору требуются параметры, они должны быть предоставлены.
+    </p>
+    <p>
+        Когда для класса объявлен конструктор, нельзя пользоваться списком инициализации в качестве
+        инициализатора.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">Complex c1(5, -2);
+                Complex c2 = {5, -2};
+            </td>
+            <td class="commenti">// Правильно
+                // Ошибка – класс <i>Complex</i> имеет конструктор
+            </td>
+        </tr>
+    </table>
+    <h2 id="l11_1_1">1.1. Конструктор умолчания </h2>
+    <p>
+        <i>Конструктор умолчания</i> класса <i>Х</i> – это конструктор класса <i>Х</i>, вызываемый
+        без параметров. Конструктор умолчания обычно имеет вид <span><span class="sint">Х<b>::</b>Х()</span></span>,
+        однако и конструктор, который может вызываться без параметров, потому что имеет параметры с
+        умолчанием, например, <span><span class="sint">Х<b>::</b>Х(int = 0)</span></span>, также
+        считается конструктором умолчания. При отсутствии других объявленных конструкторов,
+        конструктор умолчания генерируется компилятором.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex() <b>:</b> r(0), m(0) {}
+                <b>...</b>
+                };
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">Complex x;
+            </td>
+
+            <td class="commenti">// Вызов конструктора умолчания</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex(<span class="chiavi">double</span> nr = 0, <span
+                    class="chiavi">double</span> nm = 0) : r(nr), m(nm) {}
+                ...
+                };
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">Complex y1(-6, 3);</td>
+
+            <td class="commenti">// Вызов конструктора с параметрами</td>
+        </tr>
+        <tr>
+            <td class="esempi">Complex y2;</td>
+
+            <td class="commenti">// Конструктор вызывается как конструктор умолчания</td>
+        </tr>
+    </table>
+    <h2 id="l11_1_2"> 1.2. Конструктор копирования </h2>
+    <p>
+        <i>Конструктор копирования</i> для класса <i>Х</i> – это конструктор, который может быть
+        вызван для копирования объекта класса <i>Х</i>, т.е. такой конструктор, который может быть
+        вызван с одним параметром – ссылкой на объект класса <i>Х</i>. Например, <span><span
+            class="sint">X<b>::</b>X(const X&amp;)</span></span> и <span><span
+            class="sint">X<b>::</b>X(X&amp;, int = 0)</span></span> являются конструкторами
+        копирования.
+    </p>
+    <p>
+        При отсутствии объявленных конструкторов копирования компилятор генерирует <i>публичный</i>
+        конструктор копирования. Генерируемый конструктор копирования выполняет <i>побитовое
+        копирование объекта</i>. Этот метод годится лишь при отсутствии в объекте , которые хранят
+        адреса динамически распределенной памяти. Сгенерированный конструктор скопирует адрес, а не
+        содержимое памяти, таким образом, два <b>разных</b> объекта будут ссылаться на один и тот
+        участок памяти и меняться синхронно, что не является ожидаемым поведением. В таком случае
+        программист обязательно должен сам написать конструктор копирования, который будет, в
+        частности, копировать содержимое динамически распределённой памяти.
+    </p>
+    <p>
+        Однако в тех случаях, когда копирующий конструктор по умолчанию имеет правильный смысл,
+        лучше полагаться на это умолчание. Это короче, а читающие код должны понимать умолчания.
+        Кроме того, компилятор знает об этом умолчании и о возможностях его оптимизации.
+        А написание почленного копирования классов с большим количеством членов данных вручную –
+        занятие утомительное, и при этом можно наделать массу ошибок.
+    </p>
+    <p>
+        Конструктор копирования – и определяемый пользователем, и генерируемый компилятором –
+        используется:
+    </p>
+    <ul>
+        <li>при ;</li>
+        <li>при передаче аргументов;</li>
+        <li>при возврате значения из функции;</li>
+        <li>при обработке .</li>
+    </ul>
+    <p>
+        Семантика этих операций по определению совпадает с семантикой инициализации.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">Complex x = 2;
+                Complex y = Complex(2, 0);
+            </td>
+            <td class="commenti">// Создает <i>Complex</i>(2), затем копирует его в <b>x</b>
+                // Создает <i>Complex</i>(2, 0), затем копирует его в <b>у</b></td>
+        </tr>
+    </table>
+    <p>
+        От вызовов конструктора копирования легко избавиться. С тем же успехом можно записать
+        следующее.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">Complex x(2);
+                Complex y(2, 0);
+            </td>
+            <td class="commenti">// Проинициализировать <b>x</b> значением 2
+                // Проинициализировать <b>у</b> значением (2, 0)
+            </td>
+        </tr>
+    </table>
+    <p>
+        Пример конструктора копирования см. .
+    </p></section>
+<section id="l11_2">
+    <h1>2. Деструкторы </h1>
+    <p>
+        Функция-член класса Х с именем ~Х называется <b>деструктором</b>. Она используется для
+        разрушения значения класса Х непосредственно перед разрушением содержащего его объекта.
+        Деструктор не имеет параметров и возвращаемого типа, нельзя задавать даже .
+    </p>
+    <p>
+        Деструкторы автоматически вызываются, когда
+    </p>
+    <ul>
+        <li> автоматический или временный объект уходит из области действия;
+        </li>
+        <li> завершается программа (для статически сконструированных объектов);
+        </li>
+        <li> используется операция для объектов размещенных операцией .
+        </li>
+    </ul>
+    <p>
+        Деструктор может также вызываться явным образом.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">int</span> n;
+                <span class="chiavi">public</span>:
+                X();
+                ~X();
+                };
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">X xx;</td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">xx.~X();</td>
+            <td class="commenti">// Явный вызов деструктора</td>
+        </tr>
+    </table>
+</section>
+<section id="l11_3">
+    <h1> 3. Преобразования </h1>
+    <p>
+        <i>Преобразования (изменения типа)</i> объектов класса выполняются конструкторами и
+        преобразующими функциями.
+    </p>
+    <p>
+        Такие преобразования, называемые <i>пользовательскими</i>, часто неявно применяются в
+        дополнение к стандартным преобразованиям. Например, функция, ожидающая параметр типа
+        <i>Х</i>, может вызываться не только с параметром типа <i>Х</i>, но и с параметром типа
+        <i>Т</i>, если существует преобразование из <i>Т</i> в <i>Х</i>. Кроме того,
+        пользовательские преобразования применяются для приведения , параметров функций,
+        возвращаемых функциями значений, операндов в выражениях, управляющих выражений, операторах и
+        и для явного .
+    </p>
+    <p>
+        Пользовательские преобразования применяются только там, где они однозначны.
+    </p>
+    <h2 id="l11_3_1"> 3.1. Преобразование посредством конструктора </h2>
+    <p>
+        Конструктор с одним параметром задаёт преобразование типа своего параметра к типу своего
+        класса.
+    </p>
+    <p>
+        Конструктор с одним параметром не обязательно вызывается явно.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">int</span> x;
+                <span class="chiavi">public:</span>
+                X(<span class="chiavi">int</span> n);
+                ...
+                };
+                X<b>::</b>X(<span class="chiavi">int</span> n) { x = n; }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">X a = 1;</td>
+            <td class="commenti">// Эквивалентно X a = X(1)</td>
+        </tr>
+    </table>
+    <p>
+        Однако неявное преобразование может быть нежелательно в некоторых случаях.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Str
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">char</span> *str;
+                <span class="chiavi">public</span>:
+                Str(<span class="chiavi">int</span> n) { str = <span class="chiavi">new char</span>
+                [n]; *str = 0; }
+                Str(<span class="chiavi">const char</span> *p) { str = <span
+                    class="chiavi">new char</span> [strlen(p) + 1]; strcpy(str, p); }
+                ~Str() { <span class="chiavi">if</span> (str) <span class="chiavi">delete</span> []
+                str; }
+                };
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">Str s = 'a';</td>
+            <td class="commenti">// Создание строки из <i>int</i>('a') элементов</td>
+        </tr>
+    </table>
+    <p>
+        Неявное преобразование можно подавить, объявив конструктор с модификатором <i>explicit</i>.
+        Такой конструктор будет вызваться только явно.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Str
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">char</span> *str;
+                <span class="chiavi">public</span>:
+                <span class="chiavi">explicit</span> Str(<span class="chiavi">int</span> n) { str =
+                <span class="chiavi">new char</span> [n]; *str = 0; }
+                Str(<span class="chiavi">const char</span> *p) { str = <span
+                    class="chiavi">new char</span> [strlen(p) + 1]; strcpy(str, p); }
+                ~Str() { <span class="chiavi">if</span> (str) <span class="chiavi">delete</span> []
+                str; }
+                };
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">Str s1 = 'a';
+                Str s2(10);
+            </td>
+            <td class="commenti">// Ошибка – нет неявного преобразования <i>char</i> в <i>Str</i>
+                // Правильно – создаётся строка из 10 символов
+            </td>
+        </tr>
+    </table>
+    <h2 id="l11_3_2"> 3.2. Преобразующие функции </h2>
+    <p>
+        Функция-член класса Х, имя которой имеет вид <span class="sint"><b>operator </b> <i>&lt;имя типа&gt;</i></span>,
+        определяет преобразование из <i>Х</i> в тип, заданный <i>именем типа</i>. Такие функции
+        называются <i>преобразующими функциями</i> или <i>функциями приведения</i>.
+    </p>
+    <p>
+        Для такой функции не могут быть заданы ни параметры, ни возвращаемый тип.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">int</span> x;
+                <span class="chiavi">public</span>:
+                X(<span class="chiavi">int</span> n);
+                <span class="chiavi">operator int</span>();
+                ...
+                };
+                X<b>::</b>X(<span class="chiavi">int</span> n) { x = n; }
+                X<b>::</b><span class="chiavi">operator int</span>() { <span
+                    class="chiavi"> return</span> x; }
+                <span class="chiavi">int</span> a;
+                X b(0);
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">a = (<span class="chiavi">int</span>)b;</td>
+            <td class="commenti">// Явный вызов преобразующей функции</td>
+        </tr>
+        <tr>
+            <td class="esempi">a = b;</td>
+            <td class="commenti">// Неявный вызов преобразующей функции</td>
+        </tr>
+    </table>
+    <h2 id="l11_3_3"> 3.3. Разрешение неоднозначности </h2>
+    <p>
+        Присваивание значения типа <i>V</i> объекту класса <i>X</i> допустимо в том случае, если
+        имеется оператор присваивания <span><b>X::operator= (Z)</b></span> такой, что <i>V</i>
+        является <i>Z</i> или существует единственное преобразование <i>V</i> в <i>Z</i>.
+        Инициализация рассматривается аналогично.
+    </p>
+    <p>
+        В некоторых случаях значение требуемого типа может быть создано при помощи повторного
+        использования конструкторов или операторов преобразования. Это должно осуществляться при
+        помощи явных преобразований – допустим только один уровень неявных преобразований,
+        определяемых пользователем. В некоторых случаях значение требуемого типа может быть создано
+        более чем одним способом – такое недопустимо.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X { <b>...</b> X(<span class="chiavi">int</span>);
+                X(<span class="chiavi">char</span>*); <b>...</b> };
+                <span class="chiavi">class</span> Y { <b>...</b> Y(<span class="chiavi">int</span>);
+                <b>...</b> };
+                <span class="chiavi">class</span> Z { <b>...</b> Z(X); <b>...</b> };
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">X f(X);
+                Y f(Y);
+                Z g(Z);
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+<span class="chiavi">
+void</span> main()
+                { f(1);
+                f(X(1));
+                f(Y(1));
+                g("Mask");
+                g(X("Mask"));
+                g(Z("Mask"));
+                }
+            </td>
+
+            <td class="commenti">
+                // Неоднозначность - <i>f(X(1))</i> или <i>f(Y(1))</i>?
+                // Правильно
+                // Правильно
+                // Ошибка – требуется применение двух преобразований, определённых пользователем
+                // Правильно – <i>g(<b>Z</b>(X("Mask")))</i>
+                // Правильно – <i>g(Z(<b>X</b>("Mask")))</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> XX { XX(<span class="chiavi">int</span>); };
+                <span class="chiavi">void</span> h(<span class="chiavi">double</span>);
+                <span class="chiavi">void</span> h(XX);
+                <span class="chiavi">void</span> main()
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { h(1); }</td>
+
+            <td class="commenti">// <i>h(double(1))</i> или <i>h(XX(1))</i>? Вызов <i>h(1)</i>
+                означает <i>h(double(1))</i>,
+                // потому что в этом случае используются только стандартные преобразования.
+            </td>
+        </tr>
+    </table>
+    <p>
+        Правила преобразования не являются ни самыми простыми для реализации из всех возможных, ни
+        самыми легкими для документирования, ни настолько общими, как можно себе представить. Однако
+        они довольно безопасны, и их применение не приводит к неприятным сюрпризам. Гораздо легче
+        вручную разрешить неоднозначности, чем найти ошибку, вызванную преобразованием, о котором и
+        не подозревали.
+    </p></section>
+<section id="l11_4">
+    <h2>4. Пример. Разработка класса для работы со стеком </h2>
+    <h4> Первый вариант </h4>
+    <p>
+        Разработку класса необходимо начинать с <i>интерфейса</i>, т.е. с открытых (публичных)
+        функций, которые будут использоваться остальной частью программы для взаимодействия с
+        разрабатываемым классом. Для стека определены две операции: взятие элемента из стека и
+        добавление элемента в стек. Также определим конструктор (умолчания) и деструктор (обычно их
+        объявляют для всех классов), а
+        также вспомогательные функции, проверяющие пуст ли стек и была ли ошибка при работе со
+        стеком. Таким образом, интерфейс класса следующий:
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Stack
+                { <span class="chiavi">public:</span>
+                Stack();
+                ~Stack();
+                <span class="chiavi">int</span> Push(<span class="chiavi">int</span> n);
+                <span class="chiavi">int</span> Pop();
+                <span class="chiavi">int</span> IsEmpty() <span class="chiavi">const</span>;
+                <span class="chiavi">int</span> IsError() <span class="chiavi">const</span>;
+                <span class="chiavi">const char</span>* LastError() <span
+                    class="chiavi">const</span>;
+                };
+            </td>
+
+            <td class="commenti">
+                // Конструктор
+                // Деструктор
+                // Добавление элемента в стек
+                // Выбор элемента из стека
+                // Проверка, пуст ли стек
+                // Проверка, была ли ошибка
+                // Функция, возвращающая строку описания ошибки
+            </td>
+        </tr>
+    </table>
+    <p>
+        Теперь можно разрабатывать структуру данных для класса. Для хранения элементов стека будем
+        использовать массив. Также нам понадобятся переменная, указывающая на текущий элемент стека,
+        и переменная, хранящая признак ошибки.
+    </p>
+    <p>
+        Кроме этого, необходимо, естественно, определить функции, входящие в класс. После этого
+        можно использовать разработанный класс.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">class</span> Stack
+                { <span class="chiavi">private:
+    enum</span> { SIZE = 100 };
+                <span class="chiavi">enum</span> { NO_ERROR, STACK_EMPTY, STACK_FULL };
+                <span class="chiavi">int</span> stack[SIZE];
+                <span class="chiavi">int</span> *cur;
+                <span class="chiavi">int</span> error;
+                <span class="chiavi">public:</span>
+                Stack();
+                ~Stack();
+                <span class="chiavi">int</span> Push(<span class="chiavi">int</span> n);
+                <span class="chiavi">int</span> Pop();
+                <span class="chiavi">int</span> IsEmpty() <span class="chiavi">const</span>;
+                <span class="chiavi">int</span> IsError() <span class="chiavi">const</span>;
+                <span class="chiavi">const char</span>* LastError() <span
+                    class="chiavi">const</span>;
+                };
+            </td>
+            <td class="commenti">
+                // Область действия константы, определённой с помощью <i>define</i>, - файл.
+                // Чтобы локализовать область действия константы в классе, используют
+                // Массив для хранения элементов стека
+                // Указатель на текущий элемент стека
+                // Признак ошибки
+                // могут применяться
+                // как к константным, так и к неконстантным объектам
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                Stack::Stack()
+                { cur = stack; error = NO_ERROR; }
+                Stack::~Stack()
+                { }
+                <span class="chiavi">int</span> Stack::Push(<span class="chiavi">int</span> n)
+                { <span class="chiavi">if</span> (cur - stack &lt; SIZE)
+                { *cur++ = n; error = NO_ERROR; <span class="chiavi"> return</span> 1; }
+                <span class="chiavi">else</span>
+                { error = STACK_FULL; <span class="chiavi"> return</span> 0; }
+                }
+                <span class="chiavi">int</span> Stack::Pop()
+                { <span class="chiavi">if</span> (cur != stack)
+                { error = NO_ERROR; <span class="chiavi"> return</span> *--cur; }
+                <span class="chiavi">else</span>
+                { error = STACK_EMPTY; <span class="chiavi"> return</span> 0; }
+                }
+                <span class="chiavi">inline int</span> Stack::IsEmpty() <span
+                    class="chiavi">const</span>
+                { <span class="chiavi">return</span> cur == stack; }
+                <span class="chiavi">inline int</span> Stack::IsError() <span
+                    class="chiavi">const</span>
+                { <span class="chiavi">return</span> error != NO_ERROR; }
+                <span class="chiavi">const char</span>* Stack::LastError() <span class="chiavi">const</span>
+                { <span class="chiavi">if</span> (error == NO_ERROR)
+                <span class="chiavi">return</span> "There is no error";
+                <span class="chiavi">else</span> <span class="chiavi"> if</span> (error ==
+                STACK_EMPTY)
+                <span class="chiavi">return</span> "Stack is empty";
+                <span class="chiavi">else</span>
+                <span class="chiavi">return</span> "Stack is full";
+                }
+                <span class="chiavi">void</span> main()
+                { Stack s;
+                s.Push(1);
+                s.Push(2);
+                s.Push(3);
+                <span class="chiavi">while</span> (!s.IsEmpty())
+                printf("%d\n", s.Pop());
+                printf("%d\n", s.Pop());
+                printf("%s\n", s.LastError());
+                s.Push(4);
+                s.Push(5);
+                s.Push(6);
+                s.Push(7);
+                <span class="chiavi">if</span> (s.IsError())
+                printf("%s\n", s.LastError());
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p>
+    <h4>Второй вариант </h4>
+    <p>
+        После некоторого размышления разработчик пришел к выводу, что использование статического
+        массива для хранения элементов стека ограничивает разработанный класс, и решил использовать
+        динамически распределяемый массив, размер которого можно будет при необходимости увеличить.
+        Таким образом, вместо массива мы объявляем указатель и ещё одну переменную, которая будет
+        хранить размер динамически распределённого массива.
+    </p>
+    <p>
+        В результате этих изменений разработчику пришлось также изменить конструктор, в который
+        добавлены операторы для динамического распределения памяти, деструктор, в который добавлены
+        операторы освобождения памяти, и функцию добавления элемента в стек, которая при
+        необходимости перераспределяет выделенную память. Также был добавлен конструктор
+        копирования. Остальные функции остались без изменений.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">#include</span> &lt;malloc.h&gt;
+                <span class="chiavi">class</span> Stack
+                { <span class="chiavi">private:
+    enum</span> { SIZE = 100 };
+                <span class="chiavi">enum</span> { NO_ERROR, STACK_EMPTY, NOT_ENOUGH_MEMORY };
+                <span class="chiavi">int</span> size;
+                <span class="chiavi">int</span> *stack;
+                <span class="chiavi">int</span> *cur;
+                <span class="chiavi">int</span> error;
+                <span class="chiavi">public:</span>
+                Stack();
+                Stack(<span class="chiavi">const</span> Stack&amp; s); <span>// Конструктор копирования</span>
+                ~Stack();
+                <span class="chiavi">int</span> Push(<span class="chiavi">int</span> n);
+                <span class="chiavi">int</span> Pop();
+                <span class="chiavi">int</span> IsEmpty() <span class="chiavi">const</span>;
+                <span class="chiavi">int</span> IsError() <span class="chiavi">const</span>;
+                <span class="chiavi">const char</span>* LastError() <span
+                    class="chiavi">const</span>;
+                };
+                Stack::Stack()
+                { size = SIZE;
+                stack = NULL;
+                <span class="chiavi">if</span> (stack = (<span class="chiavi">int</span>
+                *)malloc(size * <span class="chiavi">sizeof</span>(<span class="chiavi">int</span>)))
+                { cur = stack;
+                error = NO_ERROR;
+                }
+                <span class="chiavi">else</span>
+                { error = NOT_ENOUGH_MEMORY;
+                size = 0;
+                }
+                }
+                Stack::Stack(<span class="chiavi">const</span> Stack&amp; s)
+                { size = s.size;
+                stack = NULL;
+                error = NO_ERROR;
+                <span class="chiavi">if</span> (size)
+                <span class="chiavi">if</span> ((stack = (<span class="chiavi">int</span>
+                *)malloc(size * <span class="chiavi">sizeof</span>(<span class="chiavi">int</span>)))
+                == NULL)
+                { error = NOT_ENOUGH_MEMORY;
+                size = 0;
+                }
+                <span class="chiavi">else</span>
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(stack + i) = *(s.stack + i);
+                cur = stack;
+                }
+                Stack::~Stack()
+                { <span class="chiavi">if</span> (stack) free(stack); }
+                <span class="chiavi">int</span> Stack::Push(<span class="chiavi">int</span> n)
+                { <span class="chiavi">if</span> (!stack) <span class="chiavi"> return</span> 0;
+                <span class="chiavi">if</span> (cur - stack &lt; size)
+                { *cur++ = n; error = NO_ERROR; <span class="chiavi"> return</span> 1; }
+                <span class="chiavi">else
+    if</span> (stack = (<span class="chiavi">int</span> *)realloc(stack, (size + SIZE) * <span
+                    class="chiavi">sizeof</span>(<span class="chiavi">int</span>)))
+                { cur = stack + size;
+                size += SIZE;
+                *cur++ = n;
+                error = NO_ERROR;
+                <span class="chiavi">return</span> 1;
+                }
+                <span class="chiavi">else</span>
+                { error = NOT_ENOUGH_MEMORY; size = 0; <span class="chiavi"> return</span> 0; }
+                }
+                <span class="chiavi">int</span> Stack::Pop()
+                { <span class="chiavi">if</span> (cur != stack)
+                { error = NO_ERROR; <span class="chiavi"> return</span> *--cur; }
+                <span class="chiavi">else</span>
+                { error = STACK_EMPTY; <span class="chiavi"> return</span> 0; }
+                }
+                <span class="chiavi">inline int</span> Stack::IsEmpty() <span
+                    class="chiavi">const</span>
+                { <span class="chiavi"> return</span> cur == stack; }
+                <span class="chiavi">inline int</span> Stack::IsError() <span
+                    class="chiavi">const</span>
+                { <span class="chiavi">return</span> error != NO_ERROR; }
+                <span class="chiavi">const char</span>* Stack::LastError() <span class="chiavi">const</span>
+                { <span class="chiavi">if</span> (error == NO_ERROR)
+                <span class="chiavi">return</span> "There is no error";
+                <span class="chiavi">else if</span> (error == STACK_EMPTY)
+                <span class="chiavi">return</span> "Stack is empty";
+                <span class="chiavi">else</span>
+                <span class="chiavi">return</span> "There is not enough memory";
+                }
+                <span class="chiavi">void</span> main()
+                { Stack s;
+                s.Push(1);
+                s.Push(2);
+                s.Push(3);
+                <span class="chiavi">while</span> (!s.IsEmpty())
+                printf("%d\n", s.Pop());
+                printf("%d\n", s.Pop());
+                printf("%s\n", s.LastError());
+                s.Push(4);
+                s.Push(5);
+                s.Push(6);
+                s.Push(7);
+                <span class="chiavi">if</span> (s.IsError())
+                printf("%s\n", s.LastError());
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+        Обратите внимание, – и это самое главное, – что основная программа осталась без изменений.
+        Поскольку разработчик поступил правильно и начал с разработки интерфейса, изменения в самом
+        классе не затронули остальную программу. Конечно, для стека всё просто, т.к. набор
+        необходимых функций мал и хорошо известен. Но разработку класса всегда надо начинать с
+        разработки интерфейса. Чем лучше будет продуман интерфейс используемых в программе классов,
+        чем меньше будет проблем при разработке программы.
+    </p>
+    <p>
+    </p></section>
+
+</body>
+</html>

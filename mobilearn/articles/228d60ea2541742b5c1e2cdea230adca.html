@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Использование Rails для API-приложений (Rails 5.0)</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="ispolzovanie-rails-dlya-api-prilozheniy-rails-5-0">
+        Использование Rails для API-приложений (Rails 5.0)</h2>
+    <p>В этом руководстве вы узнаете</p>
+    <ul>
+        <li>Что предоставляет Rails для API-приложений
+        </li>
+        <li>Как сконфигурировать Rails для работы без браузерных особенностей
+        </li>
+        <li>Как решить, какие промежуточные программы нужно включить
+        </li>
+        <li>Как решить, какие модули использовать в контроллере
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="chto-takoe-api-prilozhenie"> Что такое API-приложение?</h3>
+    <p>Обычно, когда говорят, что Rails используется как "API", имеется в виду предоставление
+        программно доступного API вместе с веб-приложением. Например, GitHub предоставляет , который
+        можно использовать в вашем собственном клиенте.</p>
+    <p>С приходом клиентских фреймворков многие разработчики используют Rails для создания бэкенда,
+        общего для их веб-приложений и других нативных приложений.</p>
+    <p>Например, Twitter использует свой в своем веб-приложении, который создан как статичный сайт,
+        потребляющий ресурсы JSON.</p>
+    <p>Вместо использования Rails для генерации динамичного HTML, взаимодействующего с сервером с
+        помощью форм и ссылок, многие разработчики трактуют их веб-приложения как всего лишь еще
+        один клиент, созданный из статичного HTML, CSS и JavaScript, потребляющего простой JSON
+        API.</p>
+    <p>Это руководство раскрывает создание приложения Rails, отдающего JSON-ресурсы клиентам API
+        <strong>или</strong> клиентскому фреймворку.</p>
+    <h3 class="inside_page_header" id="zachem-ispolzovat-rails-dlya-json-api"> Зачем использовать
+        Rails для JSON API?</h3>
+    <p>Первый вопрос, который многие задают, когда думают о создании JSON API с помощью Rails, это:
+        "Не будет ли использование Rails для отдачи некоторого JSON избыточным? Не должен ли я
+        использовать что-то вроде Sinatra?".</p>
+    <p>Для очень простых API это может быть истиной. Однако, даже в самых навороченных HTML
+        приложениях, большинство логики приложения фактически находится вне уровня
+        представления.</p>
+    <p>Причиной, по которой многие используют Rails, является то, что он предоставляет набор,
+        позволяющий взять и начать работать без осуществления множества тривиальных решений.</p>
+    <p>Давайте посмотрим на некоторые вещи, которые Rails предоставляет из коробки и которые
+        применимы к API-приложениям.</p>
+    <p>На уровне промежуточных программ:</p>
+    <ul>
+        <li>Перезагрузка: приложения Rails поддерживают прозрачную перезагрузку. Это работает даже
+            если ваше приложение становится большим и рестарт сервера для каждого запроса становится
+            неприемлемым.
+        </li>
+        <li>Режим разработки: приложения Rails идут с разумными значениями по умолчанию для
+            разработки, что делает разработку приятной без ущерба производительности для production.
+        </li>
+        <li>Тестовый режим: то же самое, что и для режима разработки.
+        </li>
+        <li>Логирование: приложения Rails логируют каждый запрос с уровнем детализации, приемлемым
+            для текущего режима. Логи Rails в development включают информацию о среде запроса,
+            запросах в базу данных и основную информацию о производительности.
+        </li>
+        <li>Безопасность: Rails обнаруживает и мешает исполнению , и безопасным способом
+            обрабатывает криптографические подписи в . Не знаете, что такое IP спуфинг или атака по
+            времени? Вот-вот!
+        </li>
+        <li>Парсинг параметров: Хотите устанавливать ваши параметры как JSON вместо URL-кодированной
+            строки? Без проблем. Rails декодирует JSON и сделает его доступным в <code>params</code>.
+            Хотите использовать вложенные URL-кодированные параметры? Это тоже работает.
+        </li>
+        <li>Условный GETs: Rails поддерживает условный <code>GET</code>, (<code>ETag</code> и <code>Last-Modified</code>),
+            обрабатывая заголовки запроса и возвращая правильный отклик и код статуса. Все, что
+            нужно, это использовать проверку в вашем контроллере, и Rails позаботится обо всех
+            деталях HTTP.
+        </li>
+        <li>Кэширование: Если использовать <code>dirty?</code> с публичным контролем кэша, Rails
+            автоматически кэширует отклики. Хранилище кэша можно легко конфигурировать.
+        </li>
+        <li>Запросы HEAD: Rails прозрачно конвертирует запросы <code>HEAD</code> в <code>GET</code>,
+            и возвращает только заголовки тем же образом. Это позволяет <code>HEAD</code> надежно
+            работать во всех API Rails.
+        </li>
+    </ul>
+    <p>Очевидно, что хотя вы и можете это создать сами в терминах существующих промежуточных
+        программ Rack, этот список демонстрирует стек промежуточных программ Rails по умолчанию,
+        представляющий большую ценность, даже хотя вы "просто генерируете JSON".</p>
+    <p>На уровне Action Pack:</p>
+    <ul>
+        <li>Ресурсный роутинг: Если вы создаете RESTful JSON API, вам захочется использовать роутер
+            Rails. Чистый и общепринятый мапинг от HTTP к контроллерам означает, что не нужно
+            тратить время, думая, как смоделировать ваш API в терминах HTTP.
+        </li>
+        <li>Генерация URL: Обратной стороной роутинга является генерация URL. Хороший API,
+            основанный на HTTP, включает URL-ы (в качестве примера смотрите ).
+        </li>
+        <li>Отклики с заголовками и редиректами: <code>head :no_content</code> и <code>redirect_to
+            user_url(current_user)</code> очень удобны. Конечно, заголовки отклика можно добавить
+            руками, но зачем?
+        </li>
+        <li>Кэширование: Rails предоставляет кэширование страниц, экшнов и фрагментов. Кэширование
+            фрагментов особенно полезно при создании вложенных объектов JSON.
+        </li>
+        <li>Простая, дайджестная и токенная аутентификация: Rails поставляется с поддержкой из
+            коробки трех типов аутентификации HTTP.
+        </li>
+        <li>Инструментарий: в Rails имеется инструментальный API, запускающий зарегистрированные
+            обработчики для множества событий, таких как обработка экшна, отсылка файла или данных,
+            перенаправление и запросы к базе данных. Информация о каждом событии приходит с
+            соответствующими параметрами (для события обработки экшна информация включает
+            контроллер, экшн, параметры, формат запроса, метод запроса и полный путь запроса).
+        </li>
+        <li>Генераторы: Это, возможно, и не нужно для опытных пользователей Rails, но это удобно
+            сгенерировать ресурс и получить модель, контроллер, заготовки для тестов и роут,
+            созданные одной командой.
+        </li>
+        <li>Плагины: Многие сторонние библиотеки поставляются с поддержкой Rails, что уменьшает или
+            устраняет стоимость настройки и внедрения библиотеки во фреймворк. Это включает вещи,
+            такие как переопределение генераторов по умолчанию, добавление задач rake и принятие
+            выбора в Rails (такого как логгер и кэширующий бэкенд).
+        </li>
+    </ul>
+    <p>Конечно, процесс загрузки Rails также соединяет воедино все зарегистрированные компоненты.
+        Например, процесс загрузки Rails это то, что использует файл
+        <code>config/database.yml</code> при конфигурации Active Record.</p>
+    <p><strong>Краткая версия</strong>: можно не задумываться, какие части Rails все еще применимы,
+        даже если вы уберете уровень представления, ответом будет "большая часть из них".</p>
+    <h3 class="inside_page_header" id="bazovaya-konfiguratsiya"> Базовая конфигурация</h3>
+    <p>Если вы создаете приложение Rails, которое будет в первую очередь сервером API, можно начать
+        с более ограниченного подмножества Rails и добавлять особенности по необходимости.</p>
+    <p>Можно создать новое приложение api Rails:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new my_api --api
+</pre>
+    </div>
+    <p>Это сделает три основных вещи:</p>
+    <ul>
+        <li>Сконфигурирует приложение, чтобы оно запускало более ограниченный набор промежуточных
+            программ, чем обычно. В частности, оно не включит по умолчанию какие-либо промежуточные
+            программы, полезные для браузерных приложений (такие как поддержка куки).
+        </li>
+        <li>Унаследует <code>ApplicationController</code> от <code>ActionController::API</code>
+            вместо <code>ActionController::Base</code>. Как и в случае с промежуточными программами,
+            это выкинет все модули Action Controller, предоставляющие функциональность, в основном
+            используемую браузерными приложениями.
+        </li>
+        <li>Сконфигурирует генераторы, чтобы они пропускали генерацию вьюх, хелперов и ассетов при
+            генерации нового ресурса.
+        </li>
+    </ul>
+    <p>Если хотите взять существующее приложение и сделать его API-приложением, следуйте этим
+        шагам.</p>
+    <p>В <code>config/application.rb</code> добавьте следующую строчку в самый верх определения
+        класса <code>Application</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.api_only = true
+</pre>
+    </div>
+    <p>Наконец, в <code>app/controllers/application_controller.rb</code> вместо:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ApplicationController &lt; ActionController::Base
+end
+</pre>
+    </div>
+    <p>сделайте:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ApplicationController &lt; ActionController::API
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="vybor-promezhutochnyh-programm"> Выбор промежуточных
+        программ</h3>
+    <p>API-приложение поставляется со следующими промежуточными программами по умолчанию:</p>
+    <ul>
+        <li>
+            <code>Rack::Sendfile</code>
+        </li>
+        <li>
+            <code>ActionDispatch::Static</code>
+        </li>
+        <li>
+            <code>Rack::Lock</code>
+        </li>
+        <li>
+            <code>ActiveSupport::Cache::Strategy::LocalCache::Middleware</code>
+        </li>
+        <li>
+            <code>ActionDispatch::RequestId</code>
+        </li>
+        <li>
+            <code>Rails::Rack::Logger</code>
+        </li>
+        <li>
+            <code>Rack::Runtime</code>
+        </li>
+        <li>
+            <code>ActionDispatch::ShowExceptions</code>
+        </li>
+        <li>
+            <code>ActionDispatch::DebugExceptions</code>
+        </li>
+        <li>
+            <code>ActionDispatch::RemoteIp</code>
+        </li>
+        <li>
+            <code>ActionDispatch::Reloader</code>
+        </li>
+        <li>
+            <code>ActionDispatch::Callbacks</code>
+        </li>
+        <li>
+            <code>Rack::Head</code>
+        </li>
+        <li>
+            <code>Rack::ConditionalGet</code>
+        </li>
+        <li>
+            <code>Rack::ETag</code>
+        </li>
+    </ul>
+    <p>Смотрите раздел по руководства по Rack, чтобы узнать подробности о них.</p>
+    <p>Другие плагины, включая Active Record, могут добавлять дополнительные промежуточные
+        программы. В основном, эти промежуточные программы безразличны к типу создаваемого
+        приложения, и имеют смысл в API-приложении Rails.</p>
+    <p>Можно получить список всех промежуточных программ вашего приложения с помощью:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake middleware
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-keshiruyuschey-promezhutochnoy-programmy">
+        Использование кэширующей промежуточной программы</h4>
+    <p>По умолчанию Rails добавит промежуточную программу, предоставляющую хранилище кэша,
+        основанного на конфигурации вашего приложения (по умолчанию memcache). Это означает, что
+        встроенный кэш HTTP будет полагаться на нее.</p>
+    <p>Например, используя метод <code>stale?</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def show
+ @post = Post.find(params[:id])
+  if stale?(last_modified: @post.updated_at)
+    render json: @post
+  end
+end
+</pre>
+    </div>
+    <p>Вызов <code>stale?</code> сравнит заголовок <code>If-Modified-Since</code> в запросе с <code>@post.updated_at</code>.
+        Если заголовок новее, чем время последнего изменения, этот экшн вернет отклик "304 Not
+        Modified". В противном случае, он отрендерит отклик и включит в него заголовок <code>Last-Modified</code>.
+    </p>
+    <p>Обычно этот механизм используется отдельно для каждого клиента. Кэширующая промежуточная
+        программа позволяет распределять этот кэширующий механизм между клиентами. Можно включить
+        меж-клиентское кэширование в вызове <code>stale?</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def show
+ @post = Post.find(params[:id])
+  if stale?(last_modified: @post.updated_at, public: true)
+    render json: @post
+  end
+end
+</pre>
+    </div>
+    <p>Это означает, что кэширующая промежуточная программа сохранит значение
+        <code>Last-Modified</code> для URL в кэше Rails, и добавит заголовок
+        <code>If-Modified-Since</code> в любой последующий входящий запрос к этому URL.</p>
+    <p>Воспринимайте это как кэширование страниц в семантике HTTP.</p>
+    <div class="note"><p>Эта промежуточная программа всегда вне мьютекса <code>Rack::Lock</code>,
+        даже в однотредовых приложениях.</p></div>
+    <h4 class="inside_page_header" id="ispolzovanie-rack-sendfile"> Использование
+        Rack::Sendfile</h4>
+    <p>При использовании метода <code>send_file</code> в контроллере Rails, он устанавливает
+        заголовок <code>X-Sendfile</code>. <code>Rack::Sendfile</code> ответственен за фактическую
+        отсылку файла.</p>
+    <p>Если ваш фронтенд сервер поддерживает ускоренную отсылку файла, <code>Rack::Sendfile</code>
+        переложит работу по фактической отсылке файла на фронтенд сервер.</p>
+    <p>Можно настроить имя заголовка, которое использует ваш фронтенд сервер для этой цели, с
+        помощью <code>config.action_dispatch.x_sendfile_header</code> в соответствующем среде
+        конфигурационном файле.</p>
+    <p>Подробнее узнать о том, как использовать <code>Rack::Sendfile</code> с популярными
+        фронтендами можно в .</p>
+    <p>Вот несколько значений для популярных серверов, которые, если будут установлены, добавят
+        поддержку для ускоренной отсылки файла:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Apache и lighttpd
+config.action_dispatch.x_sendfile_header = "X-Sendfile"
+# Nginx
+config.action_dispatch.x_sendfile_header = "X-Accel-Redirect"
+</pre>
+    </div>
+    <p>Убедитесь, что сконфигурировали на своем сервере поддержку этих опций в соответствии с
+        инструкциями в документации <code>Rack::Sendfile</code>.</p>
+    <div class="note"><p>Промежуточная программа <code>Rack::Sendfile</code> всегда вне мьютекса
+        <code>Rack::Lock</code>, даже в однотредовых приложениях.</p></div>
+    <h4 class="inside_page_header" id="ispolzovanie-actiondispatch-request"> Использование
+        ActionDispatch::Request</h4>
+    <p><code>ActionDispatch::Request#params</code> примет параметры от клиента в формате JSON и
+        сделает их доступными в контроллере внутри <code>params</code>.</p>
+    <p>Для его использования клиенту нужно сделать запрос с кодированными в JSON параметрами и
+        указать <code>Content-Type</code> как <code>application/json</code>.</p>
+    <p>Вот пример на jQuery:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+jQuery.ajax({
+  type: 'POST',
+  url: '/people',
+  dataType: 'json',
+  contentType: 'application/json',
+  data: JSON.stringify({ person: { firstName: "Yehuda", lastName: "Katz" } }),
+  success: function(json) { }
+});
+</pre>
+    </div>
+    <p><code>ActionDispatch::Request</code> увидит <code>Content-Type</code> и вашими параметрами
+        будут:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{ :person =&gt; { :firstName =&gt; "Yehuda", :lastName =&gt; "Katz" } }
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="drugie-promezhutochnye-programmy"> Другие промежуточные
+        программы</h4>
+    <p>Rails поставляется с рядом других промежуточных программ, которые вы, возможно, захотите
+        использовать в API-приложении, особенно если одним из клиентов вашего API является
+        браузер:</p>
+    <ul>
+        <li>
+            <code>Rack::MethodOverride</code>
+        </li>
+        <li>
+            <code>ActionDispatch::Cookies</code>
+        </li>
+        <li>
+            <code>ActionDispatch::Flash</code>
+        </li>
+        <li>Для управления сессиями
+            <ul>
+                <li>
+                    <code>ActionDispatch::Session::CacheStore</code>
+                </li>
+                <li>
+                    <code>ActionDispatch::Session::CookieStore</code>
+                </li>
+                <li>
+                    <code>ActionDispatch::Session::MemCacheStore</code>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <p>Любые из этих промежуточных программ могут быть добавлены с помощью:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.middleware.use Rack::MethodOverride
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="udalenie-promezhutochnyh-programm"> Удаление промежуточных
+        программ</h4>
+    <p>Если вы не хотите использовать промежуточную программу, которая включена по умолчанию в набор
+        промежуточных программ для API, ее можно убрать с помощью:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.middleware.delete ::Rack::Sendfile
+</pre>
+    </div>
+    <p>Учтите, что удаление этих промежуточных программ удалит поддержку для определенных
+        особенностей в Action Controller.</p>
+    <h3 class="inside_page_header" id="vybor-moduley-kontrollera"> Выбор модулей контроллера</h3>
+    <p>API-приложение (использующее <code>ActionController::API</code>) по умолчанию поставляется со
+        следующими модулями:</p>
+    <ul>
+        <li>
+            <code>ActionController::UrlFor</code>: Делает доступными <code>url_for</code> и
+            сотоварищи.
+        </li>
+        <li>
+            <code>ActionController::Redirecting</code>: Поддержка для <code>redirect_to</code>.
+        </li>
+        <li>
+            <code>ActionController::Rendering</code>: Базовая поддержка для рендеринга.
+        </li>
+        <li>
+            <code>ActionController::Renderers::All</code>: Поддержка для <code>render :json</code> и
+            сотоварищей.
+        </li>
+        <li>
+            <code>ActionController::ConditionalGet</code>: Поддержка для <code>stale?</code>.
+        </li>
+        <li>
+            <code>ActionController::ForceSSL</code>: Поддержка для <code>force_ssl</code>.
+        </li>
+        <li>
+            <code>ActionController::DataStreaming</code>: Поддержка для <code>send_file</code> и
+            <code>send_data</code>.
+        </li>
+        <li>
+            <code>AbstractController::Callbacks</code>: Поддержка для <code>before_action</code> и
+            сотоварищей.
+        </li>
+        <li>
+            <code>ActionController::Instrumentation</code>: Поддержка для инструментальных хуков,
+            определенных Action Controller (смотрите ).
+        </li>
+        <li>
+            <code>ActionController::Rescue</code>: Поддержка для <code>rescue_from</code>.
+        </li>
+        <li>
+            <code>ActionController::BasicImplicitRender</code>: Убеждается, что возвращен пустой
+            отклик, если нет явного.
+        </li>
+        <li>
+            <code>ActionController::StrongParameters</code>: Поддержка для белых списков параметров
+            в сочетании с массовым назначением Active Model.
+        </li>
+        <li>
+            <code>ActionController::ParamsWrapper</code>: Оборачивает хэш параметров во вложенный
+            хэш, таким образом, к примеру, не нужно указывать корневые элементы при посылка запросов
+            POST.
+        </li>
+    </ul>
+    <p>Другие плагины могут добавлять дополнительные модули. Список всех модулей, включенных в
+        <code>ActionController::API</code> можно получить в консоли rails:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails c
+&gt;&gt; ActionController::API.ancestors - ActionController::Metal.ancestors
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dobavlenie-drugih-moduley"> Добавление других модулей</h4>
+    <p>Все модули Action Controller знают о зависимых модулях, поэтому можно свободно включать любые
+        модули в контроллеры, и будут включены и настроены все зависимости.</p>
+    <p>Некоторые распространенные модули, которые вы, возможно, захотите добавить:</p>
+    <ul>
+        <li>
+            <code>AbstractController::Translation</code>: Поддержка для методов локализации
+            <code>l</code> и перевода <code>t</code>.
+        </li>
+        <li>
+            <code>ActionController::HttpAuthentication::Basic</code> (или <code>Digest</code>, или
+            <code>Token</code>): Поддержка для простой, дайджестной или токенной аутентификация
+            HTTP.
+        </li>
+        <li>
+            <code>AbstractController::Layouts</code>: Поддержка для макетов при рендеринге.
+        </li>
+        <li>
+            <code>ActionController::MimeResponds</code>: Поддержка для <code>respond_to</code>.
+        </li>
+        <li>
+            <code>ActionController::Cookies</code>: Поддержка для <code>cookies</code>, что включает
+            поддержку для подписанных и зашифрованных куки. Он требует промежуточную программу для
+            куки.
+        </li>
+    </ul>
+    <p>Лучшим местом для добавления модулей является <code>ApplicationController</code>, но вы также
+        можете добавить модули в отдельные контроллеры.</p>
+
+</body>
+</html>

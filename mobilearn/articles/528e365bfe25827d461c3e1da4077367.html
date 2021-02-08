@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 13. Статические члены класса. Друзья класса</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l13_1">
+    <h1> 1. Статические члены класса </h1>
+    <p>
+        При объявлении класса данные-члены и функции-члены класса можно объявлять
+        <b>статическими</b> с помощью ключевого слова <span class="sint">static</span>. Существует
+        лишь один экземпляр статических данных-членов класса, <i>разделяемый всеми объектами этого
+        класса в программе</i>. Статический член является не частью объектов класса, а <i>отдельным
+        объектом</i>. Статический член класса будет существовать, даже если не создано ни одного
+        объекта класса.
+    </p>
+    <p>
+        Объявление статических данных-членов внутри определения класса <b>не является</b> его
+        определением. Определение должно быть дано где-нибудь ещё.
+    </p>
+    <p>
+        Статический член <i>mem</i> класса <i>cl</i> можно обозначать как <i>cl::mem</i>, т.е.
+        независимо от объекта. На него можно также ссылаться при помощи операций доступа к членам
+        класса . При обращении к статическому члену класса через операцию доступа к членам класса
+        выражение слева от этой операции не вычисляется.
+    </p>
+    <p>
+        Функция-член класса также может быть статической. Такая функция не получает и может
+        ссылаться на нестатические члены класса только посредством операций доступа к членам класса
+        ().
+
+    </p>
+    <p>
+        Статическая функция-член класса не может быть . Не могут существовать одновременно
+        статическая и нестатическая функция-член класса с одинаковым именем и одинаковым набором
+        параметров.
+    </p>
+    <p>
+        Статические члены класса имеют внешнее связывание, т.е. могут быть доступны из других файлов
+        программы. (т.е. объявленные внутри некоторой функции) классы не могут иметь статических
+        членов.
+    </p>
+    <p>
+        Статические члены класса подчиняются обычным к членам класса.
+    </p>
+    <p>
+        Константные статические члены класса могут быть инициализированы внутри определения класса.
+        <code>
+            <span class="chiavi">class</span> BitSet
+            { <span class="chiavi">private</span>:
+            <span class="chiavi">typedef</span> _int64 elem;
+            <span class="chiavi">static const int</span> cBits = <span class="chiavi">sizeof</span>(elem)
+            * 8;
+            <span class="chiavi">static const int</span> size = 256 / cBits;
+            elem set[size];
+            <b>...</b>
+            };
+        </code>
+    </p>
+    <p>
+        Пример использования статических членов класса см. .
+    </p></section>
+<section id="l13_2">
+    <h1> 2. Друзья класса </h1>
+    <p>
+        Обычное объявление функции-члена класса гарантирует три логически разные вещи:
+    </p>
+    <ol>
+        <li>функция имеет право доступа к приватным членам класса;
+        </li>
+        <li>функция находится в области видимости класса;
+        </li>
+        <li>функция должна вызываться для объекта класса (имеется указатель ).
+        </li>
+    </ol>
+    <p>
+        Объявив функцию статической, мы придаём ей только первые два свойства. Объявив функцию
+        дружественной, мы наделяем её только первым свойством.
+    </p>
+    <p>
+        <i>Друг класса</i> – это функция, которая не является членом этого класса, но которой
+        разрешается использовать его приватные и защищённые члены. Имя друга класса не лежит в
+        области действия этого класса, и друг класса не вызывается при помощи операции доступа к
+        члену класса.
+    </p>
+    <p>
+        Друг класса, как и его члены, является частью интерфейса класса. Дружба, как и другие права
+        доступа, предоставляются классом, а не захватываются.
+    </p>
+    <p>
+        Спецификаторы доступа не затрагивают объявлений дружественных функций. «Дружба» не обладает
+        ни наследуемостью, ни транзитивностью.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">int</span> n;
+                <span class="chiavi">friend void</span> friend_function(X* p, <span class="chiavi">int</span>
+                i);
+                <span class="chiavi">public</span>:
+                <span class="chiavi">void</span> member_function(<span class="chiavi">int</span> i);
+                };
+            </td>
+
+            <td class="commenti">
+                // Спецификатор доступа <i>private</i> не работает
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> friend_function(X* p, <span
+                    class="chiavi"> int</span> i)
+                { p-&gt;n = i; }
+            </td>
+
+            <td class="commenti">// Функция не является членом класса, поэтому X:: не пишем.
+                // Поскольку дружественная функция не является членом класса, она не получает
+                // и ей необходимо явно передавать объект, с которым она будет работать.
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> X::member_function(<span class="chiavi">int</span>
+                i)
+                { n = i; }
+            </td>
+
+            <td class="commenti">
+                // Имеется в виду <i>this-&gt;n = i</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f()
+                { X obj;
+                friend_function(&amp;obj, 10);
+                obj.member_function(10);
+                }
+            </td>
+
+            <td class="commenti">
+                // Функции вызываются по-разному,
+                // но приводят к одному и тому же результату
+            </td>
+        </tr>
+    </table>
+    <p>
+        Когда дружественной объявляется , другом становится лишь функция <i>с заданными типами
+        параметров</i>. Это сделано, чтобы избежать «захвата» прав доступа путём объявления ещё
+        одной совместно используемой функции с новым набором параметров.
+    </p>
+    <p>
+        Функция-член класса Х может быть дружественной классу Y.
+        <code>
+            <span class="chiavi">class</span> Y
+            { <span class="chiavi">friend void</span> X::f();
+            <b>...</b>
+            };
+        </code>
+    </p>
+    <p>
+        Сразу все функции-члены класса Х могут быть объявлены дружественными классу Y:
+        <code>
+            <span class="chiavi">class</span> Y
+            { <span class="chiavi">friend class</span> X;
+            <b>...</b>
+            };
+        </code>
+    </p>
+    <p>
+        Механизм дружественности важен по двум причинам. Во-первых, функция может быть другом двух
+        классов. Это увеличивает эффективность работы такой функции и упрощает интерфейсы классов.
+    </p>
+    <p id="dietro">
+        Во-вторых, дружественная функция допускает применение пользовательских преобразований к
+        своему первому параметру, в то время как функции-члены класса – нет. Это позволяет
+        программисту выразить требование к первому параметру быть l-значением, описав
+        соответствующую функцию как член класса, и напротив, выразить отсутствие такого требования,
+        описав такую функцию как дружественную.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex(<span class="chiavi">double</span> r = 0, <span
+                    class="chiavi"> double</span> m = 0) : r(r), m(m) { }
+                <span>//operator double () { return r; };</span>
+                Complex <span class="chiavi"> operator</span> =(<span class="chiavi">const</span>
+                Complex&amp; c);
+                <span class="chiavi">friend</span> Complex <span class="chiavi"> operator</span>
+                ++(Complex&amp; c);
+                <span class="chiavi">friend</span> Complex <span class="chiavi"> operator</span>
+                ++(Complex&amp; c, <span class="chiavi">int</span>);
+                <span class="chiavi">friend</span> Complex <span class="chiavi">operator</span> +
+                (<span class="chiavi">const</span> Complex&amp; c1, <span
+                    class="chiavi"> const</span> Complex&amp; c2);
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi"> Complex <span class="chiavi"> operator</span> +=(<span
+                    class="chiavi">const</span> Complex&amp; c);
+                };
+            </td>
+            <td class="commenti">// Функцию <i>operator += </i>лучше реализовывать как функцию-член
+                класса
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                Complex Complex::<span class="chiavi">operator</span> =(<span
+                    class="chiavi">const</span> Complex&amp; c)
+                { <span class="chiavi">if</span> (&amp;c == this) <span
+                    class="chiavi"> return</span> *<span class="chiavi">this</span>;
+                r = c.r;
+                m = c.m;
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+
+                Complex <span class="chiavi"> operator</span> ++(Complex&amp; c)
+                { ++c.r; <span class="chiavi"> return</span> c; }
+                Complex <span class="chiavi"> operator</span> ++(Complex&amp; c, <span
+                    class="chiavi">int</span>)
+                { Complex x = c;
+                c.r++;
+                <span class="chiavi">return</span> x;
+                }
+                Complex <span class="chiavi"> operator</span> +(<span class="chiavi">const</span>
+                Complex&amp; c1, <span class="chiavi"> const</span> Complex&amp; c2)
+                { <span class="chiavi">return</span> Complex(c1.r + c2.r, c1.m + c2.m); }
+                Complex Complex::<span class="chiavi">operator</span> +=(<span
+                    class="chiavi">const</span> Complex&amp; c)
+                { r += c.r;
+                m += c.m;
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> main()
+                { Complex a(0, 0), b(2, 2), c;
+                <span class="chiavi">double</span> d = 2;
+
+                c = ++a;
+                c = a++;
+                c = a + ++b;
+                c = a + d;
+                c = 3 + b;
+                c += 4;
+                2 += c;
+                }
+            </td>
+            <td class="commenti">
+                // Неявные вызовы преобразующего конструктора.
+                // При наличии функции преобразования <i>operator double()</i> возникала бы
+                неоднозначность.
+                // Ошибка, даже при наличии преобразования из числа типа <i>double</i> к классу <i>Complex</i>,
+                // т.к. 2 не является l-значением
+            </td>
+        </tr>
+    </table>
+</section>
+<section id="l13_3">
+    <h1> 3. Пример </h1>
+    <p>
+        Приведённый в примере класс является частью программы, в которой на экране существуют
+        несколько движущихся кружочков. При попадании мышкой в кружочек он уничтожается. Программа
+        завершается после уничтожения всех кружочков.
+    </p>
+    <p>
+        В классе <i>Circle</i> существуют три – переменные, хранящие общее количество кружочков и
+        размеры окна программы. Один экземпляр каждой из этих переменных разделяется всем объектами
+        <i>Circle</i>. Также в классе <i>Circle</i> объявлены функции <i>SetSize</i> и
+        <i>GetCount</i>, которые работают со статическими членами класса. Поскольку эти функции
+        должны вызываться безотносительно некоторого объекта класса, и даже когда не существует ни
+        одного объекта класса <i>Circle</i>, они должны быть объявлены как или как . Если функции
+        объявлены как статические функции-члены класса, при вызове они должны быть квалифицированы
+        именем класса с помощью операции .
+    </p>
+    <h2 id="l13_3_1"> Файл <i>Circle.h</i></h2>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Circle
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">static int</span> count;
+                <span>// Общее количество кружочков</span>
+                <span class="chiavi">static long int</span> maxX, maxY;
+                <span>// Размеры экрана</span>
+                <span class="chiavi">int</span> x, y, sx, sy;
+                <span>// Центр кружочка и его скорость</span>
+                <span class="chiavi">int</span> radius; <span>// Радиус</span>
+                <span class="chiavi">int</span> colour; <span>// Цвет</span>
+                <span class="chiavi"> public:</span>
+                Circle();
+                ~Circle();
+                <span><b>// Выбираем один из двух вариантов (но можно и сразу оба – функции принадлежат разным областям видимости)</b></span>
+                <span class="chiavi">friend void</span> SetSize(<span class="chiavi">int</span> x,
+                <span class="chiavi"> int</span> y); <span>// Дружественные функции</span>
+                <span class="chiavi">friend int</span> GetCount();
+
+                <span class="chiavi">static void</span> SetSize(<span class="chiavi">int</span> x,
+                <span class="chiavi"> int</span> y);
+                <span>// Статические функции-члены класса</span>
+                <span class="chiavi">static int</span> GetCount();
+                <span class="chiavi">void</span> Paint(HDC hdc);
+                <span class="chiavi">void</span> Move();
+                <span class="chiavi">int</span> Is_Inside(<span class="chiavi">int</span> px, <span
+                    class="chiavi"> int</span> py);
+                <span class="chiavi">int</span> GetColour();
+                <span class="chiavi">void</span> ChangeSpeed();
+                };
+                <span class="chiavi">#define</span> WM_END (WM_USER + 1)
+            </td>
+        </tr>
+    </table>
+    <h2 id="l13_3_2">Файл <i>Circle.cpp</i></h2>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> "StdAfx.h"
+                <span class="chiavi">#include</span> "Circle.h"
+                <span class="chiavi">extern</span> HWND hWnd;
+                <span class="chiavi">int</span> Circle::count = 0; <span>// Определение и инициализация статических членов класса <i>Circle</i></span>
+                <span class="chiavi">long int</span> Circle::maxX = 800;
+                <span>// (в <b>дополнение</b> к объявлению внутри класса)</span>
+                <span class="chiavi">long int</span> Circle::maxY = 600;
+                Circle::Circle()
+                { ++count; <span>// При создании кружочка увеличиваем общее количество на 1</span>
+                x = rand() % maxX;
+                y = rand() % maxY;
+                radius = rand() % 7 + 6;
+                colour = rand() % 16;
+                sx = rand() % 15 - 7;
+                sy = rand() % 15 - 7;
+                }
+                Circle::~Circle()
+                { <span class="chiavi"> if</span> (--count == 0) <span>// При уничтожении – уменьшаем на 1</span>
+                PostMessage(hWnd, WM_END, 0, 0);
+                }
+                <span class="chiavi">void</span> Circle::Paint(HDC hdc) <span>// Рисуем</span>
+                { Ellipse(hdc, x - radius, y + radius, x + radius, y - radius); }
+                <span class="chiavi">void</span> Circle::Move() <span>// Перемещаем</span>
+                { x += sx;
+                <span class="chiavi">if</span> (x &lt; 0) x = 0;
+                <span class="chiavi">if</span> (x &gt; maxX) x = maxX;
+                y += sy;
+                <span class="chiavi">if</span> (y &lt; 0) y = 0;
+                <span class="chiavi">if</span> (y &gt; maxY) y = maxY;
+                }
+                <span class="chiavi">int</span> Circle::Is_Inside(<span class="chiavi">int</span>
+                px, <span class="chiavi"> int</span> py) <span>// Попали?</span>
+                { <span class="chiavi"> return</span> (px - x) * (px - x) + (py - y) * (py - y) &lt;=
+                radius * radius; }
+                <span class="chiavi">int</span> Circle::GetColour()
+                { <span class="chiavi"> return</span> colour; }
+                <span class="chiavi">void</span> Circle::ChangeSpeed()
+                { sx = rand() % 15 - 7; sy = rand() % 15 - 7; }
+                <span>// Функции <i>SetSize</i> и <i>GetCount</i> должны быть объявлены как дружественные функции или статические функции-члены класса,
+// т.к. они должны вызываться безотносительно некоторого объекта класса, и даже когда нет ни одного объекта класса</span>
+                <span class="chiavi">void</span> SetSize(<span class="chiavi">int</span> x, <span
+                    class="chiavi"> int</span> y) <span>// Дружественные функции</span>
+                { Circle::maxX = x; Circle::maxY = y; }
+
+                <span class="chiavi">int</span> GetCount()
+                { <span class="chiavi"> return</span> Circle::count; }
+                <span class="chiavi">void</span> Circle::SetSize(<span class="chiavi">int</span> x,
+                <span class="chiavi"> int</span> y) <span>// Статические функции-члены класса</span>
+                { Circle::maxX = x; Circle::maxY = y; }
+
+                <span class="chiavi">int</span> Circle::GetCount()
+                { <span class="chiavi"> return</span> Circle::count; }
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>
+        Вы можете также скачать этой программы
+    </p></section>
+
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Заметки о релизе Ruby on Rails 3.1</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="zametki-o-relize-ruby-on-rails-3-1"> Заметки о релизе Ruby on
+        Rails 3.1</h2>
+    <p>Ключевые новинки в Rails 3.1:</p>
+    <ul>
+        <li>Streaming
+        </li>
+        <li>Обратимые миграции
+        </li>
+        <li>Файлопровод (Assets Pipeline)
+        </li>
+        <li>jQuery как библиотека JavaScript по умолчанию
+        </li>
+    </ul>
+    <p>Эти заметки о релизе покрывают основные обновления. Чтобы узнать о различных багфиксах и
+        изменениях, обратитесь к логам изменений или к в главном репозитории Rails на GitHub.</p>
+    <h3 class="inside_page_header" id="upgrading-to-rails-3-1"> Обновление до Rails 3.1</h3>
+    <p>Если обновляете существующее приложение, было бы хорошо иметь перед этим покрытие тестами.
+        Также, до попытки обновиться до Rails 3.1, необходимо сначала обновиться до Rails 3 и
+        убедиться, что приложение все еще выполняется так, как нужно. Затем нужно предпринять
+        следующие изменения:</p>
+    <h4 class="inside_page_header" id="rails-3-1-trebuet-kak-minimum-ruby-1-8-7"> Rails 3.1 требует
+        как минимум Ruby 1.8.7</h4>
+    <p>Rails 3.1 требует Ruby 1.8.7 или выше. Поддержка всех прежних версий Ruby была официально
+        прекращена, и следует обновиться как можно быстрее. Rails 3.1 также совместим с Ruby
+        1.9.2.</p>
+    <div class="info"><p>Отметьте, что в Ruby 1.8.7 p248 и p249 имеются ошибки маршализации,
+        ломающие Rails. Хотя в Ruby Enterprise Edition это было исправлено, начиная с релиза
+        1.8.7-2010.02. В ветке 1.9, Ruby 1.9.1 не пригоден к использованию, поскольку он иногда
+        вылетает, поэтому, если хотите использовать 1.9.x перепрыгивайте на 1.9.2 для гладкой
+        работы.</p></div>
+    <h4 class="inside_page_header" id="chto-obnovit-v-prilozhenii"> Что обновить в приложении</h4>
+    <p>Следующие изменения означают обновление вашего приложения до Rails 3.1.3, последней версии
+        3.1.x Rails.</p>
+    <h5 class="inside_page_header" id="gemfile"> Gemfile</h5>
+    <p>Сделайте изменения в вашем <code>Gemfile</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'rails', '= 3.1.3'
+gem 'mysql2'
+# Needed for the new asset pipeline
+group :assets do
+  gem 'sass-rails',   "~&gt; 3.1.5"
+  gem 'coffee-rails', "~&gt; 3.1.1"
+  gem 'uglifier',     "&gt;= 1.0.3"
+end
+# jQuery is the default JavaScript library in Rails 3.1
+gem 'jquery-rails'
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="config-application-rb"> config/application.rb</h5>
+    <ul>
+        <li>
+            <p>Файлопровод требует следующие добавления:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.assets.enabled = true
+config.assets.version = '1.0'
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Если ваше приложение использует маршрут "/assets", можно изменить префикс,
+                используемый для ресурсов, чтобы избежать конфликтов:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Defaults to '/assets'
+config.assets.prefix = '/asset-files'
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="config-environments-development-rb">
+        config/environments/development.rb</h5>
+    <ul>
+        <li><p>Уберите настройку RJS <code>config.action_view.debug_rjs = true</code>.</p></li>
+        <li>
+            <p>Добавьте следующее, если хотите включить файлопровод.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Do not compress assets
+config.assets.compress = false
+# Expands the lines which load the assets
+config.assets.debug = true
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="config-environments-production-rb">
+        config/environments/production.rb</h5>
+    <ul>
+        <li>
+            <p>Снова, большинство изменений относится к файлопроводу. Подробнее о них можно
+                прочитать в руководстве .</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Compress JavaScripts and CSS
+config.assets.compress = true
+# Don't fallback to assets pipeline if a precompiled asset is missed
+config.assets.compile = false
+# Generate digests for assets URLs
+config.assets.digest = true
+# Defaults to Rails.root.join("public/assets")
+# config.assets.manifest = YOUR_PATH
+# Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
+# config.assets.precompile `= %w( search.js )
+# Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+# config.force_ssl = true
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="config-environments-test-rb">
+        config/environments/test.rb</h5>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Configure static asset server for tests with Cache-Control for performance
+config.serve_static_assets = true
+config.static_cache_control = "public, max-age=3600"
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="config-initializers-wrap_parameters-rb">
+        config/initializers/wrap_parameters.rb</h5>
+    <ul>
+        <li>
+            <p>Добавьте этот файл со следующим содержимым, если хотите оборачивать параметры во
+                вложенный хэш. По умолчанию это включено в новых приложениях.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Be sure to restart your server when you modify this file.
+# This file contains settings for ActionController::ParamsWrapper which
+# is enabled by default.
+# Enable parameter wrapping for JSON. You can disable this by setting :format to an empty array.
+ActiveSupport.on_load(:action_controller) do
+  wrap_parameters :format =&gt; [:json]
+end
+# Disable root element in JSON by default.
+ActiveSupport.on_load(:active_record) do
+  self.include_root_in_json = false
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h5 class="inside_page_header" id="uberite-optsii-cache-i-concat-v-helperah-resursov-vo-vyuhah">
+        Уберите опции :cache и :concat в хелперах ресурсов во вьюхах</h5>
+    <ul>
+        <li>Вместе с Asset Pipeline опции :cache и :concat больше не используются, удалите эти опции
+            из своих вьюх.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="sozdanie-prilozheniya-rails-3-1"> Создание приложения Rails
+        3.1</h3>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Нужен установленный руби-гем 'rails'
+$ rails new myapp
+$ cd myapp
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="storonnie-gemy"> Сторонние гемы</h4>
+    <p>Сейчас Rails использует <code>Gemfile</code> в корне приложения, чтобы определить гемы,
+        требуемые для запуска вашего приложения. Этот <code>Gemfile</code> обрабатывается , который
+        затем устанавливает все зависимости. Он может даже установить все зависимости локально в
+        ваше приложение, и оно не будет зависеть от системных гемов.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="zhivite-na-grani"> Живите на грани</h4>
+    <p><code>Bundler</code> и <code>Gemfile</code> замораживает ваше приложение Rails с помощью
+        новой отдельной команды <code>bundle</code>. Если хотите установить напрямую из репозитория
+        Git, передайте флажок <code>--edge</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp --edge
+</pre>
+    </div>
+    <p>Если у вас есть локальная копия репозитория Rails, и вы хотите создать приложение с ее
+        использованием, передайте флажок <code>--dev</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby /path/to/rails/railties/bin/rails new myapp --dev
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="arhitekturnye-izmeneniya-rails"> Архитектурные изменения
+        Rails</h3>
+    <h4 class="inside_page_header" id="fayloprovod-assets-pipeline"> Файлопровод (Assets
+        Pipeline)</h4>
+    <p>Главное изменение в Rails 3.1 это Assets Pipeline. Он делает CSS и JavaScript первосортным
+        кодом, и делает доступной надлежащую организацию, включая использование в плагинах и
+        engine-ах.</p>
+    <p>Файлопровод работает с помощью и раскрывается в руководстве .</p>
+    <h4 class="inside_page_header" id="http-streaming"> HTTP Streaming</h4>
+    <p>HTTP Streaming это другое новшество в Rails 3.1. Он позволяет браузеру загружать таблицы
+        стилей и файлы JavaScript, пока сервер все еще создает отклик. Это требует Ruby 1.9.2,
+        является опциональным, а также требует настройки веб-сервера, но популярная связка NGINX и
+        Unicorn уже готова предоставлять это преимущество.</p>
+    <h4 class="inside_page_header" id="biblioteka-js-po-umolchaniyu-teper-jquery"> Библиотека JS по
+        умолчанию теперь jQuery</h4>
+    <p>jQuery является библиотекой JavaScript по умолчанию, которая поставляется вместе с Rails 3.1.
+        Но если вы используете Prototype, это просто переключить.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp -j prototype
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="identity-map"> Identity Map</h4>
+    <p>В Active Record имеется Identity Map в Rails 3.1. Identity map содержит ранее загруженные
+        экземпляры записей и возвращает объект, связанный с записью, если к нему обращаются снова.
+        Identity map создается при каждом запросе и уничтожается при его завершении.</p>
+    <p>Rails 3.1 поставляется с отключенной по умолчанию identity map.</p>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <ul>
+        <li><p>jQuery является новой библиотекой JavaScript по умолчанию.</p></li>
+        <li><p>jQuery и Prototype более не встроенные, а предоставляются как гемы
+            <code>jquery-rails</code> и <code>prototype-rails</code>.</p></li>
+        <li><p>Генератор приложения принимает опцию <code>-j</code>, которая может быть произвольной
+            строкой. Если передать "foo", в <code>Gemfile</code> будет добавлен гем "foo-rails", и
+            манифест JavaScript приложения затребует "foo" и "foo_ujs". В данный момент существуют
+            только "prototype-rails" и "jquery-rails", и эти файлы предоставляются через
+            файлопровод.</p></li>
+        <li><p>Создание приложение или плагина запускает <code>bundle install</code>, если не
+            определено <code>--skip-gemfile</code> или <code>--skip-bundle</code>.</p></li>
+        <li><p>Генераторы контроллера и ресурса теперь автоматически создадут заглушки для ресурсов
+            (это может быть отключено с помощью <code>--skip-assets</code>). Эти заглушки будут
+            использовать CoffeeScript и Sass, если эти библиотеки доступны.</p></li>
+        <li><p>Генераторы скаффолда и приложения используют стиль хэшей из Ruby 1.9, когда запущены
+            на Ruby 1.9. Чтобы создать старый стиль хэшей, должно быть передано <code>--old-style-hash</code>.
+        </p></li>
+        <li><p>Генератор скаффолда контроллера создает блок формата для JSON вместо XML.</p></li>
+        <li><p>Логирование Active Record направлено в STDOUT и показывается в консоли.</p></li>
+        <li><p>Добавлена конфигурация <code>config.force_ssl</code>, загружающая промежуточную
+            программу <code>Rack::SSL</code> и принуждающую все запросы быть под протоколом HTTPS.
+        </p></li>
+        <li><p>Добавлена команда <code>rails plugin new</code>, создающая плагин Rails с gemspec,
+            тестами и пустым приложением для тестирования.</p></li>
+        <li><p>К стеку промежуточных программ по умолчанию добавлены <code>Rack::Etag</code> и
+            <code>Rack::ConditionalGet</code>.</p></li>
+        <li><p>К стеку промежуточных программ по умолчанию добавлена <code>Rack::Cache</code>.</p>
+        </li>
+        <li><p>Engine-ы получили большое обновление - их можно монтировать на любой путь, включать
+            ресурсы. запускать генераторы и т.д.</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="action-pack"> Action Pack</h3>
+    <h4 class="inside_page_header" id="action-controller"> Action Controller</h4>
+    <ul>
+        <li><p>Выдается предупреждение, если токен аутентификации CSRF не может быть
+            верифицирован.</p></li>
+        <li><p>Определите <code>force_ssl</code> в контроллере. чтобы принудить браузер передавать
+            данные через протокол HTTPS на конкретно этот контроллер. Для ограничения отдельных
+            экшнов могут быть использованы <code>:only</code> или <code>:except</code>.</p></li>
+        <li><p>Деликатные параметры строки запроса, определенные в
+            <code>config.filter_parameters</code>, теперь будут отфильтрованы в логе и из пути
+            запроса.</p></li>
+        <li><p>Параметры URL, возвращающие <code>nil</code> на <code>to_param</code>. теперь будут
+            убраны из строки запроса.</p></li>
+        <li><p>Добавлен <code>ActionController::ParamsWrapper</code> для оборачивания параметров во
+            вложенный хэш, и он будет включен в новых приложениях по умолчанию для запроса JSON. Это
+            может быть настроено в <code>config/initializers/wrap_parameters.rb</code>.</p></li>
+        <li><p>Добавлен <code>config.action_controller.include_all_helpers</code>. По умолчанию
+            выполняет <code>helper :all</code> в <code>ActionController::Base</code>, что включает
+            все хелперы по умолчанию. Установка <code>include_all_helpers</code> в
+            <code>false</code> приведет к включению только application_helper и хелпера.
+            соответствующего контроллеру (подобно foo_helper для foo_controller).</p></li>
+        <li><p><code>url_for</code> и именованные хелперы _url теперь принимают как опции <code>:subdomain</code>
+            и <code>:domain</code>.</p></li>
+        <li>
+            <p>Добавлен <code>Base.http_basic_authenticate_with</code> для простой базовой
+                аутентификации http с помощью единственного вызова метода класса.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  USER_NAME, PASSWORD = "dhh", "secret"
+  before_filter :authenticate, :except =&gt; [ :index ]
+  def index
+    render :text =&gt; "Everyone can see me!"
+  end
+  def edit
+    render :text =&gt; "I'm only accessible if you know the password"
+  end
+  private
+    def authenticate
+      authenticate_or_request_with_http_basic do |user_name, password|
+        user_name == USER_NAME &amp;&amp; password == PASSWORD
+      end
+    end
+end
+</pre>
+            </div>
+            <p>..теперь может быть написано как</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ApplicationController
+  http_basic_authenticate_with :name =&gt; "dhh", :password =&gt; "secret", :except =&gt; :index
+  def index
+    render :text =&gt; "Everyone can see me!"
+  end
+  def edit
+    render :text =&gt; "I'm only accessible if you know the password"
+  end
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Добавлена поддержка streaming, ее можно включить с помощью:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class PostsController &lt; ActionController::Base
+  stream
+end
+</pre>
+            </div>
+            <p>Можно ограничить некоторые экшны от этого с использованием <code>:only</code> или
+                <code>:except</code>. Подробности можно прочитать в документации по .</p>
+        </li>
+        <li><p>Маршрутный метод redirect теперь принимает хэш опций, меняющих только рассматриваемые
+            части url, или объект, отвечающий на вызов, позволяя повторно использовать
+            редиректы.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="action-dispatch"> Action Dispatch</h4>
+    <ul>
+        <li><p><code>config.action_dispatch.x_sendfile_header</code> теперь по умолчанию
+            <code>nil</code> и <code>config/environments/production.rb</code> не устанавливает
+            какое-либо значение для этого. Это позволяет серверам устанавливать его через <code>X-Sendfile-Type</code>.
+        </p></li>
+        <li><p><code>ActionDispatch::MiddlewareStack</code> теперь использует наследуемую структуру,
+            и больше не является массивом.</p></li>
+        <li><p>Добавлен <code>ActionDispatch::Request.ignore_accept_header</code> для игнорирования
+            заголовков accept.</p></li>
+        <li><p>Добавлена <code>Rack::Cache</code> в стек по умолчанию.</p></li>
+        <li><p>Ответственность за etag перенесена от <code>ActionDispatch::Response</code> в стек
+            промежуточных программ.</p></li>
+        <li><p>API хранения <code>Rack::Session</code> стало более совместимым с остальным в мире
+            Ruby. Оно обратно несовместимо, так как теперь в <code>Rack::Session</code> ожидается,
+            что <code>#get_session</code> принимает четыре аргумента, и требует <code>#destroy_session</code>
+            вместо простого <code>#destroy</code>.</p></li>
+        <li><p>Поиск шаблонов теперь ищет глубже в цепи наследования.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="action-view"> Action View</h4>
+    <ul>
+        <li><p>Добавлена опция <code>:authenticity_token</code> к <code>form_tag</code> для ручного
+            управления, или для отмены, если передать <code>:authenticity_token =&gt; false</code>.
+        </p></li>
+        <li><p>Создан <code>ActionView::Renderer</code> и определен API для <code>ActionView::Context</code>.
+        </p></li>
+        <li><p>Встроенные мутации <code>SafeBuffer</code> запрещены в Rails 3.1.</p></li>
+        <li><p>Добавлен HTML5 хелпер <code>button_tag</code>.</p></li>
+        <li><p><code>file_field</code> автоматически добавляет <code>:multipart =&gt; true</code> к
+            нужным формам.</p></li>
+        <li>
+            <p>Добавлена удобная идиома создавать HTML5 атрибуты data-* в хелперах тегов с хэшем
+                опций <code>:data</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+tag("div", :data =&gt; {:name =&gt; 'Stephen', :city_state =&gt; %w(Chicago IL)})
+# =&gt; &lt;div data-name="Stephen" data-city-state="[&amp;quot;Chicago&amp;quot;,&amp;quot;IL&amp;quot;]" /&gt;
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Ключи преобразуются в дефисные. Значения кодируются в JSON, кроме строк и символов.</p>
+    <ul>
+        <li><p><code>csrf_meta_tag</code> переименован в <code>csrf_meta_tags</code> и для него
+            сделан псевдоним <code>csrf_meta_tag</code> для обратной совместимости.</p></li>
+        <li><p>Старое API обработки шаблонов устарело, а новое API просто требует обработчик
+            шаблонов для отклика на вызов.</p></li>
+        <li><p>rhtml и rxml окончательно убраны из обработчиков шаблонов.</p></li>
+        <li><p>Вернули <code>config.action_view.cache_template_loading</code>, позволяющий решить,
+            должны ли быть кэшированы шаблоны, или нет.</p></li>
+        <li><p>Хелпер формы submit более не создает id = "object_name_id".</p></li>
+        <li><p>Позволяет <code>FormHelper#form_for</code> определить <code>:method</code> как опцию
+            первого уровня вместо вкладывания в хэш <code>:html</code>. <code>form_for(==@==post,
+                remote: true, method: :delete)</code> вместо <code>form_for(==@==post, remote: true,
+                html: { method: :delete })</code>.</p></li>
+        <li><p>Предоставлен <code>JavaScriptHelper#j()</code> как псевдоним для <code>JavaScriptHelper#escape_javascript()</code>.
+            Это заменило метод <code>Object#j()</code>, добавляемый гемом JSON в шаблоны при
+            использовании JavaScriptHelper.</p></li>
+        <li><p>Позволяет формат AM/PM в datetime selectors.</p></li>
+        <li><p><code>auto_link</code> был убран из Rails и выделен в </p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <ul>
+        <li>
+            <p>Добавлен метод класса <code>pluralize_table_names</code> для склонения по числу имен
+                таблиц отдельных моделей. Ранее это можно было сделать только глобально для всех
+                моделей с помощью <code>ActiveRecord::Base.pluralize_table_names</code>.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  self.pluralize_table_names = false
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Добавлен блок настроек для одиночных связей. Блок будет вызван после того, как
+                экземпляр будет инициализирован.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveRecord::Base
+  has_one :account
+end
+user.build_account{ |a| a.credit_limit = 100.0 }
+</pre>
+            </div>
+        </li>
+        <li><p>Добавлен <code>ActiveRecord::Base.attribute_names</code>, возвращающий список имен
+            атрибутов. Он возвратит пустой массив, если модель абстрактная, или таблица не
+            существует.</p></li>
+        <li><p>Фикстуры CSV устарели и их поддержка будет убрана в Rails 3.2.0.</p></li>
+        <li>
+            <p><code>ActiveRecord#new</code>, <code>ActiveRecord#create</code> и <code>ActiveRecord#update_attributes</code>
+                принимают второй хэш как опцию, позволяющую определить рассматриваемую роль при
+                назначении атрибутов. Это основа новой возможности массового назначения Active
+                Model:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Post &lt; ActiveRecord::Base
+  attr_accessible :title
+  attr_accessible :title, :published_at, :as =&gt; :admin
+end
+Post.new(params[:post], :as =&gt; :admin)
+</pre>
+            </div>
+        </li>
+        <li><p><code>default_scope</code> теперь может принимать блок, lambda или любой другой
+            объект, отвечающий на call для ленивых вычислений.</p></li>
+        <li><p>Скоупы по умолчанию теперь вычисляются в самый последний момент для избегания
+            проблем, когда могут быть созданы скоупы, которые неявно содержат скоуп по умолчанию, от
+            которого впоследствии невозможно будет избавиться с помощью Model.unscoped.</p></li>
+        <li><p>Адаптер PostgreSQL теперь поддерживает только PostgreSQL версии 8.2 и выше.</p></li>
+        <li><p>Промежуточная программа <code>ConnectionManagement</code> изменилась, чтобы очищать
+            пул соединения после того, как тело rack было уничтожено.</p></li>
+        <li><p>В Active Record добавлен метод <code>update_column</code>. Этот новый метод обновляет
+            заданный атрибут у объекта, пропуская валидации и колбэки. Рекомендовано использовать
+            <code>update_attributes</code> или <code>update_attribute</code> если вы не уверенны,
+            что не хотите выполнять какой-либо колбэк, включая изменение столбца
+            <code>updated_at</code>. Он не может быть вызван на новых записях.</p></li>
+        <li><p>Связи с опцией <code>:through</code> теперь могут использовать любые связи как
+            посредника или источника, включая другие связи, имеющие опцию <code>:through</code>, и
+            связи <code>has_and_belongs_to_many</code>.</p></li>
+        <li><p>Конфигурация для текущего соединения с базой данных теперь доступна с помощью <code>ActiveRecord::Base.connection_config</code>.
+        </p></li>
+        <li>
+            <p>Лимиты и смещения убираются из запросов COUNT, кроме случая, когда они оба
+                представлены.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+People.limit(1).count           # =&gt; 'SELECT COUNT(*) FROM people'
+People.offset(1).count          # =&gt; 'SELECT COUNT(*) FROM people'
+People.limit(1).offset(1).count # =&gt; 'SELECT COUNT(*) FROM people LIMIT 1 OFFSET 1'
+</pre>
+            </div>
+        </li>
+        <li><p><code>ActiveRecord::Associations::AssociationProxy</code> был разделен. Теперь
+            имеется класс <code>Association</code> (и подклассы), ответственные за работу со
+            связями, и отдельная "тонкая" обертка по имени <code>CollectionProxy</code>, передающая
+            связи коллекции. Это предотвращает загрязнение пространства имен, разделяет решаемые
+            проблемы, и позволяет дальнейший рефакторинг.</p></li>
+        <li><p>Одиночные связи (<code>has_one</code>, <code>belongs_to</code>) больше не имеют
+            прокси, и просто возвращают связанную запись или <code>nil</code>. Это означает, что
+            больше не следует использовать недокументированные методы наподобие <code>bob.mother.create</code>
+            - используйте вместо этого <code>bob.create_mother</code>.</p></li>
+        <li><p>Поддержка опции <code>:dependent</code> для связи <code>has_many :through</code>. По
+            историческим и практическим причинам, <code>:delete_all</code> является стратегией
+            удаления по умолчанию, используемой в <code>association.delete(*records)</code>, не
+            смотря на то, что стратегией по умолчанию для обычного has_many является
+            <code>:nullify</code>. Также, это работает только если вторая сторона связи belongs_to.
+            В других ситуациях следует непосредственно изменить связь through.</p></li>
+        <li><p>Изменилось поведение <code>association.destroy</code> для <code>has_and_belongs_to_many</code>
+            и <code>has_many :through</code>. Теперь 'destroy' или 'delete' на связи будет означать
+            'избавиться от связи', а не (обязательно) 'избавиться от связанных записей'.</p></li>
+        <li><p>Раньше <code>has_and_belongs_to_many.destroy(*records)</code> уничтожал сами записи.
+            Он не удалял какие-либо записи в соединительной таблице. Теперь он удаляет записи в
+            соединительной таблице.</p></li>
+        <li><p>Раньше <code>has_many_through.destroy(*records)</code> удалял сами записи и записи в
+            соединительной таблице. [Отметьте: Это не всегда было так; ранние версии Rails удаляли
+            только сами записи.] Теперь от уничтожает только записи в соединительной таблице.</p>
+        </li>
+        <li><p>Отметьте, что это изменение в некоторой степени обратно не совместимо, но, к
+            сожалению, нет никакого способа объявить его 'deprecate' перед изменением. Изменение
+            было сделано для единообразия в понятиях 'destroy' или 'delete' для различных типов
+            связи. Если хотите уничтожить сами записи, следует выполнить <code>records.association.each(&amp;:destroy)</code>.
+        </p></li>
+        <li>
+            <p>В <code>change_table</code> добавлена опция <code>:bulk =&gt; true</code>, чтобы
+                выполнить все изменения схемы, определенные в блоке, с использование одного
+                выражения ALTER.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+change_table(:users, :bulk =&gt; true) do |t|
+  t.string :company_name
+  t.change :birthdate, :datetime
+end
+</pre>
+            </div>
+        </li>
+        <li><p>Убрана поддержка доступа к атрибутами в соединительной таблице <code>has_and_belongs_to_many</code>.
+            Следует использовать <code>has_many :through</code>.</p></li>
+        <li><p>Добавлен метод <code>create_association!</code> для связей <code>has_one</code> и
+            <code>belongs_to</code>.</p></li>
+        <li>
+            <p>Миграции теперь обратимы, что означает, что Rails теперь понимает, как обратить ваши
+                миграции. Для использования обратимых миграций просто определите метод
+                <code>change</code>.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class MyMigration &lt; ActiveRecord::Migration
+  def change
+    create_table(:horses) do |t|
+      t.column :content, :text
+      t.column :remind_at, :datetime
+    end
+  end
+end
+</pre>
+            </div>
+        </li>
+        <li><p>Некоторые вещи не могут быть автоматически обратимы. Если вы знаете, как их обратить.
+            следует в миграциях определить <code>up</code> и <code>down</code>. Если вы определите
+            какое-либо изменение в change, которое не может быть обращено, при откате миграции будет
+            вызвано исключение <code>IrreversibleMigration</code>.</p></li>
+        <li>
+            <p>Теперь миграции используют методы экземпляра вместо методов класса:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class FooMigration &lt; ActiveRecord::Migration
+  def up # Не self.up
+    ...
+  end
+end
+</pre>
+            </div>
+        </li>
+        <li><p>Файлы миграции созданные генераторами модели и конструктивной миграции (для примера,
+            add_name_to_users), используют метод обратимой миграции <code>change</code> вместо
+            обычных методов <code>up</code> и <code>down</code>.</p></li>
+        <li>
+            <p>Убрана поддержка интерполяции строк с условиями SQL на связях. Вместо этого должен
+                быть использован proc.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+has_many :things, :conditions =&gt; 'foo = #{bar}'          # до
+has_many :things, :conditions =&gt; proc { "foo = #{bar}" } # после
+</pre>
+            </div>
+            <p>Внутри proc, <code>self</code> это объект, являющийся владельцем связи, за
+                исключением случая, когда связь лениво загружается, в этом случае <code>self</code>
+                это класс, в котором определена связь.</p>
+            <p>Внутри proc можно иметь "нормальные" условия, поэтому следующее будет работать:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+has_many :things, :conditions =&gt; proc { ["foo = ?", bar] }
+</pre>
+            </div>
+        </li>
+        <li><p>Ранее <code>:insert_sql</code> и <code>:delete_sql</code> на связи <code>has_and_belongs_to_many</code>
+            позволяли вызвать 'record' для получения записи, которую нужно вставить или удалить.
+            Теперь это передается как аргумент в proc.</p></li>
+        <li>
+            <p>Добавлен <code>ActiveRecord::Base#has_secure_password</code> (через <code>ActiveModel::SecurePassword</code>)
+                для инкапсуляции элементарного пароля с использованием шифрования BCrypt и соли.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Schema: User(name:string, password_digest:string, password_salt:string)
+class User &lt; ActiveRecord::Base
+  has_secure_password
+end
+</pre>
+            </div>
+        </li>
+        <li><p>При создании модели по умолчанию добавляется <code>add_index</code> для столбцов
+            <code>belongs_to</code> или <code>references</code>.</p></li>
+        <li><p>Установление id для объекта в <code>belongs_to</code> обновляет связь с объектом.</p>
+        </li>
+        <li><p>Изменилась семантика <code>ActiveRecord::Base#dup</code> и <code>ActiveRecord::Base#clone</code>,
+            чтобы более соответствовать семантике обычных методов Ruby dup и clone.</p></li>
+        <li><p>Вызов <code>ActiveRecord::Base#clone</code> приведет к неполной копии записи, включая
+            копирования состояния заморозки. Ни один колбэк не будет вызван.</p></li>
+        <li><p>Вызов <code>ActiveRecord::Base#dup</code> продублирует запись, включая вызов
+            пост-инициализационных хуков. Состояние заморозки не будет скопировано, и все связи
+            будут очищены. Дублированная запись возвратит <code>true</code> для
+            <code>new_record?</code>, будет иметь <code>nil</code> в поле id, и ее можно будет
+            сохранить.</p></li>
+        <li><p>Кэш запросов теперь работает с prepared statements. Никаких изменений в приложении не
+            требуется.</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-model"> Active Model</h3>
+    <ul>
+        <li><p><code>attr_accessible</code> принимает опцию <code>:as</code> для определении роли.
+        </p></li>
+        <li><p>Теперь <code>InclusionValidator</code>, <code>ExclusionValidator</code> и <code>FormatValidator</code>
+            принимают опцию, которая может быть proc, lambda или что угодно, что отвечает на <code>call</code>.
+            Эта опция будет вызвана с текущей записью в качестве аргумента, и возвратит объект,
+            отвечающий на <code>include?</code> для <code>InclusionValidator</code> и <code>ExclusionValidator</code>,
+            и возвратит регулярное выражение для <code>FormatValidator</code>.</p></li>
+        <li><p>Добавлен <code>ActiveModel::SecurePassword</code> для инкапсуляции элементарного
+            пароля с использованием шифрования BCrypt и соли.</p></li>
+        <li><p><code>ActiveModel::AttributeMethods</code> Допускает атрибуты, определяемые по
+            требованию.</p></li>
+        <li><p>Добавлена поддержка для выборочного включения и отключения обсерверов.</p></li>
+        <li><p>Альтернативный поиск в пространстве имен <code>I18n</code> более не поддерживается.
+        </p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-resource"> Active Resource</h3>
+    <ul>
+        <li>
+            <p>Для всех запросов формат по умолчанию был изменен на JSON. Если хотите продолжить
+                использование XML, следует установить <code>self.format = :xml</code> в классе.
+                Например,</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class User &lt; ActiveResource::Base
+  self.format = :xml
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <ul>
+        <li><p><code>ActiveSupport::Dependencies</code> теперь вызывает <code>NameError</code>, если
+            находит существующую константу в <code>load_missing_constant</code>.</p></li>
+        <li><p>Добавлен новый метод <code>Kernel#quietly</code>, приглушающий <code>STDOUT</code> и
+            <code>STDERR</code>.</p></li>
+        <li><p>Добавлен <code>String#inquiry</code> как удобный метод для преобразования String в
+            объект <code>StringInquirer</code>.</p></li>
+        <li><p>Добавлен <code>Object#in?</code> для проверки, включен ли объект в другой объект.</p>
+        </li>
+        <li><p>Теперь стратегия <code>LocalCache</code> является настоящим классом промежуточной
+            программы, а не анонимным классом.</p></li>
+        <li><p>Был представлен класс <code>ActiveSupport::Dependencies::ClassCache</code> как
+            содержащий ссылки на перегружаемые классы.</p></li>
+        <li><p>Был отрефакторен <code>ActiveSupport::Dependencies::Reference</code>, чтобы
+            пользоваться преимуществами нового <code>ClassCache</code>.</p></li>
+        <li><p>Портирован <code>Range#cover?</code> как псевдоним <code>Range#include?</code> в Ruby
+            1.8.</p></li>
+        <li><p>Добавлены <code>weeks_ago</code> и <code>prev_week</code> в Date/DateTime/Time.</p>
+        </li>
+        <li><p>Добавлен колбэк <code>before_remove_const</code> к <code>ActiveSupport::Dependencies.remove_unloadable_constants!</code>.
+        </p></li>
+    </ul>
+    <p>Устарело:</p>
+    <ul>
+        <li>
+            <code>ActiveSupport::SecureRandom</code> устарел в пользу <code>SecureRandom</code> из
+            стандартной библиотеки Ruby.
+        </li>
+    </ul>
+
+</body>
+</html>

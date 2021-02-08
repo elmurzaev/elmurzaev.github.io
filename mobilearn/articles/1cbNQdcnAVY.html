@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>37. Выбор фильтров: расчет необходимых параметров</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Выбор фильтров зависит от замысла разработчика радиоэлектронного узла, а также от типа выпрямителей, которые различают от однополупериодных до мостовых. Если выбрать П-фильтр, то его элементы рассчитывают следующим образом:</span>
+</p>
+<div class="fb2-image"><span><img alt="Приборостроение - i_084.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_084.png"></span>
+</div>
+<div class="fb2-empty-line"> </div>
+<p><span>где f – частота питающей сети; R<sub>n</sub> – сопротивление нагрузки; С – емкость (конденсатор); L<sub>др</sub>– индуктивность дросселя в цепи; мкф (микрофарад) и Гн (генри) – единицы измерения для емкости и индуктивности.</span>
+</p>
+<p><span>К<sub>п1</sub> ≈ (1–0,4) для двухполупериодного выпрямителя.</span></p>
+<p><span>Для Г-фильтра элементы реостатноемкостной цепи рассчитываются, как</span></p>
+<div class="fb2-image"><span><img alt="Приборостроение - i_085.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_085.png"></span>
+</div>
+<div class="fb2-empty-line"> </div>
+<p>
+    <span>где U<sub>1</sub>, U<sub>2</sub> – напряжения на входе и выходе фильтра; R<sub>H</sub>,J<sub>H</sub> – сопротивление нагрузки и ток через него; R<sub>ф</sub>, С<sub>ф</sub> – сопротивление и емкость Г-фильтра.</span>
+</p>
+<p><span>После фильтрации выпрямленного напряжения в радиоэлектронных узлах, для их еще более качественного питания устанавливают параметрические стабилизаторы напряжения.</span>
+</p>
+<p><span>Для выбора и расчета стабилизатора требуется: U<sub>nmax</sub>, U<sub>nmin</sub> – граничные значения напряжения питания; J<sub>cmax</sub>, J<sub>cmin</sub> – граничные значения тока стабилизатора; U<sub>c</sub>, J<sub>H</sub> – стабилизированное напряжение на нагрузке и ток через нее.</span>
+</p>
+<p><span>После выводят еще несколько параметров и выбирают по справочным данным соответствующие радиоэлектронные компоненты.</span>
+</p>
+<div class="fb2-image"><span><img alt="Приборостроение - i_086.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_086.png"></span>
+</div>
+<div class="fb2-image">
+    <p><span>Находят при заданном J<sub>H</sub></span></p>
+    <div class="fb2-image"><span><img alt="Приборостроение - i_087.png"
+                                      src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_087.png"></span>
+    </div>
+    <div class="fb2-empty-line"> </div>
+    <p><span>При сильных флуктуациях J<sub>H</sub>, находят граничные значения J<sub>c</sub> и выбирают подходящее. После всего прочего необходимо определить ограничительное сопротивление.</span>
+    </p>
+    <div class="fb2-image"><span><img alt="Приборостроение - i_088.png"
+                                      src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_088.png"></span>
+    </div>
+    <div class="fb2-empty-line"> </div>
+    <p><span>коэффициент сглаживания самого стабилизатора:</span></p>
+    <div class="fb2-image"><span><img alt="Приборостроение - i_089.png"
+                                      src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_089.png"></span>
+    </div>
+    <div class="fb2-empty-line"> </div>
+    <p><span>здесь r<em><sub>g</sub></em> – дифференциальное сопротивление самого параметрического стабилизатора.</span>
+    </p>
+</div>
+</body>
+</html>

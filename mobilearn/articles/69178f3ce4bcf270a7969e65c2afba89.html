@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Заметки о релизе Ruby on Rails 3.0</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="zametki-o-relize-ruby-on-rails-3-0"> Заметки о релизе Ruby on
+        Rails 3.0</h2>
+    <p>Rails 3.0 это волшебство! Он приготовит вам ужин и постирает белье. Вы не сможете понять как
+        вы жили без него. Это Лучшая Версия Rails, Какой Еще Не Было!</p>
+    <p>Но если серьезно, это действительно замечательная вещь. В него вложены все замечательные
+        идеи, внесенные присоединившейся командой Merb, сделан фокус на минимизацию и скорость
+        фреймворка и удобный API. Если вы переходите на Rails 3.0 с Merb 1.x, то вам многое будет
+        знакомым. Если переходите с Rails 2.x, то вы его тоже полюбите.</p>
+    <p>Даже если вам не интересны подробности об оптимизации "внутренностей", в Rails 3.0 есть что
+        показать. У нас много новых возможностей и улучшений API. Сейчас очень подходящий момент
+        стать разработчиком на Rails. Некоторые из ключевых возможностей:</p>
+    <ul>
+        <li>Совершенно новый роутинг на основе объявлений RESTful
+        </li>
+        <li>Новое Action Mailer API, похожее на Action Controller (теперь без головной боли
+            посылающее multipart сообщения!)
+        </li>
+        <li>Новый сцепляемый язык запросов Active Record, построенный на основе relational algebra
+        </li>
+        <li>Ненавязчивые хелперы JavaScript с драйверами для Prototype, jQuery и в будущем других
+            фреймворков (конец встроенному JS)
+        </li>
+        <li>Удобное управление зависимостями с помощью Bundler
+        </li>
+    </ul>
+    <p>Помимо всего этого, мы попытались как можно лучше указать об устаревании прежнего API с
+        помощью хороших предупреждений. Это означает, что можно перенести ваше существующее
+        приложение на Rails 3 без необходимости немедленного переписывания всего вашего старого кода
+        в соответствии с последними best practices.</p>
+    <p>Эти заметки о релизе покрывают основные обновления, но не включают все мелкие багфиксы и
+        изменения. Rails 3.0 содержит почти 4,000 коммитов от более чем 250 авторов! Чтобы увидеть
+        все, обратитесь к в главном репозитории Rails на GitHub.</p>
+    <p>Чтобы установить Rails 3:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Используйте sudo, если этого требует установка
+$ gem install rails
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="obnovlenie-do-rails-3"> Обновление до Rails 3</h3>
+    <p>Если обновляете существующее приложение, было бы хорошо иметь перед этим покрытие тестами.
+        Также, до попытки обновиться до Rails 3, необходимо сначала обновиться до Rails 2.3.5 и
+        убедиться, что приложение все еще выполняется так, как нужно. Затем нужно предпринять
+        следующие изменения:</p>
+    <h4 class="inside_page_header" id="rails-3-trebuet-kak-minimum-ruby-1-8-7"> Rails 3 требует как
+        минимум Ruby 1.8.7</h4>
+    <p>Rails 3.0 требует Ruby 1.8.7 или выше. Поддержка всех прежних версий Ruby была официально
+        прекращена, и следует обновиться как можно быстрее. Rails 3.0 также совместим с Ruby
+        1.9.2.</p>
+    <div class="info"><p>Отметьте, что в Ruby 1.8.7 p248 и p249 имеются ошибки маршализации,
+        ломающие Rails 3.0. Хотя в Ruby Enterprise Edition это было исправлено, начиная с релиза
+        1.8.7-2010.02. В ветке 1.9, Ruby 1.9.1 не пригоден к использованию, поскольку он иногда
+        вылетает в Rails 3.0, поэтому, если хотите использовать Rails 3.0 с 1.9.x перепрыгивайте на
+        1.9.2 для гладкой работы.</p></div>
+    <h4 class="inside_page_header" id="ob-ekt-rails-application"> Объект Rails Application</h4>
+    <p>Как часть внутренней работы по поддержке запуска нескольких приложений Rails в одном
+        процессе, Rails 3 представляет концепцию объекта Application. Этот объект содержит все
+        настройки, специфичные для приложения, и очень похож по сути на
+        <code>config/environment.rb</code> из прежних версий Rails.</p>
+    <p>Теперь каждое приложение Rails должно иметь соответствующий объект application. Этот объект
+        определяется в <code>config/application.rb</code>. При обновлении существующего приложения
+        до Rails 3, необходимо добавить этот файл и переместить подходящие конфигурации из <code>config/environment.rb</code>
+        в <code>config/application.rb</code>.</p>
+    <h4 class="inside_page_header" id="script-zamenen-na-script-rails"> script/* заменен на
+        script/rails</h4>
+    <p>Новый <code>script/rails</code> заменяет все ранее использовавшиеся скрипты из директории
+        <code>script</code>. Впрочем, сейчас не нужно запускать даже <code>script/rails</code>,
+        команда <code>rails</code> обнаруживает его при вызове из корня приложения Rails и запускает
+        этот скрипт. Пример изменившегося использования:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails console                      # вместо script/console
+$ rails g scaffold post title:string # вместо script/generate scaffold post title:string
+</pre>
+    </div>
+    <p>Запустите <code>rails --help</code>, чтобы увидеть список всех опций.</p>
+    <h4 class="inside_page_header" id="zavisimosti-i-config-gem"> Зависимости и config.gem</h4>
+    <p>Метода <code>config.gem</code> больше нет, он был заменен использованием <code>bundler</code>
+        и <code>Gemfile</code>, смотрите "Внешние Гемы":#vendoring-gems ниже.</p>
+    <h4 class="inside_page_header" id="protsess-obnovleniya"> Процесс обновления</h4>
+    <p>Для помощи в процессе обновления был создан плагин , для автоматизации его части.</p>
+    <p>Просто установите плагин, затем запустите <code>rake rails:upgrade:check</code> для проверки,
+        какие части вашего приложения следует обновить (с ссылками на информацию, как это сделать).
+        Он также предлагает задание по созданию <code>Gemfile</code>, основанного на текущих вызовах
+        <code>config.gem</code>, и задание по созданию нового маршрутного файла из старого. Чтобы
+        получить плагин, просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby script/plugin install git://github.com/rails/rails_upgrade.git
+</pre>
+    </div>
+    <p>Пример того, как это все работает, можно увидеть в </p>
+    <p>Помимо Rails Upgrade tool, если нужна помощь, есть люди в IRC и , которые, возможно,
+        сталкивались с подобными проблемами. Напишите в свой блог о своем опыте обновления, чтобы
+        другие смогли воспользоваться вашими знаниями!</p>
+    <h3 class="inside_page_header" id="sozdanie-prilozheniya-rails-3-0"> Создание приложения Rails
+        3.0</h3>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# Уже должен быть установлен руби-гем 'rails'
+$ rails new myapp
+$ cd myapp
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="storonnie-gemy"> Сторонние гемы</h4>
+    <p>Сейчас Rails использует <code>Gemfile</code> в корне приложения, чтобы определить гемы,
+        требуемые для запуска вашего приложения. Этот <code>Gemfile</code> обрабатывается , который
+        затем устанавливает все зависимости. Он может даже установить все зависимости локально в
+        ваше приложение, и оно не будет зависеть от системных гемов.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="zhivite-na-grani"> Живите на грани</h4>
+    <p><code>Bundler</code> и <code>Gemfile</code> замораживает ваше приложение Rails с помощью
+        отдельной команды <code>bundle</code>, поэтому <code>rake freeze</code> более не актуальна и
+        была отброшена.</p>
+    <p>Если хотите установить напрямую из репозитория Git, передайте флажок <code>--edge</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp --edge
+</pre>
+    </div>
+    <p>Если у вас есть локальная копия репозитория Rails, и вы хотите создать приложение с ее
+        использованием, передайте флажок <code>--dev</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby /path/to/rails/bin/rails new myapp --dev
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="arhitekturnye-izmeneniya-rails"> Архитектурные изменения
+        Rails</h3>
+    <p>Имеется шесть больших изменений в архитектуре Rails.</p>
+    <h4 class="inside_page_header" id="railties-restrung"> Railties Restrung</h4>
+    <p>Railties был обновлен, чтобы предоставить совместимое с плагинами API для всего фреймворка
+        Rails, а также полностью переписаны генераторы и зависимости Rails, в результате
+        разработчики смогут в значительной степени внедрять свой код в генераторы и фреймворк
+        приложения совместимым и определенным образом.</p>
+    <h4 class="inside_page_header" id="vse-osnovnye-komponenty-rails-byli-razdeleny"> Все основные
+        компоненты Rails были разделены</h4>
+    <p>В связи со слиянием Merb и Rails, одной из крупных работ было устранение тесно связанных
+        вместе основных компонентов Rails. Это было достигнуто, и теперь все основные компоненты
+        Rails используют то же API, что вы можете использовать для своих плагинов. Это означает, что
+        каждый сделанный вами плагин или замена любого основного компонента (например DataMapper или
+        Sequel) имеют доступ ко всему функционалу, к которому имеют доступ основные компоненты
+        Rails, и могут расширять и улучшать его как угодно.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="abstraktsiya-active-model"> Абстракция Active Model</h4>
+    <p>Частью разделения основных компонентов было выделение всех связей из Action Pack в Active
+        Record. Теперь это выполнено. Всем новым плагинам ORM теперь всего лишь нужно внедрить
+        интерфейсы Active Model, чтобы работать с Action Pack.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="abstraktsiya-kontrollera"> Абстракция контроллера</h4>
+    <p>Другой крупной частью разделения основных компонентов было создание основного суперкласса,
+        отделенного от терминов HTTP, для управления рендерингом вьюх и т.д. Создание <code>AbstractController</code>
+        позволило существенно упростить <code>ActionController</code> и <code>ActionMailer</code>,
+        убрав общий код из этих библиотек, и поместив его в Abstract Controller.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="integratsiya-arel"> Интеграция Arel</h4>
+    <p> (или Active Relation) был принят в качестве основы Active Record, и теперь требуется в
+        Rails. Arel предоставляет абстракцию SQL, упрощающую Active Record и предоставляющую основы
+        для функционала relation в Active Record.</p>
+    <p>Подробнее: - .</p>
+    <h4 class="inside_page_header" id="izvlechenie-mail"> Извлечение Mail</h4>
+    <p>В Action Mailer с самого начала были monkey патчи, пре-парсеры и даже агенты для отправки и
+        получения, все вдобавок к встроенному в исходник TMail. Версия 3 изменила все это, так что
+        весь функционал, связанный с сообщениями email был выделен в гем . Это, опять же, уменьшило
+        повторение кода и помогло определить границы между Action Mailer и парсером email.</p>
+    <p>Подробнее: - </p>
+    <h3 class="inside_page_header" id="internatsionalizatsiya"> Интернационализация</h3>
+    <p>В Rails 3 было проделано много работы над поддержкой I18n, включая гем , поддерживающий
+        разные улучшения производительности.</p>
+    <ul>
+        <li>I18n для любого объекта - поведение I18n может быть добавлено к любому объекту, включая
+            <code>ActiveModel::Translation</code> и <code>ActiveModel::Validations</code>. Для
+            переводов также имеется <code>errors.messages</code> fallback.
+        </li>
+        <li>У атрибутов имеются переводы по умолчанию.
+        </li>
+        <li>Form Submit Tag автоматически ставит правильный статус (Create или Update), в
+            зависимости от статуса объекта, и, таким образом, ставит правильный перевод.
+        </li>
+        <li>Label теперь также работает с I18n, просто передайте в него имя атрибута.
+        </li>
+    </ul>
+    <p>Подробнее: - </p>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <p>В связи с разделением главных фреймворков Rails, в Railties проведена огромная переделка,
+        чтобы он связывал фреймворки, engine-ы или плагины настолько просто и безболезненно,
+        насколько это возможно:</p>
+    <ul>
+        <li>У каждого приложения теперь есть собственное пространство имен, к примеру, приложение
+            стартует с помощью <code>YourAppName.boot</code>, что позволяет взаимодействовать с
+            другими приложениями намного проще.
+        </li>
+        <li>Теперь все в <code>Rails.root/app</code> добавляется в путь загрузки, поэтому можно
+            сделать <code>app/observers/user_observer.rb</code> и Rails загрузит его безо всяких
+            модификаций.
+        </li>
+        <li>Теперь Rails 3.0 предоставляет объект <code>Rails.config</code>, представляющий
+            централизованное хранилище всех типов гибких конфигурационных опций Rails.
+        </li>
+    </ul>
+    <p>Генератор приложения получает дополнительные флажки, позволяющие опустить установку
+        test-unit, Active Record, Prototype и Git. Также добавлен новый флажок <code>--dev</code>,
+        настраивающий приложение с <code>Gemfile</code>, указывающим на вашу версию Rails
+        (определенную путем к исходникам <code>rails</code>). Подробнее смотрите <code>rails
+            --help</code>.</p>
+    <p>Генераторы Railties требуют большого внимания, основываясь на том, что:</p>
+    <ul>
+        <li>Генераторы были полностью переписаны и обратно не совместимы.
+        </li>
+        <li>API шаблонов Rails и API генераторов были объединены (сейчас они фактически те же
+            самые).
+        </li>
+        <li>Генераторы больше не загружаются по специальным путям, они должны быть в путях загрузки
+            Ruby, поэтому вызов <code>rails generate foo</code> будет искать <code>generators/foo_generator</code>.
+        </li>
+        <li>Новые генераторы предоставляют хуки, таким образом в них могут быть легко внедрен любой
+            шаблон engine, ORM, тестовый фреймворк.
+        </li>
+        <li>Новые генераторы позволяют переопределить шаблоны, поместив копию в <code>Rails.root/lib/templates</code>.
+        </li>
+        <li>Также представлен <code>Rails::Generators::TestCase</code>, поэтому вы можете создать
+            собственные генераторы и протестировать их.
+        </li>
+    </ul>
+    <p>Также несколько переделаны вьюхи, создаваемые генераторами Railties:</p>
+    <ul>
+        <li>Сейчас вьюхи используют теги <code>div</code> вместо тегов <code>p</code>.
+        </li>
+        <li>Сейчас сгенерированные скаффолды используют партиалы <code>_form</code>, вместо
+            повторения кода во вьюхах edit и new.
+        </li>
+        <li>Сейчас формы скаффолда используют <code>f.submit</code>, возвращающий "Create ModelName"
+            или "Update ModelName", в зависимости от состояния переданного объекта.
+        </li>
+    </ul>
+    <p>Наконец, ряд улучшений был добавлен в rake-таски:</p>
+    <ul>
+        <li>Был добавлен <code>rake db:forward</code>, позволяющий откатить ваши миграции с
+            возвратом отдельно или в группах.
+        </li>
+        <li>Был добавлен <code>rake routes CONTROLLER=x</code>, позволяющий просмотреть маршруты
+            только к одному контроллеру.
+        </li>
+    </ul>
+    <p>Теперь Railties объявил устаревшим:</p>
+    <ul>
+        <li>
+            <code>RAILS_ROOT</code> в пользу <code>Rails.root</code>,
+        </li>
+        <li>
+            <code>RAILS_ENV</code> в пользу <code>Rails.env</code>, и
+        </li>
+        <li>
+            <code>RAILS_DEFAULT_LOGGER</code> в пользу <code>Rails.logger</code>.
+        </li>
+    </ul>
+    <p><code>PLUGIN/rails/tasks</code> и <code>PLUGIN/tasks</code> больше не загружаются, все таски
+        теперь должны быть в <code>PLUGIN/lib/tasks</code>.</p>
+    <p>Подробнее:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="action-pack"> Action Pack</h3>
+    <p>В Action Pack произошло множество внутренних и внешних изменений.</p>
+    <h4 class="inside_page_header" id="abstract-controller"> Abstract Controller</h4>
+    <p>В Abstract Controller были извлечены части общего назначения из Action Controller в виде
+        модуля, годного в использовании любой библиотекой, используемой для рендеринга шаблонов или
+        партиалов, хелперов, переводов, логирования и любой части цикла отклика на запрос. Теперь
+        эта абстракция позволяет <code>ActionMailer::Base</code> быть унаследованным от <code>AbstractController</code>
+        и всего лишь оборачивать Rails DSL в гем Mail.</p>
+    <p>Это также предоставило возможность вычистить Action Controller, упростив его код.</p>
+    <p>Однако отметьте, что Abstract Controller не имеет публичного API, и его не стоит запускать в
+        повседневном использовании Rails.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="action-controller"> Action Controller</h4>
+    <ul>
+        <li>В <code>application_controller.rb</code> теперь по умолчанию есть <code>protect_from_forgery</code>.
+        </li>
+        <li>
+            <code>cookie_verifier_secret</code> устарел, вместо этого теперь назначается <code>Rails.application.config.cookie_secret</code>,
+            и был перемещен в отдельный файл: <code>config/initializers/cookie_verification_secret.rb</code>.
+        </li>
+        <li>
+            <code>session_store</code> настраивалось в <code>ActionController::Base.session</code>,
+            а теперь перемещено в <code>Rails.application.config.session_store</code>. Значения по
+            умолчанию устанавливаются в <code>config/initializers/session_store.rb</code>.
+        </li>
+        <li>
+            <code>cookies.secure</code> позволяет устанавливать зашифрованные значения куки с
+            помощью <code>cookie.secure[:key] =&gt; value</code>.
+        </li>
+        <li>
+            <code>cookies.permanent</code> позволяет устанавливать постоянные значения хэш куки
+            <code>cookie.permanent[:key] =&gt; value</code>, вызывая исключение на шифрованных
+            значениях, если не проходит верификация.
+        </li>
+        <li>Теперь можно передать <code>:notice =&gt; 'This is a flash message'</code> или <code>:alert
+            =&gt; 'Something went wrong'</code> в вызове <code>format</code> внутри блока <code>respond_to</code>.
+            Хэш <code>flash[]</code> все еще работает по-прежнему.
+        </li>
+        <li>Теперь в контроллеры добавился метод <code>respond_with</code>, упрощающий старые блоки
+            <code>format</code>.
+        </li>
+        <li>Добавленный <code>ActionController::Responder</code> дает гибкость в том, как будут
+            получены созданные вами отклики.
+        </li>
+    </ul>
+    <p>Устарело:</p>
+    <ul>
+        <li>
+            <code>filter_parameter_logging</code> устарел в пользу <code>config.filter_parameters
+            &lt;&lt; :password</code>.
+        </li>
+    </ul>
+    <p>Подробнее:
+        *
+        * </p>
+    <h4 class="inside_page_header" id="action-dispatch"> Action Dispatch</h4>
+    <p>Action Dispatch это новшество в Rails 3.0, он представляет новую, более чистую реализацию
+        роутинга.</p>
+    <ul>
+        <li>Большая чистка и переписывание роутера, теперь роутер Rails является
+            <code>rack_mount</code> с лежащим в основе Rails DSL, это отдельная самодостаточная
+            часть программы.
+        </li>
+        <li>Маршруты, определяемые для каждого приложения, теперь помещаются в пространство имен
+            модуля вашего приложения, что означает:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Вместо:
+ActionController::Routing::Routes.draw do |map|
+  map.resources :posts
+end
+# Будет:
+AppName::Application.routes do
+  resources :posts
+end
+</pre>
+    </div>
+    <ul>
+        <li>В роутер добавлен метод <code>match</code>, также можно к соответствующему маршруту
+            передать любое приложение Rack.
+        </li>
+        <li>В роутер добавлен метод <code>constraints</code>, позволяющий защитить маршруты
+            определенными ограничениями.
+        </li>
+        <li>В роутер добавлен метод <code>scope</code>, позволяющий вложить маршруты в пространство
+            имен для различных языков или иных действий, например:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+scope 'es' do
+  resources :projects, :path_names =&gt; { :edit =&gt; 'cambiar' }, :path =&gt; 'proyecto'
+end
+# Даст вам экшн edit по адресу /es/proyecto/1/cambiar
+</pre>
+    </div>
+    <ul>
+        <li>В роутер добавлен метод <code>root</code> как ярлык к <code>match '/', :to =&gt;
+            path</code>.
+        </li>
+        <li>В match можно передать несколько опциональных сегментов, например <code>match
+            "/:controller(/:action(/:id))(.:format)"</code>, каждый сегмент в скобках является
+            опциональным.
+        </li>
+        <li>Маршруты могут быть выражены с помощью блоков, к примеру можно вызвать <code>controller
+            :home { match '/:action' }</code>.
+        </li>
+    </ul>
+    <div class="note"><p>Старый стиль команд <code>map</code> все еще работает, как и прежде, для
+        обратной совместимости, однако будет убран в релизе 3.1.</p></div>
+    <p>Устарело</p>
+    <ul>
+        <li>Обработка всех маршрутов в нересурсных приложениях
+            (<code>/:controller/:action/:id</code>) теперь закомментирована.
+        </li>
+        <li>:path_prefix в маршрутах больше не существует, а :name_prefix теперь автоматически
+            добавляет "_" в конец заданного значения.
+        </li>
+    </ul>
+    <p>Подробнее:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="action-view"> Action View</h4>
+    <h5 class="inside_page_header" id="nenavyazchivyy-javascript"> Ненавязчивый JavaScript</h5>
+    <p>Произошло масштабное переписывание хелперов Action View, реализованы хуки Unobtrusive
+        JavaScript (UJS) и убраны старые команды встроенного AJAX. Это позволило Rails использовать
+        любой совместимый драйвер UJS для внедрения хуков UJS в хелперах.</p>
+    <p>Это означает, что все прежние хелперы <code>remote_&lt;method&gt;</code> были убраны из ядра
+        Rails и перемещены в . Для получения хуков UJS в HTML, теперь нужно передать <code>:remote =&gt;
+            true</code>. Для примера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_for @post, :remote =&gt; true
+</pre>
+    </div>
+    <p>Создаст:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form action="http://host.com" id="create-post" method="post" data-remote="true"&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="helpery-s-blokami"> Хелперы с блоками</h4>
+    <p>Хелперы наподобие <code>form_for</code> или <code>div_for</code>, вставляющие содержимое из
+        блока, теперь используют <code>&lt;%=</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @post do |f| %&gt;
+  ...
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>От ваших собственных подобных хелперов ожидается, что они возвращают строку, а не добавляют к
+        результирующему буферу вручную.</p>
+    <p>Хелперы с другим поведением, наподобие <code>cache</code> или <code>content_for</code>, не
+        затронуты этим изменением, им нужен <code>&lt;%</code> как и прежде.</p>
+    <h5 class="inside_page_header" id="drugie-izmeneniya"> Другие изменения</h5>
+    <ul>
+        <li>Больше не нужно вызывать <code>h(string)</code> для экранирования HTML, это
+            осуществляется по умолчанию во всех шаблонах вьюх. Если хотите неэкранированную строку,
+            вызывайте <code>raw(string)</code>.
+        </li>
+        <li>Теперь по умолчанию хелперы выводят HTML 5.
+        </li>
+        <li>Хелпер формы label теперь берет значения из I18n с отдельным значением, таким образом
+            <code>f.label :name</code> возьмет перевод <code>:name</code>.
+        </li>
+        <li>Метка I18n для select теперь :en.helpers.select вместо :en.support.select.
+        </li>
+        <li>Теперь не нужно помещать знак минуса в конце интерполяции руби в шаблоне ERB для того,
+            чтобы убрать перевод строки в результирующем HTML.
+        </li>
+        <li>В Action View добавлен хелпер <code>grouped_collection_select</code>.
+        </li>
+        <li>Добавлен <code>content_for?</code>, позволяющий проверить существование содержимого во
+            вьюхе до рендеринга.
+        </li>
+        <li>Передача в хелперы форм <code>:value =&gt; nil</code> установит атрибут поля
+            <code>value</code> как nil вместо значения по умолчанию
+        </li>
+        <li>Передача в хелперы форм <code>:id =&gt; nil</code> приведет к тому, что эти поля будут
+            отрендерены без атрибута <code>id</code>
+        </li>
+        <li>Передача <code>:alt =&gt; nil</code> в <code>image_tag</code> приведет к тому, что тег
+            <code>img</code> отрендерится без атрибута <code>alt</code>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-model"> Active Model</h3>
+    <p>Active Model это новшество в Rails 3.0. Он представляет уровень абстракции для любой
+        библиотеки ORM для использования во взаимодействии с Rails с применением интерфейса Active
+        Model.</p>
+    <h4 class="inside_page_header" id="abstraktsiya-orm-i-interfeys-action-pack"> Абстракция ORM и
+        интерфейс Action Pack</h4>
+    <p>Частью разделения основных компонентов было выделение всех связей из Action Pack в Active
+        Record. Теперь это выполнено. Всем новым плагинам ORM теперь всего лишь нужно внедрить
+        интерфейсы Active Model, чтобы работать с Action Pack.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="validatsii"> Валидации</h4>
+    <p>Валидации были перемещены из Active Record в Active Model, предоставляя интерфейс для
+        валидаций, работающий во всех библиотеках ORM в Rails 3.</p>
+    <ul>
+        <li>Теперь имеется краткий метод <code>validates :attribute, options_hash</code> позволяющий
+            передать опции для всех валидационных методов класса, в метод валидации можно передать
+            более одной опции.
+        </li>
+        <li>У метода <code>validates</code> имеются следующие опции:
+            <ul>
+                <li>
+                    <code>:acceptance =&gt; Boolean</code>.
+                </li>
+                <li>
+                    <code>:confirmation =&gt; Boolean</code>.
+                </li>
+                <li>
+                    <code>:exclusion =&gt; { :in =&gt; Enumerable }</code>.
+                </li>
+                <li>
+                    <code>:inclusion =&gt; { :in =&gt; Enumerable }</code>.
+                </li>
+                <li>
+                    <code>:format =&gt; { :with =&gt; Regexp, :on =&gt; :create }</code>.
+                </li>
+                <li>
+                    <code>:length =&gt; { :maximum =&gt; Fixnum }</code>.
+                </li>
+                <li>
+                    <code>:numericality =&gt; Boolean</code>.
+                </li>
+                <li>
+                    <code>:presence =&gt; Boolean</code>.
+                </li>
+                <li>
+                    <code>:uniqueness =&gt; Boolean</code>.
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div class="note"><p>Все валидационные методы стиля Rails 2.3 все еще поддерживаются в Rails
+        3.0, новый метод валидации разработан как дополнительная помощь при валидации модели, а не
+        как замена существующего API.</p></div>
+    <p>Также можно передать объект валидатора, который можно повторно использовать в разных моделях,
+        использующих Active Model:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class TitleValidator &lt; ActiveModel::EachValidator
+  Titles = ['Mr.', 'Mrs.', 'Dr.']
+  def validate_each(record, attribute, value)
+    unless Titles.include?(value)
+      record.errors[attribute] &lt;&lt; 'must be a valid title'
+    end
+  end
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person
+  include ActiveModel::Validations
+  attr_accessor :title
+  validates :title, :presence =&gt; true, :title =&gt; true
+end
+# Или для Active Record
+class Person &lt; ActiveRecord::Base
+  validates :title, :presence =&gt; true, :title =&gt; true
+end
+</pre>
+    </div>
+    <p>Также есть поддержка самоанализа:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+User.validators
+User.validators_on(:login)
+</pre>
+    </div>
+    <p>Подробнее:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <p>Active Record было уделено много внимания в Rails 3.0, включая абстрагирование в Active
+        Model, полное обновление интерфейса запросов с применением Arel, обновления валидаций и
+        многие улучшения и фиксы. Rails 2.x API будет полностью поддерживаемым с целью
+        совместимости, до версии 3.1.</p>
+    <h4 class="inside_page_header" id="interfeys-zaprosov"> Интерфейс запросов</h4>
+    <p>Теперь Active Record, благодаря использованию Arel, возвращает relations на свои основные
+        методы. Существующее API Rails 2.3.x все еще поддерживается и не будет объявлено устаревшим
+        до Rails 3.1, и не будет убрано до Rails 3.2, однако новое API представляет следующие новые
+        методы, все возвращающие relations, позволяющие сцеплять их вместе:</p>
+    <ul>
+        <li>
+            <code>where</code> - Представляет условия для relation, которое будет возвращено.
+        </li>
+        <li>
+            <code>select</code> - Выбирает, какие атрибуты моделей будут возращены из БД.
+        </li>
+        <li>
+            <code>group</code> - Группирует relation по представленному атрибуту.
+        </li>
+        <li>
+            <code>having</code> - Представляет выражение для ограничения сгруппированных relations
+            (ограничение GROUP BY).
+        </li>
+        <li>
+            <code>joins</code> - Соединяет relation с другой таблицей.
+        </li>
+        <li>
+            <code>clause</code> - Представляет выражение, ограничивающее соединенные relations
+            (ограничение JOIN).
+        </li>
+        <li>
+            <code>includes</code> - Включает предварительную загрузку других relations.
+        </li>
+        <li>
+            <code>order</code> - Сортирует relation, основываясь на представленном выражении.
+        </li>
+        <li>
+            <code>limit</code> - Ограничивает relation представленным количеством записей.
+        </li>
+        <li>
+            <code>lock</code> - Блокирует записи, возвращенные из таблицы.
+        </li>
+        <li>
+            <code>readonly</code> - Возвращает копию данных только для чтения.
+        </li>
+        <li>
+            <code>from</code> - Предоставляет способ для выбора relation из более чем одной таблицы.
+        </li>
+        <li>
+            <code>scope</code> - (ранее <code>named_scope</code>) возвращает relations и может быть
+            сцеплен с другим методом для relation.
+        </li>
+        <li>
+            <code>with_scope</code> - и <code>with_exclusive_scope</code> теперь также возвращают
+            relations и могут быть сцеплены.
+        </li>
+        <li>
+            <code>default_scope</code> - также работает с relations.
+        </li>
+    </ul>
+    <p>Подробнее:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="uluchsheniya"> Улучшения</h4>
+    <ul>
+        <li>Добавлен <code>:destroyed?</code> к объектам Active Record.
+        </li>
+        <li>Добавлена <code>:inverse_of</code> к связям Active Record, позволяющая получить
+            экземпляр уже загруженной связи без запроса к базе данных.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="patchi-i-ustarevaniya"> Патчи и устаревания</h4>
+    <p>Кроме того, в ветке Active Record сделано много фиксов:</p>
+    <ul>
+        <li>Поддержка SQLite 2 была отброшена в пользу SQLite 3.
+        </li>
+        <li>Поддержка порядка следования столбцов в MySQL.
+        </li>
+        <li>В адаптере PostgreSQL теперь пофикшена поддержка <code>TIME ZONE</code>, теперь не будут
+            вставляться неправильные значения.
+        </li>
+        <li>Поддержка нескольких схем в именах таблицы для PostgreSQL.
+        </li>
+        <li>PostgreSQL поддерживает тип данных столбца XML.
+        </li>
+        <li>
+            <code>table_name</code> теперь кэшируется.
+        </li>
+        <li>Много работы выполнено по адаптеру Oracle, также с множеством багфиксов.
+        </li>
+    </ul>
+    <p>А также следующее объявлено устаревшим:</p>
+    <ul>
+        <li>
+            <code>named_scope</code> в классе Active Record устарел и был переименован в просто
+            <code>scope</code>.
+        </li>
+        <li>В методах <code>scope</code> следует перейти к использованию методов relation, вместо
+            метода поиска <code>:conditions =&gt; {}</code>, например <code>scope :since, lambda
+                {|time| where("created_at &gt; ?", time) }</code>.
+        </li>
+        <li>
+            <code>save(false)</code> устарел в пользу <code>save(:validate =&gt; false)</code>.
+        </li>
+        <li>I18n сообщений об ошибках для Active Record должна быть изменена с
+            :en.activerecord.errors.template на <code>:en.errors.template</code>.
+        </li>
+        <li>
+            <code>model.errors.on</code> устарел в пользу <code>model.errors[]</code>
+        </li>
+        <li>validates_presence_of =&gt; validates... :presence =&gt; true
+        </li>
+        <li>
+            <code>ActiveRecord::Base.colorize_logging</code> и <code>config.active_record.colorize_logging</code>
+            устарели в пользу <code>Rails::LogSubscriber.colorize_logging</code> и <code>config.colorize_logging</code>
+        </li>
+    </ul>
+    <div class="note"><p>Хотя реализация State Machine была в ветке Active Record несколько месяцев,
+        она была убрана из релиза Rails 3.0.</p></div>
+    <h3 class="inside_page_header" id="active-resource"> Active Resource</h3>
+    <p>Часть Active Resource также была извлечена в Active Model, позволив легко использовать
+        объекты Active Resource с Action Pack.</p>
+    <ul>
+        <li>Добавлены валидации с помощью Active Model.
+        </li>
+        <li>Добавлены хуки обсерверов.
+        </li>
+        <li>Поддержка прокси HTTP.
+        </li>
+        <li>Добавлена поддержка digest authentication.
+        </li>
+        <li>Именование модели перемещено в Active Model.
+        </li>
+        <li>Изменены атрибуты Active Resource на Hash with indifferent access.
+        </li>
+        <li>Добавлены псевдонимы <code>first</code>, <code>last</code> и <code>all</code> для
+            эквивалентных скоупов поиска.
+        </li>
+        <li>Теперь <code>find_every</code> не возвращает ошибку <code>ResourceNotFound</code>, если
+            ничего не возвращено.
+        </li>
+        <li>Добавлен <code>save!</code>, вызывающий <code>ResourceInvalid</code> если объект не
+            <code>valid?</code>.
+        </li>
+        <li>К моделям Active Resource добавлены <code>update_attribute</code> и <code>update_attributes</code>.
+        </li>
+        <li>Добавлен <code>exists?</code>.
+        </li>
+        <li>Переименован <code>SchemaDefinition</code> в <code>Schema</code> и
+            <code>define_schema</code> в <code>schema</code>.
+        </li>
+        <li>Использован <code>format</code> из Active Resources, а не <code>content-type</code> на
+            удаленных ошибках для загрузки ошибок.
+        </li>
+        <li>Использован <code>instance_eval</code> для блока схемы.
+        </li>
+        <li>Пофикшен <code>ActiveResource::ConnectionError#to_s</code>, когда <code>@response</code>
+            не отвечал на #code или #message, для совместимости с Ruby 1.9.
+        </li>
+        <li>Добавлена поддержка для ошибок в формате JSON.
+        </li>
+        <li>Гарантировано, что <code>load</code> работает с числовыми массивами.
+        </li>
+        <li>Распознается отклик 410 от удаленного (remote) ресурса, как то, что ресурс был удален
+            (deleted).
+        </li>
+        <li>Добавлена возможность установить настройки SSL на соединениях Active Resource.
+        </li>
+        <li>Настройки таймаута соединения также влияют на <code>Net::HTTP</code>
+            <code>open_timeout</code>.
+        </li>
+    </ul>
+    <p>Устарело:</p>
+    <ul>
+        <li>
+            <code>save(false)</code> устарел в пользу <code>save(:validate =&gt; false)</code>.
+        </li>
+        <li>Ruby 1.9.2: <code>URI.parse</code> и <code>.decode</code> устарели и больше не
+            используются в библиотеке.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <p>В Active Support были направлены большие усилия на то, чтобы сделать его раздробленным, это
+        означает, что вам больше не нужно требовать всю библиотеку Active Support, чтобы
+        пользоваться ее частью. Это позволило различным частям основных компонент Rails выполняться
+        быстрее.</p>
+    <p>Вот основные изменения в Active Support:</p>
+    <ul>
+        <li>Большая чистка всей библиотеки от неиспользуемых методов.
+        </li>
+        <li>Active Support более не предоставляет внешние библиотеки TZInfo, Memcache Client и
+            Builder, все они включены как зависимости и устанавливаются с помощью команды <code>bundle
+                install</code>.
+        </li>
+        <li>Безопасные буферы реализованы в <code>ActiveSupport::SafeBuffer</code>.
+        </li>
+        <li>Добавлены <code>Array.uniq_by</code> и <code>Array.uniq_by!</code>.
+        </li>
+        <li>Убран <code>Array#rand</code> и портирован <code>Array#sample</code> из Ruby 1.9.
+        </li>
+        <li>Пофикшен баг в <code>TimeZone.seconds_to_utc_offset</code>, возвращающий неправильное
+            значение.
+        </li>
+        <li>Добавлена промежуточная программа <code>ActiveSupport::Notifications</code>.
+        </li>
+        <li>
+            <code>ActiveSupport.use_standard_json_time_format</code> теперь по умолчанию true.
+        </li>
+        <li>
+            <code>ActiveSupport.escape_html_entities_in_json</code> теперь по умолчанию false.
+        </li>
+        <li>
+            <code>Integer#multiple_of?</code> принимает ноль как аргумент, возвращает false если
+            получатель не ноль.
+        </li>
+        <li>
+            <code>string.chars</code> переименован в <code>string.mb_chars</code>.
+        </li>
+        <li>
+            <code>ActiveSupport::OrderedHash</code> теперь может быть десериализован с помощью YAML.
+        </li>
+        <li>Добавлен парсер на основе SAX для XmlMini, с использованием LibXML и Nokogiri.
+        </li>
+        <li>Добавлен <code>Object#presence</code>, возвращающий объект, если он
+            <code>#present?</code>, в ином случае возвращающий <code>nil</code>.
+        </li>
+        <li>Добавлено расширение для <code>String#exclude?</code>, возвращающее противоположность
+            <code>#include?</code>.
+        </li>
+        <li>Добавлен <code>to_i</code> к <code>DateTime</code> в <code>ActiveSupport</code>, таким
+            образом <code>to_yaml</code> правильно работает в моделях с атрибутами
+            <code>DateTime</code>.
+        </li>
+        <li>Добавлен <code>Enumerable#exclude?</code> в пару к <code>Enumerable#include?</code>,
+            чтобы избежать условия <code>!x.include?</code>.
+        </li>
+        <li>Включена по умолчанию экранизация XSS для rails.
+        </li>
+        <li>Поддержка многоуровневого объединения в
+            <code>ActiveSupport::HashWithIndifferentAccess</code>.
+        </li>
+        <li>
+            <code>Enumerable#sum</code> теперь работает для всех перечисляемых типов, даже если они
+            не отвечают на <code>:size</code>.
+        </li>
+        <li>
+            <code>inspect</code> на нулевой продолжительности возвращает '0 seconds' вместо пустой
+            строки.
+        </li>
+        <li>Добавлены <code>element</code> и <code>collection</code> в <code>ModelName</code>.
+        </li>
+        <li>
+            <code>String#to_time</code> и <code>String#to_datetime</code> обрабатывают дробные
+            секунды.
+        </li>
+        <li>Добавлена поддержка для новых колбэков для объекта охватывающего фильтра, отвечающего на
+            <code>:before</code> и <code>:after</code>, используемых в предварительных и последующих
+            колбэках.
+        </li>
+        <li>Метод <code>ActiveSupport::OrderedHash#to_a</code> возвращает упорядоченный набор
+            массивов. Соответствует <code>Hash#to_a</code> из Ruby 1.9.
+        </li>
+        <li>
+            <code>MissingSourceFile</code> существует как константа, но сейчас всего лишь равна
+            <code>LoadError</code>.
+        </li>
+        <li>Добавлен <code>Class#class_attribute</code> для возможности объявить атрибуты на уровне
+            класса, значения которых наследуются и перезаписываются подклассами.
+        </li>
+        <li>Окончательно убран <code>DeprecatedCallbacks</code> в
+            <code>ActiveRecord::Associations</code>.
+        </li>
+        <li>
+            <code>Object#metaclass</code> теперь <code>Kernel#singleton_class</code>, для
+            соответствия Ruby.
+        </li>
+    </ul>
+    <p>Следующие методы были убраны, поскольку они теперь доступны в Ruby 1.8.7 и 1.9.</p>
+    <ul>
+        <li>
+            <code>Integer#even?</code> и <code>Integer#odd?</code>
+        </li>
+        <li>
+            <code>String#each_char</code>
+        </li>
+        <li>
+            <code>String#start_with?</code> и <code>String#end_with?</code> (псевдонимы в третьем
+            лице все еще остались)
+        </li>
+        <li>
+            <code>String#bytesize</code>
+        </li>
+        <li>
+            <code>Object#tap</code>
+        </li>
+        <li>
+            <code>Symbol#to_proc</code>
+        </li>
+        <li>
+            <code>Object#instance_variable_defined?</code>
+        </li>
+        <li>
+            <code>Enumerable#none?</code>
+        </li>
+    </ul>
+    <p>Патч безопасности для REXML остался в Active Support, поскольку ранним версиям Ruby 1.8.7 он
+        все еще нужен. Active Support знает, нужно его применять или нет.</p>
+    <p>Следующие методы были убраны, поскольку они больше не используются во фреймворке:</p>
+    <ul>
+        <li>
+            <code>Kernel#daemonize</code>
+        </li>
+        <li>
+            <code>Object#remove_subclasses_of</code>
+            <code>Object#extend_with_included_modules_from</code>, <code>Object#extended_by</code>
+        </li>
+        <li>
+            <code>Class#remove_class</code>
+        </li>
+        <li>
+            <code>Regexp#number_of_captures</code>, <code>Regexp.unoptionalize</code>, <code>Regexp.optionalize</code>,
+            <code>Regexp#number_of_captures</code>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <p>Action Mailer получил новый API в связи с заменой TMail на новый в качестве библиотеки для
+        электронных писем. В самом Action Mailer была переписана практически каждая строчка кода. В
+        результате теперь Action Mailer просто наследуется от Abstract Controller и оборачивает гем
+        Mail в Rails DSL. Это значительно уменьшило количество кода и дублирование других библиотек
+        в Action Mailer.</p>
+    <ul>
+        <li>По умолчанию все рассыльщики теперь находятся в <code>app/mailers</code>.
+        </li>
+        <li>Теперь можно отослать email с использованием нового API тремя методами: <code>attachments</code>,
+            <code>headers</code> and <code>mail</code>.
+        </li>
+        <li>Теперь в Action Mailer имеется нативная поддержка для встроенных вложений с помощью
+            метода <code>attachments.inline</code>.
+        </li>
+        <li>Методы рассылки Action Mailer теперь возвращают объекты <code>Mail::Message</code>,
+            которые затем могут быть отосланы с помощью метода <code>deliver</code> на них.
+        </li>
+        <li>Все методы доставки теперь абстрагированы в геме Mail.
+        </li>
+        <li>Метод отправки письма может принимать хэш всех валидных полей заголовка письма в паре с
+            их значением.
+        </li>
+        <li>Метод доставки <code>mail</code> работает подобно <code>respond_to</code> из Action
+            Controller, и можно явно или неявно рендерить шаблоны. Action Mailer превратит email в
+            multipart email по необходимости.
+        </li>
+        <li>В вызов <code>format.mime_type</code> в блоке mail можно передать proc и явно
+            отрендерить определенные типы текста, или добавить макет или различные шаблоны. Вызов
+            <code>render</code> внутри proc происходит из Abstract Controller и поддерживает те же
+            опции.
+        </li>
+        <li>Юнит тесты рассыльщика перенесены в функциональные тесты.
+        </li>
+        <li>Теперь Action Mailer делегирует все автоматическое кодирование полей заголовка и тела
+            письма в гем Mail
+        </li>
+        <li>Action Mailer автоматически закодирует поля заголовка и тело письма
+        </li>
+    </ul>
+    <p>Устарело:</p>
+    <ul>
+        <li>
+            <code>:charset</code>, <code>:content_type</code>, <code>:mime_version</code>, <code>:implicit_parts_order</code>
+            устарели в пользу стиля объявления <code>ActionMailer.default :key =&gt; value</code>.
+        </li>
+        <li>Динамические методы рассыльщика <code>create_method_name</code> и <code>deliver_method_name</code>
+            устарели, просто вызывайте <code>method_name</code>, который возвратит объект <code>Mail::Message</code>.
+        </li>
+        <li>
+            <code>ActionMailer.deliver(message)</code> устарел, просто вызывайте <code>message.deliver</code>.
+        </li>
+        <li>
+            <code>template_root</code> устарел, передавайте опции в вызов render в proc из метода
+            <code>format.mime_type</code> внутри блока создания письма <code>mail</code>
+        </li>
+        <li>Метод <code>body</code> для определения переменных экземпляра устарел (<code>body {:ivar
+            =&gt; value}</code>), всего лишь определите переменные экземпляра непосредственно в
+            методе, и они будут доступны во вьюхе.
+        </li>
+        <li>Нахождение рассыльщиков в <code>app/models</code> устарело, вместо этого используйте
+            <code>app/mailers</code>.
+        </li>
+    </ul>
+    <p>Подробнее:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

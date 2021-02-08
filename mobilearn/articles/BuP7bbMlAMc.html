@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>29. Срок службы контактов</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p>Срок службы контактов, определяется количеством переключений. Последнее зависит от материала
+    поверхности контактов. В зависимости от того, из какого материала изготовлена поверхность
+    контакта, число переключений варьируется в пределах от 9 до 100 млн.</p>
+<p>При выполнении мероприятий по устранению гашении искр и дуг исходят из формул:</p>
+<div class="fb2-image"><img alt="Приборостроение - i_070.png"
+                            src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_070.png"></div>
+<div class="fb2-empty-line"> </div>
+<p>где U<sub>k</sub> – максимальное напряжение на контактах при размыкании.</p>
+<div class="fb2-image"><img alt="Приборостроение - i_071.png"
+                            src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_071.png"></div>
+<div class="fb2-empty-line"> </div>
+<p>Где U – напряжение сети; R<sub>ш</sub> – сопротивление шунта, R<sub>H</sub> – сопротивление
+    нагрузки.</p>
+<p>Разность U<sub>k</sub> – U – перенапряжение, как правило</p>
+<p>R<sub>ш</sub> = (5/ 10)R<sub>H</sub></p>
+<p>Проблему лишнего расхода энергии можно устранить, подключив емкость или лампу тлеющего разряда
+    последовательно с шунтирующим сопротивлением.</p>
+<p>Если U<sub>k</sub> &lt; 300 B, значения С и R<sub>д</sub> (дополнительное сопротивление)
+    определяют по следующим формулам:</p>
+<div class="fb2-image"><img alt="Приборостроение - i_072.png"
+                            src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_072.png"></div>
+<div class="fb2-empty-line"> </div>
+<p>При этом процесс получается апериодическим, зато нет лишнего расхода энергии. Условием
+    апериодичности является:</p>
+<div class="fb2-image"><img alt="Приборостроение - i_073.png"
+                            src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_073.png"></div>
+<div class="fb2-empty-line"> </div>
+<p>Приемлемым считают C &lt; 2мкор.</p>
+<p>Если С подобрана правильно, то находят</p>
+<div class="fb2-image"><img alt="Приборостроение - i_074.png"
+                            src="wwwTIPSlitmirTIPSme/BookBinary/112223/1333222487/i_074.png"></div>
+<div class="fb2-empty-line"> </div>
+<p>эту формулу часто называют <strong>формулой Крюгера</strong>.</p>
+<p>В формуле U<sub>с</sub> – напряжение на С перед замыканием, а – константа, зависит от материала.
+</p>
+<p>При подключении в шунт лампы, она не должна гореть. Должен быть установлен порог, при превышении
+    которого лампа пропускает импульс шунтирующего тока.</p>
+</body>
+</html>

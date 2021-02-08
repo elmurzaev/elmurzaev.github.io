@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>34. Инкапсуляция</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Объединение в объекте кода и данных называется инкапсуляцией. В принципе, возможно предоставить достаточное количество методов, благодаря которым пользователь объекта никогда не будет обращаться к полям объекта непосредственно. Некоторые другие объектно-ориентированные языки, например Smalltalk, требуют обязательной инкапсуляции, однако в Borland Pascal имеется выбор.</span>
+</p>
+<p><span>Например, объекты TEmployee и THourly написаны таким образом, что совершенно исключена необходимость прямого обращения к их внутренним полям данных:</span>
+</p>
+<p><span>type</span></p>
+<p><span>TEmployee = object</span></p>
+<p><span>Name, Title: string[25];</span></p>
+<p><span>Rate: Real;</span></p>
+<p><span>procedure Init (AName, ATitle: string; ARate: Real);</span></p>
+<p><span>function GetName: String;</span></p>
+<p><span>function GetTitle: String;</span></p>
+<p><span>function GetRate: Real;</span></p>
+<p><span>function GetPayAmount: Real;</span></p>
+<p><span>end;</span></p>
+<p><span>THourly = object(TEmployee)</span></p>
+<p><span>Time: Integer;</span></p>
+<p><span>procedure Init(AName, ATitle: string; ARate:</span></p>
+<p><span>Real, Atime: Integer);</span></p>
+<p><span>function GetPayAmount: Real;</span></p>
+<p><span>end;</span></p>
+<div class="fb2-empty-line"> </div>
+<p><span>Здесь присутствуют только четыре поля данных: Name, Title, Rate и Time. Методы GetName и GetTitle выводят фамилию работающего и его должность соответственно. Метод GetPayAmount использует Rate, а в случае работающего THourly и Time для вычисления суммы выплат работающему. Здесь уже нет необходимости обращаться непосредственно к этим полям данных.</span>
+</p>
+<p><span>Предположив существование экземпляра AnHourly типа THourly, мы могли бы использовать набор методов для манипулирования полями данных AnHourly, например:</span>
+</p>
+<p><span>with AnHourly do</span></p>
+<p><span>begin</span></p>
+<p><span>Init (Aleksandr Petrov, Fork lift operator' 12.95, 62);</span></p>
+<p><span>{Выводит на экран фамилию, должность и сумму</span></p>
+<p><span>выплат}</span></p>
+<p><span>Show;</span></p>
+<p><span>end;</span></p>
+<p><span>Следует обратить внимание, что доступ к полям объекта осуществляется не иначе, как только с помощью методов этого объекта.</span>
+</p>
+</body>
+</html>

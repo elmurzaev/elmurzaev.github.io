@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>06. Метод Вант-Гоффа</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span><strong>Дифференциальные методы</strong> основаны на использовании уравнения для скорости реакции в его дифференциальной форме.</span>
+</p>
+<p> </p>
+<p><span>1. <strong><em>Метод Вант-Гоффа</em></strong>. Проводят реакцию так, что берут все вещества, кроме одного (скажем, А) в избытке. Реакцию проводят дважды, задаваясь разными начальными значениями концентрации. Тогда можно записать два уравнения скорости                    </span>
+</p>
+<p><span>– <a
+        href="http://spargalki.ru/images/stories/clip_image209_2_ba565383ba5bdea01aa55a5169837890.gif"><img
+        alt="clip_image209"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image209_thumb_8bfe55fcb29814eab1027fb5f320b9a1.gif"
+        title="clip_image209"></a>  =  <em>k</em><sub>1 </sub><sub><a
+        href="http://spargalki.ru/images/stories/clip_image211_2_39541b9b2dc8e492adcaa68e9a0185ab.gif"><img
+        alt="clip_image211"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image211_thumb_fcd8e9b8b2cd0a2bd9aea6ad0dd81249.gif"
+        title="clip_image211"></a></sub>    ;    – <a
+        href="http://spargalki.ru/images/stories/clip_image213_2_8e0725979c6baf8d75b557ddbf05f89e.gif"><img
+        alt="clip_image213"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image213_thumb_6e97f549b2e300d122e66669e0a85613.gif"
+        title="clip_image213"></a>  =  <em>k</em><sub>1 </sub><sub><a
+        href="http://spargalki.ru/images/stories/clip_image215_2_d6534fa29fe5efd2c8047c5cfe7766aa.gif"><img
+        alt="clip_image215"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image215_thumb_611f38eff757c1dc37e44d5c322d6b06.gif"
+        title="clip_image215"></a></sub>.</span></p>
+<p><span>Разделим уравнения друг на друга и прологарифмируем:</span></p>
+<p><span><a
+        href="http://spargalki.ru/images/stories/clip_image217_2_860fc42470ee9befaf9c8a89f17eccaa.gif"><img
+        alt="clip_image217"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image217_thumb_04dacf057698a3c3783c2215bc66b073.gif"
+        title="clip_image217"></a>  =   <a
+        href="http://spargalki.ru/images/stories/clip_image219_2_38f9171bcb7815fcc4110e352b42e912.gif"><img
+        alt="clip_image219"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image219_thumb_61017925327f2ebc4d0da5db666fde8d.gif"
+        title="clip_image219"></a>   ;    <em>lg</em> (¶C¢<sub>A </sub>/¶<em>t</em>)  –  <em>lg</em> (¶C¢¢<sub>A </sub>/¶<em>t</em>)   =   <em>n</em><sub>1 </sub>(<em>lg</em> C¢<sub>A</sub>  –  <em>lg</em> C¢¢<sub>A</sub>) ;</span>
+</p>
+<p><span><em>n</em><sub>1</sub>   =   <a
+        href="http://spargalki.ru/images/stories/clip_image221_2_8ea0680b1347e18b5645bd691421231c.gif"><img
+        alt="clip_image221"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image221_thumb_0e020d58cf18f747bcebb82603746c45.gif"
+        title="clip_image221"></a> .</span></p>
+<p><span>Дифференциалы заменяем конечными разностями</span></p>
+<p><span><em>n</em><sub>1</sub>   =   <a
+        href="http://spargalki.ru/images/stories/clip_image223_2_c53cc52bff31e0e8dc7071998efe8f9e.gif"><img
+        alt="clip_image223"
+        src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image223_thumb_d76868c5dd27d4325f6e3e2583339da8.gif"
+        title="clip_image223"></a> .</span></p>
+<p> </p>
+<p><span>Это уравнение и позволяет определить порядок реакции по веществу А. Для этого надо определить изменение концентраций DC¢<sub>A</sub> и  DC¢¢<sub>A</sub> за время D<em>t</em> , задавая разные исходные концентрации вещества А, а концентрации всех остальных веществ выбирая очень большими. Значения C¢<sub>A</sub>и  C¢¢<sub>A</sub> , входящие в знаменатель, нужно брать средними для данного промежутка времени. Аналогично определяют порядки реакций по другим веществам.</span>
+</p>
+<p><span>2. Графические варианты метода Вант-Гоффа основаны на использовании уравнения                                 </span>
+</p>
+<p><span><em>v</em>  =  <em>kC</em><em><sup>n</sup></em> ,</span></p>
+<p><span>которое можно преобразовать     </span></p>
+<p><span><em>lg v</em>   =   <em>lg k</em>  +  <em>n lgC</em> .</span></p>
+<p><span>На графике в координатах  <em>lg</em><em>v</em> – <em>lgC</em>  зависимость изображается прямой линией, угловой коэффициент которой равен <em>n</em>. Скорость определяется тангенсом угла наклона касательной к кривой  <em>С</em> = <em>f</em>(<em>t</em>). В зависимости от того, какая определяется скорость – в начальный момент реакции или в различные промежутки времени от начала ее – ­­различаются два графических варианта этого метода. </span>
+</p>
+<p><span>Вариант А. Определяют начальные скорости реакции при различных исходных концентрациях вещества. Для этого проводят касательную к точке кривой, соответствующей началу реакции. Логарифмы начальных скоростей наносят на график  <em>lg</em><em>v</em> = <em>f</em>(<em>lgC</em>). Наклон прямой соответствует порядку реакции  <em>n</em><sub>c</sub> , который называют <strong><em>концентрационным</em></strong>, или <strong><em>истинным </em></strong>(см. рис. 5). При таком определении порядка реакции образующиеся промежуточные продукты не могут влиять на ее скорость.</span>
+</p>
+<p><span>Вариант Б. Определяют скорость реакции в различные моменты времени от начала реакции, используя данные одного опыта. Для этого измеряют тангенс угла наклона касательных к кривой  <em>С</em> = <em>f</em>(<em>t</em>) при различных значениях <em>t</em>. Затем строят зависимость  <em>lg</em><em>v</em> = <em>f</em>(<em>lgC</em>) , из которой находят порядок реакции, называемый <strong><em>временным</em></strong> (<em>n<sub>t</sub></em>) (рис. 6).</span>
+</p>
+<p><span>Данным способом можно обнаружить влияние промежуточных продуктов реакции на ее скорость: если промежуточные продукты искажают ход реакции, то временной и концентрационный порядки реакции могут быть разными. Кроме того, указанием на то, что реакция протекает через различные промежуточные стадии, является дробный порядок реакции.  </span>
+</p>
+<p><span>Таким образом, необходимыми экспериментальными данными для определения порядка реакции являются данные об изменении концентрации реагирующих веществ во времени; такие данные надо получить для разных исходных концентраций веществ.    </span>
+</p>
+<p> </p>
+<table border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+    <tr>
+        <td><p><span><a
+                href="http://spargalki.ru/images/stories/clip_image225_2_e120bfca87ee04186d528c61d242b249.gif"><img
+                alt="clip_image225"
+                src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image225_thumb_c76ce97b1f41b6e675fc0554a3bf6dbd.gif"
+                title="clip_image225"></a></span></p></td>
+        <td><p><span><a
+                href="http://spargalki.ru/images/stories/clip_image227_2_6aea8c9bc44941ae29a310ce32eba08a.gif"><img
+                alt="clip_image227"
+                src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image227_thumb_70abbf4cfab19b91e1b178fd4ff86969.gif"
+                title="clip_image227"></a></span></p></td>
+    </tr>
+    <tr>
+        <td colspan="2"><p><span>Рис. 5. Экспериментальное определение концентрационного (истинного) порядка реакции</span>
+        </p></td>
+    </tr>
+    <tr>
+        <td><p><span><a
+                href="http://spargalki.ru/images/stories/clip_image229_2_a2e349816c839ecd7bb1560cec99af35.gif"><img
+                alt="clip_image229"
+                src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image229_thumb_9cd87780592b98c1b702b7ddd1f2a1bf.gif"
+                title="clip_image229"></a></span></p></td>
+        <td><p><span><a
+                href="http://spargalki.ru/images/stories/clip_image231_2_465631f159e08dac771b519f45e286e4.gif"><img
+                alt="clip_image231"
+                src="https://elmurzaev.github.io/lections/articles/spargalkiTIPSru/images/stories/clip_image231_thumb_d8afc97cdbfa4d24983ed275913d11a4.gif"
+                title="clip_image231"></a></span></p></td>
+    </tr>
+    <tr>
+        <td colspan="2"><p><span>Рис. 6. Определение временного порядка реакции</span></p>
+            <div> </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

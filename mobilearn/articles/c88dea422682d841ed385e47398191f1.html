@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 12. Перегрузка операций</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l12_1">
+    <h1> 1. Совместное использование </h1>
+    <p>
+        Если в некоторой области действия имеется несколько различных объявлений функций с одним
+        именем, это имя называется <b>совместно используемым</b>. Когда употребляется такое имя,
+        нужная функция выбирается путём сравнения типов фактических параметров с типами формальных
+        параметров.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">double</span> abs(<span class="chiavi">double</span> x);
+                <span class="chiavi">int</span> abs(<span class="chiavi">int</span> x);
+                abs(1);
+                abs(1.0);
+            </td>
+            <td class="commenti">
+                // Вызов <i>int abs(int x)</i>
+                // Вызов <i>double abs(double x)</i></td>
+        </tr>
+    </table>
+    <p>
+        Поскольку для всякого типа <i>Т</i> типы <i>Т</i> и <i>Т&amp;</i> допускают совпадающие
+        множества инициализирующих значений, функции с типами параметров, различающимися только в
+        этом отношении, <b>не могут иметь одно имя</b>.
+    </p>
+    <p>
+        Функции, которые различаются только возвращаемым типом, <b>не могут иметь одно имя</b>.
+    </p>
+    <p>
+        Различные версии совместно используемой функции-члена класса могут предоставлять различные .
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+<span class="chiavi">
+class</span> Buffer
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">char</span> *p;
+                <span class="chiavi">int</span> size;
+                <span class="chiavi">protected</span>:
+                Buffer(<span class="chiavi">int</span> s, <span class="chiavi">char</span> *np) {
+                size = s; p = np; }
+                <span class="chiavi">public</span>:
+                Buffer(<span class="chiavi">int</span> s) { p = <span class="chiavi">new char</span>[size
+                = s]; }
+                <b>...</b>
+                };
+            </td>
+        </tr>
+    </table>
+    <p>
+        Процесс поиска подходящей функции из множества перегруженных заключается в нахождении
+        наилучшего соответствия типов формальных и фактических аргументов. Это осуществляется путем
+        проверки набора критериев в следующем порядке:
+    </p>
+    <ol>
+        <li>точное соответствие типов, т.е. полное соответствие или соответствие, достигаемое
+            тривиальными преобразованиями типов (например, имя массива и указатель, имя функции и
+            указатель на функцию, типы <i>T</i> и <i>const T</i>);
+        </li>
+        <li>соответствие, достигаемое «продвижением» интегральных типов (например, <i>bool</i> в <i>int</i>,
+            <i>char</i> в <i>int</i>, <i>short</i> в <i>int</i>) и <i>float</i> в <i>double</i>;
+        </li>
+        <li>соответствие, достигаемое путем стандартных преобразований (например, <i>int</i> в <i>double</i>,
+            <i>double</i> в <i>int</i>, <i>double</i> в <i>long double</i>, указателей на
+            производные типы в указатели на базовые, указателей на произвольные типы в <i>void*</i>,
+            <i>int</i> в <i>unsigned int</i>);
+        </li>
+        <li>соответствие, достигаемое при помощи преобразований, определяемых пользователем;</li>
+        <li>соответствие за счет многоточий в объявлении функции.</li>
+    </ol>
+    <p>
+        Если соответствие может быть получено двумя способами на одном и том же уровне критериев,
+        вызов считается неоднозначным и отвергается.
+    </p>
+    <p>
+        Результат перегрузки не зависит от порядка объявления функций.
+    </p>
+    <p>
+        Альтернативой перегрузке является использование нескольких функций с различными именами и
+        разными типами аргументов. При этом приходится помнить несколько имен и то, как их правильно
+        использовать. Кроме того, при отсутствии перегрузки к аргументам функций применяются все
+        стандартные преобразования, что также может привести к дополнительным ошибкам.
+    </p>
+    <p>
+        Функции, объявленные в различных областях видимости (не пространствах имён), не являются
+        перегруженными.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> f(<span class="chiavi">int</span>);
+                <span class="chiavi">void</span> g()
+                { <span class="chiavi">void</span> f(<span class="chiavi">double</span>);
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> f(1);
+                }
+            </td>
+
+            <td class="commenti">// Вызов <i>f</i>(<i>double</i>), хотя 1 – целая константа</td>
+        </tr>
+    </table>
+</section>
+<section id="l12_2">
+    <h1> 2. Перегрузка операций </h1>
+    <p>
+        В каждой технической области – и в большинстве не технических – имеются свои стандартные
+        обозначения, облегчающие представление и обсуждение часто встречающихся концепций. Например,
+        благодаря постоянному использованию, выражение <i><b>x + y * z</b></i> яснее для нас, чем
+        фраза <i><b>умножить y на z и прибавить результат к x</b></i>. Трудно переоценить значение
+        краткой и выразительной формы записи типичных операций.
+    </p>
+    <p>
+        Как и большинство других языков <span>C++</span> поддерживает набор операций для встроенных
+        типов. Однако большинство концепций, для которых обычно используются операторы, не являются
+        встроенными типами <span>C++</span>, поэтому они должны быть представлены в виде типов,
+        определяемых пользователем. Определение (или перегрузка) операций для таких классов
+        позволяет программисту реализовать более привычную и удобную форму записи для
+        манипулирования объектами, чем та, которая доступна с использованием только базовой
+        функциональной формы записи.
+    </p>
+    <p>
+        Большинство языка С могут использоваться совместно (быть перегружены). Для этого в
+        объявлении класса необходимо объявить функцию, имеющую следующее имя:
+        <span class="sint">
+<i>&lt;тип&gt;</i> <b>operator </b><i>&lt;операция&gt;</i> (<i>&lt;операнды&gt;</i>)
+</span>
+    </p>
+    <p>
+        Не могут использоваться совместно операции <span
+            class="sint"><b>   .   .*   ::   ?:</b></span>
+    </p>
+    <p>
+        И унарная, и бинарная формы операций <span
+            class="sint"><b>   +   –   *   &amp;   </b></span> могут использоваться совместно.
+    </p>
+    <p>
+        Функция-оператор должна либо быть функцией-членом класса, либо иметь хотя бы один параметр
+        некоторого класса или ссылки на класс. Префиксная унарная операция может быть объявлена как
+        нестатическая функция-член класса без параметров либо как функция, не являющаяся членом
+        класса, с одним параметром. Бинарная операция может быть объявлена либо как нестатическая
+        функция-член с одним параметром, либо как обычная функция (не член класса) с двумя
+        параметрами.
+    </p>
+    <p>
+        Для отличия префиксного и постфиксного вариантов операции функция, реализующая постфиксный
+        вариант, объявляется с дополнительным параметром типа <i>int</i>.
+    </p>
+    <p>
+        <b>Недопустимо и невозможно менять старшинство, ассоциативность и число операндов у
+            операции.</b>
+    </p>
+    <p>
+        <b>Совместно используемая операция не может иметь параметров с умолчаниями.</b>
+    </p>
+    <p>
+        По поводу определяемых пользователем операций делается всего несколько предположений. В
+        частности, <span><b>operator=</b></span>, <span><b>operator()</b></span>, <span><b>operator[]</b></span>
+        и <span><b>operator-&gt;</b></span> должны быть нестатическими функциями-членами класса –
+        это гарантирует, что их первый операнд будет l-значением . Второй параметр (индекс) функции
+        <span><b>operator[]</b></span> может быть любого типа. Это делает возможным определение
+        векторов, ассоциативных массивов и т.д.
+    </p>
+    <p>
+        Тождества, верные для операций над основными типами (например, <span>++а ~ а += 1</span>),
+        не обязаны выполняться в отношении операций над «классовыми» типами. Такая связь не
+        сохраняется в операциях, определяемых пользователем, если только пользователь не
+        позаботиться об этом сам. Компилятор не сгенерирует определение
+        <span><b>X::operator+=</b></span> из определений <span><b>X::operator+</b></span> и
+        <span><b>X::operator=</b></span>.
+    </p>
+    <p>
+        По историческим причинам операторы <span class="sint"><b>=</b></span> (присваивание), <span
+            class="sint"><b>&amp;</b></span> (взятие адреса) и <span class="sint"><b>,</b></span>
+        (последовательность) имеют предопределённый смысл, когда применяются к объектами класса.
+        Этот предопределённый смысл может стать недоступным, если сделать операторы приватными.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> X
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">void operator</span> =(<span class="chiavi">const</span> X&amp;);
+                <span class="chiavi">void operator</span> &amp;();
+                <span class="chiavi">void operator</span> ,(<span class="chiavi">const</span> X&amp;);
+                <b>...</b>
+                };
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+<span class="chiavi">
+void</span> f(X a, X b)
+                { a = b;
+                &amp;a;
+                a, b;
+                }
+            </td>
+
+            <td class="commenti">
+
+                // Ошибка – operator= является приватным
+                // Ошибка – operator&amp; является приватным
+                // Ошибка – operator, является приватным
+            </td>
+        </tr>
+    </table>
+    <p>
+        С другой стороны, операторам можно придать новый смысл, задав соответствующие определения.
+    </p>
+    <p>
+        Рассматрим пример определения и использования перегруженных операторов.
+    </p>
+    <table id="l12_complex">
+        <tr>
+            <td class="esempi" colspan="2">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex(<span class="chiavi">double</span> nr = 0, <span
+                    class="chiavi"> double</span> nm = 0) : r(nr), m(nm) { }
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                Complex <span class="chiavi"> operator</span> ++();
+                Complex <span class="chiavi"> operator</span> ++(<span class="chiavi">int</span>);
+                Complex <span class="chiavi">operator</span> + (<span class="chiavi">const</span>
+                Complex&amp; c) <span class="chiavi">const</span>;
+                };
+
+                Complex Complex::<span class="chiavi">operator</span> ++()
+                { ++r; <span class="chiavi"> return</span> *<span class="chiavi">this</span>; }
+
+                Complex Complex::<span class="chiavi">operator</span> ++(<span
+                    class="chiavi">int</span>)
+                { Complex x = *<span class="chiavi">this</span>;
+                r++;
+                <span class="chiavi">return</span> x;
+                }
+
+                Complex Complex::<span class="chiavi">operator</span> + (<span
+                    class="chiavi">const</span> Complex&amp; c) <span class="chiavi">const</span>
+                { <span class="chiavi">return</span> Complex(r + c.r, m + c.m); }
+
+                <span class="chiavi">void</span> main()
+                { Complex a(0, 0), b(2, 2), c;
+
+                ++a;
+                a++;
+                c = a + b;
+                c = a + ++b;
+                }
+            </td>
+
+            <td class="commenti">// Все операции объявляются как члены класса
+                // Префиксная операция ++
+                // Постфиксная операция ++
+                // Объект класса надо возвращать, чтобы было возможно вкладывать вызов операций ++
+                // (как префиксной, так и постфиксной) в другие операторы
+                // Префиксная операция ++ возвращает <b>новое</b> значение операнда,
+                // в то время, как постфиксная операция ++ возвращает <b>старое</b> значение
+                операнда
+                // Эквивалентно a.operator++()
+                // Эквивалентно a.operator++(0)
+                // Эквивалентно a.operator+(b)
+            </td>
+        </tr>
+    </table>
+    <p>
+        Аргументы операций были определены как константные ссылки. Это позволяет пользоваться
+        выражениями, включающими в себя обычные арифметические операторы, без интенсивного
+        копирования. Для класса <i>Complex</i> это, возможно, не даёт значительного выигрыша во
+        времени, но для больших объектов дело обстоит иначе. Указателями в качестве аргументов
+        нельзя воспользоваться потому, что невозможно заместить смысл оператора, применяемого к
+        указателю.
+    </p>
+    <p>
+        Возвращение ссылки может также показаться эффективным решением.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">Complex<b>&amp;</b> operator + (<span class="chiavi">const</span>
+                Complex&amp; c);
+            </td>
+        </tr>
+    </table>
+    <p>
+        Это допустимо, но вызывает проблемы при выделении памяти. Так как ссылка на результат будет
+        выдана вызываемой функций как ссылка на значение, возвращаемое из функции, значение не может
+        быть автоматической переменной. Так как оператор может использоваться более одного раза в
+        выражении результат не может быть статической локальной переменной. Результат, как правило,
+        будет размещаться в свободной памяти. Копирование возвращаемого значения часто обходится
+        дешевле (в смысле времени выполнения, размера кода и данных), чем выделение и освобождение
+        памяти под объект. Кроме того, это легче запрограммировать.
+    </p>
+    <p>
+        Предпочтительно сводить к минимуму количество функций, непосредственно манипулирующих
+        представлением объекта. Этого можно добиться объявлением в теле самого класса только тех
+        операций, которые должны модифицировать значение первого аргумента, таких как
+        <span><b>+=</b></span>. Операции, которые просто выдают новое значение на основе своих
+        аргументов, такие как <b>+</b>, определяются вне класса и используют операции, имеющие
+        доступ к представлению.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">class</span> Complex
+                { <span class="chiavi">private</span>:
+                <span class="chiavi">double</span> r, m;
+                <span class="chiavi">public</span>:
+                Complex(<span class="chiavi">double</span> nr = 0, <span
+                    class="chiavi"> double</span> nm = 0) : r(nr), m(nm) { }
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> Complex <span class="chiavi">operator</span> + (<span
+                    class="chiavi">const</span> Complex&amp; c);
+            </td>
+
+            <td class="commenti">// Требует доступа к представлению</td>
+        </tr>
+        <tr>
+            <td class="esempi"> };
+
+                Complex Complex::<span class="chiavi">operator</span> += (<span
+                        class="chiavi">const</span> Complex&amp; c)
+                { r += c.r;
+                m += c.m;
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+                Complex <span class="chiavi">operator</span> + (<span class="chiavi">const</span>
+                Complex&amp;c1, <span class="chiavi">const</span> Complex&amp; c2)
+                { Complex x = c1;
+            </td>
+
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"><span class="chiavi">return</span> x += c2;
+                }
+            </td>
+
+            <td class="commenti">// Доступ к представлению при помощи +=</td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">void</span> main()
+                { Complex a(0, 0), b(2, 2), c(7, -5);
+
+                Complex r1 = a + b + c;
+
+                Complex r2 = a;
+                r2 += b;
+                r2 += c;
+                }
+            </td>
+            <td class="commenti">
+                // r1 = operator+(a, operator+(b, c))
+                // r2 = a
+                // r2.operator+=(b)
+                // r2.operator+=(c)
+            </td>
+        </tr>
+    </table>
+    <p>
+        За исключением разницы во времени вычисления <b>r1</b> и <b>r2</b> эквивалентны.
+    </p>
+    <p>
+        Составные операторы присваивания, такие как <b>+=</b> и <b>*=</b>, обычно легче определить,
+        чем их «простые» части <b>+</b> и <b>*</b>. Это сначала удивляет, но данный вывод следует из
+        того факта, что в операции <b>+</b> участвуют три объекта (два операнда и результат), а в
+        операции <b>+=</b> – только два. В последнем случае в результате избавления от временных
+        переменных улучшается производительность во время выполнения. Кроме того, такие функции (в
+        простых случаях) легко делаются встраиваемыми.
+    </p></section>
+<section id="l12_3">
+    <h1>3. Пример </h1>
+    <p>
+        Разрабатываемый класс <i>Vector</i> представляет собой вектор с переменным числом элементов.
+        Над векторами определены операции присваивание, сложение, вычитание, скалярное произведение
+        и сравнение. Для удобства доступа к элементам вектора также определена операция «индексное
+        выражение».
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;malloc.h&gt;
+                <span class="chiavi">class</span> Vector
+                { <span class="chiavi">private:
+    int</span> size;
+                <span class="chiavi">double</span> *v;
+                <span class="chiavi">public:</span>
+                <span class="chiavi">explicit</span> Vector(<span class="chiavi">int</span> n = 0);
+                Vector(<span class="chiavi">const</span> Vector&amp; vector);
+                ~Vector();
+                <span class="chiavi">int</span> GetSize() <span class="chiavi">const</span> { <span
+                    class="chiavi">return</span> size; }
+                <span class="chiavi">int</span> SetSize(<span class="chiavi">int</span> n);
+                Vector <span class="chiavi"> operator</span> = (<span class="chiavi">const</span>
+                Vector&amp; vector);
+                <span class="chiavi">double</span>&amp; <span class="chiavi"> operator</span>
+                [](<span class="chiavi">int</span> n);
+                Vector <span class="chiavi">operator</span> - () <span class="chiavi">const</span>;
+                <span class="chiavi">int     operator</span> == (<span class="chiavi">const</span>
+                Vector&amp; vector) <span class="chiavi">const</span>;
+                Vector <span class="chiavi">operator</span> + (<span class="chiavi">const</span>
+                Vector&amp; vector) <span class="chiavi">const</span>;
+                Vector <span class="chiavi">operator</span> += (<span class="chiavi">const</span>
+                Vector&amp; vector);
+                Vector <span class="chiavi">operator</span> - (<span class="chiavi">const</span>
+                Vector&amp; vector) <span class="chiavi">const</span>;
+                Vector <span class="chiavi">operator</span> -= (<span class="chiavi">const</span>
+                Vector&amp; vector);
+                Vector <span class="chiavi">operator</span> + (<span class="chiavi">double</span>
+                value) <span class="chiavi">const</span>;
+                Vector <span class="chiavi">operator</span> += (<span class="chiavi">double</span>
+                value);
+                Vector <span class="chiavi">operator</span> - (<span class="chiavi">double</span>
+                value) <span class="chiavi">const</span>;
+                Vector <span class="chiavi">operator</span> -= (<span class="chiavi">double</span>
+                value);
+                <span class="chiavi">double  operator</span> * (<span class="chiavi">const</span>
+                Vector&amp; vector) <span class="chiavi">const</span>;
+                };
+            </td>
+
+            <td class="commenti">
+                // Размер вектора
+                // Адрес массива для вектора
+                // Конструктор умолчания
+                // Конструктор копирования
+                // Деструктор
+                // Получение размера вектора
+                // Изменение размера вектора
+                // Операция присваивания
+                // Индексное выражение
+                // Унарный минус
+                // Сравнение
+                // Сложение
+                // Составное присваивание
+                // Вычитание
+                // Составное присваивание
+                // Сложение с числом
+                // Составное присваивание
+                // Вычитание числа
+                // Составное присваивание
+                // Скалярное произведение
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                Vector::Vector(<span class="chiavi">int</span> n)
+                { <span class="chiavi">if</span> (n &lt; 0) n = 0;
+                size = n;
+                v = NULL;
+                <span class="chiavi">if</span> (size)
+                <span class="chiavi">if</span> ((v = (<span class="chiavi">double</span>
+                *)malloc(size * <span class="chiavi">sizeof</span>(<span
+                    class="chiavi">double</span>))) == NULL)
+                size = 0;
+                }
+                Vector::Vector(<span class="chiavi">const</span> Vector&amp; vector)
+                { size = vector.size;
+                v = NULL;
+                <span class="chiavi">if</span> (size)
+                <span class="chiavi">if</span> ((v = (<span class="chiavi">double</span>
+                *)malloc(size * <span class="chiavi">sizeof</span>(<span
+                    class="chiavi">double</span>))) == NULL)
+                size = 0;
+                <span class="chiavi">else
+     for</span> (<span class="chiavi">int</span> i = 0; i &lt; size; i++)
+                *(v + i) = vector[i];
+                }
+                Vector::~Vector()
+                { <span class="chiavi"> if</span> (v) free(v); }
+                <span class="chiavi">int</span> Vector::SetSize(<span class="chiavi">int</span> n)
+                { <span class="chiavi">if</span> (n &lt; 0) n = 0;
+                size = n;
+                <span class="chiavi">if</span> (size)
+                <span class="chiavi">if</span> ((v = (<span class="chiavi">double</span>
+                *)realloc(v, size * <span class="chiavi">sizeof</span>(<span
+                    class="chiavi">double</span>))) == NULL)
+                size = 0;
+                <span class="chiavi">return</span> size;
+                <span>// Равенство 0 будет признаком ошибки</span>
+                }
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                Vector Vector::<span class="chiavi">operator</span> = (<span
+                    class="chiavi">const</span> Vector&amp; vector)
+                { <span class="chiavi">if</span> (<span class="chiavi">this</span> == &amp;vector)
+                <span class="chiavi"> return</span> *<span class="chiavi">this</span>;
+                size = vector.size;
+                <span class="chiavi">if</span> (size)
+            </td>
+
+            <td class="commenti">
+                // Оператор присваивания выполняет те же действия, что и конструктор копирования,
+                // и кроме того, возвращает присваиваемое значение, т.к. операция присваивания
+                // должна возвращать значение, которое может быть использовано
+                // при вложении оператора присваивания в другие операторы
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi" colspan="2"><span class="chiavi">if</span> ((v = (<span
+                    class="chiavi">double</span> *)realloc(v, size * <span
+                    class="chiavi">sizeof</span>(<span class="chiavi">double</span>))) == NULL)
+            </td>
+
+        </tr>
+        <tr>
+            <td class="esempi"> size = 0;
+                <span class="chiavi">else</span>
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(v + i) = vector[i];
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+
+                <span class="chiavi">double</span>&amp; Vector::<span class="chiavi">operator</span>
+                [] (<span class="chiavi">int</span> n)
+                { <span class="chiavi">if</span> (n &lt; 0) n = 0;
+                <span class="chiavi">if</span> (n &gt;= size) n = size - 1;
+                <span class="chiavi">return</span> *(<span class="chiavi">this</span>-&gt;v + n);
+                }
+            </td>
+            <td class="commenti">
+                // Результатом операции «индексное выражение» объявлена ссылка для того,
+                // чтобы можно было не только получать значение элемента вектора, но и изменять его
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td class="esempi">
+                Vector Vector::<span class="chiavi">operator</span> - () <span
+                    class="chiavi">const</span>
+                { Vector res(size);
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(res.v + i) = -*(<span class="chiavi">this</span>-&gt;v + i);
+                <span class="chiavi">return</span> res;
+                }
+                <span class="chiavi">int</span> Vector::<span class="chiavi">operator</span> ==
+                (<span class="chiavi">const</span> Vector&amp; vector) <span
+                    class="chiavi">const</span>
+                { <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> 0;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                <span class="chiavi">if</span> (*(<span class="chiavi">this</span>-&gt;v + i) !=
+                *(vector.v + i))
+                <span class="chiavi">return</span> 0;
+                <span class="chiavi">return</span> 1;
+                }
+                Vector Vector::<span class="chiavi">operator</span> + (<span
+                    class="chiavi">const</span> Vector&amp; vector) <span
+                    class="chiavi">const</span>
+                { Vector res(size);
+                <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> res;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(res.v + i) = *(<span class="chiavi">this</span>-&gt;v + i) + *(vector.v + i);
+                <span class="chiavi">return</span> res;
+                }
+                Vector Vector::<span class="chiavi">operator</span> += (<span
+                    class="chiavi">const</span> Vector&amp; vector)
+                { <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> *<span class="chiavi">this</span>;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(<span class="chiavi">this</span>-&gt;v + i) += *(vector.v + i);
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+                Vector Vector::<span class="chiavi">operator</span> - (<span
+                    class="chiavi">const</span> Vector&amp; vector) <span
+                    class="chiavi">const</span>
+                { Vector res(size);
+                <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> res;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(res.v + i) = *(<span class="chiavi">this</span>-&gt;v + i) - *(vector.v + i);
+                <span class="chiavi">return</span> res;
+                }
+                Vector Vector::<span class="chiavi">operator</span> -= (<span
+                    class="chiavi">const</span> Vector&amp; vector)
+                { <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> *<span class="chiavi">this</span>;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(<span class="chiavi">this</span>-&gt;v + i) -= *(vector.v + i);
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+                Vector Vector::<span class="chiavi">operator</span> + (<span
+                    class="chiavi">double</span> value) <span class="chiavi">const</span>
+                { Vector res(size);
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(res.v + i) = *(<span class="chiavi">this</span>-&gt;v + i) + value;
+                <span class="chiavi">return</span> res;
+                }
+                Vector Vector::<span class="chiavi">operator</span> += (<span
+                    class="chiavi">double</span> value)
+                { <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt;
+                size; i++)
+                *(<span class="chiavi">this</span>-&gt;v + i) += value;
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+                Vector Vector::<span class="chiavi">operator</span> - (<span
+                    class="chiavi">double</span> value) <span class="chiavi">const</span>
+                { Vector res(size);
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                *(res.v + i) = *(<span class="chiavi">this</span>-&gt;v + i) - value;
+                <span class="chiavi">return</span> res;
+                }
+                Vector Vector::<span class="chiavi">operator</span> -= (<span
+                    class="chiavi">double</span> value)
+                { <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt;
+                size; i++)
+                *(<span class="chiavi">this</span>-&gt;v + i) -= value;
+                <span class="chiavi">return</span> *<span class="chiavi">this</span>;
+                }
+                <span class="chiavi">double</span> Vector::operator * (<span
+                    class="chiavi">const</span> Vector&amp; vector) <span
+                    class="chiavi">const</span>
+                { <span class="chiavi"> double</span> res = 0;
+                <span class="chiavi">if</span> (size != vector.size) <span
+                    class="chiavi"> return</span> res;
+                <span class="chiavi">for</span> (<span class="chiavi">int</span> i = 0; i &lt; size;
+                i++)
+                res += *(<span class="chiavi">this</span>-&gt;v + i) * *(vector.v + i);
+                <span class="chiavi">return</span> res;
+                }
+                <span class="chiavi">void</span> main()
+                { Vector v1(3), v2, v3(2), v4;
+                <span class="chiavi">int</span> i;
+                <span class="chiavi">double</span> r;
+                v2.SetSize(3);
+                <span class="chiavi">for</span> (i = 0; i &lt; v1.GetSize(); i++) <span>// Задаём элементы векторов <b>v1</b> и <b>v2</b></span>
+                { v1[i] = i + 1;
+                v2[i] = i + 5;
+                }
+                v3 = v1 + v2;
+                v4 = v1 - v2 + v3;
+                v4 = -v4;
+                v3 += v1;
+                r = v1 * v2;
+                v4 = v1 * v2 + v3; <span>// Т.к. нельзя изменить приоритет операций, сначала должна выполняться операция <b>*</b>.
+                                                  // Но поскольку операция сложения числа с объектом класса не определена,
+                                                  // выражение вычислить невозможно</span>
+                }
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p></section>
+
+</body>
+</html>

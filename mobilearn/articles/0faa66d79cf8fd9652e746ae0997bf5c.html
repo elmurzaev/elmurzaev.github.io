@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Основы Active Job</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="osnovy-active-job"> Основы Active Job</h2>
+    <p>Это руководство даст вам все, что нужно, чтобы начать создавать, ставить в очередь и
+        запускать фоновые задачи.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>Как создавать задачи.
+        </li>
+        <li>Как ставить в очередь задачи.
+        </li>
+        <li>Как запускать задачи в фоне.
+        </li>
+        <li>Как асинхронно рассылать письма из вашего приложения.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="vvedenie"> Введение</h3>
+    <p>Active Job - это фреймворк для объявления задач и их запуска на разных бэкендах для очередей.
+        Эти задачи могут быть чем угодно, от регулярно запланированных чисток до списаний с карт или
+        рассылок. В общем, всем, что может быть выделено в небольшие работающие части и запускаться
+        параллельно.</p>
+    <h3 class="inside_page_header" id="naznachenie-active-job"> Назначение Active Job</h3>
+    <p>Главным является то, что он обеспечивает, что у всех приложений Rails имеется встроенная
+        инфраструктура для задач. Затем у нас могут появиться особенности фреймворка или других
+        гемов, созданных на его основе, позволяющие не заботится об отличиях в API между различными
+        исполнителями задач, такими как Delayed Job и Resque. Подбор бэкенда для очередей станет
+        более оперативной работой. Вы сможете переключаться между ними без необходимости
+        переписывать свои задачи.</p>
+    <div class="note"><p>По умолчанию, Rails поставляется с реализацией очереди в виде "немедленного
+        исполнения".
+        Это означает, что каждая задача, поставленная в очередь, будет запущена сразу.</p></div>
+    <h3 class="inside_page_header" id="sozdanie-zadachi"> Создание задачи</h3>
+    <p>Этот раздел представляет пошаговое руководство для создании задачи и добавления ее в
+        очередь.</p>
+    <h4 class="inside_page_header" id="sozdanie-zadachi"> Создание задачи</h4>
+    <p>Active Job предоставляет генератор Rails для создания задач. Следующая команда создаст задачу
+        в <code>app/jobs</code> (а также тестовый случай в <code>test/jobs</code>):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate job guests_cleanup
+invoke  test_unit
+create    test/jobs/guests_cleanup_job_test.rb
+create  app/jobs/guests_cleanup_job.rb
+</pre>
+    </div>
+    <p>Также можно создать задачу, которая будет запущена в определенной очереди:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate job guests_cleanup --queue urgent
+</pre>
+    </div>
+    <p>Если не хотите использовать генератор, можно создать файл очереди в <code>app/jobs</code>,
+        просто убедитесь, что он наследуется от <code>ActiveJob::Base</code>.</p>
+    <p>Вот как выглядит задача:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :default
+  def perform(*args)
+    # Do something later
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="pomeschenie-zadachi-v-ochered"> Помещение задачи в
+        очередь</h4>
+    <p>Поместить задачу в очередь можно так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Помещенная в очередь задача выполнится, как только освободится система очередей.
+MyJob.perform_later record
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Помещенная в очередь задача выполнится завтра в полдень.
+MyJob.set(wait_until: Date.tomorrow.noon).perform_later(record)
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Помещенная в очередь задача выполнится через неделю.
+MyJob.set(wait: 1.week).perform_later(record)
+</pre>
+    </div>
+    <p>Вот и все!</p>
+    <h3 class="inside_page_header" id="zapusk-zadach"> Запуск задач</h3>
+    <p>Чтобы поместить задачу в очередь и выполнить ее, вам необходимо настроить бэкенд для очереди,
+        т.е. вам нужно решить, какую стороннюю библиотеку для очереди Rails будет использовать.
+        Rails не предоставляет сложную систему для работы с очередями, а просто выполняет задачу
+        немедленно, если не настроен какой-либо адаптер.</p>
+    <h4 class="inside_page_header" id="bekendy"> Бэкенды</h4>
+    <p>У Active Job есть встроенные адаптеры для различных бэкендов очередей (Sidekiq, Resque,
+        Delayed Job и другие). Чтобы получить актуальный список адаптеров, обратитесь к документации
+        API по .</p>
+    <h4 class="inside_page_header" id="nastroyka-bekenda"> Настройка бэкенда</h4>
+    <p>Настроить бэкенд — это просто:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+module YourApp
+  class Application &lt; Rails::Application
+    # Убедитесь, что гем адаптера добавлен в Gemfile, и что выполнены
+    # инструкции по установке и развертыванию адаптера.
+    config.active_job.queue_adapter = :sidekiq
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Поскольку задачи запускаются параллельно с вашим Rails приложением,
+        большинство библиотек для работы с очередями требуют запуска специфичной для библиотеки
+        службы очереди (помимо старта вашего Rails приложения) для обработки задач. Для получения
+        информации о том, как это сделать, обратитесь к документации соответствующей библиотеки.</p>
+    </div>
+    <h3 class="inside_page_header" id="ocheredi"> Очереди</h3>
+    <p>Большая часть адаптеров поддерживает несколько очередей. С помощью Active Job можно
+        запланировать, что задача будет выполнена в определенной очереди:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :low_priority
+  #....
+end
+</pre>
+    </div>
+    <p>Можно задать префикс для имени очереди для всех задач с помощью <code>config.active_job.queue_name_prefix</code>
+        в <code>application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+module YourApp
+  class Application &lt; Rails::Application
+    config.active_job.queue_name_prefix = Rails.env
+  end
+end
+# app/jobs/guests_cleanup.rb
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :low_priority
+  #....
+end
+# Теперь ваша задача запустится в очереди production_low_priority в среде
+# production и в staging_low_priority в среде staging
+</pre>
+    </div>
+    <p>Разделитель префикса имени очереди по умолчанию '_'. Его можно изменить, установив <code>config.active_job.queue_name_delimiter</code>
+        в <code>application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/application.rb
+module YourApp
+  class Application &lt; Rails::Application
+    config.active_job.queue_name_prefix = Rails.env
+    config.active_job.queue_name_delimiter = '.'
+  end
+end
+# app/jobs/guests_cleanup.rb
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :low_priority
+  #....
+end
+# Теперь ваша задача запустится в очереди production.low_priority в среде
+# production и в staging.low_priority в среде staging
+</pre>
+    </div>
+    <p>Если хотите больше контроля, в какой очереди задача будет запущена, можно передать опцию
+        <code>:queue</code> в <code>#set</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+MyJob.set(queue: :another_queue).perform_later(record)
+</pre>
+    </div>
+    <p>Чтобы контролировать очередь на уровне задачи, можно передать блок в <code>#queue_as</code>.
+        Блок будет выполнен в контексте задачи (таким образом, у вас будет доступ к <code>self.arguments</code>),
+        и он должен вернуть имя очереди:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProcessVideoJob &lt; ActiveJob::Base
+  queue_as do
+    video = self.arguments.first
+    if video.owner.premium?
+      :premium_videojobs
+    else
+      :videojobs
+    end
+  end
+  def perform(video)
+    # Делаем обработку видео
+  end
+end
+ProcessVideoJob.perform_later(Video.last)
+</pre>
+    </div>
+    <div class="note"><p>Убедитесь, что ваш бэкенд для очередей "слушает" имя вашей очереди. Для
+        некоторых бэкендов необходимо указать очереди, которые нужно слушать.</p></div>
+    <h3 class="inside_page_header" id="kolbeki"> Колбэки</h3>
+    <p>Active Job предоставляет хуки на протяжение жизненного цикла задачи. Колбэки позволяют
+        включить логику в жизненный цикл задачи.</p>
+    <h4 class="inside_page_header" id="dostupnye-kolbeki"> Доступные колбэки</h4>
+    <ul>
+        <li>
+            <code>before_enqueue</code>
+        </li>
+        <li>
+            <code>around_enqueue</code>
+        </li>
+        <li>
+            <code>after_enqueue</code>
+        </li>
+        <li>
+            <code>before_perform</code>
+        </li>
+        <li>
+            <code>around_perform</code>
+        </li>
+        <li>
+            <code>after_perform</code>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ispolzovanie"> Использование</h4>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :default
+  before_enqueue do |job|
+    # делаем что-то с экземпляром задачи
+  end
+  around_perform do |job, block|
+    # делаем что-то перед выполнением
+    block.call
+    # делаем что-то после выполнения
+  end
+  def perform
+    # Отложенная задача
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <p>Одной из обычных задач в современном веб-приложении является рассылка писем за пределами
+        цикла запроса-отклика, чтобы пользователь не ждал. Active Job интегрируется с Action Mailer,
+        поэтому рассылать письма асинхронно очень просто:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Если хотите отправить письмо сейчас, используйте #deliver_now
+UserMailer.welcome(@user).deliver_now
+# Если хотите отправить письмо через Active Job, используйте #deliver_later
+UserMailer.welcome(@user).deliver_later
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="globalid"> GlobalID</h3>
+    <p>Active Job поддерживает GlobalID для параметров. Это позволяет передавать объекты Active
+        Record в ваши задачи, вместо пар класс/id, которые нужно затем десериализовать вручную.
+        Раньше задачи выглядели так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class TrashableCleanupJob &lt; ActiveJob::Base
+  def perform(trashable_class, trashable_id, depth)
+    trashable = trashable_class.constantize.find(trashable_id)
+    trashable.cleanup(depth)
+  end
+end
+</pre>
+    </div>
+    <p>Теперь можно просто сделать так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class TrashableCleanupJob &lt; ActiveJob::Base
+  def perform(trashable, depth)
+    trashable.cleanup(depth)
+  end
+end
+</pre>
+    </div>
+    <p>Это работает с любым классом, в который подмешан <code>GlobalID::Identification</code>,
+        который по умолчанию был подмешан в классы Active Record.</p>
+    <h3 class="inside_page_header" id="isklyucheniya"> Исключения</h3>
+    <p>Active Job предоставляет способ отлова исключений, возникших в течение запуска задачи:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GuestsCleanupJob &lt; ActiveJob::Base
+  queue_as :default
+  rescue_from(ActiveRecord::RecordNotFound) do |exception|
+   # Сделать что-то с этим исключением
+  end
+  def perform
+    # Отложенная задача
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="deserializatsiya"> Десериализация</h4>
+    <p>GlobalID позволяет сериализовать полностью объекты Active Record, переданные в
+        <code>#perform</code>.</p>
+    <p>Если переданная запись была удалена после того, как задача была помещена в очередь, но до
+        того, как метод <code>#perform</code> был вызван, Active Job вызовет исключение <code>ActiveJob::DeserializationError</code>.
+    </p>
+    <h3 class="inside_page_header" id="testirovanie-zadach"> Тестирование задач</h3>
+    <p>Вы можете найти подробные инструкции о том, как тестировать ваши задачи в .</p>
+
+</body>
+</html>

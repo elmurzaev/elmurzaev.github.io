@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>13. Лекция: Интеграция Python с другими языками программирования.</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p>В этой лекции рассматривается встраивание (embedding) интерпретатора Python в программу на C, и,
+    наоборот, написание модулей для Python на языке C (extending). Кратко описывается инструмент для
+    связывания C–библиотек с программами на Python (SWIG). Дается обзор связок языка Python с
+    другими языками программирования: C++, Java, OCaml, Prolog. Коротко говорится о специальном
+    языке для написания модулей расширения Python — Pyrex.</p>
+<p>C API</p>
+<p>Доступные из языка Python модули расширяются за счет модулей расширения (extension modules).
+    Модули расширения можно писать на языке C или C++ и вызывать из программ на Python. В этой
+    лекции речь пойдет о реализации Python, называемой CPython(Jython, реализация Python на
+    платформе Java не будет рассматриваться).</p>
+<p>Сама необходимость использования языка C может возникнуть, если реализуемый алгоритм, будучи
+    запрограммирован на Python, работает медленно. Например, высокопроизводительные операции с
+    массивами модуля Numeric (о котором говорилось в одной из предыдущих лекций) написаны на языке
+    C. Модули расширения позволяют объединить эффективность порождаемого компилятором C/C++ кода c
+    удобством и гибкостью интерпретатора Python. Необходимые сведения для создания модулей
+    расширения для Python даны в исчерпывающем объеме в стандартной документации, а именно в
+    документе «Python/C API Reference Manual» (справочное руководство по «Python/C API»). Здесь
+    будут рассмотрены лишь основные принципы построения модуля расширения, без детальных
+    подробностей об API. Стоит заметить, что возможности Python равно доступны и в C++, просто они
+    выражены в C–декларациях, которые можно использовать в C++.</p>
+<p>Все необходимые для модуля расширения определения находятся в заголовочном файле Python.h,
+    который должен находится где–то на пути заголовочных файлов компилятора C/C++. Следует
+    пользоваться теми же версиями библиотек, с которыми был откомпилирован Python. Желательно, и той
+    же маркой компилятора C/C++.</p>
+<p>Связь с интерпретатором Python из кода на C осуществляется путем вызова функций, определенных в
+    интерпретаторе Python. Все функции начинаются на Py или _Py, потому во избежание конфликтов в
+    модулях расширения не следует определять функций с подобными именами.</p>
+<p>Через C API доступны все встроенные возможности языка Python (при необходимости, детальнее
+    изучить этот вопрос можно по документации):</p>
+<p>высокоуровневый интерфейс интерпретатора (функции и макросы Py_Main(), PyRun_String(),
+    PyRun_File(), Py_CompileString(), PyCompilerFlags() и т.п.),</p>
+<p>функции для работы со встроенным интерпретатором и потоками (Py_Initialize(), Py_Finalize(),
+    Py_NewInterpreter(), Py_EndInterpreter(), Py_SetProgramName() и другие),</p>
+<p>управление подсчетом ссылок (макросы Py_INCREF(), Py_DECREF(), Py_XINCREF(), Py_XDECREF(),
+    Py_CLEAR()). Требуется при создании или удалении Python–объектов в C/C++-коде.</p>
+<p>обработка исключений (PyErr*-функции и PyExc_*-константы, например, PyErr_NoMemory() и
+    PyExc_IOError)</p>
+<p>управление процессом и сервисы операционной системы (Py_FatalError(), Py_Exit(), Py_AtExit(),
+    PyOS_CheckStack(), и другие функции/макросы PyOS*),</p>
+<p>импорт модулей (PyImport_Import() и другие),</p>
+<p>поддержка сериализации объектов (PyMarshal_WriteObjectToFile(), PyMarshal_ReadObjectFromFile() и
+    т.п.)</p>
+<p>поддержка анализа строки аргументов (PyArg_ParseTuple(), PyArg_VaParse(),
+    PyArg_ParseTupleAndKeywords(), PyArg_VaParseTupleAndKeywords(), PyArg_UnpackTuple() и
+    Py_BuildValue()). С помощью этих функций облегчается задача получения в коде на C параметров,
+    заданных при вызове функции из Python. Функции PyArg_Parse* принимают в качестве аргумента
+    строку формата полученных аргументов,</p>
+<p>поддержка протоколов абстрактных объектов: + Протокол объекта (PyObject_Print(),
+    PyObject_HasAttrString(), PyObject_GetAttrString(), PyObject_HasAttr(), PyObject_GetAttr(),
+    PyObject_RichCompare(), …, PyObject_IsInstance(), PyCallable_Check(), PyObject_Call(),
+    PyObject_Dir() и другие). То, что должен уметь делать любой объект Python + Протокол числа
+    (PyNumber_Check(), PyNumber_Add(), …, PyNumber_And(), …, PyNumber_InPlaceAdd(), …,
+    PyNumber_Coerce(), PyNumber_Int(), …). То, что должен делать любой объект, представляющий число
+    + Протокол последовательности (PySequence_Check(), PySequence_Size(), PySequence_Concat(),
+    PySequence_Repeat(), PySequence_InPlaceConcat(), …, PySequence_GetItem(), …,
+    PySequence_GetSlice(), PySequence_Tuple(), PySequence_Count(), …) + Протокол отображения
+    (например, словарь является отображением) (функции: PyMapping_Check(), PyMapping_Length(),
+    PyMapping_HasKey(), PyMapping_Keys(), …, PyMapping_SetItemString(), PyMapping_GetItemString() и
+    др.) + Протокол итератора (PyIter_Check(), PyIter_Next()) + Протокол буфера
+    (PyObject_AsCharBuffer(), PyObject_AsReadBuffer(), PyObject_AsWriteBuffer(),
+    PyObject_CheckReadBuffer())</p>
+<p>поддержка встроенных типов данных. Аналогично описанному в предыдущем пункте, но уже для
+    конкретных встроенных типов данных. Например: + Булевский объект (PyBool_Check() - проверка
+    принадлежности типу PyBool_Type, Py_False — объект False, Py_True — объект True,</p>
+<p>управление памятью (то есть кучей интерпретатора Python) (функции PyMem_Malloc(),
+    PyMem_Realloc(), PyMem_Free(), PyMem_New(), PyMem_Resize(), PyMem_Del()). Разумеется, можно
+    применять и средства выделения памяти C/C++, однако, в этом случае не будут использоваться
+    преимущества управления памятью интерпретатора Python (сборка мусора и т.п.). Кроме того,
+    освобождение памяти нужно производить тем же способом, что и ее выделение. Еще раз стоит
+    напомнить, что повторное освобождение одной и той же области памяти (а равно использование
+    области памяти после ее освобождения) чревато серьезными ошибками, которые компилятор C не имеет
+    возможности распознать.</p>
+<p>структуры для определения объектов встроенных типов (PyObject, PyVarObject и много других)</p>
+<p>Примечание</p>
+<p>Под протоколом здесь понимается набор методов, которые должен поддерживать тот или иной класс для
+    организации операций со своими экземплярами. Эти методы доступны не только из Python (например,
+    len(a) дает длину последовательности), но и из кода на C (PySequence_Length()).</p>
+<p>Написание модуля расширения</p>
+<p>Если необходимость встроить Python в программу возникает нечасто, то его расширение путем
+    написания модулей на C/C++ - довольно распространенная практика. Изначально Python был нацелен
+    на возможность расширения, поэтому в настоящий момент очень многие C/C++-библиотеки имеют
+    привязки к Python.</p>
+<p>Привязка к Python, хотя и может быть несколько автоматизирована, все же это процесс творческий.
+    Дело в том, что если предполагается интенсивно использовать библиотеку в Python, ее привязку
+    желательно сделать как можно более тщательно. Возможно, в ходе привязки будет сделана
+    объектно–ориентированная надстройка или другие архитектурные изменения, которые позволят
+    упростить использование библиотеки.</p>
+<p>В качестве примера можно привести выдержку из исходного кода модуля md5, который реализует
+    функцию для получения md5–дайджеста. Модуль приводится в целях иллюстрации (то есть, с
+    сокращениями). Модуль вводит собственный тип данных, MD5Type, поэтому можно увидеть не только
+    реализацию функций, но и способ описания встроенного типа. В рамках этого курса не изучить все
+    тонкости программирования модулей расширения, главное понять дух этого занятия. На комментарии
+    автора курса лекций указывает двойной слэш //:</p>
+<p>Листинг</p>
+<p>// заголовочные файлы</p>
+<p>#include «Python.h»</p>
+<p>#include «md5.h»</p>
+<p>// В частности, в заголовочном файле md5.h есть следующие определения:</p>
+<p>// typedef unsigned char *POINTER;</p>
+<p>// typedef unsigned int UINT4;</p>
+<p>// typedef struct {</p>
+<p>// UINT4 state[4]; /* state (ABCD) */</p>
+<p>// UINT4 count[2]; /* number of bits, modulo 2^64 (lsb first) */</p>
+<p>// unsigned char buffer[64]; /* input buffer */</p>
+<p>// } MD5_CTX;</p>
+<p>// Структура объекта MD5type</p>
+<p>typedef struct {</p>
+<p>PyObject_HEAD</p>
+<p>MD5_CTX md5; /* the context holder */</p>
+<p>} md5object;</p>
+<p>// Определение типа объекта MD5type</p>
+<p>static PyTypeObject MD5type;</p>
+<p>// Макрос проверки типа MD5type</p>
+<p>#define is_md5object(v) ((v) — &gt;ob_type == &amp;MD5type)</p>
+<p>// Порождение объекта типа MD5type</p>
+<p>static md5object *</p>
+<p>newmd5object(void)</p>
+<p>{</p>
+<p>md5object *md5p;</p>
+<p>md5p = PyObject_New(md5object, &amp;MD5type);</p>
+<p>if (md5p == NULL)</p>
+<p>return NULL; // не хватило памяти</p>
+<p>MD5Init(&amp;md5p-&gt;md5); // инициализация</p>
+<p>return md5p;</p>
+<p>}</p>
+<p>// Определения методов</p>
+<p>// Освобождение памяти из–под объекта</p>
+<p>static void</p>
+<p>md5_dealloc(md5object *md5p) { PyObject_Del(md5p); }</p>
+<p>static PyObject *</p>
+<p>md5_update(md5object *self, PyObject *args)</p>
+<p>{</p>
+<p>unsigned char *cp;</p>
+<p>int len;</p>
+<p>// разбор строки аргументов. Формат указывает следующее:</p>
+<p>// s# - один параметр, строка (заданная указателем и длиной)</p>
+<p>// : — разделитель</p>
+<p>// update — название метода</p>
+<p>if (!PyArg_ParseTuple(args, «s#:update», &amp;cp, &amp;len))</p>
+<p>return NULL;</p>
+<p>MD5Update(&amp;self-&gt;md5, cp, len);</p>
+<p>// Даже возврат None требует увеличения счетчика ссылок</p>
+<p>Py_INCREF(Py_None);</p>
+<p>return Py_None;</p>
+<p>}</p>
+<p>// Строка документации метода update</p>
+<p>PyDoc_STRVAR(update_doc,</p>
+<p>«update (arg)\n\</p>
+<p>\n\</p>
+<p>Update the md5 object with the string arg. Repeated calls are\n\</p>
+<p>equivalent to a single call with the concatenation of all the\n\</p>
+<p>arguments.»);</p>
+<p>// Метод digest</p>
+<p>static PyObject *</p>
+<p>md5_digest(md5object *self)</p>
+<p>{</p>
+<p>MD5_CTX mdContext;</p>
+<p>unsigned char aDigest[16];</p>
+<p>/* make a temporary copy, and perform the final */</p>
+<p>mdContext = self-&gt;md5;</p>
+<p>MD5Final(aDigest, &amp;mdContext);</p>
+<p>// результат возвращается в виде строки</p>
+<p>return PyString_FromStringAndSize((char *)aDigest, 16);</p>
+<p>}</p>
+<p>// и строка документации</p>
+<p>PyDoc_STRVAR(digest_doc, «digest() -&gt; string\n\ …»);</p>
+<p>static PyObject *</p>
+<p>md5_hexdigest(md5object *self)</p>
+<p>{</p>
+<p>// Реализация метода на C</p>
+<p>}</p>
+<p>PyDoc_STRVAR(hexdigest_doc, «hexdigest() -&gt; string\n…»);</p>
+<p>// Здесь было определение метода copy()</p>
+<p>// Методы объекта в сборе.</p>
+<p>// Для каждого метода указывается название, имя метода на C</p>
+<p>// (с приведением к типу PyCFunction), способ передачи аргументов:</p>
+<p>// METH_VARARGS (переменное кол–во) или METH_NOARGS (нет аргументов)</p>
+<p>// В конце массива — метка окончания спиcка аргументов.</p>
+<p>static PyMethodDef md5_methods[] = {</p>
+<p>{«update», (PyCFunction)md5_update, METH_VARARGS, update_doc},</p>
+<p>{«digest», (PyCFunction)md5_digest, METH_NOARGS, digest_doc},</p>
+<p>{«hexdigest», (PyCFunction)md5_hexdigest, METH_NOARGS, hexdigest_doc},</p>
+<p>{«copy», (PyCFunction)md5_copy, METH_NOARGS, copy_doc},</p>
+<p>{NULL, NULL} /* sentinel */</p>
+<p>};</p>
+<p>// Атрибуты md5–объекта обслуживает эта функция, реализуя метод</p>
+<p>// getattr.</p>
+<p>static PyObject *</p>
+<p>md5_getattr(md5object *self, char *name)</p>
+<p>{</p>
+<p>// атрибут–данное digest_size</p>
+<p>if (strcmp(name, «digest_size») == 0) {</p>
+<p>return PyInt_FromLong(16);</p>
+<p>}</p>
+<p>// поиск атрибута–метода ведется в списке</p>
+<p>return Py_FindMethod(md5_methods, (PyObject *)self, name);</p>
+<p>}</p>
+<p>// Строка документации к модулю md5</p>
+<p>PyDoc_STRVAR(module_doc, «This module implements …»);</p>
+<p>// Строка документации к классу md5</p>
+<p>PyDoc_STRVAR(md5type_doc, «An md5 represents the object…»);</p>
+<p>// Структура для объекта MD5type с описаниями для интерпретатора</p>
+<p>static PyTypeObject MD5type = {</p>
+<p>PyObject_HEAD_INIT(NULL)</p>
+<p>0, /*ob_size*/</p>
+<p>«md5.md5», /*tp_name*/</p>
+<p>sizeof(md5object), /*tp_size*/</p>
+<p>0, /*tp_itemsize*/</p>
+<p>/* methods */</p>
+<p>(destructor)md5_dealloc, /*tp_dealloc*/</p>
+<p>0, /*tp_print*/</p>
+<p>(getattrfunc)md5_getattr, /*tp_getattr*/</p>
+<p>0, /*tp_setattr*/</p>
+<p>0, /*tp_compare*/</p>
+<p>0, /*tp_repr*/</p>
+<p>0, /*tp_as_number*/</p>
+<p>0, /*tp_as_sequence*/</p>
+<p>0, /*tp_as_mapping*/</p>
+<p>0, /*tp_hash*/</p>
+<p>0, /*tp_call*/</p>
+<p>0, /*tp_str*/</p>
+<p>0, /*tp_getattro*/</p>
+<p>0, /*tp_setattro*/</p>
+<p>0, /*tp_as_buffer*/</p>
+<p>0, /*tp_xxx4*/</p>
+<p>md5type_doc, /*tp_doc*/</p>
+<p>};</p>
+<p>// Функции модуля md5:</p>
+<p>// Функция new() для получения нового объекта типа md5type</p>
+<p>static PyObject *</p>
+<p>MD5_new(PyObject *self, PyObject *args)</p>
+<p>{</p>
+<p>md5object *md5p;</p>
+<p>unsigned char *cp = NULL;</p>
+<p>int len = 0;</p>
+<p>// Разбор параметров. Здесь вертикальная черта</p>
+<p>// в строке формата означает окончание</p>
+<p>// списка обязательных параметров.</p>
+<p>// Остальное — как и выше: s# - строка, после : — имя</p>
+<p>if (!PyArg_ParseTuple(args, "|s#:new», &amp;cp, &amp;len))</p>
+<p>return NULL;</p>
+<p>if ((md5p = newmd5object()) == NULL)</p>
+<p>return NULL;</p>
+<p>// Если был задан параметр cp:</p>
+<p>if (cp)</p>
+<p>MD5Update(&amp;md5p-&gt;md5, cp, len);</p>
+<p>return (PyObject *)md5p;</p>
+<p>}</p>
+<p>// Строка документации для new()</p>
+<p>PyDoc_STRVAR(new_doc, «new([arg]) -&gt; md5 object …»);</p>
+<p>// Список функций, которые данный модуль экспортирует</p>
+<p>static PyMethodDef md5_functions[] = {</p>
+<p>{«new», (PyCFunction)MD5_new, METH_VARARGS, new_doc},</p>
+<p>{«md5», (PyCFunction)MD5_new, METH_VARARGS, new_doc},</p>
+<p>{NULL, NULL} /* Sentinel */</p>
+<p>};</p>
+<p>// Следует заметить, что md5 — то же самое, что new. Эта функция оставлена для</p>
+<p>// обратной совместимости со старым модулем md5</p>
+<p>// Инициализация модуля</p>
+<p>PyMODINIT_FUNC</p>
+<p>initmd5(void)</p>
+<p>{</p>
+<p>PyObject *m, *d;</p>
+<p>MD5type.ob_type = &amp;PyType_Type;</p>
+<p>// Инициализируется модуль</p>
+<p>m = Py_InitModule3(«md5», md5_functions, module_doc);</p>
+<p>// Получается словарь с именами модуля</p>
+<p>d = PyModule_GetDict(m);</p>
+<p>// Добавляется атрибут MD5Type (тип md5–объекта) к словарю</p>
+<p>PyDict_SetItemString(d, «MD5Type», (PyObject *)&amp;MD5type);</p>
+<p>// Добавляется целая константа digest_size к модулю</p>
+<p>PyModule_AddIntConstant(m, «digest_size», 16);</p>
+<p>}</p>
+<p>На основе этого примера можно строить собственные модули расширения, ознакомившись с
+    документацией по C/API и документом «Extending and Embedding» («Расширение и встраивание») из
+    стандартной поставки Python. Перед тем, как приступать к созданию своего модуля, следует
+    убедиться, что это целесообразно: подходящего модуля еще не создано и реализация в виде чистого
+    Python неэффективна. Если создан действительно полезный модуль, его можно предложить для
+    включения в поставку Python. Для этого нужно просто связаться с кем–нибудь из разработчиков по
+    электронной почте или предложить модуль в виде «патча» через http://sourceforge.net.</p>
+<p>Пример встраивания интерпретатора в программу на C</p>
+<p>Интерпретатор Python может быть встроен в программу на C с использованием C API. Это лучше всего
+    демонстрирует уже работающий пример:</p>
+<p>Листинг</p>
+<p>/* File : demo.c */</p>
+<p>/* Пример встраивания интерпретатора Python в другую программу */</p>
+<p>#include «Python.h»</p>
+<p>main(int argc, char **argv)</p>
+<p>{</p>
+<p>/* Передает argv[0] интерпретатору Python */</p>
+<p>Py_SetProgramName(argv[0]);</p>
+<p>/* Инициализация интерпретатора */</p>
+<p>Py_Initialize();</p>
+<p>/* … */</p>
+<p>/* Выполнение операторов Python (как бы модуль __main__) */</p>
+<p>PyRun_SimpleString(«import time\n»);</p>
+<p>PyRun_SimpleString(«print time.localtime(time.time())\n»);</p>
+<p>/* … */</p>
+<p>/* Завершение работы интерпретатора */</p>
+<p>Py_Finalize();</p>
+<p>}</p>
+<p>Компиляция этого примера с помощью компилятора gcc может быть выполнена, например, так:</p>
+<p>Листинг</p>
+<p>ver=«2.3»</p>
+<p>gcc–fpic demo.c–DHAVE_CONFIG_H–lm–lpython${ver} \</p>
+<p>— lpthread–lutil–ldl \</p>
+<p>— I/usr/local/include/python${ver} \</p>
+<p>— L/usr/local/lib/python${ver}/config \</p>
+<p>— Wl, — E \</p>
+<p>— o demo</p>
+<p>Здесь следует отметить следующие моменты:</p>
+<p>программу необходимо компилировать вместе с библиотекой libpython соответствующей версии (для
+    этого используется опция–l, за которой следует имя библиотеки) и еще с библиотеками, которые
+    требуются для Python: libpthread, libm, libutil и т.п.)</p>
+<p>опция pic порождает код, не зависящий от позиции, что позволяет в дальнейшем динамически
+    компоновать код</p>
+<p>обычно требуется явно указать каталог, в котором лежит заголовочный файл Python.h (в gcc это
+    делается опцией–I)</p>
+<p>чтобы получившийся исполняемый файл мог корректно предоставлять имена для динамически загружаемых
+    модулей, требуется передать компоновщику опцию–E: это можно сделать из gcc с помощью опции–Wl, —
+    E. (В противном случае, модуль time, а это модуль расширения в виде динамически загружаемого
+    модуля, не будет работать из–за того, что не увидит имен, определенных в libpython)</p>
+<p>Здесь же следует сделать еще одно замечание: программа, встраивающая Python, не должна много раз
+    выполнять Py_Initialize() и Py_Finalize(), так как это может приводить к утечке памяти. Сам же
+    интерпретатор Python очень стабилен и в большинстве случаев не дает утечек памяти.</p>
+<p>Использование SWIG</p>
+<p>SWIG (Simplified Wrapper and Interface Generator, упрощенный упаковщик и генератор интерфейсов) -
+    это программное средства, сильно упрощающее (во многих случаях — автоматизирующее) использование
+    библиотек, написанных на C и C++, а также на других языках программирования, в том числе (не в
+    последнюю очередь!) на Python. Нужно отметить, что SWIG обеспечивает достаточно полную поддержку
+    практически всех возможностей C++, включая предобработку, классы, указатели, наследование и даже
+    шаблоны C++. Последнее очень важно, если необходимо создать интерфейс к библиотеке шаблонов.</p>
+<p>Пользоваться SWIG достаточно просто, если уметь применять компилятор и компоновщик (что в любом
+    случае требуется при программировании на C/C++).</p>
+<p>Простой пример использования SWIG</p>
+<p>Предположим, что есть программа на C, реализующая некоторую функцию (пусть это будет вычисление
+    частоты появления различных символов в строке):</p>
+<p>Листинг</p>
+<p>/* File : freq.c */</p>
+<p>#include &lt;stdlib.h&gt;</p>
+<p>int * frequency(char s[]) {</p>
+<p>int *freq;</p>
+<p>char *ptr;</p>
+<p>freq = (int*)(calloc(256, sizeof(int)));</p>
+<p>if (freq != NULL)</p>
+<p>for (ptr = s; *ptr; ptr++)</p>
+<p>freq[*ptr] += 1;</p>
+<p>return freq;</p>
+<p>}</p>
+<p>Для того чтобы можно было воспользоваться этой функцией из Python, нужно написать интерфейсный
+    файл (расширение .i) примерно следующего содержания:</p>
+<p>Листинг</p>
+<p>/* File : freq.i */</p>
+<p>%module freq</p>
+<p>%typemap(out) int * {</p>
+<p>int i;</p>
+<p>$result = PyTuple_New(256);</p>
+<p>for(i=0; i&lt;256; i++)</p>
+<p>PyTuple_SetItem($result, i, PyLong_FromLong($1[i]));</p>
+<p>free($1);</p>
+<p>}</p>
+<p>extern int * frequency(char s[]);</p>
+<p>Интерфейсные файлы содержат инструкции самого SWIG и фрагменты C/C++-кода, возможно, с
+    макровключениями (в примере выше: $result, $1). Следует заметить, что для преобразования массива
+    целых чисел в кортеж элементов типа long, необходимо освободить память из–под исходного массива,
+    в котором подсчитывались частоты.</p>
+<p>Теперь (подразумевая, что используется компилятор gcc), создание модуля расширения может быть
+    выполнено примерно так:</p>
+<p>Листинг</p>
+<p>swig–python freq.i</p>
+<p>gcc–c–fpic freq_wrap.c freq.c -DHAVE_CONFIG_H</p>
+<p>— I/usr/local/include/python2.3–I/usr/local/lib/python2.3/config</p>
+<p>gcc–shared freq.o freq_wrap.o–o _freq.so</p>
+<p>После этого в рабочем каталоге появляется файлы _freq.so и freq.py, которые вместе и дают доступ
+    к требуемой функции:</p>
+<p>Листинг</p>
+<p>&gt;&gt;&gt; import freq</p>
+<p>&gt;&gt;&gt; freq.frequency(«ABCDEF»)[60:75]</p>
+<p>(0L, 0L, 0L, 0L, 0L, 1L, 1L, 1L, 1L, 1L, 1L, 0L, 0L, 0L, 0L)</p>
+<p>Помимо этого, можно посмотреть на содержимое файла freq_wrap.c, который был порожден SWIG: в нем,
+    среди прочих вспомогательных определений, нужных самому SWIG, можно увидеть что–то подобное
+    проиллюстрированному выше примеру модуля md5. Вот фрагмент этого файла с определением обертки
+    для функции frequency():</p>
+<p>Листинг</p>
+<p>extern int *frequency(char []);</p>
+<p>static PyObject *_wrap_frequency(PyObject *self, PyObject *args) {</p>
+<p>PyObject *resultobj;</p>
+<p>char *arg1 ;</p>
+<p>int *result;</p>
+<p>if(!PyArg_ParseTuple(args,(char *)«s:frequency»,&amp;arg1)) goto fail;</p>
+<p>result = (int *)frequency(arg1);</p>
+<p>{</p>
+<p>int i;</p>
+<p>resultobj = PyTuple_New(256);</p>
+<p>for(i=0; i&lt;256; i++)</p>
+<p>PyTuple_SetItem(resultobj, i, PyLong_FromLong(result[i]));</p>
+<p>free(result);</p>
+<p>}</p>
+<p>return resultobj;</p>
+<p>fail:</p>
+<p>return NULL;</p>
+<p>}</p>
+<p>В качестве упражнения, предлагается сопоставить это определение с файлом freq.i и понять, что
+    происходит внутри функции _wrap_frequency(). Подсказка: можно посмотреть еще раз комментарии к
+    C–коду модуля md5.</p>
+<p>Стоит еще раз напомнить, что в отличие от Python, в языке C/C++ управление памятью должно
+    происходить в явном виде. Именно поэтому добавлена функция free() при преобразовании типа. Если
+    этого не сделать, возникнут утечки памяти. Эти утечки можно обнаружить, при многократном
+    выполнении функции:</p>
+<p>Листинг</p>
+<p>&gt;&gt;&gt; import freq</p>
+<p>&gt;&gt;&gt; for i in xrange(1000000):</p>
+<p>… dummy = freq.frequency(«ABCDEF»)</p>
+<p>&gt;&gt;&gt;</p>
+<p>Если функция freq.frequency() имеет утечки памяти, выполняемый процесс очень быстро займет всю
+    имеющуюся память.</p>
+<p>Интеграция Python и других систем программирования</p>
+<p>Язык программирования Python является сценарным языком, а значит его основное назначение —
+    интеграция в единую систему разнородных программных компонентов. Выше рассматривалась
+    (низкоуровневая) интеграция с C/C++-приложениями. Нужно заметить, что в большинстве случаев
+    достаточно интеграции с использованием протокола. Например, интегрируемые приложения могут
+    общаться через XML–RPC, SOAP, CORBA, COM, .NET и т.п. В случаях, когда приложения имеют
+    интерфейс командной строки, их можно вызывать из Python и управлять стандартным вводом–выводом,
+    переменными окружения. Однако есть и более интересные варианты интеграции.</p>
+<p>Современное состояние дел по излагаемому вопросу можно узнать по адресу:
+    http://www.python.org/moin/IntegratingPythonWithOtherLanguages</p>
+<p>Java</p>
+<p>Документация по Jython (это реализация Python на Java–платформе) отмечает, что Jython обладает
+    следующими неоспоримыми преимуществами над другими языками, использующими Java–байт–код:</p>
+<p>Jython–код динамически компилирует байт–коды Java, хотя возможна и статическая компиляция, что
+    позволяет писать апплеты, сервлеты и т.п.;</p>
+<p>Поддерживает объектно–ориентированную модель Java, в том числе, возможность наследовать от
+    абстрактных Java–классов;</p>
+<p>Jython является реализацией Python — языка с практичным синтаксисом, обладающего большой
+    выразительностью, что позволяет сократить сроки разработки приложений в разы.</p>
+<p>Правда, имеются и некоторые ограничения по сравнению с «обычным» Python. Например, Java не
+    поддерживает множественного наследования, поэтому в некоторых версиях Jython нельзя наследовать
+    классы от нескольких Java–классов (в тоже время, множественное наследование поддерживается для
+    Python–классов).</p>
+<p>Следующий пример (файл lines.py) показывает полную интеграцию Java–классов с интерпретатором
+    Python:</p>
+<p>Листинг</p>
+<p># Импортируются модули из Java</p>
+<p>from java.lang import System</p>
+<p>from java.awt import *</p>
+<p># А это модуль из Jython</p>
+<p>import random</p>
+<p># Класс для рисования линий на рисунке</p>
+<p>class Lines(Canvas):</p>
+<p># Реализация метода paint()</p>
+<p>def paint(self, g):</p>
+<p>X, Y = self.getSize().width, self.getSize().height</p>
+<p>label.setText("%s x %s» % (X, Y))</p>
+<p>for i in range(100):</p>
+<p>x1, y1 = random.randint(1, X), random.randint(1, Y)</p>
+<p>x2, y2 = random.randint(1, X), random.randint(1, Y)</p>
+<p>g.drawLine(x1, y1, x2, y2)</p>
+<p># Метки, кнопки и т.п.</p>
+<p>panel = Panel(layout=BorderLayout())</p>
+<p>label = Label(«Size», Label.RIGHT)</p>
+<p>panel.add(label, «North»)</p>
+<p>button = Button(«QUIT», actionPerformed=lambda e: System.exit(0))</p>
+<p>panel.add(button, «South»)</p>
+<p>lines = Lines()</p>
+<p>panel.add(lines, 'Center')</p>
+<p># Запуск панели в окне</p>
+<p>import pawt</p>
+<p>pawt.test(panel, size=(240, 240))</p>
+<p>Программы на Jython можно компилировать в Java и собирать в jar–архивы. Для создания jar–архива
+    на основе модуля (или пакета) можно применить команду jythonc, которая входит в комплект Jython.
+    Из командной строки это можно сделать примерно так:</p>
+<p>Листинг</p>
+<p>jythonс–d–c–j lns.jar lines.py</p>
+<p>Для запуска приложения достаточно запустить lines из командной строки:</p>
+<p>Листинг</p>
+<p>java–classpath "$CLASSPATH» lines</p>
+<p>В переменной $CLASSPATH должны быть пути к архивам lns.jar и jython.jar.</p>
+<p>Prolog</p>
+<p>Для тех, кто хочет использовать Prolog из Python, существует несколько возможностей:</p>
+<p>Версия GNU Prolog (сайт: http://gprolog.sourceforge.net) интегрируется с Python посредством
+    пакета bedevere (сайт: http://bedevere.sourceforge.net)</p>
+<p>Имеется пакет PyLog (http://www.gocept.com/angebot/opensource/Pylog) для работы с SWI–Prolog
+    (http://www.swi–prolog.org) из Python</p>
+<p>Можно использовать пакет pylog (доступен с сайта: http://christophe.delord.free.fr/en/pylog/),
+    который добавляет основные возможности Prolog в Python</p>
+<p>Эти три варианта реализуют различные способы интеграции возможностей Prolog в Python. Первый
+    вариант использует SWIG, второй организует общение с Prolog–системой через конвейер, а третий
+    является специализированной реализацией Prolog.</p>
+<p>Следующий пример показывает использование модуля pylog:</p>
+<p>Листинг</p>
+<p>from pylog import *</p>
+<p>exec(compile(r»""</p>
+<p>man('Socrates').</p>
+<p>man('Democritus').</p>
+<p>mortal(X) : — man(X).</p>
+<p>«""))</p>
+<p>WHO = Var()</p>
+<p>queries = [mortal('Socrates'),</p>
+<p>man(WHO),</p>
+<p>mortal(WHO)]</p>
+<p>for query in queries:</p>
+<p>print "?», query</p>
+<p>for _ in query():</p>
+<p>print " yes:", query</p>
+<p>Что выдает результат:</p>
+<p>Листинг</p>
+<p>? mortal(Socrates)</p>
+<p>yes: mortal(Socrates)</p>
+<p>? man(_)</p>
+<p>yes: man(Socrates)</p>
+<p>yes: man(Democritus)</p>
+<p>? mortal(_)</p>
+<p>yes: mortal(Socrates)</p>
+<p>yes: mortal(Democritus)</p>
+<p>Разумеется, это не «настоящий» Prolog, но с помощью модуля pylog любой, кому требуются логические
+    возможности Prolog в Python, может написать программу с использованием Prolog–синтаксиса.</p>
+<p>OCaml</p>
+<p>Язык программирования OCaml — это язык функционального программирования (семейства ML, что
+    означает Meta Language), созданный в институте INRIA, Франция. Важной особенностью OCaml
+    является то, что его компилятор порождает исполняемый код, по быстродействию сравнимый с С,
+    родной для платформ, на которых OCaml реализован. В то же время, будучи функциональным по своей
+    природе, он приближается к Python по степени выразительности. Именно поэтому для OCaml была
+    создана библиотека Pycaml, фактически реализующая аналог C API для OCaml. Таким образом, в
+    программах на OCaml могут использоваться модули языка Python, в них даже может быть встроен
+    интерпретатор Python. Для Python имеется большое множество адаптированных C–библиотек, это дает
+    возможность пользователям OCaml применять в разработке комбинированное преимущество Python и
+    OCaml. Минусом является только необходимость знать функции Python/C API, имена которого
+    использованы для связи OCaml и Python.</p>
+<p>Следующий пример (из Pycaml) показывает программу для OCaml, которая определяет модуль для Python
+    на OCaml и вызывает встроенный интерпретатор Python:</p>
+<p>Листинг</p>
+<p>let foo_bar_print = pywrap_closure</p>
+<p>(fun x -&gt; pytuple_fromarray (pytuple_toarray x)) ;;</p>
+<p>let sd = pyimport_getmoduledict () ;;</p>
+<p>let mx = pymodule_new «CamlModule» ;;</p>
+<p>let cd = pydict_new () ;;</p>
+<p>let cx = pyclass_new (pynull (), cd, pystring_fromstring «CamlClass») ;;</p>
+<p>let cmx = pymethod_new (foo_bar_print,(pynull ()),cx) ;;</p>
+<p>let _ = pydict_setitemstring (cd, «CamlMethod», cmx) ;;</p>
+<p>let _ = pydict_setitemstring (pymodule_getdict mx, «CamlClass», cx) ;;</p>
+<p>let _ = pydict_setitemstring (sd, «CamlModule», mx) ;;</p>
+<p>let _ = pyrun_simplestring</p>
+<p>(«from CamlModule import CamlClass\n» ^</p>
+<p>«x = CamlClass()\n» ^</p>
+<p>«for i in range(100000):\n» ^</p>
+<p>« x.CamlMethod(1,2,3,4)\n» ^</p>
+<p>«print 'Done'\n»)</p>
+<p>Pyrex</p>
+<p>Для написания модулей расширения можно использовать специальный язык — Pyrex — который совмещает
+    синтаксис Python и типы данных C. Компилятор Pyrex написан на Python и превращает исходный файл
+    (например, primes.pyx) в файл на C — готовый для компиляции модуль расширения. Язык Pyrex
+    заботится об управлении памятью, удаляя после себя ставшие ненужными объекты. Пример файла из
+    документации к Pyrex (для вычисления простых чисел):</p>
+<p>Листинг</p>
+<p>def primes(int kmax):</p>
+<p>cdef int n, k, i</p>
+<p>cdef int p[1000]</p>
+<p>result = []</p>
+<p>if kmax &gt; 1000:</p>
+<p>kmax = 1000</p>
+<p>k = 0</p>
+<p>n = 2</p>
+<p>while k &lt; kmax:</p>
+<p>i = 0</p>
+<p>while i &lt; k and n % p[i] &lt;&gt; 0:</p>
+<p>i = i + 1</p>
+<p>if i == k:</p>
+<p>p[k] = n</p>
+<p>k = k + 1</p>
+<p>result.append(n)</p>
+<p>n = n + 1</p>
+<p>return result</p>
+<p>В результате применения компилятора Pyrex, нехитрой компиляции и компоновки (с помощью GCC):</p>
+<p>Листинг</p>
+<p>pyrexc primes.pyx</p>
+<p>gcc primes.c–c–fPIC–I /usr/local/include/python2.3</p>
+<p>gcc–shared primes.o–o primes.so</p>
+<p>Получается модуль расширения с функцией primes():</p>
+<p>Листинг</p>
+<p>&gt;&gt;&gt; import primes</p>
+<p>&gt;&gt;&gt; primes.primes(25)</p>
+<p>[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61,</p>
+<p>67, 71, 73, 79, 83, 89, 97]</p>
+<p>Разумеется, в Pyrex можно использовать C–библиотеки, именно поэтому он, как и SWIG, может служить
+    для построения оберток C–библиотек для Python.</p>
+<p>Следует отметить, что для простых операций Pyrex применяет C, а для обращения к объектам Python —
+    вызовы Python/C API. Таким образом, объединяется выразительность Python и эффективность C.
+    Конечно, некоторые вещи в Pyrex не доступны, например, генераторы, списковые включения и
+    Unicode, однако, цель Pyrex — создание быстродействующих модулей расширения, и для этого он
+    превосходно подходит. Ознакомится с Pyrex можно по документации (которая, к сожалению, есть пока
+    только на английском языке).</p>
+<p>Заключение</p>
+<p>В этой лекции кратко рассматривались основные возможности интеграции интерпретатора Python и
+    других систем программирования. Базовая реализация языка Python написана на C, поэтому Python
+    имеет программный интерфейс Python/C API, который позволяет программам на C/C++ обращаться к
+    интерпретатору Python, отдельным объектам, модулям и типам данных. Состав Python/C API
+    достаточно обширен, поэтому речь шла лишь о некоторых основных его элементах.</p>
+<p>Был рассмотрен процесс написания модуля расширения на C как напрямую, так и с использованием
+    генератора интерфейсов SWIG. Также кратко говорилось о возможности встраивания интерпретатора
+    Python в программу на С или OCaml.</p>
+<p>Язык Python (с помощью специальной его реализации — Jython) прозрачно интегрируется с языком
+    Java: в Python–программе, выполняемой под Jython в Java–апплете или Java–приложении, можно
+    использовать практически любые Java–классы.</p>
+<p>На примере языка Prolog были показаны различные подходы к добавлению возможностей логического
+    вывода в Python–программы: независимая реализация Prolog–машины, связь с Prolog–интерпретатором
+    через конвейер, связь через Python/C API.</p>
+<p>Интересный гибрид C и Python представляет из себя язык Pyrex. Этот язык создан с целью упростить
+    написание модулей расширения для Python на C, и использует структуры данных C и подобный Python
+    синтаксис. Несмотря на некоторые смысловые и синтаксические отличия как от C, так и от Python,
+    язык Pyrex помогает существенно сократить время разработки модулей расширения, сохранив
+    эффективность компилятора C и знакомый синтаксис Python.</p>
+<p>В данной лекции не были представлены другие возможности интеграции, например библиотека шаблонов
+    C++ Boost Python, которая позволяет интегрировать Python и C++. Кроме того, из Python можно
+    использовать библиотеки, написанные на Фортране (проект F2PY).</p>
+<p>Развитые и гибкие интеграционные возможности Python являются его основным преимуществом в
+    качестве языка для интеграции приложений. Из лекции нетрудно заключить, что Python легко
+    взаимодействует с другими системами.</p>
+<p>Ссылки</p>
+<p>Библиотека Boost Python для C++ http://www.boost.org</p>
+<center>
+    <div align="center"></div>
+</center>
+
+</body>
+</html>

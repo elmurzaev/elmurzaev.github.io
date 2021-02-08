@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>18. Стеки</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Стеком называется динамическая структура данных, добавление компоненты в которую и исключение компоненты из которой производится из одного конца, называемого вершиной стека. Стек работает по принципу LIFO(Last-In, First-Out) – «Поступивший последним, обслуживается первым».</span>
+</p>
+<p><span>Обычно над стеками выполняется три операции:</span></p>
+<p><span>1) начальное формирование стека (запись первой компоненты);</span></p>
+<p><span>2) добавление компоненты в стек;</span></p>
+<p><span>3) выборка компоненты (удаление).</span></p>
+<p><span>Для формирования стека и работы с ним необходимо иметь две переменные типа «указатель», первая из которых определяет вершину стека, а вторая – вспомогательная.</span>
+</p>
+<p><span>Пример. Составить программу, которая формирует стек, добавляет в него произвольное количество компонент, а затем читает все компоненты.</span>
+</p>
+<p><span>Program STACK;</span></p>
+<p><span>uses Crt;</span></p>
+<p><span>type</span></p>
+<p><span>Alfa = String[10];</span></p>
+<p><span>PComp = ^Comp;</span></p>
+<p><span>Comp = Record</span></p>
+<p><span>sD: Alfa;</span></p>
+<p><span>pNext: PComp</span></p>
+<p><span>end;</span></p>
+<p><span>var</span></p>
+<p><span>pTop: PComp;</span></p>
+<p><span>sC: Alfa;</span></p>
+<p><span>Procedure CreateStack(var pTop: PComp; var sC: Alfa);</span></p>
+<p><span>begin</span></p>
+<p><span>New(pTop);</span></p>
+<p><span>pTop^.pNext:= NIL;</span></p>
+<p><span>pTop^.sD:= sC;</span></p>
+<p><span>end;</span></p>
+<p><span>Procedure AddComp(var pTop: PComp; var sC: Alfa);</span></p>
+<p><span>var pAux: PComp;</span></p>
+<p><span>begin</span></p>
+<p><span>NEW(pAux);</span></p>
+<p><span>pAux^.pNext:= pTop;</span></p>
+<p><span>pTop:= pAux;</span></p>
+<p><span>pTop^.sD:= sC;</span></p>
+<p><span>end;</span></p>
+<p><span>Procedure DelComp(var pTop: PComp; var sC: ALFA);</span></p>
+<p><span>begin</span></p>
+<p><span>sC:= pTop^.sD;</span></p>
+<p><span>pTop:= pTop^.pNext;</span></p>
+<p><span>end;</span></p>
+<p><span>begin</span></p>
+<p><span>Clrscr;</span></p>
+<p><span>writeln( ВВЕДИ СТРОКУ );</span></p>
+<p><span>readln(sC);</span></p>
+<p><span>CreateStack(pTop, sC);</span></p>
+<p><span>repeat</span></p>
+<p><span>writeln( ВВЕДИ СТРОКУ );</span></p>
+<p><span>readln(sC);</span></p>
+<p><span>AddComp(pTop, sC);</span></p>
+<p><span>until sC = 'END';</span></p>
+</body>
+</html>

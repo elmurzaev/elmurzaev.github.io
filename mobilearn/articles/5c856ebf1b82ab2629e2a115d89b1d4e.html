@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Алгебра и сигма-алгебра событий</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<h3></h3>
+<div class="text">Пусть <img align="bottom" height="14"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">
+    &#151; пространство элементарных исходов
+    некоторого случайного эксперимента (т.е. непустое множество
+    произвольной природы). Мы собираемся определить набор подмножеств
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+         width="15">, которые будут называться событиями, и
+    затем задать вероятность как функцию, определённую <i class="incide">только</i> на
+    множестве событий (
+    <small class="quest">каждый третий студент 1 курса ЭФ не знает, что такое область определения
+        функции. А вы знаете?
+    </small>
+    ).
+    <p>Итак, <i class="incide">событиями</i> мы будем называть не любые подмножества
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+             width="15">, а лишь элементы некоторого выделенного
+        набора подмножеств <img align="bottom" height="14"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                width="15">. При этом необходимо позаботиться,
+        чтобы этот набор подмножеств был
+        замкнут относительно введённых в параграфе 2 главы 1
+        , т.е. чтобы объединение, пересечение,
+        дополнение событий снова давало событие. Сначала введём понятие алгебры событий.
+    </p>
+</div>
+<div class="lemma">
+    <b>Определение 10. </b>
+    Множество <img align="bottom" height="15"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16">,
+    элементами которого являются подмножества множества
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+         width="15"> (не обязательно все) называется
+    <i class="incide">алгеброй</i> (алгеброй событий), если оно удовлетворяет следующим условиям:
+    <p><b>(A1)</b>  <img align="bottom" height="16"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img190.gif" width="50"> (алгебра
+        событий содержит достоверное событие);
+    </p>
+    <p><b>(A2)</b>  если <img align="bottom" height="16"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img191.gif"
+                              width="50">, то <img align="bottom" height="19"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img192.gif"
+                                                   width="50"> (вместе с любым событием алгебра
+        содержит противоположное
+        событие);
+    </p>
+    <p><b>(A3)</b>  если <img align="bottom" height="16"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img191.gif"
+                              width="50"> и <img align="bottom" height="16"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img193.gif"
+                                                 width="51">, то
+        <img align="bottom" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img194.gif"
+             width="84"> (вместе с любыми двумя событиями алгебра содержит их объединение). </p>
+</div>
+<div class="text">
+    Из свойств <b>(A1)</b> и <b>(A2)</b> следует, что пустое множество <img align="bottom"
+                                                                            height="20"
+                                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img195.gif"
+                                                                            width="52"> также
+    содержится в <img align="bottom" height="15"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16">.
+    <p>Из <b>(A3)</b> следует, что вместе с любым конечным
+        набором событий алгебра содержит их объединение: для любого <img align="absmiddle"
+                                                                         height="17"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img196.gif"
+                                                                         width="45">,
+        для любых <img align="absmiddle" height="17"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img197.gif" width="23">, ..., <img
+                align="absmiddle" height="18"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img198.gif" width="59"> выполнено
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img199.gif" width="139">.
+    </p>
+    <p>Вместо замкнутости относительно операции объединения можно требовать
+        замкнутость относительно операции пересечения.</p>
+</div>
+<div class="corollary">
+    <b>Свойство 1. </b>
+
+    Свойство <b>(A3)</b> в определении
+    можно заменить на
+    <p><b>(A4)</b>  если <img align="bottom" height="16"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img191.gif"
+                              width="50"> и <img align="bottom" height="16"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img193.gif"
+                                                 width="51">, то
+        <img align="bottom" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img200.gif"
+             width="84">. </p>
+</div>
+<div class="proof">
+    <b>Доказательство.</b>
+    Докажем, что при выполнении <b>(A1)</b> и <b>(A2)</b> из <b>(A3)</b> следует <b>(A4)</b>.
+    Если <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+              width="15">, <img align="bottom" height="16"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img193.gif"
+                                width="51">, то <img align="bottom" height="19"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img192.gif"
+                                                     width="50">,
+    <img align="bottom" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img201.gif"
+         width="51">
+    по свойству <b>(A2)</b>. Тогда из <b>(A3)</b> следует, что
+    <img align="bottom" height="19" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img202.gif"
+         width="84">,
+    и, по <b>(A2)</b>, дополнение <img align="bottom" height="21"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img203.gif"
+                                       width="49">
+    к этому множеству также принадлежит <img align="bottom" height="15"
+                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                             width="16">.
+    В силу формул двойственности, дополнение
+    к объединению как раз и есть пересечение дополнений:
+    <p class="CENTER"><img align="absmiddle" height="36"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img204.gif" width="154">
+    </p>
+    <p>Аналогично доказывается, что при выполнении <b>(A1)</b> и <b>(A2)</b> из <b>(A4)</b> следует
+        <b>(A3)</b>,
+        т.е. эти два свойства в определении взаимозаменяемы.
+    </p>
+</div>
+<div class="example">
+    <b>Пример 11. </b>
+    Пусть <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img205.gif" width="133"> &#151;
+    пространство элементарных
+    исходов. Следующие наборы подмножеств <img align="bottom" height="14"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                               width="15"> являются алгебрами (проверьте это по
+    определению):
+    <p>1. <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img206.gif" width="259"> &#151; <i
+            class="incide">тривиальная</i> алгебра.
+    </p>
+    <p>2. <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img207.gif" width="511">.
+    </p>
+    <p>3. <img align="absmiddle" height="25"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img208.gif" width="360">,
+        где <img align="bottom" height="14"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> &#151;
+        произвольное подмножество <img align="bottom" height="14"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                       width="15">
+        (в предыдущем примере <img align="absmiddle" height="20"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img209.gif"
+                                   width="70">).
+    </p>
+    <p>4. <img align="bottom" height="17"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img210.gif" width="58"> &#151; <i
+            class="incide">множество всех подмножеств</i> <img align="bottom" height="14"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                                                               width="15">. </p>
+</div>
+<div class="exer">
+    <b>Упражнение 11. </b>
+    Доказать, что если <img align="bottom" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">
+    состоит из <img align="bottom" height="14"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">
+    элементов,
+    то в множестве всех его подмножеств ровно <img align="bottom" height="14"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img211.gif"
+                                                   width="20"> элементов.
+</div>
+<p></p>
+<h3></h3>
+<div class="text">В теории вероятностей часто возникает необходимость объединять счётные наборы
+    событий и считать событием результат такого объединения.
+    При этом свойства <b>(A3)</b> алгебры оказывается недостаточно: из него не вытекает,
+    что объединение счётной последовательности
+    множеств из алгебры снова принадлежит алгебре. Поэтому разумно наложить
+    более суровые ограничения на класс событий.
+</div>
+<div class="lemma">
+    <b>Определение 11. </b>
+
+    Множество <img align="bottom" height="15"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14">,
+    элементами которого являются подмножества множества
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+         width="15"> (не обязательно все) называется
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгеброй (<img align="absmiddle" height="16"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                    width="12">-алгеброй событий),
+    если выполнены следующие условия:
+    <p><b>(S1)</b>  <img align="absmiddle" height="16"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img213.gif" width="48">  
+        (<img align="absmiddle" height="16"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+        событий содержит достоверное событие);
+    </p>
+    <p><b>(S2)</b>  если <img align="bottom" height="16"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img214.gif"
+                              width="49">, то <img align="bottom" height="19"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img215.gif"
+                                                   width="49">
+        (вместе с любым событием <img align="absmiddle" height="16"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                      width="12">-алгебра содержит противоположное событие);
+    </p>
+    <p><b>(S3)</b>  если <img align="absmiddle" height="17"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img197.gif"
+                              width="23">, <img align="absmiddle" height="18"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img216.gif"
+                                                width="84">, то
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img217.gif" width="136">
+        (вместе с любым счётным набором событий
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+        содержит их объединение).
+    </p>
+</div>
+<div class="exer">
+    <b>Упражнение 12. </b>
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>Доказать, что вместо <b>(S1)</b> достаточно предположить непустоту
+            множества <img align="bottom" height="15"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14">.
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>Вывести из <b>(S1)</b> и <b>(S2)</b>, что <img align="absmiddle" height="17"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img218.gif"
+                                                           width="49">.
+        </dd>
+    </dl>
+</div>
+<div class="text">Этого набора аксиом достаточно для замкнутости множества
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14"> относительно счётного числа любых других операций над событиями.
+    В частности, аналогично проверяется
+    следующее свойство.
+</div>
+<div class="corollary">
+    <b>Свойство 2. </b>
+
+    Свойство <b>(S3)</b> в
+    можно заменить на
+    <p><b>(S4)</b>  если <img align="absmiddle" height="17"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img197.gif"
+                              width="23">, <img align="absmiddle" height="18"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img216.gif"
+                                                width="84">, то
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img219.gif" width="136">. </p>
+</div>
+<div class="text">
+    Как показывает следующее свойство, всякая <img align="absmiddle" height="16"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                   width="12">-алгебра автоматически является
+    алгеброй.
+</div>
+<div class="corollary">
+    <b>Свойство 3. </b>
+    Если <img align="absmiddle" height="15"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> &#151; <img
+        align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+        width="12">-алгебра,
+    то она удовлетворяет свойству <b>(A3)</b>, т.е. для любых <img align="absmiddle" height="16"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img214.gif"
+                                                                   width="49"> и <img
+        align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img220.gif"
+        width="50"> выполняется
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img221.gif"
+         width="82">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b>
+    Превратим пару <img align="absmiddle" height="18"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img222.gif" width="43"> в
+    счётную последовательность событий так:
+    <img align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img223.gif"
+         width="164">, т.е. положим <img align="absmiddle" height="17"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img224.gif"
+                                         width="59">, <img align="absmiddle" height="17"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img225.gif"
+                                                           width="58"> при всех <img
+        align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img226.gif"
+        width="40">.
+    Объединение <img align="absmiddle" height="14"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img80.gif" width="49">
+    совпадает с объединением
+    всех множеств <img align="absmiddle" height="17"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img89.gif" width="21"> из
+    этой бесконечной последовательности. А так как <img align="absmiddle" height="15"
+                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                        width="14"> &#151; <img align="absmiddle"
+                                                                                height="16"
+                                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                                width="12">-алгебра,
+    то
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img227.gif" width="149">
+    </p>
+</div>
+<div class="exer">
+    <b>Упражнение 13. </b>
+    Докажите, что для любых <img align="absmiddle" height="18"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img228.gif"
+                                 width="70">
+    выполнено <img align="absmiddle" height="20"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img229.gif" width="79">.
+</div>
+<div class="text">
+    Обратное, вообще говоря, неверно: не всякая алгебра является сигма-алгеброй.
+    Чтобы показать это, приведём пример алгебры, не являющейся <img align="absmiddle" height="16"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                    width="12">-алгеброй.
+</div>
+<div class="example">
+    <b>Пример 12. </b>
+    Пусть <img align="absmiddle" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img230.gif" width="51">,
+    и пусть <img align="bottom" height="15"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16"> &#151;
+    множество, содержащее любые
+    конечные подмножества <img align="bottom" height="14"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                               width="15"> (т.е. состоящие из конечного числа точек, в том числе
+    пустое)
+    и их дополнения. В частности, множество <img align="absmiddle" height="20"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img232.gif"
+                                                 width="61"> принадлежит
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+         width="16">, множество <img align="absmiddle" height="20"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img233.gif"
+                                     width="243">
+    также принадлежит <img align="bottom" height="15"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16">.
+    <p>Легко проверить, что множество <img align="bottom" height="15"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                           width="16"> является алгеброй.
+        Действительно, пустое множество и само <img align="absmiddle" height="14"
+                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img230.gif"
+                                                    width="51"> там содержатся,
+        дополнение к любому конечному подмножеству множества вещественных
+        чисел содержится в <img align="bottom" height="15"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                width="16"> по определению,
+        дополнение к множеству вида <img align="absmiddle" height="20"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img234.gif"
+                                         width="45"> для конечных <img align="bottom" height="14"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                       width="15"> совпадает с <img
+                align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> и также
+        принадлежит <img align="bottom" height="15"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16"> по
+        определению. Свойство <b>(A3)</b>
+        проверяется непосредственно: объединение любых конечных множеств снова конечно
+        и поэтому принадлежит <img align="bottom" height="15"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                   width="16">. Объединение конечного множества
+        с множеством вида <img align="absmiddle" height="20"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img234.gif"
+                               width="45">, где <img align="bottom" height="14"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                     width="15"> конечно, есть снова множество
+        вида <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img235.gif" width="45">, где <img
+                align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17"> конечно (или
+        пусто). Объединение двух множеств <img align="absmiddle" height="20"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img234.gif"
+                                               width="45"> и
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img235.gif" width="45">, являющихся
+        дополнениями до <img align="bottom" height="14"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                             width="15"> конечных множеств <img align="bottom" height="14"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                width="15"> и <img align="bottom"
+                                                                                   height="14"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                                   width="17">, есть
+        снова множество такого же вида.
+    </p>
+    <p>Однако алгебра <img align="bottom" height="15"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16">
+        не содержит ни одного счётного множества
+        точек. Действительно, объединяя конечные множества в конечном числе, мы можем
+        получить только конечное множество. Например, натуральный ряд <img align="bottom"
+                                                                           height="14"
+                                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img236.gif"
+                                                                           width="15">
+        не принадлежит <img align="bottom" height="15"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16">.
+        Поэтому <img align="bottom" height="15"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif" width="16"> не
+        является <img align="absmiddle" height="16"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгеброй:
+        для бесконечной, но счётной последовательности одноточечных множеств <img align="absmiddle"
+                                                                                  height="20"
+                                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img237.gif"
+                                                                                  width="68"> из
+        <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+             width="16">
+        их объединение <img align="absmiddle" height="17"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img238.gif"
+                            width="138"> не принадлежит <img align="bottom" height="15"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img189.gif"
+                                                             width="16">. </p>
+</div>
+<div class="text">Все алгебры из являются <img align="absmiddle" height="16"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                               width="12">-алгебрами, поскольку
+    содержат лишь конечное число элементов. Вообще, на конечном множестве
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+         width="15"> понятия алгебры и <img align="absmiddle" height="16"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                            width="12">-алгебры совпадают. Множество
+    всех подмножеств <img align="bottom" height="14"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">
+    является <img align="absmiddle" height="16"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгеброй
+    для любого <img align="bottom" height="14"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">.
+</div>
+
+<h3>Борелевская <img align="absmiddle" height="16"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+    в <img align="absmiddle" height="14"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif" width="15">. </h3>
+<div class="text">Приведём пример <img align="absmiddle" height="16"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                       width="12">-алгебры, которая
+    нам будет необходима в дальнейшем, &#151; <img align="absmiddle" height="16"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                   width="12">-алгебры <i class="incide">борелевских
+        множеств</i> на вещественной прямой.
+    <p><i class="incide">Борелевской сигма-алгеброй</i> в <img align="bottom" height="14"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                                               width="15"> называется самая
+        маленькая среди
+        всех возможных <img align="absmiddle" height="16"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебр,
+        содержащих любые интервалы на прямой.
+        Разумеется, <img align="absmiddle" height="16"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебры,
+        содержащие все интервалы, существуют. Например,
+        таково множество всех подмножеств <img align="bottom" height="14"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                               width="15">.
+        Чтобы сделать эти слова &#151; про самую маленькую <img align="absmiddle" height="16"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                width="12">-алгебру &#151;
+        понятными, поработаем с примерами. </p>
+</div>
+<div class="example">
+    <b>Пример 13. </b>
+    Пусть <img align="bottom" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img230.gif" width="51"> &#151;
+    вещественная прямая.
+    Рассмотрим некоторые наборы множеств, не являющиеся
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебрами, и увидим, как их можно дополнить до <img align="absmiddle"
+                                                                         height="16"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                         width="12">-алгебр.
+    <p>
+        <b>1.</b>  Множество <img align="absmiddle" height="20"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img239.gif"
+                                  width="172"> не является <img align="absmiddle" height="16"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                width="12">-алгеброй, так как,
+        например,
+        <img align="absmiddle" height="25"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img240.gif" width="321">. Самый
+        маленький набор множеств, содержащий <img align="bottom" height="14"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                                  width="15"> и являющийся
+        <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгеброй
+        (минимальная <img align="absmiddle" height="16"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра),
+        получится, если включить в него всевозможные
+        объединения, пересечения и дополнения множеств из <img align="bottom" height="14"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                                               width="15">:
+    </p>
+    <p class="center"><img align="absmiddle" height="21"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img242.gif" width="642">.
+    </p>
+</div>
+<div class="text">Более точно:</div>
+<div class="lemma">
+    <b>Определение 12. </b>
+    <i class="incide">Минимальной</i> <img align="absmiddle" height="16"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                           width="12">-алгеброй, содержащей некоторый
+    набор множеств <img align="bottom" height="14"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">,
+    называется пересечение
+    всех <img align="absmiddle" height="16"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебр,
+    содержащих <img align="bottom" height="14"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">.
+</div>
+<div class="text">Ещё раз напомним, что пересекать в есть что: хотя бы одна
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебра, содержащая данный набор множеств, всегда найдётся &#151; это
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебра всех подмножеств <img align="bottom" height="14"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                                   width="15">.
+</div>
+<div class="exer">
+    <b>Упражнение 14. </b>
+    Доказать, что пересечение двух <img align="absmiddle" height="16"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                        width="12">-алгебр, содержащих
+    набор множеств <img align="bottom" height="14"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">,
+    снова является <img align="absmiddle" height="16"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгеброй
+    (
+    <small class="quest">невероятно!</small>
+    ), содержащей
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+         width="15">.
+</div>
+<div class="exer">
+    <b>Упражнение 15. </b>
+    Найти минимальную <img align="absmiddle" height="16"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебру,
+    содержащую следующий набор подмножеств <img align="bottom" height="14"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                                width="15"> :  
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img243.gif"
+         width="172">.
+</div>
+<div class="example">
+    <b>2.</b>  
+    Пусть множество <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">
+    подмножеств вещественной прямой
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+         width="15">
+    состоит из всевозможных открытых интервалов <img align="absmiddle" height="20"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img244.gif"
+                                                     width="40">, где <img align="absmiddle"
+                                                                           height="15"
+                                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img245.gif"
+                                                                           width="42">:
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img246.gif" width="241">
+    </p>
+</div>
+<div class="exer">
+    <b>Упражнение 16. </b>
+    Проверить, что множество <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                  width="15"> всех интервалов ни в коем случае не является ни
+    алгеброй, ни
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгеброй!   
+    <small>Указание:
+        привести примеры двадцати множеств из <img align="bottom" height="14"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                                   width="15">,
+        дополнения к которым не принадлежат <img align="bottom" height="14"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                                 width="15">; привести примеры пяти множеств из <img
+                align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">,
+        любые объединения которых не принадлежат <img align="bottom" height="14"
+                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                                                      width="15">.
+    </small>
+</div>
+<p>
+</p>
+<div class="lemma">
+    <b>Определение 13. </b>
+    Минимальная <img align="absmiddle" height="16"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра,
+    содержащая множество <img align="bottom" height="14"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif"
+                              width="15"> всех интервалов на вещественной прямой,
+    называется <i class="incide">борелевской сигма-алгеброй</i> в <img align="bottom" height="14"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                                                       width="15">
+    и обозначается <img align="absmiddle" height="20"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44">.
+</div>
+<div class="text">Перечислим некоторые множества на прямой, содержащиеся
+    в <img align="absmiddle" height="20"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44"> по определению.
+    Таковы все привычные нам множества. Чтобы получить
+    множество, не содержащееся в <img align="absmiddle" height="20"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                      width="44">,
+    требуются специальные построения.
+    <p>Итак, мы знаем, что все интервалы на прямой принадлежат <img align="absmiddle" height="20"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                    width="44">,
+        и <img align="absmiddle" height="20"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44"> &#151; <img
+                align="absmiddle" height="16"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра.
+        Отсюда сразу следует, что
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44"> содержит любое
+        множество,
+        которое можно получить из интервалов с помощью счётного числа операций объединения
+        или пересечения, а также взятием дополнения.</p>
+</div>
+<div class="note">В частности, <img align="bottom" height="14"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                                    width="15"> принадлежит <img align="absmiddle" height="20"
+                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                 width="44">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Это сразу следует из свойства <b>(S1)</b> <img align="absmiddle"
+                                                                          height="16"
+                                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                                          width="12">-алгебры,
+    но может быть доказано и исходя из свойств <b>(S2)</b>, <b>(S3)</b>.
+    Интервал <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img248.gif" width="58">
+    принадлежит <img align="bottom" height="14"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img241.gif" width="15">, а
+    значит, принадлежит и <img align="absmiddle" height="20"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                               width="44"> при любом <img align="absmiddle" height="15"
+                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img249.gif"
+                                                          width="47">, т.е. <img align="absmiddle"
+                                                                                 height="20"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img250.gif"
+                                                                                 width="121">.
+    Но <img align="absmiddle" height="20"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44"> &#151; <img
+        align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+        width="12">-алгебра, и содержит счётное объединение любых своих элементов, поэтому
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img251.gif" width="195">
+    </p>
+</div>
+<div class="note">Далее, любой интервал вида <img align="absmiddle" height="20"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img252.gif"
+                                                  width="38"> (или <img align="absmiddle"
+                                                                        height="20"
+                                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img253.gif"
+                                                                        width="38">, или <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img254.gif"
+        width="43">),
+    где <img align="absmiddle" height="15"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img245.gif" width="42">, принадлежит
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+         width="44">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Интервал <img align="absmiddle" height="20"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img255.gif"
+                                         width="90"> принадлежит <img align="absmiddle" height="20"
+                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                      width="44"> при любом <img
+        align="absmiddle" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img249.gif"
+        width="47">.
+    Тогда счётное пересечение этих интервалов
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img256.gif" width="161">
+    </p>
+    по свойству <b>(S4)</b> также принадлежит <img align="absmiddle" height="20"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                   width="44">.
+</div>
+<div class="note">Любое одноточечное подмножество <img align="absmiddle" height="20"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img257.gif"
+                                                       width="63">
+    принадлежит <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif" width="44">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Действительно,
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img258.gif"
+         width="141">, а разность <img align="absmiddle" height="23"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img259.gif"
+                                       width="116"> двух множеств из
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебры снова принадлежит <img align="absmiddle" height="16"
+                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                    width="12">-алгебре.
+</div>
+<div class="exer">
+    <b>Упражнение 17. </b>
+    Докажите, что множества вида <img align="absmiddle" height="20"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img260.gif"
+                                      width="128"> принадлежат <img align="absmiddle" height="20"
+                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                    width="44">, что
+    множество натуральных чисел <img align="bottom" height="14"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img236.gif"
+                                     width="15"> принадлежит <img align="absmiddle" height="20"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                  width="44">,
+    множество рациональных чисел <img align="absmiddle" height="18"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img261.gif"
+                                      width="16"> принадлежит <img align="absmiddle" height="20"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                                                   width="44">.
+</div>
+<div class="example">
+    <b>3.</b>  
+    Борелевская <img align="absmiddle" height="16"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра
+    в <img align="absmiddle" height="14"
+           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img262.gif" width="24"> строится
+    совершенно
+    так же, как в <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif" width="15">. Это
+    должна быть минимальная
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебра, содержащая все множества
+    вида <img align="absmiddle" height="20"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img263.gif" width="174"> &#151; уже
+    не интервалы, как в <img align="bottom" height="14"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img231.gif"
+                             width="15">,
+    а прямоугольники в <img align="absmiddle" height="17"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img264.gif" width="22">,
+    параллелепипеды в <img align="absmiddle" height="17"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img265.gif" width="22">
+    и т.д.
+    Вместе с ними <img align="absmiddle" height="20"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img266.gif" width="53">
+    содержит
+    любые множества, являющиеся &#171;предельными&#187; для объединений измельчающихся
+    прямоугольников. Например, круг в <img align="absmiddle" height="17"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img264.gif"
+                                           width="22"> является борелевским множеством &#151;
+    можно изнутри или снаружи приблизить его объединениями прямоугольников.
+</div>
+<div class="note">Итак, мы определили специальный класс <img align="bottom" height="15"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                             width="14"> подмножеств пространства
+    элементарных исходов <img align="bottom" height="14"
+                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif"
+                              width="15">, названный <img align="absmiddle" height="16"
+                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                          width="12">-алгеброй событий,
+    причём применение счётного числа любых операций
+    (объединений, пересечений, дополнений)
+    к множествам из <img align="bottom" height="15"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14">
+    снова дает множество
+    из <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+            width="14">, т.е. не выводит за рамки этого класса.
+    <i class="incide">Событиями</i> будем называть <i class="incide">только</i> множества <img
+            align="bottom" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img214.gif"
+            width="49">.
+</div>
+<div class="text">Определим теперь понятие вероятности как функции, определённой
+    на множестве событий (функции, которая каждому событию ставит в соответствие число &#151;
+    вероятность этого события).
+    <p>А чтобы читателю сразу стало понятно, о чём пойдёт речь, добавим: вероятность мы определим
+        как
+        неотрицательную нормированную меру, заданную на <img align="absmiddle" height="16"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                                             width="12">-алгебре <img align="bottom"
+                                                                                      height="15"
+                                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                                                      width="14">
+        подмножеств <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">.
+        <img align="bottom" height="15"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/biggrin.gif" width="15"></p>
+    <p>
+        Следующий параграф познакомит нас с понятиями меры и вероятностной меры.</p>
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p>
+    <sup>1</sup> (7.01.1871 &#151; 3.02.1956, France)
+</p>
+<p>
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+</p>
+</body>
+
+</body>
+</html>

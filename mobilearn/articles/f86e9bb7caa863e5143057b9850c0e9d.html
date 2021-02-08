@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>3.1. Правило Крамера</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="CONTENT" width="100%">
+</td>
+<td class="CONTENT" width="100%">
+    <p class="MsoNormal">Пусть задана система <span lang="EN-US">n</span> линейных уравнений с <span
+            lang="EN-US">n</span> неизвестными</p>
+    <p align="right" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1188" type="#_x0000_t75"
+                 style='width:152.25pt;height:60.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image304.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="81"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image305.gif"
+                                   v:shapes="_x0000_i1188" width="203"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1188"
+                         DrawAspect="Content" ObjectID="_1072191295">
+            </o:OLEObject>
+        </xml><![endif]--><span>                           </span>(1.10)</p>
+    <p class="MsoNormal">Составим из коэффициентов при
+        неизвестных определитель и назовем его определителем системы:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1189" type="#_x0000_t75" style='width:87pt;height:59.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image306.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="79"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image307.gif"
+                                   v:shapes="_x0000_i1189" width="116"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1189"
+                         DrawAspect="Content" ObjectID="_1072191296">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Совокупность значений неизвестных
+        <i><span lang="EN-US">x<sub>i</sub></span></i>=<i><span lang="EN-US">a<sub>i</sub></span>,
+        </i><i><span lang="EN-US">i</span></i> =1, 2, …, <i><span lang="EN-US">n</span></i>, при
+        подстановке
+        которых уравнения системы обращаются в равенства, назовем решением системы.</p>
+    <p class="MsoNormal">Докажем, что если определитель
+        системы (1.10) отличен от нуля, то система имеет, и притом единственное,
+        решение</p>
+    <p class="MsoNormal"><span><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1190"
+                 type="#_x0000_t75" style='width:32.25pt;height:24pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image308.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="32"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image309.gif"
+                                   v:shapes="_x0000_i1190" width="43"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1190"
+                         DrawAspect="Content" ObjectID="_1072191298">
+            </o:OLEObject>
+        </xml><![endif]--></span><span> </span><i><span lang="EN-US">i</span></i>= 1, 2, …, <i><span
+            lang="EN-US">n</span></i>,</p>
+    <p class="MsoNormal">где &#916;<i><sub><span lang="EN-US">i</span></sub></i>
+        – определитель, получаемый из определителя <span>&#916;</span> заменой <span
+                lang="EN-US">i</span>-го столбца на столбец свободных
+        членов.</p>
+    <p class="MsoNormal">Умножим
+        первое уравнение системы (1.10) на А<sub>11</sub>, второе – на А<sub>21</sub>,
+        …, <span lang="EN-US">n</span>-ое – на А<sub><span lang="EN-US">n</span>1</sub> и все
+        уравнения
+        сложим. Получим<span lang="EN-US">:</span></p>
+    <p class="MsoNormal"><i><span
+            lang="EN-US">x<sub>1</sub> (a<sub>11</sub>A<sub>11</sub>+a<sub>21</sub>A<sub>21</sub>+…+a<sub>n1</sub>A<sub>n1</sub>)+</span></i>
+    </p>
+    <p align="right" class="MsoNormal"><i><span
+            lang="EN-US">+x<sub>2</sub> (a<sub>12</sub>A<sub>11</sub>+a<sub>22</sub>A<sub>21</sub>+…+a<sub>n2</sub>A<sub>n1</sub>)+…+<span>                                    </span></span></i><span
+            lang="EN-US">(1.11)<i></i></span></p>
+    <p class="MsoNormal"><i><span
+            lang="EN-US">+x<sub>n</sub> (a<sub>1n</sub>A<sub>11</sub>+a<sub>2n</sub>A<sub>21</sub>+…+a<sub>nn</sub>A<sub>n1</sub>)
+=</span></i></p>
+    <p class="MsoNormal"><i>= </i><i><span lang="EN-US">b</span><sub>1</sub></i><i><span
+            lang="EN-US">A</span><sub>11</sub>+</i><i><span lang="EN-US">b</span><sub>2</sub></i><i><span
+            lang="EN-US">A</span><sub>21</sub>+…+</i><i><span
+            lang="EN-US">b<sub>n</sub>A<sub>n</sub></span><sub>1</sub>.</i></p>
+    <p class="MsoNormal">В левой части
+        этого выражения множитель при <i>х</i><sub>1</sub>
+        равен определителю системы согласно теореме разложения, а остальные множители
+        при <i>х</i><sub>2</sub>, …, <i>х</i><sub><span lang="EN-US">n</span></sub> равны нулю.</p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">В правой части выражения (1.11) мы имеем разложение по элементам
+        первого столбца определителя</p>
+    <p class="a1"><span>
+    <p> </p></span></p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1191" type="#_x0000_t75" style='width:87pt;height:54.75pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image310.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="73"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image311.gif"
+                                   v:shapes="_x0000_i1191" width="116"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1191"
+                         DrawAspect="Content" ObjectID="_1072191299">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Таким образом, из системы (1.11)
+        получено уравнение <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1192" type="#_x0000_t75"
+                     style='width:48pt;height:13.5pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image312.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="18"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image313.gif"
+                                       v:shapes="_x0000_i1192" width="64"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1192"
+                         DrawAspect="Content" ObjectID="_1072191300">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span></p>
+    <p class="MsoNormal">и <sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1193" type="#_x0000_t75" style='width:39.75pt;height:27pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image314.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="36"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image315.gif"
+                                   v:shapes="_x0000_i1193" width="53"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1193"
+                         DrawAspect="Content" ObjectID="_1072191301">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Домножая теперь уравнения системы
+        (1.10) на алгебраические дополнения элементов второго, третьего и т.д. и,
+        наконец, <span lang="EN-US">n</span>-го столбцов
+        поочередно и складывая эти уравнения, получим</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1194" type="#_x0000_t75" style='width:33pt;height:23.25pt' o:ole=""
+                fillcolor="window">
+            <v:imagedata src="obj.files/image316.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="31"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image317.gif"
+                                   v:shapes="_x0000_i1194" width="44"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1194"
+                         DrawAspect="Content" ObjectID="_1072191302">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>…, <sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1195" type="#_x0000_t75" style='width:30pt;height:25.5pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image318.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="34"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image319.gif"
+                                       v:shapes="_x0000_i1195" width="40"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1195"
+                         DrawAspect="Content" ObjectID="_1072191303">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><span>Таким
+образом, имеем окончательно</span> <sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1196"
+                 type="#_x0000_t75" style='width:36.75pt;height:27pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image320.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="36"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image321.gif"
+                                   v:shapes="_x0000_i1196" width="49"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1196"
+                         DrawAspect="Content" ObjectID="_1072191304">
+            </o:OLEObject>
+        </xml><![endif]-->, <sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1197" type="#_x0000_t75"
+                     style='width:39.75pt;height:27pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image322.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="36"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image323.gif"
+                                       v:shapes="_x0000_i1197" width="53"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1197"
+                         DrawAspect="Content" ObjectID="_1072191305">
+            </o:OLEObject>
+        </xml><![endif]-->,…,<sub><!--[if gte vml 1]>
+            <v:shape id="_x0000_i1198" type="#_x0000_t75"
+                     style='width:42.75pt;height:27pt' o:ole="" fillcolor="window">
+                <v:imagedata src="obj.files/image324.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="36"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image325.gif"
+                                       v:shapes="_x0000_i1198" width="57"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1198"
+                         DrawAspect="Content" ObjectID="_1072191306">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Замечание. </b>Правило
+        Крамера при <span lang="EN-US">n</span>&gt;3 не
+        имеет практического применения из-за громоздкости вычислений.</p>
+    <p class="MsoNormal"><b>Пример 16.</b> Решить
+        систему уравнений по правилу Крамера:</p>
+    <p align="center" class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape
+                id="_x0000_i1199" type="#_x0000_t75" style='width:71.25pt;height:40.5pt'
+                o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image326.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="54"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image327.gif"
+                                   v:shapes="_x0000_i1199" width="95"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1199"
+                         DrawAspect="Content" ObjectID="_1072191307">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal"><b>Решение.</b> вычислим
+        определитель системы:</p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1200" type="#_x0000_t75"
+                 style='width:57pt;height:39.75pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image328.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="53"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image329.gif"
+                                   v:shapes="_x0000_i1200" width="76"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1200"
+                         DrawAspect="Content" ObjectID="_1072191308">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span>то есть система
+        совместна.</p>
+    <p class="MsoNormal">
+    <p> </p></p>
+    <p class="MsoNormal">Найдем далее вспомогательные определители:</p>
+    <p class="a1"><span>
+    <p> </p></span></p>
+    <p class="MsoNormal"><sub><!--[if gte vml 1]>
+        <v:shape id="_x0000_i1201" type="#_x0000_t75"
+                 style='width:69.75pt;height:41.25pt' o:ole="" fillcolor="window">
+            <v:imagedata src="obj.files/image330.wmz" o:title=""/>
+        </v:shape><![endif]--><img height="55"
+                                   src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image331.gif"
+                                   v:shapes="_x0000_i1201" width="93"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1201"
+                         DrawAspect="Content" ObjectID="_1072191309">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span><sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1202" type="#_x0000_t75" style='width:72.75pt;height:42pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image332.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="56"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image333.gif"
+                                       v:shapes="_x0000_i1202" width="97"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1202"
+                         DrawAspect="Content" ObjectID="_1072191310">
+            </o:OLEObject>
+        </xml><![endif]--><span> </span><sub><!--[if gte vml 1]>
+            <v:shape
+                    id="_x0000_i1203" type="#_x0000_t75" style='width:75.75pt;height:42pt' o:ole=""
+                    fillcolor="window">
+                <v:imagedata src="obj.files/image334.wmz" o:title=""/>
+            </v:shape><![endif]--><img height="56"
+                                       src="http://abc.vvsu.ru/Books/l_matemk1/obj.files/image335.gif"
+                                       v:shapes="_x0000_i1203" width="101"></sub><!--[if gte mso 9]>
+        <xml>
+            <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1203"
+                         DrawAspect="Content" ObjectID="_1072191311">
+            </o:OLEObject>
+        </xml><![endif]--></p>
+    <p class="MsoNormal">Тогда <i>х</i><sub>1</sub>=30,
+        <i>х</i><sub>2</sub>=20, <i>х</i><sub>3</sub>=-60.</p>
+</td>
+
+</body>
+</html>

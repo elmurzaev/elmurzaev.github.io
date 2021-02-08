@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Основы создания плагинов Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="osnovy-sozdaniya-plaginov-rails"> Основы создания плагинов
+        Rails</h2>
+    <p>Плагин Rails - это либо расширение, либо изменение основного фреймворка. Плагины
+        представляют:</p>
+    <ul>
+        <li>Способ для разработчиков делиться новыми идеями без затрагивания стабильного кода.
+        </li>
+        <li>Сегментную архитектуру, такую, что часть кода может быть исправлена или изменена по
+            своему собственному графику.
+        </li>
+        <li>Решение для разработчиков ядра приложения, чтобы не включать каждую новую особенность в
+            свой код.
+        </li>
+    </ul>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как создать плагин с нуля.
+        </li>
+        <li>Как написать и запустить тесты для плагина.
+        </li>
+    </ul>
+    <p>Это руководство описывает, как создать плагин, движимый тестами (TDD), который будет:</p>
+    <ul>
+        <li>Расширять классы ядра Ruby, такие как Hash и String.
+        </li>
+        <li>Добавлять методы в <code>ActiveRecord::Base</code> в традициях плагинов 'acts_as'.
+        </li>
+        <li>Представлять информацию о том, где разместить генераторы в вашем плагине.
+        </li>
+    </ul>
+    <p>Для целей этого руководства представьте на момент, что вы заядлый любитель птиц. Вашей
+        любимой птицей является дятел (Yaffle), и вы хотите создать плагин, позволяющий другим
+        разработчикам пользоваться особенностями дятлов.</p>
+    <h3 class="inside_page_header" id="nastroyka"> Настройка</h3>
+    <p>В настоящий момент плагины Rails создаются как гемы, <em>gem</em>. Они могут использоваться
+        различными приложениями с помощью RubyGems и Bundler.</p>
+    <h4 class="inside_page_header" id="sozdanie-gema"> Создание гема.</h4>
+    <p>Rails поставляется с командой <code>rails plugin new</code>, создающей скелет для разработки
+        любого типа расширения Rails со способностью запуска интеграционных тестов с помощью
+        приложения-заглушки Rails. Создайте свой плагин с помощью команды:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails plugin new yaffle
+</pre>
+    </div>
+    <p>Как ее использовать и ее опции смотрите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails plugin new --help
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="testirovanie-svoego-novogo-plagina"> Тестирование своего
+        нового плагина</h3>
+    <p>Можете перейти в директорию, содержащую плагин, запустить команду <code>bundle install</code>,
+        и запустить сгенерированный тест с использованием команды <code>rake</code>.</p>
+    <p>Вы должны увидеть:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Это сообщает вам, что все сгенерировалось правильно, и вы можете начать добавлять
+        функционал.</p>
+    <h3 class="inside_page_header" id="rasshirenie-klassov-yadra"> Расширение классов ядра</h3>
+    <p>Этот раздел объясняет, как добавить метод в String, который будет доступен везде в вашем
+        приложении rails.</p>
+    <p>В следующем примере мы добавим метод в String с именем <code>to_squawk</code>. Для начала
+        создайте новый файл теста с несколькими утверждениями:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/test/core_ext_test.rb
+require 'test_helper'
+class CoreExtTest &lt; ActiveSupport::TestCase
+  def test_to_squawk_prepends_the_word_squawk
+    assert_equal "squawk! Hello World", "Hello World".to_squawk
+  end
+end
+</pre>
+    </div>
+    <p>Запустите <code>rake</code> для запуска теста. Этот тест должен провалиться, так как мы еще
+        не реализовали метод <code>to_squawk</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+    1) Error:
+  CoreExtTest#test_to_squawk_prepends_the_word_squawk:
+  NoMethodError: undefined method `to_squawk' for "Hello World":String
+    /path/to/yaffle/test/core_ext_test.rb:5:in `test_to_squawk_prepends_the_word_squawk'
+</pre>
+    </div>
+    <p>Отлично - теперь мы готовы начать разработку.</p>
+    <p>В <code>lib/yaffle.rb</code> добавьте <code>require 'yaffle/core_ext'</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle.rb
+require 'yaffle/core_ext'
+module Yaffle
+end
+</pre>
+    </div>
+    <p>Наконец, создайте файл <code>core_ext.rb</code> и добавьте метод <code>to_squawk</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle/core_ext.rb
+String.class_eval do
+  def to_squawk
+    "squawk! #{self}".strip
+  end
+end
+</pre>
+    </div>
+    <p>Чтобы проверить, что этот метод делает то, что нужно, запустите юнит тесты с помощью <code>rake</code>
+        из директории плагина.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <p>Чтобы увидеть его в действии, измените директорию на test/dummy, запустите консоль и начните
+        squawking:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails console
+&gt;&gt; "Hello World".to_squawk
+=&gt; "squawk! Hello World"
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="dobavlenie-metoda-quot-acts_as-quot-v-active-record">
+        Добавление метода "acts_as" в Active Record</h3>
+    <p>Обычным паттерном для плагинов является добавление в модель метода с именем <code>acts_as_something</code>.
+        В нашем случае мы хотим написать метод с именем <code>acts_as_yaffle</code>, добавляющий
+        метод <code>squawk</code> в модель Active Record.</p>
+    <p>Для начала настройте свои файлы, вам нужны:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/test/acts_as_yaffle_test.rb
+require 'test_helper'
+class ActsAsYaffleTest &lt; ActiveSupport::TestCase
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle.rb
+require 'yaffle/core_ext'
+require 'yaffle/acts_as_yaffle'
+module Yaffle
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle/acts_as_yaffle.rb
+module Yaffle
+  module ActsAsYaffle
+    # your code will go here
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dobavlenie-metoda-klassa"> Добавление метода класса</h4>
+    <p>Этот плагин ожидает, что мы добавим в модель метод с именем <code>last_squawk</code>. Однако,
+        у пользователей плагина уже может быть определен метод в модели <code>last_squawk</code>,
+        который они используют для чего-то иного. Этот плагин позволит имени быть измененным,
+        добавив метод класса <code>yaffle_text_field</code>.</p>
+    <p>Для начала напишем падающий тест, показывающий нужное нам поведение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/test/acts_as_yaffle_test.rb
+require 'test_helper'
+class ActsAsYaffleTest &lt; ActiveSupport::TestCase
+  def test_a_hickwalls_yaffle_text_field_should_be_last_squawk
+    assert_equal "last_squawk", Hickwall.yaffle_text_field
+  end
+  def test_a_wickwalls_yaffle_text_field_should_be_last_tweet
+    assert_equal "last_tweet", Wickwall.yaffle_text_field
+  end
+end
+</pre>
+    </div>
+    <p>При запуске <code>rake</code> вы увидите следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+    1) Error:
+  ActsAsYaffleTest#test_a_hickwalls_yaffle_text_field_should_be_last_squawk:
+  NameError: uninitialized constant ActsAsYaffleTest::Hickwall
+    /path/to/yaffle/test/acts_as_yaffle_test.rb:6:in `test_a_hickwalls_yaffle_text_field_should_be_last_squawk'
+    2) Error:
+  ActsAsYaffleTest#test_a_wickwalls_yaffle_text_field_should_be_last_tweet:
+  NameError: uninitialized constant ActsAsYaffleTest::Wickwall
+    /path/to/yaffle/test/acts_as_yaffle_test.rb:10:in `test_a_wickwalls_yaffle_text_field_should_be_last_tweet'
+  4 runs, 2 assertions, 0 failures, 2 errors, 0 skips
+</pre>
+    </div>
+    <p>Это сообщает нам об отсутствии необходимых моделей (Hickwall и Wickwall), которые мы пытаемся
+        протестировать. Эти модели можно с легкостью создать в нашем "dummy" приложении Rails,
+        запустив следующие команды в директории test/dummy:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd test/dummy
+$ bin/rails generate model Hickwall last_squawk:string
+$ bin/rails generate model Wickwall last_squawk:string last_tweet:string
+</pre>
+    </div>
+    <p>Теперь можно создать необходимые таблицы в вашей тестовой базе данных, перейдя в
+        приложение-заглушку и мигрировав базу данных. Сначала запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd test/dummy
+$ bin/rake db:migrate
+</pre>
+    </div>
+    <p>Пока вы тут, измените модели Hickwall и Wickwall так, чтобы они знали, что они должны
+        действовать как дятлы.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# test/dummy/app/models/hickwall.rb
+class Hickwall &lt; ActiveRecord::Base
+  acts_as_yaffle
+end
+# test/dummy/app/models/wickwall.rb
+class Wickwall &lt; ActiveRecord::Base
+  acts_as_yaffle yaffle_text_field: :last_tweet
+end
+</pre>
+    </div>
+    <p>Также добавим код, определяющий метод <code>acts_as_yaffle</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle/acts_as_yaffle.rb
+module Yaffle
+  module ActsAsYaffle
+    extend ActiveSupport::Concern
+    included do
+    end
+    module ClassMethods
+      def acts_as_yaffle(options = {})
+        # тут будет ваш код
+      end
+    end
+  end
+end
+ActiveRecord::Base.include(Yaffle::ActsAsYaffle)
+</pre>
+    </div>
+    <p>Затем можно вернуться в корневую директорию плагина (<code>cd ../..</code>) и перезапустить
+        тесты с помощью <code>rake</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+    1) Error:
+  ActsAsYaffleTest#test_a_hickwalls_yaffle_text_field_should_be_last_squawk:
+  NoMethodError: undefined method `yaffle_text_field' for #&lt;Class:0x007fd105e3b218&gt;
+    activerecord (4.1.5) lib/active_record/dynamic_matchers.rb:26:in `method_missing'
+    /path/to/yaffle/test/acts_as_yaffle_test.rb:6:in `test_a_hickwalls_yaffle_text_field_should_be_last_squawk'
+    2) Error:
+  ActsAsYaffleTest#test_a_wickwalls_yaffle_text_field_should_be_last_tweet:
+  NoMethodError: undefined method `yaffle_text_field' for #&lt;Class:0x007fd105e409c0&gt;
+    activerecord (4.1.5) lib/active_record/dynamic_matchers.rb:26:in `method_missing'
+    /path/to/yaffle/test/acts_as_yaffle_test.rb:10:in `test_a_wickwalls_yaffle_text_field_should_be_last_tweet'
+  4 runs, 2 assertions, 0 failures, 2 errors, 0 skips
+</pre>
+    </div>
+    <p>Подбираемся ближе... Теперь мы реализуем код метода <code>acts_as_yaffle</code>, чтобы тесты
+        проходили.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle/acts_as_yaffle.rb
+module Yaffle
+  module ActsAsYaffle
+   extend ActiveSupport::Concern
+    included do
+    end
+    module ClassMethods
+      def acts_as_yaffle(options = {})
+        cattr_accessor :yaffle_text_field
+        self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
+      end
+    end
+  end
+end
+ActiveRecord::Base.include(Yaffle::ActsAsYaffle)
+</pre>
+    </div>
+    <p>Когда запустите <code>rake</code>, все тесты должны пройти:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="dobavlenie-metoda-ekzemplyara"> Добавление метода
+        экземпляра</h4>
+    <p>Этот плагин добавит метод 'squawk' в любой объект Active Record, который вызовет
+        'acts_as_yaffle'. Метод 'squawk' просто установит значение одному из полей в базе
+        данных.</p>
+    <p>Для начала напишем падающий тест, показывающий желаемое поведение:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/test/acts_as_yaffle_test.rb
+require 'test_helper'
+class ActsAsYaffleTest &lt; ActiveSupport::TestCase
+  def test_a_hickwalls_yaffle_text_field_should_be_last_squawk
+    assert_equal "last_squawk", Hickwall.yaffle_text_field
+  end
+  def test_a_wickwalls_yaffle_text_field_should_be_last_tweet
+    assert_equal "last_tweet", Wickwall.yaffle_text_field
+  end
+  def test_hickwalls_squawk_should_populate_last_squawk
+    hickwall = Hickwall.new
+    hickwall.squawk("Hello World")
+    assert_equal "squawk! Hello World", hickwall.last_squawk
+  end
+  def test_wickwalls_squawk_should_populate_last_tweet
+    wickwall = Wickwall.new
+    wickwall.squawk("Hello World")
+    assert_equal "squawk! Hello World", wickwall.last_tweet
+  end
+end
+</pre>
+    </div>
+    <p>Запустите тест, чтобы убедиться, что последние два теста упадут с ошибкой, содержащей
+        "NoMethodError: undefined method `squawk'", затем обновите 'acts_as_yaffle.rb', чтобы он
+        выглядел так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# yaffle/lib/yaffle/acts_as_yaffle.rb
+module Yaffle
+  module ActsAsYaffle
+    extend ActiveSupport::Concern
+    included do
+    end
+    module ClassMethods
+      def acts_as_yaffle(options = {})
+        cattr_accessor :yaffle_text_field
+        self.yaffle_text_field = (options[:yaffle_text_field] || :last_squawk).to_s
+        include Yaffle::ActsAsYaffle::LocalInstanceMethods
+      end
+    end
+    module LocalInstanceMethods
+      def squawk(string)
+        write_attribute(self.class.yaffle_text_field, string.to_squawk)
+      end
+    end
+  end
+end
+ActiveRecord::Base.include(Yaffle::ActsAsYaffle)
+</pre>
+    </div>
+    <p>Запустите <code>rake</code> в последний раз, вы должны увидеть:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+  6 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+</pre>
+    </div>
+    <div class="note"><p>Использование <code>write_attribute</code> для записи в поле модели - это
+        всего лишь пример того, как плагин может взаимодействовать с моделью, но не всегда
+        правильный метод для использования. Например, также можно использовать:</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+send("#{self.class.yaffle_text_field}=", string.to_squawk)
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="generatory"> Генераторы</h3>
+    <p>Генераторы могут быть включены в ваш гем простым их добавлением в директорию lib/generators
+        вашего плагина. Подробнее о создании генераторов смотрите в </p>
+    <h3 class="inside_page_header" id="publikatsiya-vashego-gema"> Публикация вашего гема</h3>
+    <p>Плагины в виде гемов, которые в текущий момент в разработке, могут с легкостью быть доступны
+        из любого репозитория Git. Чтобы поделиться гемом Yaffle с другими, просто передайте код в
+        репозиторий Git (такой как GitHub) и добавьте строчку в Gemfile требуемого приложения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'yaffle', git: 'git://github.com/yaffle_watcher/yaffle.git'
+</pre>
+    </div>
+    <p>После запуска <code>bundle install</code> функционал вашего гема будет доступен в приложении.
+    </p>
+    <p>Когда гем будет готов стать доступным в виде формального релиза, он может быть опубликован на
+        . Подробнее о публикации гемов на RubyGems смотрите: </p>
+    <h3 class="inside_page_header" id="dokumentatsiya-rdoc"> Документация RDoc</h3>
+    <p>Как только ваш плагин станет стабильным, и вы будете готовы его разместить, сделайте хорошее
+        дело, документировав его! К счастью, написание документации для вашего плагина - это очень
+        просто.</p>
+    <p>Первым шагом является обновление файла README детальной информацией о том, как использовать
+        ваш плагин. Ключевые вещи, которые следует включить, следующие:</p>
+    <ul>
+        <li>Ваше имя
+        </li>
+        <li>Как установить
+        </li>
+        <li>Как добавить функционал в приложение (несколько примеров обычных ситуаций использования)
+        </li>
+        <li>Предупреждения, хитрости или подсказки, которые могут помочь пользователям и сохранить
+            их время
+        </li>
+    </ul>
+    <p>Как только README готов, пройдитесь и добавьте комментарии rdoc ко всем методам, которые
+        будут использовать разработчики. Также принято добавить комментарии '#:nodoc:' к тем частям
+        кода, которые не включены в публичный API.</p>
+    <p>Как только ваши комментарии закончены, перейдите в директорию плагины и запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bundle exec rake rdoc
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ssylki"> Ссылки</h4>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

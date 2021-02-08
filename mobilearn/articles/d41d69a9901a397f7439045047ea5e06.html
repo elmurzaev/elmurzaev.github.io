@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Заметки о релизе Ruby on Rails 4.2</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="zametki-o-relize-ruby-on-rails-4-2"> Заметки о релизе Ruby on
+        Rails 4.2</h2>
+    <p>Ключевые новинки в Rails 4.2:</p>
+    <ul>
+        <li>Active Job
+        </li>
+        <li>Асинхронные письма
+        </li>
+        <li>Adequate Record
+        </li>
+        <li>Веб-консоль
+        </li>
+        <li>Поддержка внешних ключей
+        </li>
+    </ul>
+    <p>Эти заметки о релизе покрывают только основные обновления. Чтобы узнать о других обновлениях,
+        различных багфиксах и изменениях, обратитесь к логам изменений или к в главном репозитории
+        Rails на GitHub.</p>
+    <h3 class="inside_page_header" id="obnovlenie-do-rails-4-2"> Обновление до Rails 4.2</h3>
+    <p>Если вы обновляете существующее приложение, было бы хорошо иметь перед этим покрытие тестами.
+        Также, до попытки обновиться до Rails 4.2, необходимо сначала обновиться до Rails 4.1 и
+        убедиться, что приложение все еще выполняется так, как нужно. Список вещей, которые нужно
+        выполнить для обновления доступен в руководстве .</p>
+    <h3 class="inside_page_header" id="osnovnye-izmeneniya"> Основные изменения</h3>
+    <h4 class="inside_page_header" id="active-job"> Active Job</h4>
+    <p>Active Job — это новый фреймворк в Rails 4.2. Это обычный интерфейс для систем очередей,
+        таких как , , и так далее.</p>
+    <p>Задачи, написанные с помощью Active Job API, запускаются в любой поддерживаемой очереди
+        благодаря их соответствующим адаптерам. Active Job поставляется преднастроенным с встроенным
+        исполнителем, выполняющим задачи сразу.</p>
+    <p>Часто задачам необходимо принимать объекты Active Record в качестве аргументов. Active Job
+        передает ссылки на объект как URI (единые идентификаторы ресурса) вместо маршализации самого
+        объекта. Новая библиотека создает URI и ищет объекты, на которые они ссылаются. Передача
+        объектов Active Record как атрибутов задачи внутри устроена как использование Global ID.</p>
+    <p>Например, если <code>trashable</code> это объект Active Record, тогда эта задача будет
+        работать без необходимости сериализации:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class TrashableCleanupJob &lt; ActiveJob::Base
+  def perform(trashable, depth)
+    trashable.cleanup(depth)
+  end
+end
+</pre>
+    </div>
+    <p>За подробностями обратитесь к руководству по .</p>
+    <h4 class="inside_page_header" id="asinhronnye-pisma"> Асинхронные письма</h4>
+    <p>Созданный на основе Active Job, сейчас Action Mailer имеет метод <code>#deliver_later</code>,
+        добавляющий отсылку вашего письма с помощью очереди, таким образом, не блокируя контроллер
+        или модель. если очередь асинхронная (встроенная очередь по умолчанию будет блокировать).
+    </p>
+    <p>Отсылка писем прямо сейчас все еще возможна с помощью <code>deliver_now</code>.</p>
+    <h4 class="inside_page_header" id="adequate-record"> Adequate Record</h4>
+    <p>Adequate Record — это набор улучшений производительности в Active Record, сделавший обычные
+        вызовы методов <code>find</code> и <code>find_by</code> и некоторых запросов связей до двух
+        раз быстрее.</p>
+    <p>Он работает, кэшируя обычные запросы SQL как подготовленные выражения (prepared statements) и
+        повторно используя их при подобных вызовах, опуская большую часть работы по созданию запроса
+        при последующих вызовах. За подробностями обратитесь к .</p>
+    <p>Active Record будет пользоваться преимуществами этой особенности на поддерживаемых операциях
+        автоматически, без какого-либо вовлечения пользователя или изменения кода. Вот несколько
+        примеров поддерживаемых операций:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Post.find(1)  # Первый вызов создает и кэширует подготовленное выражение
+Post.find(2)  # Последующие вызовы повторно используют закэшированное подготовленное выражение
+Post.find_by_title('first post')
+Post.find_by_title('second post')
+post.comments
+post.comments(true)
+</pre>
+    </div>
+    <p>Важно подчеркнуть то, что, как подчеркивают вышеприведенные примеры, подготовленные выражения
+        не кэшируют значения, переданные в вызов метода, они только являются шаблонами для них.</p>
+    <p>Кэширование не используется в следующих сценариях:</p>
+    <ul>
+        <li>В модели есть скоуп по умолчанию
+        </li>
+        <li>Модель использует наследование с единой таблицей (STI)
+        </li>
+        <li>
+            <code>find</code> со списком ids. Т.е.:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  # не кэшируются
+  Post.find(1,2,3)
+  Post.find([1,2])
+</pre>
+    </div>
+    <ul>
+        <li>
+            <code>find_by</code> с фрагментом SQL:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  Post.find_by('published_at &lt; ?', 2.weeks.ago)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="veb-konsol"> Веб-консоль</h4>
+    <p>Новые приложения, создаваемые начиная с Rails 4.2, поставляются с гемом по умолчанию.
+        Веб-консоль добавляет интерактивную консоль Ruby на каждой странице ошибки и хелпер вьюх и
+        контроллеров <code>console</code>.</p>
+    <p>Интерактивная консоль на страницах ошибок позволяет выполнять код в контексте места, где было
+        вызвано исключение. Хелпер вьюх <code>console</code> при вызове в любом месте вьюхи или
+        контроллера запускает интерактивную консоль в последнем контексте, как только завершится
+        рендеринг.</p>
+    <h4 class="inside_page_header" id="podderzhka-vneshnih-klyuchey"> Поддержка внешних ключей</h4>
+    <p>DSL миграций теперь поддерживает добавление или удаление внешних ключей. Также они
+        выгружаются в <code>schema.rb</code>. В настоящее время внешние ключи поддерживаются только
+        адаптерами <code>mysql</code>, <code>mysql2</code> и <code>postgresql</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# добавляет внешний ключ на `articles.author_id`, ссылающийся на `authors.id`
+add_foreign_key :articles, :authors
+# добавляет внешний ключ на `articles.author_id`, ссылающийся на `users.lng_id`
+add_foreign_key :articles, :users, column: :author_id, primary_key: "lng_id"
+# удаляет внешний ключ на `accounts.branch_id`
+remove_foreign_key :accounts, :branches
+# удаляет внешний ключ на `accounts.owner_id`
+remove_foreign_key :accounts, column: :owner_id
+</pre>
+    </div>
+    <p>Смотрите полное описание в документации API для
+        и .</p>
+    <h3 class="inside_page_header" id="nesovmestimosti"> Несовместимости</h3>
+    <p>Ранее устаревшая функциональность была убрана. Обратитесь к отдельным компонентам за
+        информацией о новых устареваниях в этом релизе.</p>
+    <p>Следующие изменения требуют немедленных действий при обновлении.</p>
+    <h4 class="inside_page_header" id="render-so-strokovym-argumentom"><code>render</code> со
+        строковым аргументом</h4>
+    <p>Раньше вызов в контроллере <code>render "foo/bar"</code> был эквивалентом <code>render file:
+        "foo/bar"</code>. В Rails 4.2 это стало означать <code>render template: "foo/bar"</code>.
+        Если нужно рендерить файл, измените свой код на использования явной формы (<code>render
+            file: "foo/bar"</code>).</p>
+    <h4 class="inside_page_header" id="respond_with-metod-klassa-respond_to">
+        <code>respond_with</code> / метод класса <code>respond_to</code>
+    </h4>
+    <p>Методы <code>respond_with</code> и соответствующий метод класса <code>respond_to</code> были
+        перемещены в гем . Добавьте <code>gem 'responders', '~&gt; 2.0'</code> в свой Gemfile для
+        использования:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/controllers/users_controller.rb
+class UsersController &lt; ApplicationController
+  respond_to :html, :json
+  def show
+    @user = User.find(params[:id])
+    respond_with @user
+  end
+end
+</pre>
+    </div>
+    <p>Метод экземпляра <code>respond_to</code> не был затронут:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# app/controllers/users_controller.rb
+class UsersController &lt; ApplicationController
+  def show
+    @user = User.find(params[:id])
+    respond_to do |format|
+      format.html
+      format.json { render json: @user }
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="host-po-umolchaniyu-dlya-rails-server"> Хост по умолчанию для
+        <code>rails server</code>
+    </h4>
+    <p>Из-за , по умолчанию <code>rails server</code> теперь ждет запросов на <code>localhost</code>
+        вместо <code>0.0.0.0</code>. Это минимально затрагивает стандартный процесс разработки, так
+        как и , и будут работать, как и прежде на вашей машине.</p>
+    <p>Однако, это изменение не позволяет доступ к серверу Rails с другой машины, например, если
+        ваша среда разработки в виртуальной машине, и вы хотите доступ к ней с хоста. В таких
+        случаях запускайте сервер с помощью <code>rails server -b 0.0.0.0</code>, чтобы восстановить
+        старое поведение.</p>
+    <p>Если так сделаете, не забудьте правильно настроить свой файервол, чтобы только доверенные
+        машины вашей сети имели доступ к вашему серверу разработки.</p>
+    <h4 class="inside_page_header" id="sanitayzer-html"> Санитайзер HTML</h4>
+    <p>Санитайзер HTML был заменен новой, более надежной, реализацией, созданной на основе и . Новый
+        санитайзер более безопасный и его санация более мощная и гибкая.</p>
+    <p>Из-за нового алгоритма, санированный результат может быть различным для определенных
+        патологических входных данных.</p>
+    <p>Если у вас есть особая необходимость в точном результате от старого санитайзера , можете
+        добавить гем в свой Gemfile, и получите старое поведение. Этот гем не будет выдавать
+        предостережения об устаревании, поскольку он опциональный.</p>
+    <p><code>rails-deprecated_sanitizer</code> будет поддерживаться только для Rails 4.2; он не
+        будет поддерживаться для Rails 5.0.</p>
+    <p>Подробнее об изменениях в новом санитайзере смотрите .</p>
+    <h4 class="inside_page_header" id="assert_select"><code>assert_select</code>
+    </h4>
+    <p><code>assert_select</code> теперь базируется на .</p>
+    <p>В результате некоторые ранее валидные селекторы теперь не поддерживаются. Если ваше
+        приложение использует любое из этих написаний, их нужно обновить:</p>
+    <ul>
+        <li>
+            <p> Значения в селекторах атрибутов необходимо заключать в кавычки, если они содержат не
+                буквенно-цифровые символы.</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+# до
+a[href=/]
+a[href$=/]
+# теперь
+a[href="/"]
+a[href$="/"]
+</pre>
+            </div>
+        </li>
+        <li>
+            <p> DOM, созданные из источника HTML, содержащего невалидный HTML с неправильно
+                вложенными элементами, могут отличаться.</p>
+            <p>Например:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# содержимое: &lt;div&gt;&lt;i&gt;&lt;p&gt;&lt;/i&gt;&lt;/div&gt;
+# раньше:
+assert_select('div &gt; i')  # =&gt; true
+assert_select('div &gt; p')  # =&gt; false
+assert_select('i &gt; p')    # =&gt; true
+# сейчас:
+assert_select('div &gt; i')  # =&gt; true
+assert_select('div &gt; p')  # =&gt; true
+assert_select('i &gt; p')    # =&gt; false
+</pre>
+            </div>
+        </li>
+        <li>
+            <p> Если выбираемые данные содержат сущности, значение для сравнения раньше было чистым
+                (т.е. <code>AT&amp;amp;T</code>), а сейчас вычисленное (т.е. <code>AT&amp;T</code>).
+            </p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# содержимое: &lt;p&gt;AT&amp;amp;T&lt;/p&gt;
+# раньше:
+assert_select('p', 'AT&amp;amp;T')  # =&gt; true
+assert_select('p', 'AT&amp;T')      # =&gt; false
+# сейчас:
+assert_select('p', 'AT&amp;T')      # =&gt; true
+assert_select('p', 'AT&amp;amp;T')  # =&gt; false
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="udaleno"> Удалено</h4>
+    <ul>
+        <li><p> Опция <code>--skip-action-view</code> была убрана из генератора приложения.
+            ()</p></li>
+        <li><p> Команда <code>rails application</code> была убрана без замены.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарел отсутствующий <code>config.log_level</code> для окружений production.
+            ()</p></li>
+        <li><p> Устарел <code>rake test:all</code> в пользу <code>rake test</code>, так как он
+            теперь запускает все тесты в папке <code>test</code>.
+            ()</p></li>
+        <li><p> Устарел <code>rake test:all:db</code> в пользу <code>rake test:db</code>.
+            ()</p></li>
+        <li><p> Устарел <code>Rails::Rack::LogTailer</code> без замены.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p> Представлен <code>web-console</code> в Gemfile приложения по умолчанию.
+            ()</p></li>
+        <li><p> Добавлена опция <code>required</code> для связей в генераторе модели.
+            ()</p></li>
+        <li>
+            <p> Представлено пространство имен <code>x</code> для определения произвольных
+                конфигурационных опций:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/environments/production.rb
+config.x.payment_processing.schedule = :daily
+config.x.payment_processing.retries  = 3
+config.x.super_debugger              = true
+</pre>
+            </div>
+            <p>Затем эти опции доступны в объекте configuration:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.configuration.x.payment_processing.schedule # =&gt; :daily
+Rails.configuration.x.payment_processing.retries  # =&gt; 3
+Rails.configuration.x.super_debugger              # =&gt; true
+</pre>
+            </div>
+            <p>()</p>
+        </li>
+        <li>
+            <p> Представлен <code>Rails::Application.config_for</code> для загрузки конфигурации для
+                текущего окружения.</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# config/exception_notification.yml:
+production:
+  url: http://127.0.0.1:8080
+  namespace: my_app_production
+development:
+  url: http://localhost:3001
+  namespace: my_app_development
+# config/production.rb
+Rails.application.configure do
+  config.middleware.use ExceptionNotifier, config_for(:exception_notification)
+end
+</pre>
+            </div>
+            <p>()</p>
+        </li>
+        <li><p> Представлена опция <code>--skip-turbolinks</code> для генератора приложения, чтобы
+            не генерировать интеграцию с turbolinks.
+            ()</p></li>
+        <li><p> Представлен скрипт <code>bin/setup</code> как соглашение для автоматической
+            настройки для быстрого развертывания вашего приложения.
+            ()</p></li>
+        <li><p> Изменено значение по умолчанию для <code>config.assets.digest</code> на
+            <code>true</code> в среде development.
+            ()</p></li>
+        <li><p> Представлен API для регистрации новых расширений для <code>rake notes</code>.
+            ()</p></li>
+        <li><p> Представлен колбэк <code>after_bundle</code> для использования в шаблонах Rails.
+            ()</p></li>
+        <li><p> Представлен <code>Rails.gem_version</code> как удобный метод для возврата <code>Gem::Version.new(Rails.version)</code>.
+            ()</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="action-pack"> Action Pack</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="udaleno"> Удалено</h4>
+    <ul>
+        <li><p><code>respond_with</code> и метод класса <code>respond_to</code> были убраны из Rails
+            и перемещены в гем <code>responders</code> (версия 2.0). Добавьте <code>gem
+                'responders', '~&gt; 2.0'</code> в свой <code>Gemfile</code>, чтобы продолжать
+            использовать эти особенности.
+            (,
+            )</p></li>
+        <li><p> Убран устаревший
+            <code>AbstractController::Helpers::ClassMethods::MissingHelperError</code> в пользу
+            <code>AbstractController::Helpers::MissingHelperError</code>.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарела опция <code>only_path</code> в хелперах <code>*_path</code>.
+            ()</p></li>
+        <li><p> Устарели <code>assert_tag</code>, <code>assert_no_tag</code>, <code>find_tag</code>
+            и <code>find_all_tag</code> в пользу <code>assert_select</code>.
+            ()</p></li>
+        <li>
+            <p> Устарела поддержка опции <code>:to</code> в роутере со значением символом или
+                строкой без символа "#":</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+get '/posts', to: MyRackApp    =&gt; (Не требуется изменения)
+get '/posts', to: 'post#index' =&gt; (Не требуется изменения)
+get '/posts', to: 'posts'      =&gt; get '/posts', controller: :posts
+get '/posts', to: :index       =&gt; get '/posts', action: :index
+</pre>
+            </div>
+            <p>()</p>
+        </li>
+        <li>
+            <p> Устарела поддержка строковых ключей в хелперах URL:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# плохо
+root_path('controller' =&gt; 'posts', 'action' =&gt; 'index')
+# хорошо
+root_path(controller: 'posts', action: 'index')
+</pre>
+            </div>
+            <p>()</p>
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li>
+            <p> Семейство методов <code>*_filter</code> убраны из документации. Их использование не
+                рекомендуется в пользу семейства методов <code>*_action</code>:</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+after_filter          =&gt; after_action
+append_after_filter   =&gt; append_after_action
+append_around_filter  =&gt; append_around_action
+append_before_filter  =&gt; append_before_action
+around_filter         =&gt; around_action
+before_filter         =&gt; before_action
+prepend_after_filter  =&gt; prepend_after_action
+prepend_around_filter =&gt; prepend_around_action
+prepend_before_filter =&gt; prepend_before_action
+skip_after_filter     =&gt; skip_after_action
+skip_around_filter    =&gt; skip_around_action
+skip_before_filter    =&gt; skip_before_action
+skip_filter           =&gt; skip_action_callback
+</pre>
+            </div>
+            <p>Если ваше приложение в настоящее время зависит от этих методов, следует их заменить
+                на методы <code>*_action</code>. Они будут объявлены устаревшими в будущем и
+                когда-нибудь будут убраны из Rails.</p>
+            <p>(Commit ,
+                )</p>
+        </li>
+        <li><p><code>render nothing: true</code> или рендеринг тела <code>nil</code> больше не
+            добавляет одиночный пробел в тело отклика.
+            ()</p></li>
+        <li><p> Rails теперь автоматически включает дайджест шаблона в ETag.
+            ()</p></li>
+        <li><p> Сегменты, передаваемые в хелперы URL, теперь автоматически экранируются.
+            ()</p></li>
+        <li><p> Представлена опция <code>always_permitted_parameters</code> для настройки, какие
+            параметры разрешены глобально. Значение по умолчанию для этой настройки <code>['controller',
+                'action']</code>.
+            ()</p></li>
+        <li><p> Добавлен метод HTTP <code>MKCALENDAR</code> из .
+            ()</p></li>
+        <li><p> Модификации <code>*_fragment.action_controller</code> теперь включают имена
+            контроллера и экшна в payload.
+            ()</p></li>
+        <li><p> Улучшена страница Routing Error с помощью нечеткого (fuzzy) соответствия для поиска
+            маршрутов.
+            ()</p></li>
+        <li><p> Добавлена опция для отключения логирования ошибок CSRF.
+            ()</p></li>
+        <li><p> Когда сервер Rails настроен обслуживать статичные файлы, сжатые файлы также будут
+            обслужены, если клиент их поддерживает и эти файлы (<code>.gz</code>) есть на диске. По
+            умолчанию asset pipeline создает файлы <code>.gz</code> для всех сжимаемых файлов.
+            Обслуживание сжатых файлов минимизирует передаваемые данные и ускоряет запрос к файлу.
+            Всегда если обслуживаете файлы ресурсов на сервере Rails в production.
+            ()</p></li>
+        <li>
+            <p> При вызове хелперов <code>process</code> в интеграционном тесте, пути необходим
+                начальный слэш. Раньше его можно было опустить, но это был побочный продукт
+                реализации, а не специальная особенность, т.е.:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+test "list all posts" do
+  get "/posts"
+  assert_response :success
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="action-view"> Action View</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарели <code>AbstractController::Base.parent_prefixes</code>. Переопределите
+            <code>AbstractController::Base.local_prefixes</code> когда хотите изменить, где следует
+            искать вьюхи.
+            ()</p></li>
+        <li><p> Устарел <code>ActionView::Digestor#digest(name, format, finder, options = {})</code>.
+            Аргументы должны быть переданы как хэш.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p><code>render "foo/bar"</code> теперь расширяется до <code>render template:
+            "foo/bar"</code> вместо <code>render file: "foo/bar"</code>.
+            ()</p></li>
+        <li><p> Хелперы форм больше не создают элемент <code>&lt;div&gt;</code> с inline CSS вокруг
+            скрытых полей.
+            ()</p></li>
+        <li><p> Представлена специальная локальная переменная <code>#{partial_name}_iteration</code>
+            для использования с партиалами, рендерящимися с коллекцией. Она предоставляет доступ к
+            текущему состоянию итерации с помощью методов <code>index</code>, <code>size</code>,
+            <code>first?</code> и <code>last?</code>.
+            ()</p></li>
+        <li><p> Placeholder I18n следует тем же соглашениям, что и <code>label</code> I18n.
+            ()</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарели хелперы <code>*_path</code> в рассыльщиках. Всегда используйте вместо них
+            хелперы <code>*_url</code>.
+            ()</p></li>
+        <li><p> Устарели <code>deliver</code> / <code>deliver!</code> в пользу
+            <code>deliver_now</code> / <code>deliver_now!</code>.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p><code>link_to</code> и <code>url_for</code> по умолчанию создают абсолютные URL в
+            шаблонах, больше нет необходимости передавать <code>only_path: false</code>.
+            ()</p></li>
+        <li><p> Представлен <code>deliver_later</code>, который добавляет в очередь задачу для
+            доставки писем асинхронно.
+            ()</p></li>
+        <li><p> Добавлена конфигурационная опция <code>show_previews</code> для включения
+            предпросмотра писем вне окружения разработки.
+            ()</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="ubrano"> Убрано</h4>
+    <ul>
+        <li><p> Убран <code>cache_attributes</code> и сотоварищи. Все атрибуты кэшируются.
+            ()</p></li>
+        <li><p> Убран устаревший метод <code>ActiveRecord::Base.quoted_locking_column</code>.
+            ()</p></li>
+        <li><p> Убран устаревший метод <code>ActiveRecord::Migrator.proper_table_name</code>.
+            Используйте вместо него метод экземпляра <code>proper_table_name</code> на <code>ActiveRecord::Migration</code>.
+            ()</p></li>
+        <li><p> Убран неиспользуемый тип <code>:timestamp</code>. Прозрачно добавлен как псевдоним к
+            <code>:datetime</code> во всех случаях. Исправлены несоответствия, когда типы столбцов
+            используются вне Active Record, например для сериализации XML.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарело проглатывание ошибок в <code>after_commit</code> и
+            <code>after_rollback</code>.
+            ()</p></li>
+        <li><p> Устарела сломанная поддержка автоматического определения кэширующих счетчиков на
+            связях <code>has_many :through</code>. Вместо этого следует вручную указывать кэширующий
+            счетчик на связях <code>has_many</code> и <code>belongs_to</code> для записей through.
+            ()</p></li>
+        <li><p> Устарела передача объектов Active Record в <code>.find</code> или
+            <code>.exists?</code>. Вместо этого сначала вызывайте <code>id</code> на объектах.
+            (Commit ,
+            )</p></li>
+        <li>
+            <p> Устарела недоделанная поддержка интервальных значений PostgreSQL с исключенными
+                концами (полуинтервалов). Сейчас мы переводим интервалы PostgreSQL в интервалы Ruby.
+                Это преобразование не полностью возможно, поскольку интервалы Ruby не поддерживают
+                исключение концов.</p>
+            <p>Текущее решение увеличения конца интервала не корректно и устарело. Для подтипов, в
+                которых мы не знаем как увеличить (т.е. где не определен <code>succ</code>), он
+                вызовет <code>ArgumentError</code> для интервалов с исключенными концами.</p>
+            <p>()</p>
+        </li>
+        <li><p> Устарел вызов <code>DatabaseTasks.load_schema</code> без соединения. Вместо него
+            используйте <code>DatabaseTasks.load_schema_current</code>.
+            ()</p></li>
+        <li><p> Устарел <code>sanitize_sql_hash_for_conditions</code> без замены. Для выполнения
+            запросов и обновлений предпочтительным API является использование <code>Relation</code>.
+            ()</p></li>
+        <li><p> Устарели <code>add_timestamps</code> и <code>t.timestamps</code> без передачи опции
+            <code>:null</code>. Значение по умолчанию <code>null: true</code> изменится в Rails 5 на
+            <code>null: false</code>.
+            ()</p></li>
+        <li><p> Устарел <code>Reflection#source_macro</code> без замены, так как он больше не
+            требуется в Active Record.
+            ()</p></li>
+        <li><p> Устарел <code>serialized_attributes</code> без замен.
+            ()</p></li>
+        <li><p> Устарел возврат <code>nil</code> от <code>column_for_attribute</code> когда не
+            существует столбец. Он будет возвращать null object в Rails 5.0
+            ()</p></li>
+        <li><p> Устарело использование <code>.joins</code>, <code>.preload</code> и <code>.eager_load</code>
+            со связями, зависящими от состояния экземпляра (т.е. те, которые определены со скоупом,
+            принимающим аргумент) без замены.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p><code>SchemaDumper</code> использует <code>force: :cascade</code> на <code>create_table</code>.
+            Это позволяет перезагрузить схему с внешними ключами.</p></li>
+        <li><p> Добавлена опция <code>:required</code> к одиночным связям, определяющая наличие
+            валидации для связи.
+            ()</p></li>
+        <li><p><code>ActiveRecord::Dirty</code> теперь обнаруживает изменения в мутируемых
+            значениях. Сериализованные атрибуты в моделях Active Record больше не сохраняются, когда
+            не изменились. Это также работает с другими типами, такими как строковые столбцы и json
+            столбцы в PostgreSQL.
+            (Pull Requests ,
+            ,
+            )</p></li>
+        <li><p> Представлен таск Rake <code>db:purge</code> для опустошения базы данных для текущей
+            среды.
+            ()</p></li>
+        <li><p> Представлен <code>ActiveRecord::Base#validate!</code>, вызывающий <code>ActiveRecord::RecordInvalid</code>,
+            если запись невалидна.
+            ()</p></li>
+        <li><p> Представлен <code>#validate</code> в качестве псевдонима для <code>#valid?</code>.
+            ()</p></li>
+        <li><p><code>#touch</code> теперь принимает несколько атрибутов, которые будут затронуты за
+            раз.
+            ()</p></li>
+        <li><p> Адаптер PostgreSQL теперь поддерживает тип данных <code>jsonb</code> в PostgreSQL
+            9.4+.
+            ()</p></li>
+        <li><p> Адаптеры PostgreSQL и SQLite больше не добавляют лимит по умолчанию в 255 символов
+            для строковых столбцов.
+            ()</p></li>
+        <li><p> Добавлена поддержка для типа столбца <code>citext</code> в адаптере PostgreSQL.
+            ()</p></li>
+        <li><p> Добавлена поддержка для пользовательского интервального типа в адаптере PostgreSQL.
+            ()</p></li>
+        <li><p><code>sqlite3:///some/path</code> теперь считается абсолютным системным путем <code>/some/path</code>.
+            Для относительных путей используйте <code>sqlite3:some/path</code>. (Раньше <code>sqlite3:///some/path</code>
+            считался относительным путем <code>some/path</code>. Это поведение устарело в Rails
+            4.1).
+            ()</p></li>
+        <li><p> Добавлена поддержка для долей секунд в MySQL 5.6 и выше.
+            (Pull Request ,
+            )</p></li>
+        <li><p> Добавлен <code>ActiveRecord::Base#pretty_print</code> для красивого отображения
+            моделей.
+            ()</p></li>
+        <li><p><code>ActiveRecord::Base#reload</code> теперь ведет себя так же, как <code>m =
+            Model.find(m.id)</code>, что означает, что он больше не помнит дополнительные атрибуты
+            из кастомного <code>SELECT</code>.
+            ()</p></li>
+        <li><p><code>ActiveRecord::Base#reflections</code> теперь возвращает хэш со строковыми
+            ключами вместо символьных ключей.
+            ()</p></li>
+        <li><p> Метод <code>references</code> в миграциях теперь поддерживает опцию
+            <code>type</code> для указания типа внешнего ключа (например, <code>:uuid</code>).
+            ()</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-model"> Active Model</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="ubrano"> Убрано</h4>
+    <ul>
+        <li> Убран устаревший <code>Validator#setup</code> без замены.
+            ()
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарел <code>reset_#{attribute}</code> в пользу <code>restore_#{attribute}</code>.
+            ()</p></li>
+        <li><p> Устарел <code>ActiveModel::Dirty#reset_changes</code> в пользу <code>clear_changes_information</code>.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p> Представлен <code>#validate</code> в качестве псевдонима для <code>#valid?</code>.
+            ()</p></li>
+        <li><p> Представлен метод <code>restore_attributes</code> в <code>ActiveModel::Dirty</code>
+            для восстановления измененных (dirty) атрибутов их предыдущими значениями.
+            (Pull Request ,
+            )</p></li>
+        <li><p><code>has_secure_password</code> по умолчанию больше не запрещает пустые пароли (т.е.
+            пароли, содержащие только пробелы).
+            ()</p></li>
+        <li><p> Теперь <code>has_secure_password</code> проверяет, что заданный пароль меньше 72
+            символов, если включены валидации.
+            ()</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <p>За подробностями обратитесь к .</p>
+    <h4 class="inside_page_header" id="ubrano"> Убрано</h4>
+    <ul>
+        <li><p> Убраны устаревшие <code>Numeric#ago</code>, <code>Numeric#until</code>, <code>Numeric#since</code>,
+            <code>Numeric#from_now</code>.
+            ()</p></li>
+        <li><p> Убраны устаревшие ограничители на основе строки для
+            <code>ActiveSupport::Callbacks</code>.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarelo"> Устарело</h4>
+    <ul>
+        <li><p> Устарели <code>Kernel#silence_stderr</code>, <code>Kernel#capture</code> и <code>Kernel#quietly</code>
+            без замены.
+            ()</p></li>
+        <li><p> Устарел <code>Class#superclass_delegating_accessor</code>, вместо него используйте
+            <code>Class#class_attribute</code>.
+            ()</p></li>
+        <li><p> Устарел <code>ActiveSupport::SafeBuffer#prepend!</code> так как <code>ActiveSupport::SafeBuffer#prepend</code>
+            теперь выполняет ту же самую функцию.
+            ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p> Представлена новая конфигурационная опция <code>active_support.test_order</code> для
+            определения порядка, в котором выполняются тестовые случаи. В настоящее время эта опция
+            по умолчанию <code>:sorted</code>, но будет изменена на <code>:random</code> в Rails
+            5.0.
+            ()</p></li>
+        <li><p><code>Object#try</code> и <code>Object#try!</code> теперь могут использоваться без
+            явного получателя в блоке.
+            (,
+            )</p></li>
+        <li><p> Тестовый хелпер <code>travel_to</code> теперь обрезает компонент <code>usec</code>
+            до 0.
+            ()</p></li>
+        <li><p> Представлен <code>Object#itself</code> как идентифицирующая функция.
+            (Commit ,
+            )</p></li>
+        <li><p> Теперь <code>Object#with_options</code> может использоваться без явного получателя в
+            блоке.
+            ()</p></li>
+        <li><p> Представлен <code>String#truncate_words</code> для обрезания строки по количеству
+            слов.
+            ()</p></li>
+        <li><p> Добавлены <code>Hash#transform_values</code> и <code>Hash#transform_values!</code>
+            для упрощения обычной практики, когда значения хэша должны измениться, но ключи остаются
+            прежними.
+            ()</p></li>
+        <li><p> Теперь словообразующий хелпер <code>humanize</code> отбрасывает любые начальные
+            знаки подчеркивания.
+            ()</p></li>
+        <li><p> Представлен <code>Concern#class_methods</code> как альтернатива <code>module
+            ClassMethods</code>, а также <code>Kernel#concern</code> для избегания шаблонного <code>module
+            Foo; extend ActiveSupport::Concern; end</code>.
+            ()</p></li>
+        <li><p> Новое про автозагрузку и перезагрузку констант.</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="blagodarnosti"> Благодарности</h3>
+    <p>Взгляните , на людей, которые потратили много часов, сделав Rails стабильнее и надёжнее.
+        Спасибо им всем.</p>
+
+</body>
+</html>

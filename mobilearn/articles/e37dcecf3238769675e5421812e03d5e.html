@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Rails для начинающих</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rails-dlya-nachinayuschih"> Rails для начинающих</h2>
+    <p>Это руководство раскрывает установку и запуск Ruby on Rails.</p>
+    <p>После его прочтения, вы узнаете:</p>
+    <ul>
+        <li>Как установить Rails, создать новое приложение на Rails и присоединить ваше приложение к
+            базе данных.
+        </li>
+        <li>Общую структуру приложения на Rails.
+        </li>
+        <li>Основные принципы MVC (Model, View Controller - «Модель-представление-контроллер») и
+            дизайна, основанного на RESTful.
+        </li>
+        <li>Как быстро создать изначальный код приложения на Rails.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="dopuscheniya-v-etom-rukovodstve"> Допущения в этом
+        руководстве</h3>
+    <p>Это руководство рассчитано на новичков, которые хотят запустить приложение на Rails с нуля.
+        Оно не предполагает, что вы раньше работали с Rails. Однако, чтобы полноценно им
+        воспользоваться, необходимо предварительно установить:</p>
+    <ul>
+        <li>Язык версии 2.2.2 или новее
+        </li>
+        <li>Правильную версию , если вы используете Windows
+        </li>
+        <li>Систему пакетов , которая устанавливается вместе с Ruby версий 1.9 и выше. Чтобы
+            подробнее узнать о RubyGems, прочитайте .
+        </li>
+        <li>Установленную
+        </li>
+    </ul>
+    <p>Rails – фреймворк для веб-разработки, написанный на языке программирования Ruby. Если у вас
+        нет опыта в Ruby, возможно вам будет тяжело сразу приступить к изучению Rails. Есть
+        несколько хороших англоязычных ресурсов, посвященных изучению Ruby, например:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <p>Обращайте внимание, что некоторые ресурсы, хотя все еще великолепные, но все же покрывают
+        старые версии Ruby, такие как 1.6, и в особенности 1.8, и не включает некоторые элементы
+        синтаксиса, которые вы увидите в повседневной разработке на Rails.</p>
+    <h3 class="inside_page_header" id="chto-takoe-rails"> Что такое Rails?</h3>
+    <p>Rails - фреймворк для веб-разработки, написанный на языке программирования Ruby. Он
+        разработан, чтобы сделать программирование веб-приложений проще, так как использует ряд
+        допущений о том, что нужно каждому разработчику для создания нового проекта. Он позволяет
+        вам писать меньше кода в процессе программирования, в сравнении с другими языками и
+        фреймворками. Профессиональные разработчики на Rails также отмечают, что с ним разработка
+        веб-приложений более забавна =)</p>
+    <p>Rails - своевольный программный продукт. Он делает предположение, что имеется "лучший" способ
+        что-то сделать, и он так разработан, что стимулирует этот способ - а в некоторых случаях
+        даже препятствует альтернативам. Если изучите "The Rails Way", то, возможно, откроете в себе
+        значительное увеличение производительности. Если будете упорствовать и переносить старые
+        привычки с других языков в разработку на Rails, и попытаетесь использовать шаблоны,
+        изученные где-то еще, ваш опыт разработки будет менее счастливым.</p>
+    <p>Философия Rails включает два важных ведущих принципов:</p>
+    <ul>
+        <li>
+            <strong>Don't Repeat Yourself:</strong> DRY — это принцип разработки ПО, который гласит,
+            что "Каждый кусочек информации должен иметь единственное, неизбыточное, Every piece of
+            knowledge must have a single, unambiguous, авторитетное представление в системе." Не
+            пишите одну и ту же информацию снова и снова, код будет легче поддерживать, и он будет
+            более расширяемым и менее ошибочным..
+        </li>
+        <li>
+            <strong>Convention Over Configuration:</strong> — у Rails есть мнения о наилучших
+            способах делать множество вещей в веб приложении, и по умолчанию выставлены эти
+            соглашения, вместо того, чтобы заставлять вас по мелочам править многочисленные
+            конфигурационные файлы.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="sozdanie-novogo-proekta-rails"> Создание нового проекта
+        Rails</h3>
+    <p>Лучший способ использования этого руководства - проходить каждый шаг и смотреть, что
+        получится, пропустите код или шаг и учебное приложение не заработает, поэтому следует
+        буквально все делать шаг за шагом.</p>
+    <p>Следуя этому руководству, вы создадите проект Rails с названием <code>blog</code>, очень
+        простой веб-блог. Прежде чем начнем создавать приложение, нужно убедиться, что сам Rails
+        установлен.</p>
+    <div class="info"><p>Нижеследующие примеры используют <code>$</code> для обозначения строки
+        ввода терминала в UNIX-подобных операционных системах, хотя у вас он может быть настроен по
+        другому Если вы используете Windows, ваша строка будет выглядеть наподобие c:\source_code&gt;
+    </p></div>
+    <h4 class="inside_page_header" id="ustanovka-rails"> Установка Rails</h4>
+    <p>Откройте приложения для командной строки. На Mac OS X откройте Terminal.app, на Windows
+        выберите "Run" в меню Start и напишите 'cmd.exe'. Любые команды, начинающиеся со знака
+        доллара <code>$</code> должны быть запущены в командной строке. Убедитесь, что у вас
+        установлена текущая версия Ruby:</p>
+    <div class="info"><p>Существует ряд инструментов для помощи в быстрой установке Ruby и Ruby on
+        Rails в вашей системе. Пользователи Windows могут использовать , а пользователи Mac OS X
+        могут использовать . Больше методов для установки для большинства операционных систем можно
+        увидеть на .</p></div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby -v
+ruby 2.2.2p95
+</pre>
+    </div>
+    <p>Многие популярные UNIX-подобные ОС поставляются с приемлемой версией SQLite3. На Windows,
+        если вы устанавливали Rails с помощью Rails Installer, у вас уже установлен SQLite. Прочие
+        пользователи могут обратиться к инструкциям по установке на . Проверьте, что он корректно
+        установлен и содержится в вашем PATH:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ sqlite3 --version
+</pre>
+    </div>
+    <p>Программа должна сообщить свою версию.</p>
+    <p>Для установки Rails используйте команду <code>gem install</code>, представленную RubyGems:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ gem install rails
+</pre>
+    </div>
+    <p>Чтобы проверить, что все установлено верно, нужно выполнить следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails --version
+</pre>
+    </div>
+    <p>Если выводится что-то вроде "Rails 5.0.0", можно продолжать.</p>
+    <h4 class="inside_page_header" id="sozdanie-prilozheniya-blog"> Создание приложения Blog</h4>
+    <p>Rails поставляется с рядом скриптов, названных генераторами, разработанных для облегчения
+        жизни разработчика, создавая все, что необходимо для начала работы над определенной задачей.
+        Одним из них является генератор нового приложения, предоставляющий вам основу приложения
+        Rails, таким образом, вам не нужно писать его самим.</p>
+    <p>Для использования этого генератора, откройте терминал, войдите в папку, в которой у вас есть
+        права на создание файлов и напишите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new blog
+</pre>
+    </div>
+    <p>Это создаст приложение на Rails с именем Blog в директории <code>blog</code> и установит
+        гемы, зависимости от которых упомянуты в <code>Gemfile</code> при использовании <code>bundle
+            install</code>.</p>
+    <div class="info"><p>Можно посмотреть все возможные опции командной строки, которые принимает
+        билдер приложения на Rails, запустив <code>rails new -h</code>.</p></div>
+    <p>После того, как вы создали приложение blog, перейдите в его папку:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd blog
+</pre>
+    </div>
+    <p>В директории <code>blog</code> имеется несколько автоматически созданных файлов и папок,
+        задающих структуру приложения на Rails. Большая часть работы в этом самоучителе будет
+        происходить в папке <code>app</code>, но сейчас пробежимся по функциям каждой папки, которые
+        создает Rails в новом приложении по умолчанию:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Файл/Папка</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td>app/</td>
+            <td>Содержит контроллеры, модели, вьюхи, хелперы, рассыльщики и ресурсы вашего
+                приложения. Мы рассмотрим эту папку подробнее далее.
+            </td>
+        </tr>
+        <tr>
+            <td>bin/</td>
+            <td>Содержит Rails скрипты которые стартуют ваше приложение, также директория может
+                содержать другие скрипты которые вы используете для настройки, деплоя или запуска.
+            </td>
+        </tr>
+        <tr>
+            <td>config/</td>
+            <td>Конфигурации маршрутов, базы данных вашего приложения, и т.д. Более подробно это
+                раскрыто в
+            </td>
+        </tr>
+        <tr>
+            <td>config.ru</td>
+            <td>Конфигурация Rack для серверов, основанных на Rack, используемых для запуска
+                приложения.
+            </td>
+        </tr>
+        <tr>
+            <td>db/</td>
+            <td>Содержит текущую схему вашей базы данных, а также миграции базы данных.</td>
+        </tr>
+        <tr>
+            <td>GemfileGemfile.lock</td>
+            <td>Эти файлы позволяют указать, какие зависимости от гемов нужны для вашего приложения
+                на Rails. Эти файлы используются гемом Bundler. Подробнее о Bundler смотрите на
+            </td>
+        </tr>
+        <tr>
+            <td>lib/</td>
+            <td>Внешние модули для вашего приложения.</td>
+        </tr>
+        <tr>
+            <td>log/</td>
+            <td>Файлы логов приложения.</td>
+        </tr>
+        <tr>
+            <td>public/</td>
+            <td>Единственная папка, которая доступна извне как есть. Содержит статичные файлы и
+                скомпилированные ресурсы.
+            </td>
+        </tr>
+        <tr>
+            <td>Rakefile</td>
+            <td>Этот файл содержит набор команд, которые могут быть запущены в командной строке.
+                Определения команд производятся во всех компонентах Rails. Вместо изменения
+                Rakefile, вы можете добавить свои собственные задачи, добавив файлы в директорию
+                lib/tasks вашего приложения.
+            </td>
+        </tr>
+        <tr>
+            <td>README.rdoc</td>
+            <td>Это вводный мануал для вашего приложения. Его следует отредактировать, чтобы
+                рассказать остальным, что ваше приложение делает, как его настроить, и т.п.
+            </td>
+        </tr>
+        <tr>
+            <td>test/</td>
+            <td>Юнит-тесты, фикстуры и прочий аппарат тестирования. Это раскрывается в руководстве
+            </td>
+        </tr>
+        <tr>
+            <td>tmp/</td>
+            <td>Временные файлы (такие как файлы кэша и pid)</td>
+        </tr>
+        <tr>
+            <td>vendor/</td>
+            <td>Место для кода внешних разработчиков. В типичном приложении на Rails, включает
+                внешние гемы.
+            </td>
+        </tr>
+    </table>
+    <h3 class="inside_page_header" id="hello-rails"> Hello, Rails!</h3>
+    <p>Для начала, давайте выведем на экран какой-либо текст. Для этого нужен запущенный сервер
+        вашего приложения на Rails.</p>
+    <h4 class="inside_page_header" id="zapusk-veb-servera"> Запуск веб-сервера</h4>
+    <p>Фактически у вас уже есть функциональное приложение на Rails. Чтобы убедиться, нужно
+        запустить веб-сервер на вашей машине. Это можно осуществить, запустив следующую команду из
+        директории <code>blog</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails server
+</pre>
+    </div>
+    <div class="info"><p>Если вы используете Windows, вы должны передавать скрипты из папки <code>bin</code>
+        непосредственно в интерпретатор Ruby, то есть <code>ruby bin\rails server</code>.</p></div>
+    <div class="info"><p>Компилирование CoffeeScript и сжатие файлов JavaScript требует JavaScript
+        runtime в вашей системе, и его отсутствие приведет к ошибке <code>execjs</code> во время
+        компиляции. Обычно Mac OS X и Windows поставляются с установленным JavaScript runtime. Rails
+        добавляет гем <code>therubyracer</code> в генерируемый <code>Gemfile</code> нового
+        приложения в закомментированной строке, если нужно, можете ее раскомментировать. <code>therubyrhino</code>
+        - рекомендованный runtime для пользователей JRuby, он добавляется в <code>Gemfile</code>,
+        если приложение создаётся под JRuby. Можно узнать все о поддерживаемых runtime-ах в </p>
+    </div>
+    <p>Это запустит WEBrick, веб-сервер, распространяющийся с Ruby по умолчанию. Чтобы увидеть
+        приложение в действии, откройте окно браузера и пройдите по адресу . Вы должны увидеть
+        дефолтную информационную страницу Rails:</p>
+    <p><img alt="скриншот Welcome Aboard" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/rails_welcome.png" title=""></p>
+    <div class="info"><p>Для остановки веб-сервера нажмите Ctrl+C в терминале, где он запущен. Чтобы
+        убедиться в том, что сервер был остановлен, вы должны снова увидеть курсор командной строки.
+        Для большинства UNIX-подобных систем, включая Mac OS X, это будет знак доллара
+        <code>$</code>. В режиме development, Rails в основном не требует остановки сервера; все
+        изменения, которые Вы делаете в файлах, автоматически подхватываются сервером.</p></div>
+    <p>Страница "Welcome Aboard" это своеобразный тест для нового приложения на Rails: она
+        показывает, что ваши программы настроены достаточно правильно для отображения страницы.
+        Также можете нажать по ссылке <em>About your application’s environment</em> чтобы увидеть
+        сводку о среде вашего приложения.</p>
+    <h4 class="inside_page_header" id="skazhite-quot-privet-quot-relsy"> Скажите "привет",
+        Рельсы</h4>
+    <p>Чтобы Rails сказал "Привет", нужно создать, как минимум, <em>контроллер</em> и <em>вьюху</em>.
+    </p>
+    <p>Назначением контроллера является получение определенных запросов к приложению.
+        <em>Роутинг</em> решает, какой контроллер получит какие запросы. Часто имеется более одного
+        маршрута к каждому контроллеру, и различные маршруты могут быть обработаны различными <em>экшнами</em>.
+        Назначением каждого экшна является сбор информации для предоставления ее во вьюху.</p>
+    <p>Назначением вьюхи (представления) является отображение этой информации в удобочитаемом
+        формате. Необходимо отметить важное различие, что местом, в котором собирается информация,
+        является <em>контроллер</em>, а не вьюха. Вьюха должна только лишь отображать эту
+        информацию. По умолчанию шаблоны вьюх пишутся на языке, названном eRuby (Embedded Ruby),
+        который конвертируется циклом запросов в Rails до отправки пользователю.</p>
+    <p>Для создания нового контроллера, нужно запустить генератор "controller" и сказать ему, что вы
+        хотите контроллер с именем "welcome" с экшном по имени "index", вот так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate controller welcome index
+</pre>
+    </div>
+    <p>Rails создаст несколько файлов и маршрут.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+create  app/controllers/welcome_controller.rb
+ route  get 'welcome/index'
+invoke  erb
+create    app/views/welcome
+create    app/views/welcome/index.html.erb
+invoke  helper
+create    app/helpers/welcome_helper.rb
+invoke    test_unit
+create      test/helpers/welcome_helper_test.rb
+invoke  assets
+invoke    coffee
+create      app/assets/javascripts/welcome.coffee
+invoke    scss
+create      app/assets/stylesheets/welcome.scss
+</pre>
+    </div>
+    <p>Наиболее важными из них являются, разумеется, контроллер, расположенный в <code>app/controllers/welcome_controller.rb</code>,
+        и вьюха, расположенная в <code>app/views/welcome/index.html.erb</code>.</p>
+    <p>Откройте файл <code>app/views/welcome/index.html.erb</code> в текстовом редакторе. Удалите
+        весь существующий в файле код и замените его на следующую единственную строчку кода:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;h1&gt;Hello, Rails!&lt;/h1&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="nastroyka-domashney-stranitsy-prilozheniya"> Настройка
+        домашней страницы приложения</h4>
+    <p>Теперь, когда мы сделали контроллер и вьюху, нужно сказать Rails, что мы хотим увидеть "Hello
+        Rails!". В нашем случае мы хотим это увидеть, когда зайдем в корневой URL нашего сайта, .
+        Однако сейчас это место заняла тестовая страница "Welcome Aboard".</p>
+    <p>Чтобы это исправить, удалите файл <code>index.html</code>, расположенный в директории <code>public</code>
+        приложения, если таковой имеется.</p>
+    <p>Так нужно сделать, так как Rails отдаст любой статичный файл из директории
+        <code>public</code>, соответствующий маршруту, предпочтя его любому динамическому
+        содержимому, создаваемому из контроллеров. Файл <code>index.html</code> особенный: он будет
+        отдан, если запрос придет в корневой маршрут, т.е. . Если произойдет другой запрос, такой
+        как , будет отдан файл <code>public/welcome.html</code>, но только если он существует.</p>
+    <p>Теперь нужно сказать Rails, где находится настоящая домашняя страница.</p>
+    <p>Откройте файл <code>config/routes.rb</code> в редакторе.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.routes.draw do
+  get 'welcome/index'
+  # The priority is based upon order of creation:
+  # first created -&gt; highest priority.
+  # See how all your routes lay out with "rake routes".
+  #
+  # You can have the root of your site routed with "root"
+  # root 'welcome#index'
+  #
+  # ...
+</pre>
+    </div>
+    <p>Это <em>маршрутный файл</em> вашего приложения, который содержит варианты входа на сайт на
+        специальном языке , который говорит Rails, как соединять входящие запросы с контроллерами и
+        экшнами. Этот файл содержит много закомментированных строк с примерами, и один из них
+        фактически показывает, как соединить корень сайта с определенным контроллером и экшном.
+        Найдите строку, начинающуюся с <code>root</code> и раскомментируйте ее. Должно получится
+        следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+root 'welcome#index'
+</pre>
+    </div>
+    <p><code>root 'welcome#index'</code> говорит Rails направить запросы к корню приложения в экшн
+        index контроллера welcome, а <code>get 'welcome/index'</code> говорит Rails направлять
+        запросы к в экшн index контроллера welcome. Он был создан ранее при запуске генератора
+        контроллера (<code>bin/rails generate controller welcome index</code>).</p>
+    <p>Запустите снова веб-сервер, если вы его остановили для генерации контроллера (<code>bin/rails
+        server</code>) и пройдите по адресу в браузере. Вы увидите надпись <code>Hello,
+        Rails!</code>, которую поместили в <code>app/views/welcome/index.html.erb</code>,
+        показывающую, что этот новый маршрут действительно ведет в экшн <code>index</code> в <code>WelcomeController</code>,
+        и вьюха корректно рендерится.</p>
+    <div class="info"><p>Чтобы узнать больше о роутинге, обратитесь к руководству .</p></div>
+    <h3 class="inside_page_header" id="razrabatyvaem-bystro"> Разрабатываем быстро</h3>
+    <p>После того, как вы увидели, как создать контроллер, экшн и вьюху, давайте создадим что-то
+        более вещественное.</p>
+    <p>Теперь в приложении Blog, мы создадим новый <em>ресурс</em>. Ресурс - это термин,
+        обозначающий коллекцию схожих объектов, таких как статьи, люди или животные. Можно
+        создавать, читать, обновлять и уничтожать элементы для ресурса, и эти операции называются
+        операциями <em>CRUD</em> (create, read, update, destroy).</p>
+    <p>Rails представляет метод <code>resources</code>, который используется для объявления
+        стандартного ресурса REST. Вам необходимо добавить <em>ресурс article</em> в <code>config/routes.rb</code>,
+        как представлено ниже.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.routes.draw do
+  resources :articles
+  root 'welcome#index'
+end
+</pre>
+    </div>
+    <p>Если запустить <code>bin/rake routes</code>, можно увидеть, что он объявил все маршруты для
+        стандартных действий RESTful. Значение столбца префикса (и остальных столбцов) мы рассмотрим
+        позже, а пока обратите внимание, что Rails знает о форме единственного числа слова <code>article</code>
+        и разумно использует это различие.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake routes
+      Prefix Verb   URI Pattern                  Controller#Action
+    articles GET    /articles(.:format)          articles#index
+             POST   /articles(.:format)          articles#create
+ new_article GET    /articles/new(.:format)      articles#new
+edit_article GET    /articles/:id/edit(.:format) articles#edit
+     article GET    /articles/:id(.:format)      articles#show
+             PATCH  /articles/:id(.:format)      articles#update
+             PUT    /articles/:id(.:format)      articles#update
+             DELETE /articles/:id(.:format)      articles#destroy
+        root GET    /                            welcome#index
+</pre>
+    </div>
+    <p>В следующем разделе мы добавим возможность создания новых статей и сможем просматривать их.
+        Это буквы "C" и "R" из CRUD: create и read. Форма для этого будет выглядеть так:</p>
+    <p><img alt="Форма новой статьи" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/new_article.png" title=""></p>
+    <p>Она выглядит немного просто сейчас, но это нормально. Позже мы увидим, как улучшить ее
+        внешний вид.</p>
+    <h4 class="inside_page_header" id="osnovy"> Основы</h4>
+    <p>Сперва нам необходимо где-то создать новую статью. Наиболее подходящим местом будет <code>/articles/new</code>.
+        С уже определенным маршрутом уже можно осуществлять запросы к <code>/articles/new</code>
+        приложения. Перейдите на и вы увидите ошибку маршрутизации:</p>
+    <p><img alt="Другая ошибка роутинга, uninitialized constant ArticlesController"
+            class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/routing_error_no_controller.png"
+            title=""></p>
+    <p>Эта ошибка произошла, поскольку маршрут нуждается в определенном контроллере, чтобы обслужить
+        запрос. Решение этой проблемы простое: нужно создать контроллер с именем <code>ArticlesController</code>.
+        Это будет сделано запуском команды:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate controller articles
+</pre>
+    </div>
+    <p>Если открыть только что созданный <code>app/controllers/articles_controller.rb</code>, можно
+        увидеть абсолютно пустой контроллер:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+end
+</pre>
+    </div>
+    <p>Контроллер - это просто класс, унаследованный от <code>ApplicationController</code>. В этом
+        классе вы должны определить методы, которые станут экшнами для этого контроллера. Эти экшны
+        будут выполнять операции CRUD со статьями в вашей системе.</p>
+    <div class="note"><p>В <code>Ruby</code> методы бывают <code>public</code>, <code>private</code>
+        и <code>protected</code>, но экшнами контроллеров могут быть только <code>public</code>
+        методы. Подробнее смотрите в .</p></div>
+    <p>Если теперь обновить , вы увидите новую ошибку:</p>
+    <p><img alt="Unknown action new for ArticlesController!" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/unknown_action_new_for_articles.png"
+            title=""></p>
+    <p>Эта ошибка показывает, что Rails не может найти экшн <code>new</code> внутри <code>ArticlesController</code>,
+        который был только что создан. Это так, поскольку контроллеры в Rails при создании пустые по
+        умолчанию, если вы не указали желаемые экшны при процессе генерации.</p>
+    <p>Чтобы вручную определить экшн в контроллере, все что нужно - это определить в нем новый
+        метод. Откройте <code>app/controllers/articles_controller.rb</code> и в классе <code>ArticlesController</code>
+        определите метод <code>new</code>, чтобы контроллер стал выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  def new
+  end
+end
+</pre>
+    </div>
+    <p>С методом <code>new</code>, определенным в <code>ArticlesController</code>, если обновите ,
+        увидите другую ошибку:</p>
+    <p><img alt="Template is missing for articles/new" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/template_is_missing_articles_new.png"
+            title=""></p>
+    <p>Вы получили эту ошибку, поскольку Rails ожидает, что обычные экшны, такие как этот, имеют
+        связанные с ними вьюхи для отображения их информации. Когда нет доступных вьюх, Rails
+        вызовет исключение.</p>
+    <p>В вышеприведенном изображении конец строки был обрезан. Давайте посмотрим на полное сообщение
+        об ошибке:</p>
+    <blockquote>
+        <p>Missing template articles/new, application/new with {locale:[:en], formats:[:html],
+            handlers:[:erb, :builder, :coffee]}. Searched in: * "/path/to/blog/app/views"</p>
+    </blockquote>
+    <p>Как много букв! Давайте быстро пробежимся и поймем, что означает каждая часть.</p>
+    <p>Первая часть указывает, какой шаблон отсутствует. В нашем случае, шаблон
+        <code>articles/new</code>. Rails сперва ищет этот шаблон. Если не находит, он пытается
+        загрузить шаблон с именем <code>application/new</code>. Он так ищет, поскольку <code>ArticlesController</code>
+        унаследован от <code>ApplicationController</code>.</p>
+    <p>Следующая часть сообщения содержит хэш. Ключ <code>:locale</code> в этом хэше просто
+        показывает, на каком языке должен быть получен шаблон. По умолчанию это английский шаблон -
+        или "en". Следующий ключ <code>:formats</code> определяет формат шаблона для отдачи в
+        отклик. Формат по умолчанию <code>:html</code>, таким образом, Rails ищет шаблон HTML.
+        Последний ключ, <code>:handlers</code>, говорит нам, какие <em>обработчики шаблона</em>
+        могут быть использованы для рендеринга нашего шаблона. <code>:erb</code> в основном
+        используется для шаблонов HTML, <code>:builder</code> используется для шаблонов XML, и
+        <code>:coffee</code> использует CoffeeScript для создания шаблонов JavaScript.</p>
+    <p>Заключительная часть этого сообщения говорит нам, где Rails искал шаблоны. Шаблоны в простом
+        приложении Rails, таком как наше, содержатся в одном месте, но в более сложных приложениях,
+        они могут находиться в разных местах.</p>
+    <p>Простейшим шаблоном, работающим в данном случае, будет расположенный в <code>app/views/articles/new.html.erb</code>.
+        Расширение этого файла важно: первое расширение это <em>формат</em> шаблона, а второе
+        расширение это <em>обработчик</em>, который будет использован. Rails пытается найти шаблон с
+        именем <code>articles/new</code> в <code>app/views</code> приложения. Форматом для этого
+        шаблона может быть только <code>html</code>, а обработчиком должен быть один из
+        <code>erb</code>, <code>builder</code> или <code>coffee</code>. Поскольку мы хотим создать
+        новую форму HTML, будем использовать язык <code>ERB</code>, разработанный, чтобы внедрять
+        Ruby в HTML.</p>
+    <p>Следовательно, файл должен называться <code>articles/new.html.erb</code> и должен быть
+        расположен в директории <code>app/views</code> приложения.</p>
+    <p>Создайте новый файл <code>app/views/articles/new.html.erb</code> и поместите в него:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;h1&gt;New Article&lt;/h1&gt;
+</pre>
+    </div>
+    <p>Теперь при обновлении вы увидите, что у страницы появился заголовок. Теперь маршрут,
+        контроллер, экшн и вьюха гармонично работают. Время создать форму для новой статьи.</p>
+    <h4 class="inside_page_header" id="pervaya-forma"> Первая форма</h4>
+    <p>Для создания формы в этом шаблоне, мы будем использовать <em>form builder</em>. Основной form
+        builder для Rails представлен методом хелпера по имени <code>form_for</code>. Для
+        использования этого метода добавьте код в <code>app/views/articles/new.html.erb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for :article do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :text %&gt;&lt;br&gt;
+    &lt;%= f.text_area :text %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Если теперь обновить страницу, вы увидите точно такую форму как в начале примера. Создание
+        форм в Rails, действительно, очень простое!</p>
+    <p>При вызове <code>form_for</code>, вы передали в него определяющий объект для этой формы. В
+        нашем случае это символ <code>:article</code>. Это сообщает хелперу <code>form_for</code>,
+        для чего эта форма. Внутри блока для этого метода, объект <code>FormBuilder</code> -
+        представленный как <code>f</code> - используется для создания двух меток и двух текстовых
+        полей, по одному для заголовка и текста статьи. Наконец, вызов <code>submit</code> на
+        объекте <code>f</code> создаст кнопку отправки формы.</p>
+    <p>Хотя, у этой формы есть одна проблема. Если посмотрите на созданный HTML, просмотрев исходник
+        страницы, то увидите у формы атрибут <code>action</code>, указывающий на
+        <code>/articles/new</code>. Это проблема, поскольку этот маршрут ведет на ту же самую
+        страницу, и этот маршрут должен использоваться только для отображения формы для новой
+        статьи.</p>
+    <p>Форме нужно использовать иной URL, чтобы вести куда-то еще. Это можно быстро сделать с
+        помощью опции <code>:url</code> для <code>form_for</code>. Обычно в Rails, экшн,
+        используемый для подтверждения формы new, такой как эта, называется "create", поэтому форма
+        должна указывать на этот экшн.</p>
+    <p>Отредактируйте строчку <code>form_for</code> в <code>app/views/articles/new.html.erb</code>
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for :article, url: articles_path do |f| %&gt;
+</pre>
+    </div>
+    <p>В этом примере в опцию <code>:url</code> передан хелпер <code>articles_path</code>. Чтобы
+        увидеть, что с помощью него делает Rails, снова посмотрим на результат <code>bin/rake
+            routes</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake routes
+      Prefix Verb   URI Pattern                  Controller#Action
+    articles GET    /articles(.:format)          articles#index
+             POST   /articles(.:format)          articles#create
+ new_article GET    /articles/new(.:format)      articles#new
+edit_article GET    /articles/:id/edit(.:format) articles#edit
+     article GET    /articles/:id(.:format)      articles#show
+             PATCH  /articles/:id(.:format)      articles#update
+             PUT    /articles/:id(.:format)      articles#update
+             DELETE /articles/:id(.:format)      articles#destroy
+        root GET    /                            welcome#index
+</pre>
+    </div>
+    <p>Хелпер <code>articles_path</code> сообщает Rails указать форме на URI Pattern, связанный с
+        префиксом <code>articles</code>; и форма пошлет (по умолчанию) запрос <code>POST</code> на
+        этот маршрут. Он связан с экшном <code>create</code> текущего контроллера, <code>ArticlesController</code>.
+    </p>
+    <p>С определенными формой и ее связанным маршрутом, можно заполнить форму и нажать на кнопку
+        отправки, чтобы начать процесс создания новой статьи, поэтому идите и сделайте это. При
+        отправке формы вы увидите знакомую ошибку:</p>
+    <p><img alt="Unknown action create for ArticlesController" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/unknown_action_create_for_articles.png"
+            title=""></p>
+    <p>Чтобы это заработало, нужно создать экшн <code>create</code> в
+        <code>ArticlesController</code>.</p>
+    <h4 class="inside_page_header" id="sozdanie-statey"> Создание статей</h4>
+    <p>Чтобы убрать "Unknown action", нужно определить экшн <code>create</code> в классе <code>ArticlesController</code>
+        в <code>app/controllers/articles_controller.rb</code>, ниже экшна <code>new</code>, как
+        показано:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  def new
+  end
+  def create
+  end
+end
+</pre>
+    </div>
+    <p>Если теперь еще раз отправить форму, вы увидите другую знакомую ошибку: отсутствует шаблон.
+        Это нормально, сейчас это можно проигнорировать. Экшн <code>create</code> должен только
+        сохранять нашу статью в базу данных.</p>
+    <p>При отправке формы, ее поля будут посланы в Rails как <em>параметры</em>. К этим параметрам
+        можно обратиться из экшнов контроллера, как правило, для выполнения определенных задач.
+        Чтобы увидеть, на что похожи эти параметры, измените экшн <code>create</code> так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  render plain: params[:article].inspect
+end
+</pre>
+    </div>
+    <p>Тут метод <code>render</code> принимает очень простой хэш с ключом <code>:plain</code> и
+        значением <code>params[:article].inspect</code>. Метод <code>params</code> это объект,
+        представляющий параметры (или поля), приходящие от формы. Метод <code>params</code>
+        возвращает объект <code>ActiveSupport::HashWithIndifferentAccess</code>, позволяющий
+        получать доступ к ключам хэша с использованием или строк, или символов. В этой ситуации
+        имеют значение только параметры, пришедшие от формы.</p>
+    <div class="info"><p>Убедитесь, что у вас есть твердое понимание метода <code>params</code>, так
+        как вы будете его использовать очень часто. Давайте рассмотрим в качестве примера URL:
+        <strong></strong>. В этом URL, <code>params[:username]</code> будет равен "dhh" и <code>params[:email]</code>
+        будет равен "".</p></div>
+    <p>Если еще раз отправить форму, вы больше не увидите ошибку об отсутствующем шаблоне. Вместо
+        этого вы увидите что-то вроде следующего:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{"title"=&gt;"First article!", "text"=&gt;"This is my first article."}
+</pre>
+    </div>
+    <p>Теперь этот экшн отображает параметры для статьи, пришедшие из формы. Однако, это все еще
+        бесполезно. Да, вы видите параметры, но по сути ничего не делаете с ними.</p>
+    <h4 class="inside_page_header" id="sozdanie-modeli-article"> Создание модели Article</h4>
+    <p>Модели в Rails используют имя в единственном числе, а их соответствующая таблица в базе
+        данных - имя во множественном числе. Rails предоставляет генератор для создания моделей,
+        которым пользуются большинство разработчиков на Rails для создания новых моделей. Для
+        создания новой модели, запустите эту команду в своем терминале:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model Article title:string text:text
+</pre>
+    </div>
+    <p>С помощью этой команды мы сообщаем Rails что хотим модель <code>Article</code> с атрибутом
+        <em>title</em> строкового типа и атрибутом <em>text</em> текстового типа. Эти атрибуты
+        автоматически добавятся в таблицу <code>articles</code> и привяжутся к модели
+        <code>Article</code>.</p>
+    <p>Rails в ответ создаст ряд файлов. Сейчас нам интересны только
+        <code>app/models/article.rb</code> и
+        <code>db/migrate/20140120191729_create_articles.rb</code> (у вас имя может немного
+        отличаться). Последний ответственен за создание структуры базы данных, поэтому мы и
+        рассмотрим его далее.</p>
+    <div class="info"><p>Active Record достаточно сообразителен, чтобы автоматически связать имена
+        столбцов с атрибутами модели, что означает, что внутри моделей Rails не нужно объявлять
+        атрибуты, Active Record сделает это автоматически.</p></div>
+    <h4 class="inside_page_header" id="zapusk-migratsii"> Запуск миграции</h4>
+    <p>Как вы уже видели, <code>bin/rails generate model</code> создал файл <em>миграции базы
+        данных</em> в директории <code>db/migrate</code>. Миграции - это класс Ruby, разработанный
+        для того, чтобы было просто создавать и модифицировать таблицы базы данных. Rails использует
+        команды rake для запуска миграций, и возможна отмена миграции после того, как она была
+        применена к вашей базе данных. Имя файла миграции включает временную метку, чтобы быть
+        уверенным, что они выполняются в той последовательности, в которой они создавались.</p>
+    <p>Если Вы заглянете в файл <code>db/migrate/YYYYMMDDHHMMSS_create_articles.rb</code> (помните,
+        у вас файл имеет немного другое имя), вот что там обнаружите:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateArticles &lt; ActiveRecord::Migration
+  def change
+    create_table :articles do |t|
+      t.string :title
+      t.text :text
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Эта миграция создает метод <code>change</code>, вызываемый при запуске этой миграции.
+        Действие, определенное в этой миграции, также является обратимым, что означает, что Rails
+        знает, как отменить изменения, сделанные этой миграцией, в случае, если вы решите их
+        отменить позже. Когда вы запустите эту миграцию, она создаст таблицу <code>articles</code>
+        со строковым столбцом и текстовым столбцом. Она также создаст два поля временных меток для
+        отслеживания времени создания и обновления статьи.</p>
+    <div class="info"><p>Для подробностей о миграциях Rails обратитесь к руководству .</p></div>
+    <p>Сейчас нам нужно использовать команду rake, чтобы запустить миграцию:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate
+</pre>
+    </div>
+    <p>Rails запустит эту команду миграции и сообщит, что он создал таблицу Articles.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+==  CreateArticles: migrating ==================================================
+-- create_table(:articles)
+   -&gt; 0.0019s
+==  CreateArticles: migrated (0.0020s) =========================================
+</pre>
+    </div>
+    <div class="note"><p>Так как вы работаете по умолчанию в среде development, эта команда будет
+        применена к базе данных, определенной в секции <code>development</code> вашего файла <code>config/database.yml</code>.
+        Если хотите запустить миграции в другой среде, например в production, следует явно передать
+        ее при вызове команды: <code>bin/rake db:migrate RAILS_ENV=production</code>.</p></div>
+    <h4 class="inside_page_header" id="sohranenie-dannyh-v-kontrollere"> Сохранение данных в
+        контроллере</h4>
+    <p>Возвратимся к <code>ArticlesController</code>, нам нужно изменить экшн <code>create</code>,
+        чтобы использовать новую модель <code>Article</code> для сохранения данных в базе данных.
+        Откройте <code>app/controllers/articles_controller.rb</code> и измените экшн
+        <code>create</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @article = Article.new(params[:article])
+  @article.save
+  redirect_to @article
+end
+</pre>
+    </div>
+    <p>Вот что тут происходит: каждая модель Rails может быть инициализирована с помощью
+        соответствующих атрибутов, которые будут автоматически привязаны к соответствующим столбцам
+        базы данных. В первой строчке мы как раз это и делаем (помните, что
+        <code>params[:article]</code> содержит интересующие нас атрибуты). Затем
+        <code>@article.save</code> ответственен за сохранение модели в базу данных. Наконец, мы
+        перенаправляем пользователя на экшн <code>show</code>, который мы определим позже.</p>
+    <div class="info"><p>Вы, возможно, задаетесь вопросом, почему <code>A</code> в
+        <code>Article.new</code> заглавная, хотя все остальные ссылки на статьи в этом руководстве
+        используют строчное написание. В этом контексте мы ссылаемся на класс по имени
+        <code>Article</code>, который определен в <code>app/models/article.rb</code>. Имена классов
+        в Ruby должны начинаться с заглавной буквы.</p></div>
+    <div class="info"><p>Как мы увидим далее, <code>@article.save</code> возвращает булево значение,
+        показывающее, была ли сохранена модель, или нет.</p></div>
+    <p>Если теперь перейти на , вы <strong>почти</strong> сможете создать новую статью. Попробуйте!
+        Вы должны получить ошибку, которая выглядит так:</p>
+    <p><img alt="Forbidden attributes for new article" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/forbidden_attributes_for_new_article.png"
+            title=""></p>
+    <p>Rails имеет ряд защитных мер, помогающих писать безопасные приложения, и вы только что
+        столкнулись с одной из них. Она называется
+        и требует, чтобы мы указали Rails, какие именно параметры разрешено передавать в экшны
+        нашего контроллера.</p>
+    <p>Почему об этом нужно беспокоиться? Возможность взять и автоматически назначить все параметры
+        контроллера в вашу модель облегчит работу программиста, но это удобство также позволяет
+        использование в злонамеренных целях. Что, если запрос к серверу был специально создан как
+        отправка формы новой статьи, но также включает дополнительные поля, которые нарушают
+        целостность вашего приложения? Они будут 'массово назначены' в вашу модель и затем в базу
+        данных среди нормальных данных — потенциально ломая ваше приложение, или еще хуже.</p>
+    <p>Нам нужно составить белый список параметров нашего контроллера, чтобы предотвратить ошибочное
+        массовое назначение. В этом случае, мы хотим и разрешить, и затребовать параметры <code>title</code>
+        и <code>text</code> для корректного использования в <code>create</code>. Синтаксис для этого
+        представлен методами <code>require</code> и <code>permit</code>. Изменение затрагивает одну
+        строчку в экшне <code>create</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  @article = Article.new(params.require(:article).permit(:title, :text))
+</pre>
+    </div>
+    <p>Это часто выносится в отдельный метод, чтобы его можно было повторно использовать в
+        нескольких экшнах одного контроллера, например в <code>create</code> и <code>update</code>.
+        Метод часто делают <code>private</code> (это уже не связано с массовым назначением), чтобы
+        убедиться, что он не может быть вызван вне предназначенного контекста. Вот результат:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @article = Article.new(article_params)
+  @article.save
+  redirect_to @article
+end
+private
+  def article_params
+    params.require(:article).permit(:title, :text)
+  end
+</pre>
+    </div>
+    <div class="info"><p>За подробностями обратитесь к .</p></div>
+    <h4 class="inside_page_header" id="otobrazhenie-statey"> Отображение статей</h4>
+    <p>Если снова отправить форму, Rails сообщит о ненайденном экшне <code>show</code>. Нам это уже
+        не нужно, поэтому давайте добавим экшн <code>show</code> до того.</p>
+    <p>Как вы уже видели в результатах выполнения <code>bin/rake routes</code>, маршрут для экшна
+        <code>show</code> следующий:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+article GET    /articles/:id(.:format)      articles#show
+</pre>
+    </div>
+    <p>Специальный синтаксис <code>:id</code> сообщит rails, что этот маршрут ожидает параметр
+        <code>:id</code>, который в нашем случае будет идентификатором статьи.</p>
+    <p>Как и раньше, нам необходим экшн <code>show</code> в <code>app/controllers/articles_controller.rb</code>
+        и его соответствующая вьюха.</p>
+    <div class="note"><p>Частой практикой является помещать стандартные экшны CRUD в каждом
+        контроллере в следующем порядке: <code>index</code>, <code>show</code>, <code>new</code>,
+        <code>edit</code>, <code>create</code>, <code>update</code> и <code>destroy</code>. Можно
+        использовать любой порядок, какой хотите, но помните, что это публичные методы; как уже
+        упоминалось ранее в этом руководстве, они должны быть помещены перед любыми private или
+        protected методами в контроллере, чтобы они заработали.</p></div>
+    <p>С учетом этого, давайте добавим экшн <code>show</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  def show
+    @article = Article.find(params[:id])
+  end
+  def new
+  end
+  # опущено для краткости
+</pre>
+    </div>
+    <p>Нужно отметить несколько вещей. Мы использовали <code>Article.find</code> для поиска статьи,
+        в которой мы заинтересованы, передав <code>params[:id]</code>, чтобы получить параметр
+        <code>:id</code> из запроса. Также мы использовали переменную экземпляра (с префиксом <code>@</code>)
+        для хранения ссылки на объект статьи. Мы сделали так, потому что Rails передаст все
+        переменные экземпляра во вьюху.</p>
+    <p>Теперь создайте новый файл <code>app/views/articles/show.html.erb</code> со следующим
+        содержимым:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>С таким изменением, вы, наконец, сможете создать новую статью. Посетите и попробуйте!</p>
+    <p><img alt="Отображение статьи" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/show_action_for_articles.png" title="">
+    </p>
+    <h4 class="inside_page_header" id="otobrazhenie-vseh-statey"> Отображение всех статей</h4>
+    <p>Нам все еще нужен способ для отображения списка всех наших статей, давайте сделаем его.
+        Маршрут, выводящийся с помощью <code>bin/rake routes</code>, следующий:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+articles GET    /articles(.:format)          articles#index
+</pre>
+    </div>
+    <p>Добавьте соответствующий этому маршруту экшн <code>index</code> внутри <code>ArticlesController</code>
+        в файле <code>app/controllers/articles_controller.rb</code>. Когда мы пишем экшн
+        <code>index</code>, обычной практикой является разместить его как первый метод в
+        контроллере. Сделаем это:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  def index
+    @articles = Article.all
+  end
+  def show
+    @article = Article.find(params[:id])
+  end
+  def new
+  end
+  # опущено для краткости
+</pre>
+    </div>
+    <p>И, наконец, вьюха для этого экшна, расположенная в
+        <code>app/views/articles/index.html.erb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Listing articles&lt;/h1&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Text&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;% @articles.each do |article| %&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;%= article.title %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= article.text %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Show', article_path(article) %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;% end %&gt;
+&lt;/table&gt;
+</pre>
+    </div>
+    <p>Теперь, если перейти в , можно увидеть список всех статей, которые вы уже создали.</p>
+    <h4 class="inside_page_header" id="dobavlenie-ssylki"> Добавление ссылки</h4>
+    <p>Теперь вы можете создавать и просматривать отдельную и все статьи. Давайте добавим несколько
+        ссылок для навигации между страницами.</p>
+    <p>Откройте <code>app/views/welcome/index.html.erb</code> и измените его следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Hello, Rails!&lt;/h1&gt;
+&lt;%= link_to 'My Blog', controller: 'articles' %&gt;
+</pre>
+    </div>
+    <p>Метод <code>link_to</code> - один из встроенных хелперов Rails. Он создает гиперссылку, на
+        основе текста для отображения и указания куда перейти - в нашем случае путь для контроллера
+        articles.</p>
+    <p>Давайте добавим ссылки и в другие вьюхи, начнем с добавления ссылки "New Article" в <code>app/views/articles/index.html.erb</code>,
+        поместив ее над тегом <code>&lt;table&gt;</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to 'New article', new_article_path %&gt;
+</pre>
+    </div>
+    <p>Эта ссылка позволит перейти на форму для создания новой статьи.</p>
+    <p>Теперь добавьте еще одну ссылку в <code>app/views/articles/new.html.erb</code>, под формой,
+        чтобы вернуться обратно в экшн <code>index</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for :article, url: articles_path do |f| %&gt;
+  ...
+&lt;% end %&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Наконец, добавьте ссылку в шаблон <code>app/views/articles/show.html.erb</code>, чтобы также
+        вернуться в экшн <code>index</code>, чтобы просматривающие отдельную статью могли вернуться
+        и просмотреть снова полный список:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <div class="info"><p>Если вам нужна ссылка на экшн того же контроллера, не нужно определять
+        опцию <code>:controller</code>, так как Rails по умолчанию использует текущий контроллер.
+    </p></div>
+    <div class="info"><p>В режиме development (с которым вы работаете по умолчанию), Rails
+        перегружает ваше приложение с каждым запросом браузера, так что не нужно останавливать и
+        перезапускать веб-сервер при внесении изменений.</p></div>
+    <h4 class="inside_page_header" id="dobavim-nemnogo-validatsiy"> Добавим немного валидаций</h4>
+    <p>Файл модели <code>app/models/article.rb</code> выглядит проще простого:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+end
+</pre>
+    </div>
+    <p>Не так уж много написано в этом файле, но заметьте, что класс <code>Article</code> наследован
+        от <code>ActiveRecord::Base</code>. Active Record обеспечивает огромную функциональность для
+        Ваших моделей Rails, включая основные операции для базы данных CRUD (Create, Read, Update,
+        Destroy - создать, читать, обновить, уничтожить), валидации данных, сложную поддержку поиска
+        и возможность устанавливать отношения между разными моделями.</p>
+    <p>Rails включает методы, помогающие проверить данные, которые вы передаете в модель. Откройте
+        файл <code>app/models/article.rb</code> и отредактируйте:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+end
+</pre>
+    </div>
+    <p>Эти изменения позволят быть уверенным, что все статьи имеют заголовок длиной как минимум пять
+        символов. Rails может проверять разные условия в модели, включая существование или
+        уникальность полей, их формат и существование связанных объектов. Подробнее валидации
+        раскрыты в .</p>
+    <p>Теперь, когда есть валидации, при вызове <code>@article.save</code> на невалидной статье,
+        будет возвращен <code>false</code>. Если снова открыть <code>app/controllers/articles_controller.rb</code>,
+        вы увидите, что мы не проверяем результат вызова <code>@article.save</code> в экшне <code>create</code>.
+        Если в этой ситуации <code>@article.save</code> не удастся, нам нужно снова показать форму
+        пользователю. Для этого замените экшны <code>new</code> и <code>create</code> в <code>app/controllers/articles_controller.rb</code>
+        на эти:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def new
+  @article = Article.new
+end
+def create
+  @article = Article.new(article_params)
+  if @article.save
+    redirect_to @article
+  else
+    render 'new'
+  end
+end
+private
+  def article_params
+    params.require(:article).permit(:title, :text)
+  end
+</pre>
+    </div>
+    <p>Теперь экшн <code>new</code> создает новую переменную экземпляра по имени
+        <code>@article</code>, и вы увидите, зачем это, через пару абзацев.</p>
+    <p>Отметьте, что в экшне <code>create</code> мы использовали <code>render</code> вместо <code>redirect_to</code>,
+        когда <code>save</code> возвращает <code>false</code>. Метод <code>render</code>
+        использован, чтобы объект <code>@article</code> был передан назад в шаблон <code>new</code>,
+        когда он будет отрендерен. Этот рендеринг выполняется в рамках того же запроса, что и
+        отправка формы, в то время как <code>redirect_to</code> сообщает браузеру выполнить другой
+        запрос.</p>
+    <p>Если перезагрузите и попытаетесь сохранить статью без заголовка, Rails вернет вас обратно на
+        форму, но это не очень полезно. Вам нужно сказать пользователю, что что-то пошло не так. Для
+        этого нужно модифицировать <code>app/views/articles/new.html.erb</code> для проверки на
+        сообщения об ошибке:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for :article, url: articles_path do |f| %&gt;
+  &lt;% if @article.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;
+        &lt;%= pluralize(@article.errors.count, "error") %&gt; prohibited
+        this article from being saved:
+      &lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;% @article.errors.full_messages.each do |msg| %&gt;
+          &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+        &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :text %&gt;&lt;br&gt;
+    &lt;%= f.text_area :text %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Несколько вещей о том, что происходит. Мы проверяем, имеются ли какие-либо ошибки с помощью
+        <code>@article.errors.any?</code>, и в этом случае показываем список всех ошибок с помощью
+        <code>@article.errors.full_messages</code>.</p>
+    <p><code>pluralize</code> это хелпер rails, принимающий число и строку как аргументы. Если число
+        больше одного, строка будет автоматически склонено во множественном числе.</p>
+    <p>Причина, по которой мы добавили <code>@article = Article.new</code> в <code>ArticlesController</code>,
+        в том, что в противном случае <code>@article</code> будет <code>nil</code> во вьюхе, и вызов
+        <code>@article.errors.any?</code> вызовет ошибку.</p>
+    <div class="info"><p>Rails автоматически оборачивает поля, содержащие ошибку, в div с классом
+        <code>field_with_errors</code>. Можно определить правило css, чтобы сделать их
+        выделяющимися.</p></div>
+    <p>Теперь у нас будет прекрасное сообщение об ошибке при сохранении статьи без заголовка, если
+        попробуете так сделать в форме новой статьи .</p>
+    <p><img alt="Форма с ошибками" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/form_with_errors.png" title=""></p>
+    <h4 class="inside_page_header" id="obnovlenie-statey"> Обновление статей</h4>
+    <p>Мы раскрыли часть "CR" от CRUD. Теперь сфокусируемся на части "U", обновлении (updating)
+        статей.</p>
+    <p>Первым шагом следует добавить экшн <code>edit</code> в <code>ArticlesController</code>, как
+        правило между экшнами <code>new</code> и <code>create</code>, как показано.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def new
+  @article = Article.new
+end
+def edit
+  @article = Article.find(params[:id])
+end
+def create
+  @article = Article.new(article_params)
+  if @article.save
+    redirect_to @article
+  else
+    render 'new'
+  end
+end
+</pre>
+    </div>
+    <p>Вьюха будет содержать форму, схожую с той, которую мы использовали при создании новых статей.
+        Создайте файл с именем <code>app/views/articles/edit.html.erb</code> и добавьте в него
+        следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Editing article&lt;/h1&gt;
+&lt;%= form_for :article, url: article_path(@article), method: :patch do |f| %&gt;
+  &lt;% if @article.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;
+        &lt;%= pluralize(@article.errors.count, "error") %&gt; prohibited
+        this article from being saved:
+      &lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;% @article.errors.full_messages.each do |msg| %&gt;
+          &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+        &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :text %&gt;&lt;br&gt;
+    &lt;%= f.text_area :text %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Сейчас мы указываем форме на экшн <code>update</code>, который пока не определен, но скоро мы
+        это сделаем.</p>
+    <p>Опция <code>method: :patch</code> говорит Rails, что мы хотим, чтобы эта форма была
+        отправлена с помощью <code>PATCH</code>, метода HTTP, от которого ожидается, что он
+        используется для <strong>обновления</strong> ресурсов в соответствии с протоколом REST.</p>
+    <p>Первым параметром <code>form_for</code> может быть объект, скажем, <code>@article</code>.
+        который заставит хелпер заполнить форму полями объекта. Передав символ
+        (<code>:article</code>) с тем же именем, как переменная экземпляра (<code>@article</code>),
+        автоматически приведет к тому же поведению. Тут это и произошло. Подробности в .</p>
+    <p>Затем нужно создать экшн <code>update</code> в
+        <code>app/controllers/articles_controller.rb</code>. Добавьте его между экшном
+        <code>create</code> и методом <code>private</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @article = Article.new(article_params)
+  if @article.save
+    redirect_to @article
+  else
+    render 'new'
+  end
+end
+def update
+  @article = Article.find(params[:id])
+  if @article.update(article_params)
+    redirect_to @article
+  else
+    render 'edit'
+  end
+end
+private
+  def article_params
+    params.require(:article).permit(:title, :text)
+  end
+</pre>
+    </div>
+    <p>Новый метод, <code>update</code>, используется, когда хотите обновить запись, которая уже
+        существует, и он принимает хэш, содержащий атрибуты, которые вы хотите обновить. Как и
+        прежде, если будет ошибка обновления статьи, мы хотим опять показать форму пользователю.</p>
+    <p>Мы заново использовали метод <code>article_params</code>, который определили ранее для экшна
+        create.</p>
+    <div class="info"><p>Не обязательно передавать все атрибуты в <code>update</code>. К примеру,
+        если был вызван <code>@article.update(title: 'A new title')</code>, Rails обновит только
+        атрибут <code>title</code>, оставив все другие атрибуты нетронутыми.</p></div>
+    <p>Наконец, мы хотим показать ссылку на экшн <code>edit</code> в списке всех статей, так что,
+        давайте добавим ее в <code>app/views/articles/index.html.erb</code> рядом с ссылкой "Show":
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Text&lt;/th&gt;
+    &lt;th colspan="2"&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;% @articles.each do |article| %&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;%= article.title %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= article.text %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Show', article_path(article) %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Edit', edit_article_path(article) %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;% end %&gt;
+&lt;/table&gt;
+</pre>
+    </div>
+    <p>И также добавим в шаблон <code>app/views/articles/show.html.erb</code>, чтобы ссылка "Edit"
+        также была на странице статьи. Добавьте следующее в конце шаблона:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+...
+&lt;%= link_to 'Edit', edit_article_path(@article) %&gt; |
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>И вот как выглядит наше приложение сейчас:</p>
+    <p><img alt="Экшн index с ссылкой на редактирование" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/index_action_with_edit_link.png"
+            title=""></p>
+    <h4 class="inside_page_header" id="ispolzovanie-partialov-dlya-ochistki-povtoreniya-vo-vyuhah">
+        Использование партиалов для очистки повторения во вьюхах</h4>
+    <p>Наша страница <code>edit</code> очень похожа на страницу <code>new</code>, фактически они
+        используют один и тот же код для отображения формы. Давайте уберем это дублирование,
+        использовав партиал вьюхи. По соглашению, файлы партиалов начинаются со знака подчеркивания.
+    </p>
+    <div class="info"><p>Подробнее о партиалах можно прочитать в руководстве .</p></div>
+    <p>Создайте новый файл <code>app/views/articles/_form.html.erb</code> со следующим содержимым:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @article do |f| %&gt;
+  &lt;% if @article.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;
+        &lt;%= pluralize(@article.errors.count, "error") %&gt; prohibited
+        this article from being saved:
+      &lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;% @article.errors.full_messages.each do |msg| %&gt;
+          &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+        &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :text %&gt;&lt;br&gt;
+    &lt;%= f.text_area :text %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Все, за исключением объявления <code>form_for</code>, осталось тем же самым. Причина, по
+        которой можно использовать это более короткое и простое объявление <code>form_for</code> по
+        сравнению с другим формами, в том, что <code>@article</code> — это <em>ресурс</em>,
+        соответствующий полному набору ресурсных маршрутов, и Rails способен определить, какой
+        использовать URI и method. Подробнее об этом использовании <code>form_for</code> смотрите в
+        .</p>
+    <p>Давайте сейчас обновим вьюху <code>app/views/articles/new.html.erb</code>, чтобы использовать
+        этот новый партиал, переписав ее полностью:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;New article&lt;/h1&gt;
+&lt;%= render 'form' %&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>И то же самое для вьюхи <code>app/views/articles/edit.html.erb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Edit article&lt;/h1&gt;
+&lt;%= render 'form' %&gt;
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="udalenie-statey"> Удаление статей</h4>
+    <p>Теперь мы готовы раскрыть часть "D" от CRUD, удаление (deleting) из базы данных. Следуя
+        соглашению REST, маршрут для удаления статей в результатах вывода <code>bin/rake
+            routes</code> следующий:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+DELETE /articles/:id(.:format)      articles#destroy
+</pre>
+    </div>
+    <p>Метод роутинга <code>delete</code> должен быть использован для маршрутов, уничтожающих
+        ресурсы. Если бы его оставить обычным маршрутом <code>get</code>, станет возможным создавать
+        следующие злонамеренные URL:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;a href='http://example.com/articles/1/destroy'&gt;look at this cat!&lt;/a&gt;
+</pre>
+    </div>
+    <p>Мы используем метод <code>delete</code> для уничтожения ресурсов, и этот маршрут связывается
+        с экшном <code>destroy</code> в <code>app/controllers/articles_controller.rb</code>, который
+        еще не существует. Метод <code>destroy</code> обычно последний экшн CRUD в контроллере, и
+        подобно остальным публичным экшнам CRUD, он должен быть расположен перед любыми <code>private</code>
+        или <code>protected</code> методами. Давайте его добавим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def destroy
+  @article = Article.find(params[:id])
+  @article.destroy
+  redirect_to articles_path
+end
+</pre>
+    </div>
+    <p>Полностью <code>ArticlesController</code> в файле <code>app/controllers/articles_controller.rb</code>
+        должен выглядеть теперь так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  def index
+    @articles = Article.all
+  end
+  def show
+    @article = Article.find(params[:id])
+  end
+  def new
+    @article = Article.new
+  end
+  def edit
+    @article = Article.find(params[:id])
+  end
+  def create
+    @article = Article.new(article_params)
+    if @article.save
+      redirect_to @article
+    else
+      render 'new'
+    end
+  end
+  def update
+    @article = Article.find(params[:id])
+    if @article.update(article_params)
+      redirect_to @article
+    else
+      render 'edit'
+    end
+  end
+  def destroy
+    @article = Article.find(params[:id])
+    @article.destroy
+    redirect_to articles_path
+  end
+  private
+    def article_params
+      params.require(:article).permit(:title, :text)
+    end
+end
+</pre>
+    </div>
+    <p>Можно вызывать <code>destroy</code> на объектах Active Record, когда вы хотите удалить их из
+        базы данных. Отметьте, что нам не нужно добавлять вьюху для этого экшна, так как мы
+        перенаправляем на экшн <code>index</code>.</p>
+    <p>Наконец, добавим ссылку 'Destroy' в шаблон экшна <code>index</code> (<code>app/views/articles/index.html.erb</code>),
+        собрав все ссылки вместе.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Listing Articles&lt;/h1&gt;
+&lt;%= link_to 'New article', new_article_path %&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Text&lt;/th&gt;
+    &lt;th colspan="3"&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;% @articles.each do |article| %&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;%= article.title %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= article.text %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Show', article_path(article) %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Edit', edit_article_path(article) %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Destroy', article_path(article),
+              method: :delete,
+              data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;% end %&gt;
+&lt;/table&gt;
+</pre>
+    </div>
+    <p>Тут мы используем <code>link_to</code> другим образом. Мы передаем именованный маршрут как
+        второй аргумент, и опции как иной аргумент. Опции <code>method: :delete</code> и <code>data:
+            { confirm: 'Are you sure?' }</code> используются как атрибуты html5, поэтому при нажатии
+        ссылки, Rails сначала покажет пользователю диалог подтверждения, а затем отправит ссылку с
+        помощью метода <code>delete</code>. Это выполняется с помощью файла JavaScript <code>jquery_ujs</code>,
+        который автоматически включается в макет приложения (<code>app/views/layouts/application.html.erb</code>)
+        при создании приложения. Без этого файла диалог подтверждения не будет показан.</p>
+    <p><img alt="Диалог подтверждения" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/confirm_dialog.png" title=""></p>
+    <div class="info"><p>Узнайте больше про ненавязчивый адаптер jQuery (jQuery UJS) в руководстве
+        .</p></div>
+    <p>Наши поздравления, теперь вы можете создавать, просматривать все и по отдельности, обновлять
+        и уничтожать статьи.</p>
+    <div class="info"><p>В основном, Rails рекомендует использовать ресурсные объекты вместо
+        объявления маршрутов вручную. Подробнее о роутинге смотрите .</p></div>
+    <h3 class="inside_page_header" id="dobavlyaem-vtoruyu-model"> Добавляем вторую модель</h3>
+    <p>Настало время добавить вторую модель в приложение. Вторая модель будет управлять
+        комментариями на статьи.</p>
+    <h4 class="inside_page_header" id="generiruem-model"> Генерируем модель</h4>
+    <p>Мы намереваемся использовать тот же генератор, что мы использовали ранее при создании модели
+        <code>Article</code>. В этот раз мы создадим модель <code>Comment</code>, содержащую ссылку
+        на статью. Запустите следующую команду в терминале:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model Comment commenter:string body:text article:references
+</pre>
+    </div>
+    <p>Эта команда создаст четыре файла:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Файл</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td>db/migrate/20140120201010_create_comments.rb</td>
+            <td>Миграция для создания таблицы comments в вашей базе данных (ваше имя файла будет
+                включать другую временную метку)
+            </td>
+        </tr>
+        <tr>
+            <td>app/models/comment.rb</td>
+            <td>Модель Comment</td>
+        </tr>
+        <tr>
+            <td>test/models/comment_test.rb</td>
+            <td>Каркас для тестирования модели комментария</td>
+        </tr>
+        <tr>
+            <td>test/fixtures/comments.yml</td>
+            <td>Образцы комментариев для использования в тестировании</td>
+        </tr>
+    </table>
+    <p>Сначала взглянем на <code>app/models/comment.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Comment &lt; ActiveRecord::Base
+  belongs_to :article
+end
+</pre>
+    </div>
+    <p>Это очень похоже на модель <code>Article</code>, которую мы видели ранее. Разница в строке
+        <code>belongs_to :article</code>, которая устанавливает <em>связь</em> Active Record. Вы
+        ознакомитесь со связями в следующем разделе руководства.</p>
+    <p>В дополнение к модели, Rails также сделал миграцию для создания соответствующей таблицы базы
+        данных:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CreateComments &lt; ActiveRecord::Migration
+  def change
+    create_table :comments do |t|
+      t.string :commenter
+      t.text :body
+      t.references :article, index: true, foreign_key: true
+      t.timestamps null: false
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Строка <code>t.references</code> создает числовой столбец с именем <code>article_id</code>,
+        индекс для него, и ограничение внешнего ключа, указывающего на столбец <code>id</code>
+        таблицы <code>articles</code>. Далее запускаем миграцию:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate
+</pre>
+    </div>
+    <p>Rails достаточно сообразителен, чтобы запускать только те миграции, которые еще не были
+        запущены для текущей базы данных, в нашем случае Вы увидите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+==  CreateComments: migrating =================================================
+-- create_table(:comments)
+   -&gt; 0.0115s
+==  CreateComments: migrated (0.0119s) ========================================
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="svyazyvaem-modeli"> Связываем модели</h4>
+    <p>Связи Active Record позволяют Вам легко объявлять отношения между двумя моделями. В случае с
+        комментариями и статьями, вы можете описать отношения следующим образом:</p>
+    <ul>
+        <li>Каждый комментарий принадлежит одной статье.
+        </li>
+        <li>Одна статья может иметь много комментариев.
+        </li>
+    </ul>
+    <p>Фактически, это очень близко к синтаксису, который использует Rails для объявления этой
+        связи. Вы уже видели строку кода в модели <code>Comment</code> (app/models/comment.rb),
+        которая делает каждый комментарий принадлежащим статье:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Comment &lt; ActiveRecord::Base
+  belongs_to :article
+end
+</pre>
+    </div>
+    <p>Вам нужно отредактировать <code>app/models/article.rb</code>, добавив другую сторону связи:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  has_many :comments
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+  [...]
+end
+</pre>
+    </div>
+    <p>Эти два объявления автоматически делают доступным большое количество возможностей. Например,
+        если у вас есть переменная экземпляра <code>@article</code>, содержащая статью, вы можете
+        получить все комментарии, принадлежащие этой статье, в массиве, вызвав <code>@article.comments</code>.
+    </p>
+    <div class="info"><p>Более подробно о связях Active Record смотрите руководство .</p></div>
+    <h4 class="inside_page_header" id="dobavlyaem-marshrut-dlya-kommentariev"> Добавляем маршрут для
+        комментариев</h4>
+    <p>Как в случае с контроллером <code>welcome</code>, нам нужно добавить маршрут, чтобы Rails
+        знал, по какому адресу мы хотим пройти, чтобы увидеть <code>комментарии</code>. Снова
+        откройте файл <code>config/routes.rb</code> и отредактируйте его следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :articles do
+  resources :comments
+end
+</pre>
+    </div>
+    <p>Это создаст <code>comments</code> как <em>вложенный ресурс</em> в <code>articles</code>. Это
+        другая сторона захвата иерархических отношений, существующих между статьями и комментариями.
+    </p>
+    <div class="info"><p>Более подробно о роутинге написано в руководстве .</p></div>
+    <h4 class="inside_page_header" id="generiruem-kontroller"> Генерируем контроллер</h4>
+    <p>Имея модель, обратим свое внимание на создание соответствующего контроллера. Снова будем
+        использовать то же генератор, что использовали прежде:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate controller Comments
+</pre>
+    </div>
+    <p>Создадутся пять файлов и пустая директория:</p>
+    <table class="table table-striped">
+        <tr>
+            <th>Файл/Директория</th>
+            <th>Назначение</th>
+        </tr>
+        <tr>
+            <td>app/controllers/comments_controller.rb</td>
+            <td>Контроллер Comments</td>
+        </tr>
+        <tr>
+            <td>app/views/comments/</td>
+            <td>Вьюхи контроллера хранятся здесь</td>
+        </tr>
+        <tr>
+            <td>test/controllers/comments_controller_test.rb</td>
+            <td>Тест для контроллера</td>
+        </tr>
+        <tr>
+            <td>app/helpers/comments_helper.rb</td>
+            <td>Хелпер для вьюх</td>
+        </tr>
+        <tr>
+            <td>app/assets/javascripts/comment.coffee</td>
+            <td>CoffeeScript для контроллера</td>
+        </tr>
+        <tr>
+            <td>app/assets/stylesheets/comment.scss</td>
+            <td>Каскадная таблица стилей для контроллера</td>
+        </tr>
+    </table>
+    <p>Как и в любом другом блоге, наши читатели будут создавать свои комментарии сразу после
+        прочтения статьи, и после добавления комментария они будут направляться обратно на страницу
+        отображения статьи и видеть, что их комментарий уже отражен. В связи с этим, наш <code>CommentsController</code>
+        служит в качестве средства создания комментариев и удаления спама, если такой будет.</p>
+    <p>Сначала мы расширим шаблон Article show (<code>app/views/articles/show.html.erb</code>),
+        чтобы он позволял добавить новый комментарий:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+&lt;h2&gt;Add a comment:&lt;/h2&gt;
+&lt;%= form_for([@article, @article.comments.build]) do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :commenter %&gt;&lt;br&gt;
+    &lt;%= f.text_field :commenter %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :body %&gt;&lt;br&gt;
+    &lt;%= f.text_area :body %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;%= link_to 'Edit', edit_article_path(@article) %&gt; |
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Это добавит форму на страницу отображения статьи, создающую новый комментарий при вызове
+        экшна <code>create</code> в <code>CommentsController</code>. Тут вызов <code>form_for</code>
+        использует массив, что создаст вложенный маршрут, такой как
+        <code>/articles/1/comments</code>.</p>
+    <p>Давайте напишем <code>create</code> в <code>app/controllers/comments_controller.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CommentsController &lt; ApplicationController
+  def create
+    @article = Article.find(params[:article_id])
+    @comment = @article.comments.create(comment_params)
+    redirect_to article_path(@article)
+  end
+  private
+    def comment_params
+      params.require(:comment).permit(:commenter, :body)
+    end
+end
+</pre>
+    </div>
+    <p>Тут все немного сложнее, чем вы видели в контроллере для статей. Это побочный эффект
+        вложения, которое вы настроили. Каждый запрос к комментарию отслеживает статью, к которой
+        комментарий присоединен, таким образом сначала решаем вопрос с получением статьи, вызвав
+        <code>find</code> на модели <code>Article</code>.</p>
+    <p>Кроме того, код пользуется преимуществом некоторых методов, доступных для связей. Мы
+        используем метод <code>create</code> на <code>@article.comments</code>, чтобы создать и
+        сохранить комментарий. Это автоматически связывает комментарий так, что он принадлежит к
+        определенной статье.</p>
+    <p>Как только мы создали новый комментарий, мы возвращаем пользователя обратно на оригинальную
+        статью, используя хелпер <code>article_path(@article)</code>. Как мы уже видели, он вызывает
+        экшн <code>show</code> в <code>ArticlesController</code>, который, в свою очередь, рендерит
+        шаблон <code>show.html.erb</code>. В этом месте мы хотим отображать комментарии, поэтому
+        давайте добавим следующее в <code>app/views/articles/show.html.erb</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+&lt;h2&gt;Comments&lt;/h2&gt;
+&lt;% @article.comments.each do |comment| %&gt;
+  &lt;p&gt;
+    &lt;strong&gt;Commenter:&lt;/strong&gt;
+    &lt;%= comment.commenter %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;strong&gt;Comment:&lt;/strong&gt;
+    &lt;%= comment.body %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;h2&gt;Add a comment:&lt;/h2&gt;
+&lt;%= form_for([@article, @article.comments.build]) do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :commenter %&gt;&lt;br&gt;
+    &lt;%= f.text_field :commenter %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :body %&gt;&lt;br&gt;
+    &lt;%= f.text_area :body %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;%= link_to 'Edit', edit_article_path(@article) %&gt; |
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Теперь в вашем блоге можно добавлять статьи и комментарии и отображать их в нужных
+        местах.</p>
+    <p><img alt="Статья с комментариями" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/article_with_comments.png" title=""></p>
+    <h3 class="inside_page_header" id="refaktoring"> Рефакторинг</h3>
+    <p>Теперь, когда у нас есть работающие статьи и комментарии, взглянем на шаблон <code>app/views/articles/show.html.erb</code>.
+        Он стал длинным и неудобным. Давайте воспользуемся партиалами, чтобы разгрузить его.</p>
+    <h4 class="inside_page_header" id="rendering-kollektsiy-partialov"> Рендеринг коллекций
+        партиалов</h4>
+    <p>Сначала сделаем партиал для комментариев, показывающий все комментарии для статьи. Создайте
+        файл <code>app/views/comments/_comment.html.erb</code> и поместите в него следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Commenter:&lt;/strong&gt;
+  &lt;%= comment.commenter %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Comment:&lt;/strong&gt;
+  &lt;%= comment.body %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>Затем можно изменить <code>app/views/articles/show.html.erb</code> вот так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+&lt;h2&gt;Comments&lt;/h2&gt;
+&lt;%= render @article.comments %&gt;
+&lt;h2&gt;Add a comment:&lt;/h2&gt;
+&lt;%= form_for([@article, @article.comments.build]) do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :commenter %&gt;&lt;br&gt;
+    &lt;%= f.text_field :commenter %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :body %&gt;&lt;br&gt;
+    &lt;%= f.text_area :body %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+&lt;%= link_to 'Edit', edit_article_path(@article) %&gt; |
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Теперь это отрендерит партиал <code>app/views/comments/_comment.html.erb</code> по разу для
+        каждого комментария в коллекции <code>@article.comments</code>. Так как метод
+        <code>render</code> перебирает коллекцию <code>@article.comments</code>, он назначает каждый
+        комментарий локальной переменной с именем, как у партиала, в нашем случае
+        <code>comment</code>, которая нам доступна в партиале для отображения.</p>
+    <h4 class="inside_page_header" id="rendering-partialnoy-formy"> Рендеринг партиальной формы</h4>
+    <p>Давайте также переместим раздел нового комментария в свой партиал. Опять же, создайте файл
+        <code>app/views/comments/_form.html.erb</code>, содержащий:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for([@article, @article.comments.build]) do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :commenter %&gt;&lt;br&gt;
+    &lt;%= f.text_field :commenter %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :body %&gt;&lt;br&gt;
+    &lt;%= f.text_area :body %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Затем измените <code>app/views/articles/show.html.erb</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Title:&lt;/strong&gt;
+  &lt;%= @article.title %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Text:&lt;/strong&gt;
+  &lt;%= @article.text %&gt;
+&lt;/p&gt;
+&lt;h2&gt;Comments&lt;/h2&gt;
+&lt;%= render @article.comments %&gt;
+&lt;h2&gt;Add a comment:&lt;/h2&gt;
+&lt;%= render 'comments/form' %&gt;
+&lt;%= link_to 'Edit', edit_article_path(@article) %&gt; |
+&lt;%= link_to 'Back', articles_path %&gt;
+</pre>
+    </div>
+    <p>Второй render всего лишь определяет шаблон партиала, который мы хотим рендерить, <code>comments/form</code>.
+        Rails достаточно сообразительный, чтобы подставить подчеркивание в эту строку и понять, что
+        Вы хотели рендерить файл <code>_form.html.erb</code> в директории
+        <code>app/views/comments</code>.</p>
+    <p>Объект <code>@article</code> доступен в любых партиалах, рендерируемых во вьюхе, так как мы
+        определили его как переменную экземпляра.</p>
+    <h3 class="inside_page_header" id="udalenie-kommentariev"> Удаление комментариев</h3>
+    <p>Другой важной особенностью блога является возможность удаления спама. Чтобы сделать это,
+        нужно вставить некоторую ссылку во вьюхе и экшн <code>destroy</code> в <code>CommentsController</code>.
+    </p>
+    <p>Поэтому сначала добавим ссылку для удаления в партиал <code>app/views/comments/_comment.html.erb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;strong&gt;Commenter:&lt;/strong&gt;
+  &lt;%= comment.commenter %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;strong&gt;Comment:&lt;/strong&gt;
+  &lt;%= comment.body %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;%= link_to 'Destroy Comment', [comment.article, comment],
+               method: :delete,
+               data: { confirm: 'Are you sure?' } %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <p>Нажатие этой новой ссылки "Destroy Comment" запустит <code>DELETE
+        /articles/:article_id/comments/:id</code> в нашем <code>CommentsController</code>, который
+        затем будет использоваться для нахождения комментария, который мы хотим удалить, поэтому
+        давайте добавим экшн destroy в наш контроллер
+        (<code>app/controllers/comments_controller.rb</code>):</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CommentsController &lt; ApplicationController
+  def create
+    @article = Article.find(params[:article_id])
+    @comment = @article.comments.create(comment_params)
+    redirect_to article_path(@article)
+  end
+  def destroy
+    @article = Article.find(params[:article_id])
+    @comment = @article.comments.find(params[:id])
+    @comment.destroy
+    redirect_to article_path(@article)
+  end
+  private
+    def comment_params
+      params.require(:comment).permit(:commenter, :body)
+    end
+end
+</pre>
+    </div>
+    <p>Экшн <code>destroy</code> найдет статью, которую мы просматриваем, обнаружит комментарий в
+        коллекции <code>@article.comments</code> и затем уберет его из базы данных и вернет нас
+        обратно на просмотр статьи.</p>
+    <h4 class="inside_page_header" id="udalenie-svyazannyh-ob-ektov"> Удаление связанных
+        объектов</h4>
+    <p>Если удаляете статью, связанные с ней комментарии также должны быть удалены, в противном
+        случае они будут просто занимать место в базе данных. Rails позволяет использовать опцию
+        <code>dependent</code> на связи для достижения этого. Измените модель Article, <code>app/models/article.rb</code>,
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Article &lt; ActiveRecord::Base
+  has_many :comments, dependent: :destroy
+  validates :title, presence: true,
+                    length: { minimum: 5 }
+  [...]
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="bezopasnost"> Безопасность</h3>
+    <h4 class="inside_page_header" id="basic-authentication"> Простая аутентификация</h4>
+    <p>Если вы опубликуете свой блог онлайн, любой сможет добавлять, редактировать и удалять статьи
+        или удалять комментарии.</p>
+    <p>Rails предоставляет очень простую аутентификационную систему HTTP, которая хорошо работает в
+        этой ситуации.</p>
+    <p>В <code>ArticlesController</code> нам нужен способ блокировать доступ к различным экшнам,
+        если пользователь не аутентифицирован. Тут мы можем использовать метод Rails <code>http_basic_authenticate_with</code>,
+        разрешающий доступ к требуемым экшнам, если метод позволит это.</p>
+    <p>Чтобы использовать систему аутентификации, мы определим ее вверху нашего <code>ArticlesController</code>
+        в <code>app/controllers/articles_controller.rb</code>. В нашем случае, мы хотим, чтобы
+        пользователь был аутентифицирован для каждого экшна, кроме <code>index</code> и
+        <code>show</code>, поэтому напишем так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ArticlesController &lt; ApplicationController
+  http_basic_authenticate_with name: "dhh", password: "secret", except: [:index, :show]
+  def index
+    @articles = Article.all
+  end
+  # пропущено для краткости
+</pre>
+    </div>
+    <p>Мы также хотим позволить только аутентифицированным пользователям удалять комментарии,
+        поэтому в <code>CommentsController</code>
+        (<code>app/controllers/comments_controller.rb</code>) мы напишем:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class CommentsController &lt; ApplicationController
+  http_basic_authenticate_with name: "dhh", password: "secret", only: :destroy
+  def create
+    @article = Article.find(params[:article_id])
+    # ...
+  end
+  # пропущено для краткости
+</pre>
+    </div>
+    <p>Теперь, если попытаетесь создать новую статью, то встретитесь с простым вызовом
+        аутентификации HTTP:</p>
+    <p><img alt="Простой вызов аутентификации HTTP" class="img-polaroid"
+            src="http://rusrails.ru/images/getting_started/challenge.png" title=""></p>
+    <p>Также для приложений Rails доступны иные методы аутентификации. Двумя популярными аддонами
+        для Rails, среди прочих, являются
+        и .</p>
+    <h4 class="inside_page_header" id="prochie-mysli-o-bezopasnosti"> Прочие мысли о
+        безопасности</h4>
+    <p>Безопасность, особенно в веб приложениях, это обширная и детализированная область.
+        Безопасность вашего приложения Rails раскрывается более детально в .</p>
+    <h3 class="inside_page_header" id="chto-dalshe"> Что дальше?</h3>
+    <p>После того, как вы создали свое первое приложение на Rails, можете свободно его
+        модифицировать и экспериментировать на свое усмотрение.</p>
+    <p>Помните, что вы не сможете сделать без посторонней помощи все, что угодно. Так же, как вы
+        обращались к этому руководству "Rails для начинающих", далее можете так же свободно
+        пользоваться этими ресурсами:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>Канал на irc.freenode.net
+        </li>
+    </ul>
+    <p>Отдельно хотелось бы выделить и поддержать следующие хорошие русскоязычные ресурсы по Ruby on
+        rails:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="oshibki-konfiguratsii"> Ошибки конфигурации</h3>
+    <p>Простейший способ работы с Rails заключается в хранении всех внешних данных в UTF-8. Если не
+        так, библиотеки Ruby и Rails часто будут способны конвертировать ваши родные данные в UTF-8,
+        но это не всегда надежно работает, поэтому лучше быть уверенным, что все внешние данные
+        являются UTF-8.</p>
+    <p>Если вы допускаете ошибку в этой области, наиболее обычным симптомом является черный ромбик
+        со знаком вопроса внутри, появляющийся в браузере. Другим обычным симптомом являются
+        символы, такие как "Ã¼" появляющиеся вместо "ü". Rails предпринимает ряд внутренних шагов
+        для смягчения общих случаев тех проблем, которые могут быть автоматически обнаружены и
+        исправлены. Однако, если имеются внешние данные, не хранящиеся в UTF-8, это может привести к
+        такого рода проблемам, которые не могут быть автоматически обнаружены Rails и
+        исправлены.</p>
+    <p>Два наиболее обычных источника данных, которые не в UTF-8:</p>
+    <ul>
+        <li>Ваш текстовый редактор: Большинство текстовых редакторов (такие как TextMate), по
+            умолчанию сохраняют файлы как UTF-8. Если ваш текстовый редактор так не делает, это
+            может привести к тому, что специальные символы, введенные в ваши шаблоны (такие как é)
+            появятся как ромбик с вопросительным знаком в браузере. Это также касается ваших файлов
+            перевода i18N. Большинство редакторов, не устанавливающие по умолчанию UTF-8 (такие как
+            некоторые версии Dreamweaver) предлагают способ изменить умолчания на UTF-8. Сделайте
+            так.
+        </li>
+        <li>Ваша база данных: Rails по умолчанию преобразует данные из вашей базы данных в UTF-8 на
+            границе. Однако, если ваша база данных не использует внутри UTF-8, она может не быть
+            способной хранить все символы, которые введет ваш пользователь. Например, если ваша база
+            данных внутри использует Latin-1, и ваш пользователь вводит русские, ивритские или
+            японские символы, данные будут потеряны как только попадут в базу данных. Если возможно,
+            используйте UTF-8 как внутреннее хранилище в своей базе данных.
+        </li>
+    </ul>
+
+</body>
+</html>

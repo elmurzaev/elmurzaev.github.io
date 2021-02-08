@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<update>
+	<enabled>true</enabled>
+	<forced-update>true</forced-update>
+	<version>2.0.1.7</version>
+	<version-code>20017</version-code>
+	<release-notes>Некоторые правки и улучшения</release-notes>
+	<download-link>market://details?id=com.eschool.app</download-link>
+</update>

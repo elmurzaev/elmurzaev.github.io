@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Рекомендации для руководств по Ruby on Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="rekomendatsii-dlya-rukovodstv-po-ruby-on-rails"> Рекомендации
+        для руководств по Ruby on Rails</h2>
+    <p>Это руководство документирует рекомендации по написанию руководств по Ruby on Rails. Это
+        руководство следует самому себе в изящном цикле, являясь примером для самого себя.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>О соглашениях, используемых в документации Rails.
+        </li>
+        <li>Как сгенерировать руководства локально.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="markdown"> Markdown</h3>
+    <p>Руководства написаны на . Имеется полная , а также .</p>
+    <h3 class="inside_page_header" id="prolog"> Пролог</h3>
+    <p>Каждое руководство должно начинаться с мотивационного текста сверху (это маленькое введение в
+        голубой области ). Пролог должен рассказать читателю, о чем это руководство, и что они
+        изучат. В качестве примера смотрите .</p>
+    <h3 class="inside_page_header" id="zagolovki"> Заголовки</h3>
+    <p>Название каждого руководства использует заголовок <code>h1</code>; разделы руководства —
+        заголовок <code>h2</code>; подразделы используют заголовок <code>h3</code>; и так далее.
+        Отметьте, что сгенерированный в HTML результат будет использовать теги заголовков, начиная с
+        <code>&lt;h2&gt;</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Guide Title
+===========
+Section
+-------
+### Sub Section
+</pre>
+    </div>
+    <p>При написании заголовков начинайте с заглавной буквы все слова, кроме предлогов, союзов,
+        внутренних артиклей и форм глагола "to be":</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+#### Middleware Stack is an Array
+#### When are Objects Saved?
+</pre>
+    </div>
+    <p>Используйте форматирования для кода, как в обычном тексте:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+##### The `:content_type` Option
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rekomendatsii-po-dokumentirovaniyu-api"> Рекомендации по
+        документированию API</h3>
+    <p>Эти руководства и API должны быть согласованны и последовательны, насколько возможно. В
+        частности, эти разделы также применяются к руководствам:</p>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="rukovodstva-v-html"> Руководства в HTML</h3>
+    <p>До генерации руководств, убедитесь, что используете последнюю версию Bundler в своей системе.
+        На момент написания этих строк, вам нужно установить на свое устройство Bundler 1.3.5 или
+        более поздний.</p>
+    <p>Чтобы установить последнюю версию Bundler, запустите <code>gem install bundler</code>.</p>
+    <h4 class="inside_page_header" id="generatsiya"> Генерация</h4>
+    <p>Чтобы сгенерировать все руководства, просто сделайте <code>cd</code> в директорию <code>guides</code>,
+        запустите <code>bundle install</code> и выполните:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+bundle exec rake guides:generate
+</pre>
+    </div>
+    <p>или</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+bundle exec rake guides:generate:html
+</pre>
+    </div>
+    <p>Результирующие файлы HTML будут в директории <code>./output</code>.</p>
+    <p>Чтобы обработать <code>my_guide.md</code> и ничего, кроме него, используйте переменную среды
+        <code>ONLY</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+touch my_guide.md
+bundle exec rake guides:generate ONLY=my_guide
+</pre>
+    </div>
+    <p>По умолчанию неизмененные руководства не обрабатываются, поэтому <code>ONLY</code> редко
+        нужна на практике.</p>
+    <p>Чтобы принудить к обработке всех руководств, передайте <code>ALL=1</code>.</p>
+    <p>Также рекомендовано работать с <code>WARNINGS=1</code>. Это обнаружит дублированные ID и
+        предупредит о битых внутренних ссылках.</p>
+    <p>Если хотите сгенерировать руководства на языке ином, чем английский, можете держать их в
+        отдельной директории в <code>source</code> (то есть <code>source/es</code>) и использовать
+        переменную среды <code>GUIDES_LANGUAGE</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+bundle exec rake guides:generate GUIDES_LANGUAGE=es
+</pre>
+    </div>
+    <p>Если хотите увидеть все переменные окружения, которые могут использоваться генерационным
+        скриптом, просто запустите:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rake
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="validatsiya"> Валидация</h4>
+    <p>Пожалуйста, проверяйте сгенерированный HTML с помощью:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+bundle exec rake guides:validate
+</pre>
+    </div>
+    <p>В частности, заголовки имеют ID, созданный на основе их содержания, и это часто ведет к
+        дубликатам. Установите <code>WARNINGS=1</code> при генерировании руководств, чтобы
+        обнаружить их. Сообщение с предупреждением предложит решение.</p>
+    <h3 class="inside_page_header" id="rukovodstva-dlya-kindle"> Руководства для Kindle</h3>
+    <h4 class="inside_page_header" id="generatsiya"> Генерация</h4>
+    <p>Чтобы сгенерировать руководства для Kindle, используйте следующую задачу rake:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+bundle exec rake guides:generate:kindle
+</pre>
+    </div>
+
+</body>
+</html>

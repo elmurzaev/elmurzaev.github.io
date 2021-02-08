@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>35. Расширяющиеся объекты</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Если определен порожденный тип, то методы порождающего типа наследуются, однако при желании они могут переопределяться. Для переопределения наследуемого метода попросту описывается новый метод с тем же именем, что и наследуемый метод, но с другим телом и (при необходимости) с другим множеством параметров.</span>
+</p>
+<p><span>Определим дочерний по отношению к TEmployee тип, представляющий работника, которому платится часовая ставка, в следующем примере:</span>
+</p>
+<p><span>const</span></p>
+<p><span>PayPeriods = 26; { периоды выплат }</span></p>
+<p><span>OvertimeThreshold = 80; { на период выплаты }</span></p>
+<p><span>OvertimeFactor = 1.5; { почасовой коэффициент }</span></p>
+<p><span>type</span></p>
+<p><span>THourly = object(TEmployee)</span></p>
+<p><span>Time: Integer;</span></p>
+<p><span>procedure Init(AName, ATitle: string; ARate:</span></p>
+<p><span>Real, Atime: Integer);</span></p>
+<p><span>function GetPayAmount: Real;</span></p>
+<p><span>end;</span></p>
+<p><span>procedure THourly.Init(AName, ATitle: string;</span></p>
+<p><span>ARate: Real, Atime: Integer);</span></p>
+<p><span>begin</span></p>
+<p><span>TEmployee.Init(AName, ATitle, ARate);</span></p>
+<p><span>Time:= ATime;</span></p>
+<p><span>end;</span></p>
+<p><span>function THourly.GetPayAmount: Real;</span></p>
+<p><span>var</span></p>
+<p><span>Overtime: Integer;</span></p>
+<p><span>begin</span></p>
+<p><span>Overtime:= Time – OvertimeThreshold;</span></p>
+<p><span>if Overtime &gt; 0 then</span></p>
+<p><span>GetPayAmount:= RoundPay(OvertimeThreshold * Rate</span></p>
+<p><span>+</span></p>
+<p><span>Rate OverTime * OvertimeFactor</span></p>
+<p><span>* Rate)</span></p>
+<p><span>else</span></p>
+<p><span>GetPayAmount:= RoundPay(Time * Rate)</span></p>
+<p><span>end;</span></p>
+<p><span>Вызывая переопределяемый метод, необходимо быть уверенным в том, что порожденный тип объекта включает функциональность родителя. Кроме того, любое изменение в родительском методе автоматически оказывает влияние на все порожденные.</span>
+</p>
+<p><span>Важное замечание: хотя методы могут быть переопределены, поля данных переопределяться не могут. После того как было определено поле данных в иерархии объекта, никакой дочерний тип не может определить поле данных в точности с таким же именем.</span>
+</p>
+</body>
+</html>

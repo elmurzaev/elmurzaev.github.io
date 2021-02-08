@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Хелперы форм Action View</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="helpery-form"> Хелперы форм</h2>
+    <p>Формы в веб-приложениях - это основной интерфейс для пользовательского ввода. Однако,
+        разметка форм может быстро стать нудной в написании и поддержке из-за необходимости
+        описывать элементы форм и их бесчисленные атрибуты. Rails устраняет эту сложность,
+        предоставляя хелперы вьюх для разметки форм. Однако, поскольку эти хелперы имеют разные
+        принципы использования, разработчикам нужно знать различия между похожими методами хелперов,
+        прежде чем начать их использовать.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как создавать формы поиска и подобного рода формы, не представляющие определенную модель
+            вашего приложения
+        </li>
+        <li>Как создавать модельно-ориентированные формы для создания и редактирования определенных
+            записей базы данных
+        </li>
+        <li>Как создавать селект-боксы с различными типами данных
+        </li>
+        <li>Какие хелперы даты и времени предоставляет Rails
+        </li>
+        <li>В чем особенность формы загрузки файлов
+        </li>
+        <li>Как отправлять формы на внешние ресурсы и указывать настройку
+            <code>authenticity_token</code>.
+        </li>
+        <li>Как создавать сложные формы
+        </li>
+    </ul>
+    <div class="note"><p>Это руководство не претендует на полную документацию по доступным хелперам
+        форм и их аргументам. Если нужна полная информация, посетите .</p></div>
+    <h3 class="inside_page_header" id="razbiraemsya-s-prostymi-formami"> Разбираемся с простыми
+        формами</h3>
+    <p>Самый простой хелпер форм - это <code>form_tag</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag do %&gt;
+  Содержимое формы
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>При подобном вызове без аргументов, он создает тег <code>&lt;form&gt;</code>, который, при
+        отправке, сформирует POST-запрос к текущей странице. Например, предположим текущая страница
+        <code>/home/index</code>, тогда сгенерированный HTML будет выглядеть так (некоторые переводы
+        строк добавлены для читаемости):</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/" method="post"&gt;
+  &lt;input name="utf8" type="hidden" value="&amp;#x2713;" /&gt;
+  &lt;input name="authenticity_token" type="hidden" value="J7CBxfHalt49OSHp27hblqK20c9PgwJ108nDHX/8Cts=" /&gt;
+  Содержимое формы
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Можно увидеть, что HTML содержит элемент <code>input</code> с типом <code>hidden</code>. Этот
+        <code>input</code> важен, поскольку без него форма не может быть успешно отправлена. Скрытый
+        элемент input с атрибутом name <code>utf8</code> обеспечивает, чтобы браузер правильно
+        относился к кодировке вашей формы, он генерируется для всех форм, у которых action равен
+        "GET" или "POST". Второй элемент input с именем <code>authenticity_token</code> является
+        особенностью безопасности Rails, называемой <strong>защитой от подделки межсайтовых
+            запросов</strong>, и хелперы форм генерируют его для каждой формы, у которых action не
+        "GET" (если эта особенность безопасности включена). Подробнее об этом можно прочитать в .
+    </p>
+    <h4 class="inside_page_header" id="harakternaya-forma-poiska"> Характерная форма поиска</h4>
+    <p>Одной из наиболее простых форм, встречающихся в вебе, является форма поиска. Эта форма
+        содержит:</p>
+    <ul>
+        <li>элемент формы с методом "GET",
+        </li>
+        <li>метку для поля ввода,
+        </li>
+        <li>элемент поля ввода текста и
+        </li>
+        <li>элемент отправки.
+        </li>
+    </ul>
+    <p>Чтобы создать эту форму, используем, соответственно, <code>form_tag</code>,
+        <code>label_tag</code>, <code>text_field_tag</code> и <code>submit_tag</code>. Как здесь:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag("/search", method: "get") do %&gt;
+  &lt;%= label_tag(:q, "Search for:") %&gt;
+  &lt;%= text_field_tag(:q) %&gt;
+  &lt;%= submit_tag("Search") %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Это создаст следующий HTML:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/search" method="get"&gt;
+  &lt;input name="utf8" type="hidden" value="&amp;#x2713;" /&gt;
+  &lt;label for="q"&gt;Search for:&lt;/label&gt;
+  &lt;input id="q" name="q" type="text" /&gt;
+  &lt;input name="commit" type="submit" value="Search" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <div class="info"><p>Для каждого поля формы генерируется атрибут ID из его имени
+        (<code>"q"</code> в примере). Эти ID могут быть очень полезны для стилей CSS или управления
+        полями форм с помощью JavaScript.</p></div>
+    <p>Кроме <code>text_field_tag</code> и <code>submit_tag</code> имеется похожий хелпер для <em>каждого</em>
+        элемента управления формой в HTML.</p>
+    <div class="warning"><p>Всегда используйте "GET" как метод для форм поиска. Это позволит
+        пользователям сохранить в закладки определенный поиск и потом вернуться к нему. В более
+        общем плане Rails призывает вас использовать правильный метод HTTP для экшна.</p></div>
+    <h4 class="inside_page_header" id="neskolko-heshey-v-vyzovah-helpera-formy"> Несколько хэшей в
+        вызовах хелпера формы</h4>
+    <p>Хелпер <code>form_tag</code> принимает 2 аргумента: путь для экшна и хэш опций. Этот хэш
+        определяет метод отправки формы и опции HTML, такие как класс элемента form.</p>
+    <p>Как в случае с хелпером <code>link_to</code>, аргумент пути не должен быть строкой. Это может
+        быть хэш параметров URL, распознаваемый механизмом маршрутизации Rails, преобразующим хэш в
+        валидный URL. Однако, если оба аргумента для <code>form_tag</code> хэши, можно легко
+        получить проблему, если захотите определить оба. Например, вы напишите так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_tag(controller: "people", action: "search", method: "get", class: "nifty_form")
+# =&gt; '&lt;form accept-charset="UTF-8" action="/people/search?method=get&amp;class=nifty_form" method="post"&gt;'
+</pre>
+    </div>
+    <p>Здесь методы <code>method</code> и <code>class</code> присоединены к строке запроса
+        сгенерированного URL, поскольку, хотя вы и хотели передать два хэша, фактически вы передали
+        один. Чтобы сообщить об этом Ruby, следует выделить первый хэш (или оба хэша) фигурными
+        скобками. Это создаст HTML, который вы ожидаете:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_tag({controller: "people", action: "search"}, method: "get", class: "nifty_form")
+# =&gt; '&lt;form accept-charset="UTF-8" action="/people/search" method="get" class="nifty_form"&gt;'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="helpery-dlya-sozdaniya-elementov-form"> Хелперы для создания
+        элементов форм</h4>
+    <p>Rails предоставляет ряд хелперов для генерации элементов форм, таких как чекбоксы, текстовые
+        поля, радио-кнопки и так далее. Эти простые хелперы с именами, оканчивающимися на "<em>tag"
+            (такие как <code>text_field_tag</code> и <code>check_box_tag</code>), генерируют
+            отдельный элемент <code>&lt;input&gt;</code>. Первый параметр у них это всегда имя поля.
+            Когда форма отправлена, имя будет передано среди данных формы, и, в свою очередь,
+            помещено в хэш <code>params</code> со значением, введенным пользователем в это поле.
+            Например, если форма содержит `&lt;%= text</em>field_tag(:query) %&gt;<code>, то
+            значение для этого поля можно получить в контроллере с помощью</code>params[:query]`.
+    </p>
+    <p>При именовании полей Rails использует определенные соглашения, делающие возможным отправлять
+        параметры с нескалярными величинами, такие как массивы и хэши, которые также будут доступны
+        в <code>params</code>. Об этом можно прочесть в . Для подробностей по точному использованию
+        этих хелперов, обратитесь к .</p>
+    <h5 class="inside_page_header" id="chekboksy"> Чекбоксы</h5>
+    <p>Чекбоксы - это элементы управления формой, которые дают пользователю ряд опций, которые он
+        может включить или выключить:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= check_box_tag(:pet_dog) %&gt;
+&lt;%= label_tag(:pet_dog, "I own a dog") %&gt;
+&lt;%= check_box_tag(:pet_cat) %&gt;
+&lt;%= label_tag(:pet_cat, "I own a cat") %&gt;
+</pre>
+    </div>
+    <p>Это создаст следующее:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="pet_dog" name="pet_dog" type="checkbox" value="1" /&gt;
+&lt;label for="pet_dog"&gt;I own a dog&lt;/label&gt;
+&lt;input id="pet_cat" name="pet_cat" type="checkbox" value="1" /&gt;
+&lt;label for="pet_cat"&gt;I own a cat&lt;/label&gt;
+</pre>
+    </div>
+    <p>Первый параметр у <code>check_box_tag</code>, разумеется, - это имя поля. Второй параметр,
+        естественно, - это значение поля. Это значение будет включено в данные формы (и будет
+        присутствовать в <code>params</code>), когда чекбокс нажат.</p>
+    <h5 class="inside_page_header" id="radio-knopki"> Радио-кнопки</h5>
+    <p>Радио-кнопки, чем-то похожие на чекбоксы, - это элементы управления, которые определяют набор
+        взаимоисключающих опций (т.е. пользователь может выбрать только одну):</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= radio_button_tag(:age, "child") %&gt;
+&lt;%= label_tag(:age_child, "I am younger than 21") %&gt;
+&lt;%= radio_button_tag(:age, "adult") %&gt;
+&lt;%= label_tag(:age_adult, "I'm over 21") %&gt;
+</pre>
+    </div>
+    <p>Результат:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="age_child" name="age" type="radio" value="child" /&gt;
+&lt;label for="age_child"&gt;I am younger than 21&lt;/label&gt;
+&lt;input id="age_adult" name="age" type="radio" value="adult" /&gt;
+&lt;label for="age_adult"&gt;I'm over 21&lt;/label&gt;
+</pre>
+    </div>
+    <p>Как и у <code>check_box_tag</code>, второй параметр для <code>radio_button_tag</code> это
+        значение поля. Так как эти две радио-кнопки имеют одинаковое имя (<code>age</code>),
+        пользователь может выбрать одну, и <code>params[:age]</code> будет содержать или <code>"child"</code>,
+        или <code>"adult"</code>.</p>
+    <div class="note"><p>Всегда используйте метки (labels) для чекбоксов и радио-кнопок. Они
+        связывают текст с определенной опцией и, предоставляя большее пространство для щелчка,
+        упрощают ввод.</p></div>
+    <h4 class="inside_page_header" id="drugie-interesnye-helpery"> Другие интересные хелперы</h4>
+    <p>Среди других элементов управления формой стоит упомянуть текстовое поле, поле пароля, скрытое
+        поле, поля поиска, ввода телефона, даты, времени, цвета, даты-времени, локальных
+        даты-времени, месяца, недели, url, email, числовые и интервалов:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= text_area_tag(:message, "Hi, nice site", size: "24x6") %&gt;
+&lt;%= password_field_tag(:password) %&gt;
+&lt;%= hidden_field_tag(:parent_id, "5") %&gt;
+&lt;%= search_field(:user, :name) %&gt;
+&lt;%= telephone_field(:user, :phone) %&gt;
+&lt;%= date_field(:user, :born_on) %&gt;
+&lt;%= datetime_field(:user, :meeting_time) %&gt;
+&lt;%= datetime_local_field(:user, :graduation_day) %&gt;
+&lt;%= month_field(:user, :birthday_month) %&gt;
+&lt;%= week_field(:user, :birthday_week) %&gt;
+&lt;%= url_field(:user, :homepage) %&gt;
+&lt;%= email_field(:user, :address) %&gt;
+&lt;%= color_field(:user, :favorite_color) %&gt;
+&lt;%= time_field(:task, :started_at) %&gt;
+&lt;%= number_field(:product, :price, in: 1.0..20.0, step: 0.5) %&gt;
+&lt;%= range_field(:product, :discount, in: 1..100) %&gt;
+</pre>
+    </div>
+    <p>результат:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;textarea id="message" name="message" cols="24" rows="6"&gt;Hi, nice site&lt;/textarea&gt;
+&lt;input id="password" name="password" type="password" /&gt;
+&lt;input id="parent_id" name="parent_id" type="hidden" value="5" /&gt;
+&lt;input id="user_name" name="user[name]" type="search" /&gt;
+&lt;input id="user_phone" name="user[phone]" type="tel" /&gt;
+&lt;input id="user_born_on" name="user[born_on]" type="date" /&gt;
+&lt;input id="user_meeting_time" name="user[meeting_time]" type="datetime" /&gt;
+&lt;input id="user_graduation_day" name="user[graduation_day]" type="datetime-local" /&gt;
+&lt;input id="user_birthday_month" name="user[birthday_month]" type="month" /&gt;
+&lt;input id="user_birthday_week" name="user[birthday_week]" type="week" /&gt;
+&lt;input id="user_homepage" name="user[homepage]" type="url" /&gt;
+&lt;input id="user_address" name="user[address]" type="email" /&gt;
+&lt;input id="user_favorite_color" name="user[favorite_color]" type="color" value="#000000" /&gt;
+&lt;input id="task_started_at" name="task[started_at]" type="time" /&gt;
+&lt;input id="product_price" max="20.0" min="1.0" name="product[price]" step="0.5" type="number" /&gt;
+&lt;input id="product_discount" max="100" min="1" name="product[discount]" type="range" /&gt;
+</pre>
+    </div>
+    <p>Скрытые поля не отображаются пользователю, вместо этого они содержат данные, как и любое
+        текстовое поле. Их значения могут быть изменены с помощью JavaScript.</p>
+    <div class="warning"><p>Поля поиска, ввода телефона, даты, времени, цвета, даты-времени,
+        локальных даты-времени, месяца, недели, url, email, числовые и интервалов - это элементы
+        управления HTML5. Если необходимо, чтобы у вашего приложения была совместимость со старыми
+        браузерами, вам необходим HTML5 polyfill (предоставляемый с помощью CSS и/или JavaScript).
+        Хотя в таких решениях , популярными инструментами на сегодняшний момент являются и ,
+        предоставляющие простой способ добавить функциональность, основанную на присутствии
+        обнаруженных особенностей HTML5.</p></div>
+    <div class="info"><p>Если используются поля для ввода пароля (для любых целей), вы можете
+        настроить свое приложение для предотвращения появления их значений в логах приложения. Это
+        можно изучить в .</p></div>
+    <h3 class="inside_page_header" id="rabotaem-s-ob-ektami-modeli"> Работаем с объектами
+        модели</h3>
+    <h4 class="inside_page_header" id="helpery-ob-ekta-modeli"> Хелперы объекта модели</h4>
+    <p>Наиболее частыми задачами для форм являются редактирование или создание объекта модели. В то
+        время как хелперы <code>*_tag</code>, конечно, могут быть использованы для этой задачи, они
+        несколько многословны, так как для каждого тега вам придется обеспечить использование
+        правильного имени параметра и установку подходящего значения поля по умолчанию. Rails
+        предоставляет методы, подогнанные под эту задачу. У этих хелперов отсутствует суффикс <code>_tag</code>,
+        например, <code>text_field</code>, <code>text_area</code>.</p>
+    <p>У этих хелперов первый аргумент - это имя переменной экземпляра, а второй - это имя метода
+        (обычно атрибутного), вызываемого для этого объекта. Rails установит значение элемента
+        управления равным возвращаемому значению метода объекта и установит подходящее имя поля.
+        Если ваш контроллер определил <code>@person</code> и имя этой персоны Henry, тогда форма,
+        содержащая:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= text_field(:person, :name) %&gt;
+</pre>
+    </div>
+    <p>выдаст подобный результат</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;input id="person_name" name="person[name]" type="text" value="Henry"/&gt;
+</pre>
+    </div>
+    <p>После подтверждения формы, значение, введенное пользователем, будет храниться в <code>params[:person][:name]</code>.
+        Хэш <code>params[:person]</code> годен для передачи в <code>Person.new</code> или, если
+        <code>@person</code> - это экземпляр Person, в <code>@person.update</code>. Хотя имя
+        атрибута - очень распространенный второй параметр для этих хелперов, он не является
+        обязательным. В вышеупомянутом примере, до тех пор пока объекты person имеют методы <code>name</code>
+        и <code>name=</code>, Rails будет удовлетворен.</p>
+    <div class="warning"><p>Необходимо передавать имя переменной экземпляра, т.е.
+        <code>:person</code> или <code>"person"</code>, а не фактический экземпляр объекта вашей
+        модели.</p></div>
+    <p>Rails предоставляет хелперы для отображения ошибок валидации, связанных с объектом модели.
+        Детально они раскрываются в руководстве .</p>
+    <h4 class="inside_page_header" id="privyazyvanie-formy-k-ob-ektu"> Привязывание формы к
+        объекту</h4>
+    <p>Хотя комфортность несколько улучшилась, она еще далека от совершенства. Если у
+        <code>Person</code> много атрибутов для редактирования, тогда мы должны повторить имя
+        редактируемого объекта много раз. То, что мы хотим сделать, - это как-то привязать форму к
+        объекту модели, что как раз осуществляется с помощью <code>form_for</code>.</p>
+    <p>Допустим у нас есть контроллер для работы со статьями <code>articles_controller.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def new
+  @article = Article.new
+end
+</pre>
+    </div>
+    <p>Соответствующая вьюха <code>articles/new.html.erb:</code>, использующая <code>form_for</code>,
+        выглядит так</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @article, url: {action: "create"}, html: {class: "nifty_form"} do |f| %&gt;
+  &lt;%= f.text_field :title %&gt;
+  &lt;%= f.text_area :body, size: "60x12" %&gt;
+  &lt;%= f.submit "Create" %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Следует отметить несколько вещей:</p>
+    <ul>
+        <li>
+            <code>@article</code> - это фактический объект, который редактируется.
+        </li>
+        <li>Здесь есть одиночный хэш опций. Опции маршрутизации передаются в хэше <code>:url</code>,
+            опции HTML передаются в хэше <code>:html</code>. Также для формы можно предоставить
+            опцию <code>:namespace</code>, чтобы быть уверенным в уникальности атрибутов id
+            элементов формы. Атрибут namespace будет префиксом с подчеркиванием в генерируемых для
+            HTML id.
+        </li>
+        <li>Метод <code>form_for</code> предоставляет объект <strong>form builder</strong>
+            (переменная <code>f</code>).
+        </li>
+        <li>Методы создания элементов управления формой вызываются <em>для</em> объекта form builder
+            <code>f</code>.
+        </li>
+    </ul>
+    <p>Итоговый HTML:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/articles" method="post" class="nifty_form"&gt;
+  &lt;input id="article_title" name="article[title]" type="text" /&gt;
+  &lt;textarea id="article_body" name="article[body]" cols="60" rows="12"&gt;&lt;/textarea&gt;
+  &lt;input name="commit" type="submit" value="Create" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Имя, переданное в <code>form_for</code>, контролирует ключ, используемый в
+        <code>params</code> для доступа к значениям формы. В примере имя <code>article</code>, и,
+        таким образом, все поля формы имеют имена <code>article[attribute_name]</code>.
+        Соответственно, в экшне <code>create</code> хэш <code>params[:article]</code> имеет ключи
+        <code>:title</code> и <code>:body</code>. О значимости имен полей ввода подробнее можно
+        прочитать в разделе про имена параметров.</p>
+    <p>Методы хелпера, вызываемые из form builder, идентичны хелперам объекта модели, за исключением
+        того, что не нужно указывать, какой объект будет редактироваться, так как это уже
+        регулируется в form builder.</p>
+    <p>Можно создать подобное привязывание без фактического создания тега <code>&lt;form&gt;</code>
+        с помощью хелпера <code>fields_for</code>. Это полезно для редактирования дополнительных
+        объектов модели в той же форме. Например, если имеем модель <code>Person</code> со связанной
+        моделью <code>ContactDetail</code>, Вы можете создать форму для создания обеих моделей
+        подобным образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @person, url: {action: "create"} do |person_form| %&gt;
+  &lt;%= person_form.text_field :name %&gt;
+  &lt;%= fields_for @person.contact_detail do |contact_details_form| %&gt;
+    &lt;%= contact_details_form.text_field :phone_number %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>которая выдаст такой результат:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/people" class="new_person" id="new_person" method="post"&gt;
+  &lt;input id="person_name" name="person[name]" type="text" /&gt;
+  &lt;input id="contact_detail_phone_number" name="contact_detail[phone_number]" type="text" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Объект, предоставляемый <code>fields_for</code>, - это form builder, подобный тому, который
+        предоставляется <code>form_for</code> (фактически <code>form_for</code> внутри себя вызывает
+        <code>fields_for</code>).</p>
+    <h4 class="inside_page_header" id="polozhites-na-identifikatsiyu-zapisi"> Положитесь на
+        идентификацию записи</h4>
+    <p>Модель Article непосредственно доступна пользователям приложения, и таким образом, следуя
+        лучшим рекомендациям разработки на Rails, вы должны объявить ее как <strong>ресурс</strong>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :articles
+</pre>
+    </div>
+    <div class="info"><p>Объявление ресурса имеет несколько побочных эффектов. Смотрите для
+        подробностей по настройке и использованию ресурсов.</p></div>
+    <p>Когда работаем с ресурсами RESTful, вызовы <code>form_for</code> могут стать значительно
+        проще, если их основывать на <strong>идентификации записи</strong>. Вкратце, вы должны всего
+        лишь передать экземпляр модели и позволить Rails выяснить имя модели и остальное:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+## Создание новой статьи
+# длинный стиль:
+form_for(@article, url: articles_path)
+# то же самое, короткий стиль (используется идентификация записи):
+form_for(@article)
+## Редактирование существующей статьи
+# длинный стиль:
+form_for(@article, url: article_path(@article), html: {method: "patch"})
+# короткий стиль:
+form_for(@article)
+</pre>
+    </div>
+    <p>Отметьте, как вызов короткого стиля <code>form_for</code> остается тем же самым, независимо
+        от того, будет запись новой или существующей. Идентификация записи достаточно
+        сообразительная, чтобы выяснить, новая ли запись, запрашивая <code>record.new_record?</code>.
+        Она также выбирает правильный путь для подтверждения и имя, основывающееся на классе
+        объекта.</p>
+    <p>Rails также автоматически установит надлежащие атрибуты формы <code>class</code> и
+        <code>id</code>: форма, создающая статью, будет иметь <code>id</code> и <code>class</code>
+        <code>new_article</code>. Если редактируется статья с id=23, то <code>class</code> будет
+        установлен как <code>edit_article</code>, и id - как <code>edit_article_23</code>. Эти
+        атрибуты будут опускаться для краткости далее в этом руководстве.</p>
+    <div class="warning"><p>Когда используется STI (single-table inheritance, наследование с единой
+        таблицей) с вашими моделями, нельзя полагаться на идентификацию записей субкласса, если лишь
+        родительский класс определен ресурсом. Вы должны определить имя модели, <code>:url</code> и
+        <code>:method</code> явно.</p></div>
+    <h5 class="inside_page_header" id="rabotaem-s-prostranstvami-imen"> Работаем с пространствами
+        имен</h5>
+    <p>Если вы создали пространство имен маршрутов, <code>form_for</code> также можно изящно
+        сократить. Если у приложения есть пространство имен admin, то</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_for [:admin, @article]
+</pre>
+    </div>
+    <p>создаст форму, которая передается <code>ArticlesController</code> в пространстве имен admin
+        (передача в <code>admin_article_path(@article)</code> в случае с обновлением). Если у вас
+        несколько уровней пространства имен, тогда синтаксис подобный:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_for [:admin, :management, @article]
+</pre>
+    </div>
+    <p>Более подробно о системе маршрутизации Rails и связанным соглашениям смотрите .</p>
+    <h4 class="inside_page_header" id="kak-formy-rabotayut-s-metodami-patch-put-ili-delete"> Как
+        формы работают с методами PATCH, PUT или DELETE?</h4>
+    <p>Фреймворк Rails поддерживает дизайн RESTful в ваших приложениях, что означает частое
+        использование запросов "PATCH" и "DELETE" (помимо "GET" и "POST"). Однако, большинство
+        браузеров <em>не поддерживают</em> методы, иные, чем "GET" и "POST", когда они исходят от
+        подтверждаемых форм.</p>
+    <p>Rails работает с этой проблемой, эмулируя другие методы с помощью POST со скрытым полем,
+        названным <code>"_method"</code>, который установлен для отражения желаемого метода:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+form_tag(search_path, method: "patch")
+</pre>
+    </div>
+    <p>результат:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/search" method="post"&gt;
+  &lt;input name="_method" type="hidden" value="patch" /&gt;
+  &lt;input name="utf8" type="hidden" value="&amp;#x2713;" /&gt;
+  &lt;input name="authenticity_token" type="hidden" value="f755bb0ed134b76c432144748a6d4b7a7ddf2b71" /&gt;
+  ...
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>При парсинге данных POST, Rails принимает в счет специальный параметр <code>_method</code> и
+        действует с ним, как будто бы был определен этот метод HTTP ("PATCH" в этом примере).</p>
+    <h3 class="inside_page_header" id="legkoe-sozdanie-spiskov-vybora"> Легкое создание списков
+        выбора</h3>
+    <p>Списки выбора в HTML требуют значительной верстки (один элемент <code>OPTION</code> для
+        каждого варианта выбора), поэтому имеет большой смысл создавать их динамически.</p>
+    <p>Вот как может выглядеть верстка:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;select name="city_id" id="city_id"&gt;
+  &lt;option value="1"&gt;Lisbon&lt;/option&gt;
+  &lt;option value="2"&gt;Madrid&lt;/option&gt;
+  ...
+  &lt;option value="12"&gt;Berlin&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+    </div>
+    <p>Тут мы имеем перечень городов, имена которых представлены пользователю. Самому приложению для
+        обработки нужен только их ID, поэтому он используется как атрибут value варианта выбора.
+        Давайте посмотрим, как Rails может нам помочь.</p>
+    <h4 class="inside_page_header" id="tegi-select-i-option"> Тэги Select и Option</h4>
+    <p>Наиболее простой хелпер - это <code>select_tag</code>, который, как следует из имени, просто
+        создает тег <code>SELECT</code>, инкапсулирующий строку опций:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= select_tag(:city_id, '&lt;option value="1"&gt;Lisbon&lt;/option&gt;...') %&gt;
+</pre>
+    </div>
+    <p>Это закладывает начало, но пока еще динамически не создает теги вариантов выбора. Вы можете
+        создать теги option с помощью хелпера <code>options_for_select</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...]) %&gt;
+результат:
+&lt;option value="1"&gt;Lisbon&lt;/option&gt;
+&lt;option value="2"&gt;Madrid&lt;/option&gt;
+...
+</pre>
+    </div>
+    <p>Первый аргумент для <code>options_for_select</code> - это вложенный массив, в котором каждый
+        элемент содержит два элемента: текст варианта (название города) и значение варианта (id
+        города). Значение варианта - это то, что будет передано в ваш контроллер. Часто бывает, что
+        значение - это id соответствующего объекта базы данных, но это не всегда так.</p>
+    <p>Зная это, вы можете комбинировать <code>select_tag</code> и <code>options_for_select</code>
+        для достижения желаемой полной верстки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= select_tag(:city_id, options_for_select(...)) %&gt;
+</pre>
+    </div>
+    <p><code>options_for_select</code> позволяет вам предварительно выбрать вариант, передав его
+        значение.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...], 2) %&gt;
+результат:
+&lt;option value="1"&gt;Lisbon&lt;/option&gt;
+&lt;option value="2" selected="selected"&gt;Madrid&lt;/option&gt;
+...
+</pre>
+    </div>
+    <p>Всякий раз, когда Rails видит внутреннее значение создаваемого варианта, соответствующего
+        этому значению, он добавит атрибут <code>selected</code> к нему.</p>
+    <div class="info"><p>Второй аргумент для <code>options_for_select</code> должен быть точно равен
+        желаемому внутреннему значению. В частности, если значение - число <code>2</code>, вы не
+        можете передать <code>"2"</code> в <code>options_for_select</code> - вы должны передать
+        <code>2</code>. Имейте это в виду при использовании значений, извлеченных из хэша <code>params</code>,
+        так как они всегда строковые.</p></div>
+    <div class="warning"><p>Когда отсутствует <code>:include_blank</code> или <code>:prompt</code>,
+        <code>:include_blank</code> становится true, если атрибут <code>required</code> - true,
+        отображаемый <code>size</code> - 1 и <code>multiple</code> не true.</p></div>
+    <p>С помощью хэшей можно добавить произвольные атрибуты в option:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= options_for_select(
+  [
+    ['Lisbon', 1, { 'data-size' =&gt; '2.8 million' }],
+    ['Madrid', 2, { 'data-size' =&gt; '3.2 million' }]
+  ], 2
+) %&gt;
+результат:
+&lt;option value="1" data-size="2.8 million"&gt;Lisbon&lt;/option&gt;
+&lt;option value="2" selected="selected" data-size="3.2 million"&gt;Madrid&lt;/option&gt;
+...
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="spiski-vybora-dlya-raboty-s-modelyami"> Списки выбора для
+        работы с моделями</h4>
+    <p>В большинстве случаев элементы управления формой будут связаны с определенной моделью базы
+        данных, и, как вы наверное и ожидали, Rails предоставляет хелперы, предназначенные для этой
+        цели. Как в случае с другими хелперами форм, когда работаете с моделями, суффикс
+        <code>_tag</code> отбрасывается от <code>select_tag</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# контроллер:
+@person = Person.new(city_id: 2)
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+# вьюха:
+&lt;%= select(:person, :city_id, [['Lisbon', 1], ['Madrid', 2], ...]) %&gt;
+</pre>
+    </div>
+    <p>Отметьте, что третий параметр - массив опций - имеет тот же самый тип аргумента, что мы
+        передавали в <code>options_for_select</code>. Преимущество в том, что не стоит беспокоиться
+        об предварительном выборе правильного города, если пользователь уже выбрал его - Rails
+        сделает это за вас, прочитав из атрибута <code>@person.city_id</code>.</p>
+    <p>Как и в других хелперах, если хотите использовать хелпер <code>select</code> в form builder с
+        областью видимостью объекта <code>@person</code>, синтаксис будет такой:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+# select в form builder
+&lt;%= f.select(:city_id, ...) %&gt;
+</pre>
+    </div>
+    <p>В хелпер <code>select</code> также можно передать блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= f.select(:city_id) do %&gt;
+  &lt;% [['Lisbon', 1], ['Madrid', 2]].each do |c| -%&gt;
+    &lt;%= content_tag(:option, c.first, value: c.last) %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <div class="warning"><p>При использовании <code>select</code> (или подобного хелпера, такого как
+        <code>collection_select</code>, <code>select_tag</code>), чтобы установить связь <code>belongs_to</code>,
+        вы должны передать имя внешнего ключа (в примере выше <code>city_id</code>), а не само имя
+        связи. Если определите <code>city</code> вместо <code>city_id</code>, Active Record вызовет
+        ошибку в строке <code>ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got
+            String(#1138750)</code>, когда вы передадите хэш <code>params</code> в
+        <code>Person.new</code> или <code>update</code>. Можно взглянуть на это по другому, что
+        хелперы форм редактируют только атрибуты. Также вам стоит побеспокоиться о потенциальных
+        последствиях безопасности, если разрешить пользователям редактировать внешние ключи
+        напрямую.</p></div>
+    <h4 class="inside_page_header" id="tegi-varianta-vybora-iz-kollektsii-proizvolnyh-ob-ektov">
+        Тэги варианта выбора из коллекции произвольных объектов</h4>
+    <p>Создание тегов вариантов с помощью <code>options_for_select</code> требует, чтобы вы создали
+        массив, содержащий текст и значение для каждого варианта. Но что, если мы имеем модель
+        <code>City</code> (вероятно даже модель Active Record) и хотим создать теги вариантов из
+        коллекции этих объектов? Одним из решений будет сделать вложенный массив с помощью итераций:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% cities_array = City.all.map { |city| [city.name, city.id] } %&gt;
+&lt;%= options_for_select(cities_array) %&gt;
+</pre>
+    </div>
+    <p>Хотя это и валидное решение, но Rails предоставляет менее многословную альтернативу: <code>options_from_collection_for_select</code>.
+        Этот хелпер принимает коллекцию произвольных объектов и два дополнительных аргумента - имена
+        методов для считывания опций <strong>value</strong> и <strong>text</strong>, соответственно:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= options_from_collection_for_select(City.all, :id, :name) %&gt;
+</pre>
+    </div>
+    <p>Как следует из имени, это генерирует только теги option. Для генерации работающего списка
+        выбора его необходимо использовать в сочетании с <code>select_tag</code>, как это делалось
+        для <code>options_for_select</code>. Когда работаем с объектами модели, так же, как <code>select</code>
+        комбинирует <code>select_tag</code> и <code>options_for_select</code>, <code>collection_select</code>
+        комбинирует <code>select_tag</code> с <code>options_from_collection_for_select</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= collection_select(:person, :city_id, City.all, :id, :name) %&gt;
+</pre>
+    </div>
+    <p>Как и с другими хелперами, если вы хотите использовать <code>collection_select</code> в
+        связке с form builder-ом привязанным к объекту <code>@person</code>, синтаксис будет
+        следующим:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= f.collection_select(:city_id, City.all, :id, :name) %&gt;
+</pre>
+    </div>
+    <p>Напомним, что <code>options_from_collection_for_select</code> в
+        <code>collection_select</code> - то же самое, что и <code>options_for_select</code> в <code>select</code>.
+    </p>
+    <div class="note"><p>Пары, переданные в <code>options_for_select</code> должны сперва иметь имя,
+        затем id, однако для <code>options_from_collection_for_select</code> первый аргумент - это
+        метод значения, а второй аргумент - метод текста.</p></div>
+    <h4 class="inside_page_header" id="vybor-chasovogo-poyasa-i-strany"> Выбор часового пояса и
+        страны</h4>
+    <p>Для управления поддержкой часовых поясов в Rails, можете спрашивать своих пользователей, в
+        какой зоне они находятся. Это потребует создать варианты выбора из списка предопределенных
+        объектов TimeZone, используя <code>collection_select</code>, но вы можете просто
+        использовать хелпер <code>time_zone_select</code>, который уже все это содержит:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= time_zone_select(:person, :time_zone) %&gt;
+</pre>
+    </div>
+    <p>Также есть хелпер <code>time_zone_options_for_select</code> для ручного (и поэтому гибко
+        настраиваемого) способа осуществления этого. Читайте документацию по API, чтобы узнать о
+        доступных аргументах для этих двух методов.</p>
+    <p>Rails <em>раньше</em> имел хелпер <code>country_select</code> для выбора стран, но сейчас он
+        вынесен во внешний . При его использовании убедитесь, что включение или исключение
+        определенных имен из списка может быть несколько спорным (это и послужило причиной
+        извлечения этой функциональности из Rails).</p>
+    <h3 class="inside_page_header" id="ispolzovanie-helperov-daty-i-vremeni"> Использование хелперов
+        даты и времени</h3>
+    <p>Можно выбрать не использовать хелперы форм, создающие поля ввода даты и времени HTML5, а
+        использовать альтернативные хелперы даты и времени. Эти хелперы даты и времени отличаются от
+        остальных хелперов форм в двух важных аспектах:</p>
+    <ul>
+        <li>Дата и время не представлены отдельным элементом ввода. Вместо них есть несколько, один
+            на каждый компонент (год, месяц, день и т.д.), и, таким образом, нет одного значения в
+            хэше <code>params</code> с вашими датой и временем.
+        </li>
+        <li>Другие хелперы используют суффикс <code>_tag</code> для обозначения, является ли хелпер
+            скелетным, либо работает на основе объектов модели. Что касается дат и времени, <code>select_date</code>,
+            <code>select_time</code> и <code>select_datetime</code> - это скелетные хелперы, а
+            <code>date_select</code>, <code>time_select</code> и <code>datetime_select</code> - это
+            эквивалентные хелперы объекта модели.
+        </li>
+    </ul>
+    <p>Оба эти семейства хелперов создадут ряд списков выбора для различных компонент (год, месяц,
+        день и т.д.).</p>
+    <h4 class="inside_page_header" id="skeletnye-helpery"> Скелетные хелперы</h4>
+    <p>Семейство хелперов <code>select_*</code> принимает как первый аргумент экземпляр
+        <code>Date</code>, <code>Time</code> или <code>DateTime</code>, который используется как
+        текущее выбранное значение. Можете опустить этот параметр в случае, если используется
+        текущая дата. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= select_date Date.today, prefix: :start_date %&gt;
+</pre>
+    </div>
+    <p>выведет (с опущенными для краткости начальными значениями вариантов)</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;select id="start_date_year" name="start_date[year]"&gt; ... &lt;/select&gt;
+&lt;select id="start_date_month" name="start_date[month]"&gt; ... &lt;/select&gt;
+&lt;select id="start_date_day" name="start_date[day]"&gt; ... &lt;/select&gt;
+</pre>
+    </div>
+    <p>Эти элементы ввода выдадут результат в <code>params[:start_date]</code>, являющийся хэшем с
+        ключами <code>:year</code>, <code>:month</code>, <code>:day</code>. Чтобы получить
+        фактический объект <code>Date</code>, <code>Time</code> или <code>DateTime</code>,
+        необходимо извлечь эти значения и передать их в подходящий конструктор, например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, params[:start_date][:day].to_i)
+</pre>
+    </div>
+    <p>Опция <code>:prefix</code> это ключ, используемый для получения хэша компонентов даты из хэша
+        <code>params</code>. Здесь она была установлена как <code>start_date</code>, если опущена,
+        то по умолчанию равна <code>date</code>.</p>
+    <h4 class="inside_page_header" id="helpery-ob-ekta-modeli"> Хелперы объекта модели</h4>
+    <p><code>select_date</code> не очень хорошо работает с формами, обновляющими или создающими
+        объекты Active Record, так как Active Record ожидает, что каждый элемент хэша
+        <code>params</code> соответствует одному атрибуту.</p>
+    <p>Хелперы объекта модели для даты и времени возвращает параметры со специальными именами, и
+        когда Active Record видит параметры с такими именами, он знает, что они должны быть
+        скомбинированы с другими параметрами, и передает конструктору подходящее значения для типа
+        столбца. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= date_select :person, :birth_date %&gt;
+</pre>
+    </div>
+    <p>выдаст (с опущенными для краткости начальными значениями вариантов)</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;select id="person_birth_date_1i" name="person[birth_date(1i)]"&gt; ... &lt;/select&gt;
+&lt;select id="person_birth_date_2i" name="person[birth_date(2i)]"&gt; ... &lt;/select&gt;
+&lt;select id="person_birth_date_3i" name="person[birth_date(3i)]"&gt; ... &lt;/select&gt;
+</pre>
+    </div>
+    <p>что приведет к такому результату в хэше <code>params</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{'person' =&gt; {'birth_date(1i)' =&gt; '2008', 'birth_date(2i)' =&gt; '11', 'birth_date(3i)' =&gt; '22'}}
+</pre>
+    </div>
+    <p>Когда это передастся в <code>Person.new</code> (или <code>update</code>), Active Record
+        отметит, что эти параметры должны быть использованы, для конструирования атрибута <code>birth_date</code>
+        и использует суффиксную информацию для определения, в каком порядке должен передать эти
+        параметры в функции, такие как <code>Date.civil</code>.</p>
+    <h4 class="inside_page_header" id="obschie-optsii"> Общие опции</h4>
+    <p>Оба семейства хелперов используют одинаковый базовый набор функций для создания
+        индивидуальных тегов select, таким образом, они оба принимают множество одинаковых опций. В
+        частности, по умолчанию Rails создаст варианты выбора года как текущий год плюс/минус пять
+        лет. Если это неподходящий вариант, опции <code>:start_year</code> и <code>:end_year</code>
+        переопределяют это. Для получения исчерпывающего перечня доступных опций обратитесь к .</p>
+    <p>Как правило, следует использовать <code>date_select</code> при работе с объектами модели и
+        <code>select_date</code> в иных случаях, таких как формы поиска, в которых результаты
+        фильтруются по дате.</p>
+    <div class="note"><p>В большинстве случаев встроенные элементы подбора дат неуклюжи в
+        использовании, так как не позволяют пользователю видеть отношения между датой и днями
+        недели.</p></div>
+    <h4 class="inside_page_header" id="individualnye-komponenty"> Индивидуальные компоненты</h4>
+    <p>Иногда необходимо отобразить лишь одиночный компонент даты, такой как год или месяц. Rails
+        предоставляет ряд хелперов для этого, по одному для каждого компонента
+        <code>select_year</code>, <code>select_month</code>, <code>select_day</code>, <code>select_hour</code>,
+        <code>select_minute</code>, <code>select_second</code>. Эти хелперы достаточно простые. По
+        умолчанию они создадут поле ввода, названное по имени компонента времени (например, "year"
+        для <code>select_year</code>, "month" для <code>select_month</code> и т.д.), хотя это может
+        быть переопределено в опции <code>:field_name</code>. Опция <code>:prefix</code> работает
+        так же, как работает для <code>select_date</code> и <code>select_time</code> и имеет такое
+        же значение по умолчанию.</p>
+    <p>Первый параметр определяет значение даты, которое будет предложено для выбора
+        (соответствующий элемент может быть извлечен из экземпляра <code>Date</code>,
+        <code>Time</code> или <code>DateTime</code>), либо сразу задается числовым значением.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= select_year(2011) %&gt;
+&lt;%= select_year(Time.now) %&gt;
+</pre>
+    </div>
+    <p>создаст такой же результат, если сейчас 2011 год, и значение, выбранное пользователем, может
+        быть получено как <code>params[:date][:year]</code>.</p>
+    <h3 class="inside_page_header" id="zagruzka-faylov"> Загрузка файлов</h3>
+    <p>Частой задачей является загрузка некоторого файла, или аватарки, или файла CSV, содержащего
+        информацию для обработки. Самая важная вещь, это помнить при загрузке файла, что кодирование
+        формы <em>ДОЛЖНО</em> быть установлено как "multipart/form-data". Если используете <code>form_for</code>,
+        это будет выполнено автоматически. Если используете <code>form_tag</code>, нужно установить
+        это самому, как в следующем примере.</p>
+    <p>Следующие две формы обе загружают файл.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag({action: :upload}, multipart: true) do %&gt;
+  &lt;%= file_field_tag 'picture' %&gt;
+&lt;% end %&gt;
+&lt;%= form_for @person do |f| %&gt;
+  &lt;%= f.file_field :picture %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Rails предоставляет обычную пару хелперов: скелетный <code>file_field_tag</code> и
+        модельно-ориентированный <code>file_field</code>. Единственное отличие от других хелперов в
+        том, что нельзя установить значение по умолчанию для поля ввода файла, так как в этом нет
+        смысла. Как и следует ожидать, в первом случае загруженный файл находится в <code>params[:picture]</code>,
+        а во втором случае в <code>params[:person][:picture]</code>.</p>
+    <h4 class="inside_page_header" id="chto-imeem-zagruzhennym"> Что имеем загруженным</h4>
+    <p>Объект в хэше <code>params</code> - это экземпляр одного из подклассов класса IO. В
+        зависимости от размера загруженного файла, это может оказаться либо экземпляр класса <code>StringIO</code>,
+        либо экземпляр класса <code>File</code>, отраженный на временный файл в папке временных
+        файлов. В обоих случаях объект будет иметь атрибут <code>original_filename</code>,
+        содержащий имя файла на компьютере пользователя, и атрибут <code>content_type</code>,
+        содержащий тип MIME загруженного файла. Следующий отрывок сохраняет загруженное содержимое в
+        <code>#{Rails.root}/public/uploads</code> под тем же именем, что и оригинальный файл
+        (предположив, что форма была одна из предыдущего примера).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def upload
+  uploaded_io = params[:person][:picture]
+  File.open(Rails.root.join('public', 'uploads', uploaded_io.original_filename), 'wb') do |file|
+    file.write(uploaded_io.read)
+  end
+end
+</pre>
+    </div>
+    <p>Как только файл был загружен, появляется множество потенциальных задач, начиная от того, где
+        хранить файлы (на диске, Amazon S3 и т.д.), и как связать их с моделями, до изменения
+        размера файлов изображений и создания эскизов. Такие частности выходят за рамки данного
+        руководства, но имеется несколько библиотек, разработанных для содействия этому. Две лучших
+        из них - это и .</p>
+    <div class="note"><p>Если пользователь не выбрал файл, соответствующий параметр останется пустой
+        строкой.</p></div>
+    <h4 class="inside_page_header" id="rabota-s-ajax"> Работа с Ajax</h4>
+    <p>В отличие от других форм, форма асинхронной загрузки файла - это не просто передача параметра
+        <code>remote: true</code> в <code>form_for</code>. В Ajax-форме сериализация происходит
+        посредством JavaScript, исполняющимся внутри браузера, и, поскольку JavaScript не может
+        прочесть файлы с жесткого диска, файл не может быть загружен. Наиболее частым решением
+        является использование невидимого iframe, который служит целью для отправки формы.</p>
+    <h3 class="inside_page_header" id="nastroyka-form-builder"> Настройка Form Builder</h3>
+    <p>Как ранее упоминалось, объект, который передается от <code>form_for</code> и
+        <code>fields_for</code>, - это экземпляр <code>FormBuilder</code> (или его подкласса). Form
+        builder инкапсулирует представление элементов формы для отдельного объекта. Хотя, конечно,
+        можно писать хелперы для своих форм обычным способом, вы также можете объявить подкласс
+        <code>FormBuilder</code> и добавить хелперы туда. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @person do |f| %&gt;
+  &lt;%= text_field_with_label f, :first_name %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>может быть заменено этим</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @person, builder: LabellingFormBuilder do |f| %&gt;
+  &lt;%= f.text_field :first_name %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>через определение класса <code>LabellingFormBuilder</code> подобным образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class LabellingFormBuilder &lt; ActionView::Helpers::FormBuilder
+  def text_field(attribute, options={})
+    label(attribute) + super
+  end
+end
+</pre>
+    </div>
+    <p>Если это используется часто, можно определить хелпер <code>labeled_form_for</code> который
+        автоматически определяет опцию <code>builder: LabellingFormBuilder</code>.</p>
+    <p>Form builder также определяет, что произойдет, если вы сделаете</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render partial: f %&gt;
+</pre>
+    </div>
+    <p>Если <code>f</code> - это экземпляр <code>FormBuilder</code>, тогда это отрендерит партиал
+        <code>form</code>, установив объект партиала как form builder. Если form builder класса
+        <code>LabellingFormBuilder</code>, тогда вместо этого будет отрендерен партиал <code>labelling_form</code>.
+    </p>
+    <h3 class="inside_page_header" id="understanding-parameter-naming-conventions"> Понимание
+        соглашений по именованию параметров</h3>
+    <p>Как вы видели в предыдущих разделах, значения из форм могут быть на верхнем уровне хэша
+        <code>params</code> или вложены в другой хэш. Например, в стандартном экшне
+        <code>create</code> для модели Person, <code>params[:person]</code> будет обычно хэшем всех
+        атрибутов для создания персоны. Хэш <code>params</code> может также содержать массивы,
+        массивы хэшей и тому подобное.</p>
+    <p>Фундаментально формы HTML не знают о структурировании данных, все, что они создают - это пары
+        имя-значение, где пары являются обычными строками. Массивы и хэши, которые вы видите в своем
+        приложении, - это результат некоторых соглашений по именованию параметров, которые
+        использует Rails.</p>
+    <div class="info"><p>Вы можете быстрее пробовать примеры этого раздела, используя консоль для
+        прямого вызова парсера параметров из Rack. Например:</p></div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rack::Utils.parse_query "name=fred&amp;phone=0123456789"
+# =&gt; {"name"=&gt;"fred", "phone"=&gt;"0123456789"}
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="bazovye-struktury"> Базовые структуры</h4>
+    <p>Две базовые структуры - это массивы и хэши. Хэши отражают синтаксис, используемый для доступа
+        к значению в <code>params</code>. Например, если форма содержит</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="person_name" name="person[name]" type="text" value="Henry"/&gt;
+</pre>
+    </div>
+    <p>хэш <code>params</code> будет содержать</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+{'person' =&gt; {'name' =&gt; 'Henry'}}
+</pre>
+    </div>
+    <p>и <code>params[:person][:name]</code> получит отправленное значение в контроллере.</p>
+    <p>Хэши могут быть вложены на столько уровней, сколько требуется, например:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="person_address_city" name="person[address][city]" type="text" value="New York"/&gt;
+</pre>
+    </div>
+    <p>вернет такой хэш <code>params</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{'person' =&gt; {'address' =&gt; {'city' =&gt; 'New York'}}}
+</pre>
+    </div>
+    <p>Обычно Rails игнорирует дублирующиеся имена параметра. Если имя параметра содержит пустой
+        набор квадратных скобок <code>[]</code>, то они будут накоплены в массиве. Если хотите,
+        чтобы люди могли оставлять несколько телефонных номеров, можете поместить это в форму:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input name="person[phone_number][]" type="text"/&gt;
+&lt;input name="person[phone_number][]" type="text"/&gt;
+&lt;input name="person[phone_number][]" type="text"/&gt;
+</pre>
+    </div>
+    <p>Что приведет к тому, что <code>params[:person][:phone_number]</code> будет массивом,
+        содержащим введенные телефонные номера.</p>
+    <h4 class="inside_page_header" id="kombiniruem-ih"> Комбинируем их</h4>
+    <p>Можно смешивать и сочетать эти две концепции. Один из элементов хэша может быть массивом, как
+        в предыдущем примере, или вы можете иметь массив хэшей. Например, форма может позволить вам
+        создать любое количество адресов, повторяя следующий фрагмент кода</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input name="addresses[][line1]" type="text"/&gt;
+&lt;input name="addresses[][line2]" type="text"/&gt;
+&lt;input name="addresses[][city]" type="text"/&gt;
+</pre>
+    </div>
+    <p>Что приведет к тому, что <code>params[:addresses]</code> будет массивом хэшей с ключами
+        <code>line1</code>, <code>line2</code> и <code>city</code>. Rails начинает собирать значения
+        в новый хэш, когда он встречает имя элемента, уже существующее в текущем хэше.</p>
+    <p>Однако, имеется ограничение, по которому хэши не могут быть вложены произвольно, является
+        допустимым только один уровень "массивности". Массивы обычно могут быть заменены хэшами,
+        например, вместо массива объектов моделей можно иметь хэш объектов модели с ключами, равными
+        их id, индексу массива или любому другому параметру.</p>
+    <div class="warning"><p>Параметры в массиве не очень хорошо работают с хелпером
+        <code>check_box</code>. В соответствии со спецификацией HTML, невыбранные чекбоксы не
+        возвращают значения. Хелпер <code>check_box</code> обходит это, создавая второе скрытое поле
+        с тем же именем. Если чекбокс не нажат, подтверждается только скрытое поле, а если он нажат,
+        то они оба подтверждаются, но значение от чекбокса получает приоритет. При работе с
+        параметрами массива эти дублирующиеся подтверждения запутают Rails дублирующимися именами
+        полей, и непонятно, как он решит, где начать новый элемент массива. Предпочтительнее
+        использовать или <code>check_box_tag</code>, или хэши вместо массивов.</p></div>
+    <h4 class="inside_page_header" id="ispolzovanie-helperov-form"> Использование хелперов форм</h4>
+    <p>Предыдущие разделы совсем не использовали хелперы Rails. Хотя можно создавать имена полей
+        самому и передавать их напрямую хелперам, таким как <code>text_field_tag</code>, Rails также
+        предоставляет поддержку на более высоком уровне. В вашем распоряжении имеется два
+        инструмента: параметр имени для <code>form_for</code> и <code>fields_for</code>, и опция
+        <code>:index</code>, принимаемая этими хелперами.</p>
+    <p>Вы возможно захотите рендерить форму с набором полей ввода для каждого адреса человека.
+        Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @person do |person_form| %&gt;
+  &lt;%= person_form.text_field :name %&gt;
+  &lt;% @person.addresses.each do |address| %&gt;
+    &lt;%= person_form.fields_for address, index: address.id do |address_form|%&gt;
+      &lt;%= address_form.text_field :city %&gt;
+    &lt;% end %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Предположим, у кого-то есть два адреса с id 23 и 45, это создаст что-то подобное:</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;form accept-charset="UTF-8" action="/people/1" class="edit_person" id="edit_person_1" method="post"&gt;
+  &lt;input id="person_name" name="person[name]" type="text" /&gt;
+  &lt;input id="person_address_23_city" name="person[address][23][city]" type="text" /&gt;
+  &lt;input id="person_address_45_city" name="person[address][45][city]" type="text" /&gt;
+&lt;/form&gt;
+</pre>
+    </div>
+    <p>Это приведет к тому, что хэш <code>params</code> будет выглядеть так</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{'person' =&gt; {'name' =&gt; 'Bob', 'address' =&gt; {'23' =&gt; {'city' =&gt; 'Paris'}, '45' =&gt; {'city' =&gt; 'London'}}}}
+</pre>
+    </div>
+    <p>Rails знает, что все эти поля должны быть частью хэша person, так как вы вызвали <code>fields_for</code>
+        для первого form builder. Определяя опцию <code>:index</code>, Вы сообщаете Rails, что
+        вместо именования полей <code>person[address][city]</code>, он должен вставить индекс,
+        заключенный в [], между address и city. Это часто полезно, так как просто обнаружить, какая
+        запись Address должна быть изменена. Можете передать числа с некоторыми другими значениями,
+        строки или даже <code>nil</code> (который приведет к созданию параметра в массиве).</p>
+    <p>Чтобы создать более замысловатые вложения, можете определить первую часть имени поля (<code>person[address]</code>
+        в предыдущем примере) явно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= fields_for 'person[address][primary]', address, index: address do |address_form| %&gt;
+  &lt;%= address_form.text_field :city %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>создаст такие поля</p>
+    <div class="code_container">
+<pre class="brush: xml; gutter: false; toolbar: false">
+&lt;input id="person_address_primary_1_city" name="person[address][primary][1][city]" type="text" value="bologna" /&gt;
+</pre>
+    </div>
+    <p>По общему правилу конечное имя поля - это сцепление имени, переданного в
+        <code>fields_for</code>/<code>form_for</code>, значение индекса и имени атрибута. Можете
+        также передать опцию <code>:index</code> прямо в хелперы, такие как <code>text_field</code>,
+        но, как правило, будет меньше повторов, если определить это на уровне form builder, чем для
+        отдельного элемента ввода.</p>
+    <p>Как ярлык вы можете добавить [] к имени и опустить опцию <code>:index</code>. Это то же
+        самое, что определение <code>index: address</code>, таким образом</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= fields_for 'person[address][primary][]', address do |address_form| %&gt;
+  &lt;%= address_form.text_field :city %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>создаст абсолютно тот же результат, что и предыдущий пример.</p>
+    <h3 class="inside_page_header" id="formy-k-vneshnim-resursam"> Формы к внешним ресурсам</h3>
+    <p>Хелперы форм Rails можно использовать и для создания форм для передачи данных внешнему
+        ресурсу. Однако, иногда необходимо установить <code>authenticity_token</code> для ресурса;
+        это можно осуществить, передав параметр <code>authenticity_token:
+            'your_external_token'</code> в опциях <code>form_tag</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag 'http://farfar.away/form', authenticity_token: 'external_token' do %&gt;
+  Form contents
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Иногда при отправке данных внешнему ресурсу, такому как платежный шлюз, поля, которые можно
+        использовать в форме, ограничены внешним API, и генерация <code>authenticity_token</code>
+        нежелательна. Чтобы не посылать токен, просто передайте <code>false</code> в опцию <code>:authenticity_token</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_tag 'http://farfar.away/form', authenticity_token: false do %&gt;
+  Form contents
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Та же техника также доступна и для <code>form_for</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @invoice, url: external_url, authenticity_token: 'external_token' do |f| %&gt;
+  Form contents
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Или, если не хотите создавать поле <code>authenticity_token</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= form_for @invoice, url: external_url, authenticity_token: false do |f| %&gt;
+  Form contents
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="sozdanie-slozhnyh-form"> Создание сложных форм</h3>
+    <p>Многие приложения вырастают из пределов простых форм, редактирующих одиночные объекты.
+        Например, при создании <code>Person</code> вы, возможно, захотите позволить пользователю (в
+        той же самой форме) создать несколько записей адресов (домашний, рабочий и т.д.). Позже,
+        редактируя этого человека, пользователю должно быть доступно добавление, удаление или правка
+        адреса, если необходимо.</p>
+    <h4 class="inside_page_header" id="nastroyka-modeli"> Настройка модели</h4>
+    <p>Active Record представляет поддержку на уровне модели с помощью метода <code>accepts_nested_attributes_for</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  has_many :addresses
+  accepts_nested_attributes_for :addresses
+end
+class Address &lt; ActiveRecord::Base
+  belongs_to :person
+end
+</pre>
+    </div>
+    <p>Это создаст метод <code>addresses_attributes=</code> в <code>Person</code>, позволяющий
+        создавать, обновлять и (опционально) уничтожать адреса.</p>
+    <h4 class="inside_page_header" id="vlozhennye-formy"> Вложенные формы</h4>
+    <p>Следующая форма позволяет пользователю создать <code>Person</code> и связанные с ним адреса.
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @person do |f| %&gt;
+  Addresses:
+  &lt;ul&gt;
+    &lt;%= f.fields_for :addresses do |addresses_form| %&gt;
+      &lt;li&gt;
+        &lt;%= addresses_form.label :kind %&gt;
+        &lt;%= addresses_form.text_field :kind %&gt;
+        &lt;%= addresses_form.label :street %&gt;
+        &lt;%= addresses_form.text_field :street %&gt;
+        ...
+      &lt;/li&gt;
+    &lt;% end %&gt;
+  &lt;/ul&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Когда связь принимает вложенные атрибуты, <code>fields_for</code> рендерит свой блок для
+        каждого элемента связи. В частности, если у person нет адресов, он ничего не рендерит.
+        Обычным паттерном для контроллера является построение одного или более пустых дочерних
+        элементов, чтобы как минимум один набор полей был показан пользователю. Следующий пример
+        покажет 2 набора полей адресов в форме нового person.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def new
+  @person = Person.new
+  2.times { @person.addresses.build}
+end
+</pre>
+    </div>
+    <p><code>fields_for</code> вкладывает form builder. Имя параметра будет таким, какое ожидает
+        <code>accepts_nested_attributes_for</code>. К примеру, при создании пользователя с 2
+        адресами, отправленные параметры будут выглядеть так</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+{
+  'person' =&gt; {
+    'name' =&gt; 'John Doe',
+    'addresses_attributes' =&gt; {
+      '0' =&gt; {
+        'kind' =&gt; 'Home',
+        'street' =&gt; '221b Baker Street'
+      },
+      '1' =&gt; {
+        'kind' =&gt; 'Office',
+        'street' =&gt; '31 Spooner Street'
+      }
+    }
+  }
+}
+</pre>
+    </div>
+    <p>Ключи хэша <code>:addresses_attributes</code> не важны, они всего лишь должны быть различными
+        для каждого адреса.</p>
+    <p>Если связанный объект уже сохранен, <code>fields_for</code> автоматически создает скрытое
+        поле с <code>id</code> сохраненной записи. Это можно отключить, передав <code>include_id:
+            false</code> в <code>fields_for</code>. Это может быть желаемым, если автоматически
+        созданное поле размещается туда, где тег input не имеет валидного HTML, или при
+        использовании ORM, когда дочерние элементы не имеют <code>id</code>.</p>
+    <h4 class="inside_page_header" id="kontroller"> Контроллер</h4>
+    <p>Как обычно, в контроллере необходим
+        , который вы передаёте в модель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @person = Person.new(person_params)
+  # ...
+end
+private
+  def person_params
+    params.require(:person).permit(:name, addresses_attributes: [:id, :kind, :street])
+  end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="udalenie-ob-ektov"> Удаление объектов</h4>
+    <p>Можно позволить пользователям удалять связанные объекты, передав <code>allow_destroy:
+        true</code> в <code>accepts_nested_attributes_for</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  has_many :addresses
+  accepts_nested_attributes_for :addresses, allow_destroy: true
+end
+</pre>
+    </div>
+    <p>Если хэш атрибутов для объекта содержит ключ <code>_destroy</code> со значением '1' или
+        'true', тогда объект будет уничтожен. Эта форма позволяет пользователям удалять адреса:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= form_for @person do |f| %&gt;
+  Addresses:
+  &lt;ul&gt;
+    &lt;%= f.fields_for :addresses do |addresses_form| %&gt;
+      &lt;li&gt;
+        &lt;%= addresses_form.check_box :_destroy %&gt;
+        &lt;%= addresses_form.label :kind %&gt;
+        &lt;%= addresses_form.text_field :kind %&gt;
+        ...
+      &lt;/li&gt;
+    &lt;% end %&gt;
+  &lt;/ul&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Не забудьте обновить белый список параметров в вашем контроллере, а также включить туда поле
+        <code>_destroy</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def person_params
+  params.require(:person).
+    permit(:name, addresses_attributes: [:id, :kind, :street, :_destroy])
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="predotvraschenie-pustyh-zapisey"> Предотвращение пустых
+        записей</h4>
+    <p>Часто полезно игнорировать наборы полей, которые пользователь не заполнял. Этим можно
+        управлять, передав <code>:reject_if</code> proc в <code>accepts_nested_attributes_for</code>.
+        Этот proc будет вызван для каждого хэша атрибутов, отправляемого формой. Если proc
+        возвращает <code>false</code>, тогда Active Record не создаст связанный объект для этого
+        хэша. Следующий пример пытается создать адрес, если установлен атрибут <code>kind</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Person &lt; ActiveRecord::Base
+  has_many :addresses
+  accepts_nested_attributes_for :addresses, reject_if: lambda {|attributes| attributes['kind'].blank?}
+end
+</pre>
+    </div>
+    <p>Вместо этого для удобства можно передать символ <code>:all_blank</code>, который создаст
+        proc, который отвергнет записи, когда все атрибуты пустые, за исключением любого значения
+        для <code>_destroy</code>.</p>
+    <h4 class="inside_page_header" id="dobavlenie-poley-na-letu"> Добавление полей на лету</h4>
+    <p>Вместо рендеринга нескольких наборов полей, можно сделать их добавление только когда
+        пользователь нажимает на кнопку 'Добавить новый адрес'. Rails не предоставляет какой-либо
+        встроенной поддержки для этого. При создании новых наборов полей, следует убедиться, что
+        ключ связанного массива уникальный - наиболее распространенным выбором является текущий
+        javascript date (миллисекунды после epoch).</p>
+
+</body>
+</html>

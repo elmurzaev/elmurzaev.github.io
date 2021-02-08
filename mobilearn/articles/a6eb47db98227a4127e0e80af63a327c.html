@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Основные формулы комбинаторики</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p>
+</p>
+<h2>
+</h2>
+<div class="text">В данном разделе мы займёмся подсчётом числа &#171;шансов&#187;. О числе шансов
+    говорят, когда возможно несколько результатов
+    какого-либо действия (извлечение карты из колоды, подбрасывание кубика или
+    монетки). Число шансов &#151; это число способов проделать это действие или, что то же самое,
+    число возможных результатов
+    этого действия.
+</div>
+<h3></h3>
+<div class="text">Пусть одно действие можно проделать пятью способами, а другое &#151; двумя.
+    Каким числом способов можно проделать пару этих действий?
+</div>
+<div class="teor">
+    <b>Теорема 1. </b>
+    Пусть множество <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15">
+    состоит из <img align="bottom" height="14"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12">
+    элементов: <img align="absmiddle" height="20"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img3.gif" width="129">, а
+    множество <img align="bottom" height="14"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif" width="17"> &#151; из
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img5.gif"
+         width="18"> элементов: <img align="absmiddle" height="20"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img6.gif"
+                                     width="131">.
+    Тогда можно образовать ровно <img align="bottom" height="14"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img7.gif"
+                                      width="27"> пар <img align="absmiddle" height="21"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img8.gif"
+                                                           width="53">, взяв
+    первый элемент из множества <img align="bottom" height="14"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                     width="15">, а второй &#151; из множества <img align="bottom"
+                                                                                    height="14"
+                                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                                    width="17">.
+</div>
+<div class="remark">
+    <b>Замечание 1.</b>
+    Можно сформулировать утверждение так: если первый элемент
+    можно выбрать <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12">
+    способами, а второй элемент &#151; <img align="bottom" height="14"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img5.gif"
+                                            width="18"> способами,
+    то пару элементов можно выбрать <img align="bottom" height="14"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img7.gif"
+                                         width="27"> способами.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> С элементом <img align="absmiddle" height="17"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img9.gif"
+                                            width="19"> мы можем образовать <img align="bottom"
+                                                                                 height="14"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img5.gif"
+                                                                                 width="18"> пар:
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img10.gif"
+         width="177">.
+    Столько же пар можно составить с элементом <img align="absmiddle" height="17"
+                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img11.gif"
+                                                    width="19">, столько же &#151; с элементом
+    <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img12.gif"
+         width="19"> и с любым другим из <img align="bottom" height="14"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                              width="12"> элементов множества <img align="bottom"
+                                                                                   height="14"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                                   width="15">.
+    Т.е. всего возможно <img align="bottom" height="14"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img7.gif" width="27">
+    пар, в которых первый элемент выбран из множества <img align="bottom" height="14"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                           width="15">, а второй &#151; из множества
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+         width="17">.<p class="qed">QED</p>
+</div>
+<div class="exer">
+    <b>Упражнение 1. </b>
+    С помощью теоремы доказать, что:
+    <dl compact>
+        <dt>а)</dt>
+        <dd>при подбрасывании трёх монет возможно 2·2·2=8 различных результатов;
+        </dd>
+        <dt>б)</dt>
+        <dd>бросая дважды игральную кость, получим 6·6=36 различных результатов;
+        </dd>
+        <dt>в)</dt>
+        <dd>трёхзначных чисел бывает 9·10·10=900;
+        </dd>
+        <dt>г)</dt>
+        <dd>трёхзначных чисел, все цифры которых различны, существует 9·9·8;
+        </dd>
+        <dt>д)</dt>
+        <dd>чётных трёхзначных чисел возможно 9·10·5.</dd>
+    </dl>
+</div>
+<h3></h3>
+<div class="text">Есть урна (ящик), содержащая <img align="bottom" height="14"
+                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                    width="13"> пронумерованных объектов (шаров).
+    Мы выбираем из этой урны <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                  width="12"> шаров; результатом выбора является набор из <img
+            align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+            width="12"> шаров.
+    Нас интересует, сколькими
+    способами можно выбрать <img align="bottom" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                 width="12"> шаров из <img align="bottom" height="14"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                           width="13">,
+    или сколько различных результатов может получиться.
+    На этот вопрос нельзя дать однозначный ответ, пока мы не определимся:
+    а) с тем, как организован выбор (можно ли шары
+    возвращать в урну), и б)
+    с тем, что понимается под различными результатами
+    выбора.
+    <p>Рассмотрим следующие возможные способы выбора.</p>
+    <p>
+    </p>
+    <dl compact>
+        <dt>1.</dt>
+        <dd>Выбор <i class="incide">с возвращением</i>: каждый вынутый шар возвращается
+            в урну, каждый следующий шар выбирается из полной урны.
+            В полученном наборе из <img align="bottom" height="14"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                        width="12"> номеров шаров могут
+            встречаться одни и те же номера.
+        </dd>
+        <dt>2.</dt>
+        <dd>Выбор <i class="incide">без возвращения</i>: вынутые шары в урну не
+            возвращаются, и в полученном наборе не могут
+            встречаться одни и те же номера.
+        </dd>
+    </dl>
+    <p>Условимся, какие результаты выбора (наборы
+        из <img align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif" width="12"> номеров
+        шаров) мы будем
+        считать различными. Есть ровно две возможности.</p>
+    <p>
+    </p>
+    <dl compact>
+        <dt>1.
+        </dt>
+        <dd>Выбор <i class="incide">с учётом порядка</i>:
+            два набора номеров шаров считаются различными, если они
+            отличаются составом или порядком номеров.
+            Так, при выборе трёх шаров из урны, содержащей 5 шаров,
+            наборы (1, 5, 2), (2, 5, 1) и (4, 4, 5) различны, если
+            порядок учитывается.
+        </dd>
+        <dt>2.
+        </dt>
+        <dd>Выбор <i class="incide">без учёта порядка</i>:
+            два набора номеров шаров считаются различными, если они
+            отличаются составом. Наборы, отличающиеся лишь порядком
+            следования номеров, считаются одинаковыми.
+            <p>Так, наборы (1, 5, 2) и (2, 5, 1) не различаются и образуют один и тот же результат
+                выбора, если порядок не учитывается.
+            </p>
+        </dd>
+    </dl>
+    <p>Подсчитаем, сколько возможно различных результатов
+        для каждой из четырёх схем выбора (выбор с возвращением или без,
+        и в каждом из этих случаев &#151; с учётом порядка или без).</p>
+</div>
+<div class="exer">
+    <b>Упражнение 2. </b>
+    Перечислить все возможные результаты в каждой из четырёх схем при выборе
+    двух шаров из четырёх.
+    Например, при выборе с возвращением
+    и без учёта порядка: (1, 1), (1, 2), (1, 3), (1, 4), (2, 2), (2, 3), (2, 4), (3, 3), (3, 4), (4,
+    4).
+</div>
+<p></p>
+<h3></h3>
+<p>
+</p>
+<div class="teor">
+    <b>Теорема 2. </b>Общее количество различных наборов при выборе <img align="bottom" height="14"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                                         width="12"> элементов из
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+         width="13"> без возвращения и с учётом порядка равняется
+    <p class="CENTER"><img align="absmiddle" height="55"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img32.gif" width="325">
+    </p>
+    и называется <i class="incide">числом размещений</i> из <img align="bottom" height="14"
+                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                                 width="13"> элементов по <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+        width="12"> элементов.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Первый шар можно выбрать <img align="bottom" height="14"
+                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                         width="13"> способами, его номер &#151;
+    любой из <img align="bottom" height="14"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13"> возможных.
+    При любом выборе первого шара есть <img align="absmiddle" height="17"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img33.gif"
+                                            width="43"> способ выбрать второй шар.
+    По , число возможных пар
+    <p class="CENTER"><img align="absmiddle" height="40"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img34.gif" width="347">
+    </p>
+    <p>равно <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img35.gif" width="67">. Для
+        каждой такой пары есть <img align="absmiddle" height="17"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img36.gif"
+                                    width="43"> способа выбрать третий шар.
+        По теореме , число возможных троек
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="31"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img37.gif" width="546">
+    </p>
+    <p>равно произведению числа пар <img align="absmiddle" height="20"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img35.gif"
+                                         width="67"> и числа способов выбора третьего шара,
+        т.е. равно <img align="absmiddle" height="20"
+                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img38.gif" width="121">.
+        Продолжая рассуждения, получим, что
+        общее число возможных наборов из <img align="bottom" height="14"
+                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                              width="12"> шаров
+        равно <img align="absmiddle" height="20"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img39.gif" width="197">.
+        В этом произведении <img align="bottom" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                 width="12"> сомножителей последний множитель <img align="absmiddle"
+                                                                                   height="16"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img40.gif"
+                                                                                   width="74"> есть
+        число способов выбора <img align="bottom" height="14"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                   width="12">-го шара, когда уже выбраны предыдущие.
+    </p>
+    <p class="qed">QED</p>
+</div>
+<div class="corollary">
+    <b>Следствие 1. </b>
+    Если в множестве <img align="bottom" height="14"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">
+    элементов, то существует ровно <img align="bottom" height="14"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img41.gif"
+                                        width="18"> <i class="incide">перестановок</i>
+    этих элементов.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Перестановка &#151; результат выбора без возвращения
+    и с учётом порядка <img align="bottom" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">
+    элементов
+    из <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+            width="13">. Поэтому общее число перестановок равно <img align="absmiddle" height="20"
+                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img42.gif"
+                                                                     width="63">
+    <p class="qed">QED</p>
+</div>
+<div class="exer">
+    <b>Упражнение 3.</b>
+    Найти, сколько всего возможно различных результатов в следующих экспериментах:
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>из колоды в 36 карт без возвращения, с учётом порядка вынимают три карты;
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>Вася, Петя, Оля и Лена занимают какие-то четыре из десяти мест в классе;
+        </dd>
+        <dt>в)
+        </dt>
+        <dd>из русского алфавита выбирают четыре разные буквы и составляют слово;
+        </dd>
+        <dt>г)
+        </dt>
+        <dd>из различных цифр, не равных нулю, составляется трёхзначное число.
+        </dd>
+    </dl>
+</div>
+<p></p>
+<h3></h3>
+<div class="teor">
+    <b>Теорема 3. </b>
+    Общее количество различных наборов при выборе <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                       width="12">
+    элементов из <img align="bottom" height="14"
+                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13"> без
+    возвращения и без учёта порядка равняется
+    <p class="CENTER"><img align="absmiddle" height="58"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img44.gif" width="171">
+    </p>
+    <p>и называется <i class="incide">числом сочетаний</i> из
+        <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+             width="13"> элементов по <img align="bottom" height="14"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                           width="12"> элементов.</p>
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Согласно ,
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+         width="12"> различных номеров шаров можно
+    упорядочить <img align="bottom" height="14"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img45.gif" width="17">
+    способами.
+    Поэтому из каждого набора, выбранного без возвращения и без учёта порядка,
+    можно образовать <img align="bottom" height="14"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img45.gif" width="17">
+    наборов, отличающихся друг от друга
+    порядком следования номеров. Т.е. при выборе без возвращения и с учётом порядка
+    возможно в <img align="bottom" height="14"
+                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img45.gif" width="17"> раз
+    больше наборов, чем при выборе без учёта порядка.
+    Поэтому число наборов при выборе без учёта порядка равно <img align="absmiddle" height="22"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img46.gif"
+                                                                  width="48">
+    <p class="qed">QED</p>
+</div>
+<div class="exer">
+    <b>Упражнение 4.</b>
+    Найти, сколько всего возможно различных результатов в следующих экспериментах:
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>из колоды в 36 карт без возвращения, без учёта порядка вынимают три карты;
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>из русского алфавита выбрасывают четыре буквы.
+        </dd>
+    </dl>
+</div>
+<h3></h3>
+<div class="teor">
+    <b> Теорема 4. </b>
+    Общее количество различных наборов при выборе <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                       width="12"> элементов из <img align="bottom"
+                                                                                     height="14"
+                                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                                                     width="13"> с
+    возвращением и с учётом порядка равняется <img align="bottom" height="18"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img47.gif"
+                                                   width="21">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b>
+    Первый шар можно выбрать <img align="bottom" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                  width="13"> способами. При каждом из этих
+    способов второй шар можно выбрать также <img align="bottom" height="14"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                 width="13"> способами,
+    и так <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+               width="12"> раз. Общее число наборов равно
+    <img align="bottom" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img48.gif"
+         width="134">.<p class="qed">QED</p>
+</div>
+<div class="exer">
+    <b>Упражнение 5.</b>
+    Найти, сколько всего возможно различных результатов в следующих экспериментах:
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>из колоды в 36 карт тянут три раза карту с учётом порядка и с возвращением;
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>пятизначное число составляется из одних нечётных цифр;
+        </dd>
+        <dt>в)
+        </dt>
+        <dd>обезьяна напечатала на машинке слово из десяти букв.
+        </dd>
+    </dl>
+</div>
+<h3></h3>
+<div class="text">Рассмотрим урну с двумя пронумерованными шарами и перечислим результаты выбора
+    двух
+    шариков из этой урны при выборе с возвращением.
+    <p class="center"></p>
+    <table border="1" cellpadding="3">
+        <tr valign="BASELINE">
+            <td align="CENTER" nowrap>с учётом порядка</td>
+            <td align="LEFT" nowrap>без учёта порядка</td>
+        </tr>
+        <tr valign="center">
+            <td align="CENTER" nowrap>(1,1)</td>
+            <td align="CENTER" nowrap>(1,1) </td>
+        </tr>
+        <tr valign="center">
+            <td align="CENTER" nowrap>(2,2)</td>
+            <td align="CENTER" nowrap>(2,2) </td>
+        </tr>
+        <tr valign="center">
+            <td align="CENTER" nowrap>
+                (1,2)
+                (2,1)
+            </td>
+            <td align="LEFT" nowrap> <big class="LARGE">}</big>     (1,2)        </td>
+        </tr>
+    </table>
+    <p>Видим, что в схеме &#171;без учёта порядка&#187; получилось три различных
+        результата, в отличие от четырёх результатов в схеме &#171;с учётом порядка&#187;.
+        Заметим также, что никаким делением на &#171;число каких-нибудь перестановок&#187;,
+        которое помогло избавиться от учёта порядка при выборе без возвращения,
+        число 3 из числа 4 получить не удастся.</p>
+</div>
+<div class="teor">
+    <b>  Теорема 5. </b>
+    Общее количество различных наборов при выборе <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                       width="12"> элементов из <img align="bottom"
+                                                                                     height="14"
+                                                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                                                     width="13"> с
+    возвращением и без учёта порядка равняется
+    <p class="CENTER"><img align="absmiddle" height="42"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img49.gif" width="139">
+    </p>
+</div>
+<div class="exer">
+    <b>Упражнение 6. </b>
+    Проверить, что при <img align="bottom" height="14"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img50.gif" width="45">
+    и <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img51.gif"
+           width="44"> получается ровно 3.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Рассмотрим подробно, чем отличаются друг от друга два
+    разных результата такой схемы выбора.
+    Нам не важен порядок номеров, т.е. мы учитываем только,
+    сколько раз в нашем наборе из <img align="bottom" height="14"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                       width="12"> номеров шаров появился каждый номер.
+    Поэтому результат выбора можно представить набором
+    чисел <img align="absmiddle" height="18"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img52.gif" width="109">, в котором
+    <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img53.gif"
+         width="17"> &#151;
+    число появлений шара номер <img align="bottom" height="14"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif"
+                                    width="8"> в наборе,
+    и <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img55.gif"
+           width="133">.
+    Числа <img align="absmiddle" height="17"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img53.gif" width="17"> принимают
+    значения из <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img56.gif" width="60">.
+    Два результата выбора в схеме выбора с возвращением и без учёта порядка
+    различаются,
+    если соответствующие им наборы <img align="absmiddle" height="18"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img52.gif"
+                                        width="109"> не совпадают (порядок следования элементов <img
+        align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img53.gif"
+        width="17"> учитывается).
+    <p>Представим себе другой эксперимент, имеющий точно такие же результаты,
+        и посчитаем их количество.
+        Есть <img align="bottom" height="14"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13"> ящиков, в
+        которых размещаются <img align="bottom" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                 width="12"> шаров. Нас интересует только число шаров в каждом
+        ящике.
+        Результатом эксперимента снова является набор
+        чисел <img align="absmiddle" height="18"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img52.gif" width="109">, где
+        <img align="absmiddle" height="17"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img53.gif" width="17"> равно числу
+        шаров в ящике с номером <img align="absmiddle" height="14"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif"
+                                     width="8">, и <img align="absmiddle" height="17"
+                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img55.gif"
+                                                        width="133">. Числа <img align="absmiddle"
+                                                                                 height="17"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img53.gif"
+                                                                                 width="17">
+        принимают натуральные значения или равны нулю.
+    </p>
+    <p>А теперь изобразим результат такого размещения в виде схемы, в которой
+        вертикальные линии обозначают перегородки между ящиками, а точки &#151;
+        находящиеся в ящиках шары:
+    </p>
+    <p class="CENTER">
+        <img align="absmiddle" height="33"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img17.gif" width="493">
+    </p>
+    <p>Мы видим результат размещения девяти шаров по семи ящикам. Первый ящик
+        содержит три шара, второй и шестой ящики пусты, третий ящик содержит один шар,
+        в четвёртом и пятом ящиках лежит по два шара.
+        Переложим один шар из первого ящика во второй и
+        изобразим таким же образом ещё два результата размещения:
+    </p>
+    <p class="CENTER">
+        <img align="absmiddle" height="33"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img16.gif" width="493">
+        <img align="absmiddle" height="33"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img15.gif" width="493">
+    </p>
+    <p>Видим, что все размещения можно получить, меняя между собой шары и
+        перегородки, или расставляя <img align="bottom" height="14"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                         width="12"> шаров на <img align="absmiddle" height="16"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif"
+                                                                   width="74"> местах.
+        Число <img align="absmiddle" height="16"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif" width="74">
+        получается так: у <img align="bottom" height="14"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                               width="13"> ящиков есть ровно <img align="absmiddle" height="16"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img58.gif"
+                                                                  width="43"> перегородка,
+        считая крайние, но из них перемещать можно лишь <img align="absmiddle" height="17"
+                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img33.gif"
+                                                             width="43"> внутреннюю перегородку.
+        Таким образом, имеется <img align="absmiddle" height="16"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif"
+                                    width="74"> мест, которые
+        можно занять шарами либо внутренними перегородками. Перебрав все возможные
+        способы расставить <img align="bottom" height="14"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                width="12"> шаров на этих <img align="absmiddle" height="16"
+                                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif"
+                                                               width="74"> местах
+        (заполняя оставшиеся места перегородками), переберем все нужные размещения.
+    </p>
+    <p>Осталось заметить, что
+        способов расставить <img align="bottom" height="14"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                 width="12"> шаров на <img align="absmiddle" height="16"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif"
+                                                           width="74"> местах существует
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="42"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img49.gif" width="139">
+    </p>Именно столько есть способов выбрать из <img align="absmiddle" height="16"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img57.gif"
+                                                     width="74"> номеров мест <img align="bottom"
+                                                                                   height="14"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                                                   width="12">
+    номеров мест для шаров.
+</div>
+<div class="exer">
+    <b>Упражнение 7.</b>
+    <dl compact>
+        <dt>а)
+        </dt>
+        <dd>Найти количество способов разложить натуральное число <img align="bottom" height="14"
+                                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                                       width="12"> в сумму
+            <img align="bottom" height="14"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">
+            целых неотрицательных слагаемых, если важен порядок следования этих слагаемых.
+        </dd>
+        <dt>б)
+        </dt>
+        <dd>Найти число различных производных порядка <img align="bottom" height="14"
+                                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img2.gif"
+                                                           width="12"> функции <img align="bottom"
+                                                                                    height="14"
+                                                                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                                                    width="13">
+            переменных.
+        </dd>
+        <dt>в)
+        </dt>
+        <dd>Найти число возможных результатов подбрасывания двух игральных костей, если
+            кости считаются неразличимыми. То же самое для трёх игральных костей.
+        </dd>
+    </dl>
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+</body>
+
+</body>
+</html>

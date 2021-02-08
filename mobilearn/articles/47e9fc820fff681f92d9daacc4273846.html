@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title> Лекция 7. Динамическое распределение памяти. Списки</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<section id="l7_1">
+    <h1>1. Динамическое распределение памяти </h1>
+    <p>
+        Статически распределяемые переменные существуют либо всё время существования программы, либо
+        в течение времени существования функции, в которой они объявлены (для переменных). Иногда
+        возникает необходимость управлять распределением памяти динамически во время работы
+        программы, например, если мы не знаем точно, сколько памяти нам понадобиться, или для более
+        гибкого управления памятью, чтобы не занимать память, которая реально не нужна.
+    </p>
+    <p>
+        Распределение памяти осуществляется функцией
+        <span class="sint">
+<span class="type">void *</span><span class="fun">malloc</span>(<span
+                class="type">size_t</span> <var>size</var>);
+</span>
+    </p>
+    <p>
+        Прототип функции находится в файлах <span class="sint">&lt;stdlib.h&gt;</span> и <span
+            class="sint">&lt;malloc.h&gt;</span>.
+    </p>
+    <p>
+        Данная функция выделяет память, объём которой <b>в байтах</b> указывается как параметр
+        функции. Функция возвращает адрес выделенной памяти или <i>NULL</i>, если память не может
+        быть выделена. <i>NULL</i> – это специальная константа, которая представляет собой
+        недействительный указатель.
+    </p>
+    <p>
+        Функция возвращает указатель на пустой тип <span><span class="type">void *</span></span>,
+        который может быть преобразован к <b>любому</b> типу и <b>должен</b> быть преобразован к
+        нужному типу. <b>Обязательно надо проверять результат, возвращаемый функцией!</b>
+    </p>
+    <p>
+        Существуют также ещё две функции, которые позволяют сделать выделение памяти более гибким:
+        <span class="sint">
+<span class="type">void</span> *<span class="fun">calloc</span>(<span
+                class="type">size_t</span> <var>num</var>, <span class="type">size_t</span> <var>size</var>);
+<span class="type">void</span> *<span class="fun">realloc</span>(<span
+                class="type">void *</span><var>memblock</var>, <span
+                class="type">size_t</span> <var>size</var>);
+</span>
+    </p>
+    <p>
+        Первая функция выделяет память под массив из <i>num</i> элементов, каждый из которых имеет
+        размер <i>size</i>. Элементы массива инициализируются нулями.
+    </p>
+    <p>
+        Вторая функция изменяет размер блока, выделенного ранее функциями <i>malloc</i>,
+        <i>calloc</i> или <i>realloc</i>. Параметр <i>memblock</i> содержит адрес блока для
+        изменения, а параметр <i>size</i> – необходимый размер блока. Положение блока в оперативной
+        памяти может измениться, при этом содержимое будет скопировано.
+    </p>
+    <p>
+        После того, как отпала необходимость в выделенной памяти, надо освободить её:
+        <span class="sint">
+<span class="type">void</span> <span class="fun">free</span>(<span class="type">void *</span><var>memblock</var>);
+</span>
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">p = (<span class="chiavi">int</span> *)malloc(<span class="chiavi">sizeof</span>(<span
+                    class="chiavi">int</span>));
+            </td>
+            <td class="commenti">// С помощью операции <b>sizeof</b> определяем размер переменной
+                типа <i>int</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">if</span> (!p)
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi"> { printf("Not enough memory\n"); <span class="chiavi">return</span>;
+                }
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <b>...</b></td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">free(p);</td>
+            <td class="commenti"></td>
+        </tr>
+    </table>
+    <p id="l7_new_delete">
+        В языке С++ были введены новые операторы для выделения и освобождения динамической памяти:
+        <span class="sint">new</span> и <span class="sint">delete</span>.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">int</span> *p;
+            </td>
+            <td class="commenti"></td>
+        </tr>
+        <tr>
+            <td class="esempi">p = <span class="chiavi">new int</span>;</td>
+            <td class="commenti">// Выделение памяти для одно переменной типа <i>int</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">delete</span> p;
+            </td>
+            <td class="commenti">// Освобождение выделенной памяти</td>
+        </tr>
+        <tr>
+            <td class="esempi">p = <span class="chiavi">new int</span> [10];</td>
+            <td class="commenti">// Выделение памяти для массива из 10 элементов типа <i>int</i>
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">delete</span> [] p;
+            </td>
+            <td class="commenti">// Освобождение выделенной памяти</td>
+        </tr>
+    </table>
+    <p>
+        При использовании операторов <span class="sint">new</span> и <span
+            class="sint">delete</span> также необходимо проверять, была ли выделена память. Обычно в
+        случае ошибки оператор <span class="sint">new</span> генерирует <i>bad_alloc</i>, но можно
+        изменить его поведение так, чтобы в случае ошибки возвращалось значение 0.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;new&gt;
+                <span class="chiavi">int</span> *p;
+                <span class="chiavi">try</span>
+                { p = <span class="chiavi">new int</span>; }
+                <span class="chiavi">catch</span> (std::bad_alloc)
+                { printf("Not enough memory\n"); <span class="chiavi">return</span>; }
+                <b>...</b>
+                <span class="chiavi">delete</span> p;
+            </td>
+            <td class="commenti"> // Для использования <i>bad_alloc</i> и <i>nothrow</i></td>
+        </tr>
+        <tr>
+            <td class="esempi">p = <span class="chiavi">new</span>(std::nothrow) <span
+                    class="chiavi">int</span>[10];
+                <span class="chiavi">if</span> (!p)
+                { printf("Not enough memory\n"); <span class="chiavi">return</span>; }
+                <b>...</b>
+                <span class="chiavi">delete</span> [] p;
+            </td>
+            <td class="commenti">// Теперь исключение не генерируется</td>
+        </tr>
+    </table>
+</section>
+<section id="l7_2">
+    <h1> 2. Списки </h1>
+    <p>
+        <b>Однонаправленный список</b> – это структура, каждый элемент которой содержит адрес
+        следующего элемента. В последнем элементе в данный адрес записывается значение специальной
+        константы <i>NULL</i> для обозначения конца списка. Адрес первого элемента нужно хранить в
+        специальной переменной.
+    </p>
+    <p>
+        Поскольку каждый элемент должен содержать информационную часть и адрес следующего элемента
+        (которые в общем случае имеют разный тип) для хранения элементов списка используются .
+    </p>
+    <p>
+        Существует два основных способа построения списков: с добавлением элементов в начало списка
+        и с добавлением элементов в конец списка. Первый способ проще, но элементы в списке
+        располагаются в обратном порядке. Если же нужно, чтобы элементы списка располагались в
+        прямом порядке, надо использовать второй способ.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">struct</span> S
+                { <span class="chiavi"> char</span> str[21];
+                <span class="chiavi">int</span> a;
+                <span class="chiavi">struct</span> S *next;
+                };
+                <span class="chiavi">struct</span> S *begin, *cur, *prev;
+            </td>
+        </tr>
+        <tr>
+            <td class="commenti">
+                // Добавление элементов в начало списка
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">cur = NULL;
+                <span class="chiavi">while</span> (!feof(in))
+                { begin = (<span class="chiavi">struct</span> S *)malloc(<span
+                        class="chiavi">sizeof</span>(<span class="chiavi">struct</span> S));
+                <span class="chiavi">if</span> (begin == NULL)
+                { printf("Insufficient memory\n");
+                fclose(in); fclose(out); <span class="chiavi">return</span>;
+                }
+                fscanf(in, "%s%d", begin-&gt;str, &amp;(begin-&gt;a));
+                begin-&gt;next = cur;
+                cur = begin;
+                }
+            </td>
+        </tr>
+        <tr>
+            <td class="commenti">
+                // Добавление элементов в конец списка
+            </td>
+        </tr>
+        <tr>
+            <td class="esempi">begin = (<span class="chiavi">struct</span> S *)malloc(<span
+                    class="chiavi">sizeof</span>(<span class="chiavi">struct</span> S));
+                <span class="chiavi">if</span> (begin == NULL)
+                { printf("Insufficient memory\n");
+                fclose(in); fclose(out); <span class="chiavi">return</span>;
+                }
+                fscanf(in, "%s%d", begin-&gt;str, &amp;(begin-&gt;a));
+                begin-&gt;next = NULL;
+                prev = begin;
+                <span class="chiavi">while</span> (!feof(in))
+                { cur = (<span class="chiavi">struct</span> S *)malloc(<span
+                        class="chiavi">sizeof</span>(<span class="chiavi">struct</span> S));
+                <span class="chiavi">if</span> (cur == NULL)
+                { printf("Insufficient memory\n");
+                fclose(in); fclose(out); <span class="chiavi">return</span>;
+                }
+                fscanf(in, "%s%d", cur-&gt;str, &amp;(cur-&gt;a));
+                cur-&gt;next = NULL;
+                prev-&gt;next = cur;
+                prev = cur;
+                }
+            </td>
+        </tr>
+    </table>
+</section>
+<section id="l7_3">
+    <h2>3. Примеры </h2>
+    <p id="l7_3_1">
+        <b>Пример 1.</b> Динамическое распределение массива.
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">#include</span> &lt;stdlib.h&gt;
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi"> char</span> *argv[])
+                { <span class="chiavi">double</span> *a, *p, *end;
+                <span class="chiavi">double</span> s;
+                <span class="chiavi">int</span> n, i;
+                FILE *file;
+                <span class="chiavi">if</span> (argc &lt; 2)
+                { printf("Недостаточно параметров!\n");
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> ((file = fopen(argv[1], "r")) == NULL)
+                { printf("Невозможно открыть файл '%s'\n", argv[1]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> (fscanf(file, "%d", &amp;n) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[1]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                <span>// Используем один из двух вариантов выделения памяти</span>
+                <span class="chiavi">if</span> ((a = (<span class="chiavi">double</span> *)malloc(n
+                * <span class="chiavi">sizeof</span>(<span class="chiavi">double</span>))) == NULL)
+                { printf("Недостаточно памяти!\n");
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> ((a = (<span class="chiavi">double</span> *)calloc(n,
+                <span class="chiavi">sizeof</span>(<span class="chiavi">double</span>))) == NULL)
+                { printf("Недостаточно памяти!\n");
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">for</span> (i = 0; i &lt; n; i++)
+                <span class="chiavi">if</span> (fscanf(file, "%lf", &amp;a[i]) &lt; 1)
+                { printf ("Ошибка чтения из файла '%s'\n", argv[1]);
+                fclose(file);
+                <span class="chiavi">return</span>;
+                }
+                fclose(file);
+                <span>// Обычный способ обработки массива</span>
+                <span class="chiavi">for</span> (s = 0, i = 0; i &lt; n; i++)
+                s += a[i];
+                printf("Сумма равна %lf\n", s);
+                <span>// Использование указателя для доступа к элементам массива</span>
+                <span class="chiavi">for</span> (s = 1, p = a, end = p + n; p &lt; end; p++)
+                s *= *p;
+                printf("\Произведение равно %lf\n", s);
+                <b> free(a); <span>// Освобождение выделенной памяти</span></b>
+                }
+            </td>
+        </tr>
+    </table>
+    <p id="l7_3_2">
+        <b>Пример 2.</b> Работа со списком (см. ).
+    </p>
+    <table>
+        <tr>
+            <td class="esempi">
+                <span class="chiavi">#include</span> &lt;stdio.h&gt;
+                <span class="chiavi">#include</span> &lt;conio.h&gt;
+                <span class="chiavi">#include</span> &lt;malloc.h&gt;
+                <span class="chiavi">#include</span> &lt;string.h&gt;
+                <span class="chiavi">struct</span> S
+                { <span class="chiavi">char</span> str[21];
+                <span class="chiavi">int</span> a;
+                <span class="chiavi">struct</span> S *next; <span>// Можно объявить указатель на еще не объявленную структуру</span>
+                };
+                <span class="chiavi">void</span> main(<span class="chiavi">int</span> argc, <span
+                    class="chiavi"> char</span> *argv[])
+                { <span class="chiavi">struct</span> S *begin, *cur, *prev;
+                <span class="chiavi">int</span> a, check = 0;
+                <span class="chiavi">char</span> str[21] = "";
+                FILE *in, *out;
+                <span class="chiavi">char</span> ans;
+                <span class="chiavi">if</span> (argc &lt; 3)
+                { printf("Too few arguments.\n"); <span class="chiavi">return</span>; }
+                <span class="chiavi">if</span> ((in = fopen(argv[1], "r")) == NULL)
+                { printf("It is impossible to open file '%s'.\n", argv[1]);
+                <span class="chiavi">return</span>;
+                }
+                <span class="chiavi">if</span> ((out = fopen(argv[2], "w")) == NULL)
+                { printf("It is impossible to open file '%s'.\n", argv[2]);
+                fclose(in); <span class="chiavi">return</span>;
+                }
+                <span>// Строим список, добавляя элементы в конец. Первый элемент вводим отдельно</span>
+                begin = (<span class="chiavi">struct</span> S *)malloc(<span
+                    class="chiavi">sizeof</span>(<span class="chiavi">struct</span> S));
+                <span class="chiavi">if</span> (begin == NULL)
+                { printf("Insufficient memory\n");
+                fclose(in); fclose(out); <span class="chiavi">return</span>;
+                }
+                fscanf(in, "%s%d", begin-&gt;str, &amp;(begin-&gt;a));
+                begin-&gt;next = NULL;
+                prev = begin;
+                <span class="chiavi">while</span> (!feof(in))
+                { cur = (<span class="chiavi">struct</span> S *)malloc(<span
+                    class="chiavi">sizeof</span>(<span class="chiavi">struct</span> S));
+                <span class="chiavi">if</span> (cur == NULL)
+                { printf("Insufficient memory\n");
+                fclose(in); fclose(out); <span class="chiavi">return</span>;
+                }
+                fscanf(in, "%s%d", cur-&gt;str, &amp;(cur-&gt;a));
+                cur-&gt;next = NULL;
+                prev-&gt;next = cur;
+                prev = cur;
+                }
+                fclose(in);
+                printf("Use Str for search? "); ans = getche();
+                <span class="chiavi">if</span> (ans == 'y' || ans == 'Y')
+                { printf("\nInput string for search: "); scanf("%s",str); }
+                printf("\nUse A for search? "); ans = getche();
+                <span class="chiavi">if</span> (ans == 'y' || ans == 'Y')
+                { check = 1; printf("\nInput A: "); scanf("%d", &amp;a); }
+                <span>// Вывод элементов, удовлетворяющих условию</span>
+                <span class="chiavi">for</span> (cur = begin; cur; cur = cur-&gt;next)
+                <span class="chiavi">if</span> ((!*str || strcmp(str, cur-&gt;str) == 0) &amp;&amp;
+                (!check || a == cur-&gt;a))
+                fprintf(out, "%-30s %3d\n", cur-&gt;str, cur-&gt;a);
+                <span>// Удаление элементов, не удовлетворяющих условию. Адрес предыдущего элемента понадобится при удалении</span>
+                <span class="chiavi">for</span> (prev = NULL, cur = begin; cur; )
+                <span class="chiavi">if</span> ((*str &amp;&amp; strcmp(str, cur-&gt;str) != 0) ||
+                (check &amp;&amp; a != cur-&gt;a))
+                <span class="chiavi">if</span> (prev == NULL) <span>// Если нужно удалить первый элемент</span>
+                { begin = cur-&gt;next;
+                free(cur);
+                cur = begin;
+                }
+                <span class="chiavi">else</span> <span>// Удаление не первого элемента</span>
+                { prev-&gt;next = cur-&gt;next;
+                free(cur);
+                cur = prev-&gt;next;
+                }
+                <span class="chiavi">else</span> <span>// Если удалять не надо, просто меняем указатели</span>
+                { prev = cur; cur = cur-&gt;next; }
+                <span class="chiavi">for</span> (cur = begin; cur; cur = cur-&gt;next)
+                fprintf(out, "%-30s %3d\n", cur-&gt;str, cur-&gt;a);
+                fclose(out);
+                <span>// Освобождение памяти, выделенной для списка</span>
+                <span class="chiavi">for</span> (cur = begin; cur; )
+                { prev = cur;
+                cur = cur-&gt;next;
+                free(prev);
+                }
+                begin = NULL;
+                }
+            </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>

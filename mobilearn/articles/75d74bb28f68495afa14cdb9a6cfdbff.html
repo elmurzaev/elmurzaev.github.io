@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Метод сил</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<td class="line1bb" valign="top">
+    <p><strong>Лекция № 38.</strong> Метод сил.</p>
+    <p align="justify">   Наиболее широко применяемым в машиностроении общим методом раскрытия
+        статической неопределимости стержневых и рамных систем является <i>метод сил</i>. Он
+        заключается в том, что заданная статически неопределимая система освобождается от
+        дополнительных связей как внешних, так и взаимных, а их действие заменяется силами и
+        моментами. Величина их в дальнейшем подбирается так, чтобы перемещения в системе
+        соответствовали тем ограничениям, которые накладываются на систему отброшенными связями.
+        Таким образом, при указанном способе решения неизвестными оказываются силы. Отсюда и
+        название «метод сил». Такой прием не является единственно возможным. В строительной механике
+        широко применяются и другие методы, например метод деформаций, в котором за неизвестные
+        принимаются не силовые факторы, а перемещения в элементах стержневой системы.</p>
+    <p align="justify">   Итак, раскрытие статической неопределимости любой рамы методом сил
+        начинается с отбрасывания дополнительных связей. Система, освобожденная от дополнительных
+        связей, становится статически определимой. Она носит название <i>основной системы</i>.</p>
+    <br>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image001-37.gif"><br><br>
+        а-д) модификации основной системы<br>
+        <b>Рис.1.</b> пример стержневой рамы:
+    </center>
+    <p> </p>
+    <p align="justify">   Для каждой статически неопределимой стержневой системы можно подобрать,
+        как правило, сколько угодно основных систем. Например, для рамы, показанной на рис. 1, можно
+        предложить основные системы, <i>а</i>), <i>б</i>),..., которые получены путем отбрасывания
+        семи дополнительных связей в различных комбинациях. Вместе с тем нужно помнить, что не
+        всякая система с семью отброшенными связями может быть принята как основная. На рис. 2
+        показано три примера для той же рамы, в которой также отброшено семь связей, однако сделано
+        это неправильно, так как оставшиеся связи не обеспечивают кинематической неизменяемости
+        системы, с одной стороны, и статической определимости во всех узлах,&#151; с другой.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image002-37.gif"><br><br>
+        <b>Рис.2.</b>Некорректные преобразования заданной системы в основные по причине
+        кинематической изменяемости- а) б), или статической определимости во всех узлах &#151; в)
+    </center>
+    <p> </p>
+    <p align="justify">   После того как дополнительные связи отброшены и система превращена в
+        статически определимую, необходимо, как уже говорилось, ввести вместо связей неизвестные
+        силовые факторы. В тех сечениях, где запрещены линейные перемещения, вводятся силы. Там, где
+        запрещены угловые смещения, вводятся моменты. Как в том, так и в другом случае неизвестные
+        силовые факторы будем обозначать <i>X<sub>i</sub></i>-, где <i>i</i> &#151; номер
+        неизвестного. Наибольшее значение <i>i</i> равно степени статической неопределимости
+        системы. Заметим, что для внутренних связей силы <i>X<sub>i</sub></i>, &#151; являются
+        взаимными. Если в каком-либо сечении рама разрезана, то равные и противоположные друг другу
+        силы и моменты прикладываются как к правой, так и к левой частям системы.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image003-36.gif"><br><br>
+        а)-д) по отношению к заданной системе<br>
+        <b>Рис.3.</b> Пять разновидностей основных систем
+    </center>
+    <p> </p>
+    <p align="justify">   Основная система, к которой приложены все внешние заданные силы и
+        неизвестные силовые факторы, носит название <i>эквивалентной системы</i>. На рис. 3 показано
+        пять эквивалентных систем, которые соответствуют приведенным выше основным системам (рис.
+        1). Принцип приложения неизвестных силовых факторов становится ясным без дальнейших
+        пояснений.</p>
+    <p>Теперь остается составить уравнения для определения неизвестных.</p>
+    <p align="justify">   Обратимся к некоторому конкретному примеру. Рассмотрим, например, первую
+        эквивалентную систему из числа представленных на рис. 3,4. Тем, что рассматривается
+        конкретно взятая семь раз статически неопределимая система, общность рассуждений не будет
+        нарушена.</p>
+    <p align="justify">   Перейдем теперь к составлению уравнений для определения неизвестных
+        силовых факторов. Условимся через <img
+                src="http://www.toehelp.ru/theory/sopromat/image004-36.gif"> обозначать взаимное
+        смещение точек системы.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image005-36.gif"><br><br>
+        <b>Рис.4.</b> Пример расчета рамы а)по выбранной основной системе- б)
+    </center>
+    <p> </p>
+    <p align="justify">   Первый индекс при <img
+            src="http://www.toehelp.ru/theory/sopromat/image006-36.gif"> соответствует направлению
+        перемещения, а второй &#151; силе, вызвавшей это перемещение.</p>
+    <p align="justify">   В рассматриваемой раме в точке <i>А</i> отброшена неподвижная опора.
+        Следовательно, горизонтальное перемещение здесь равно нулю и можно записать:<sub></sub></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image007-36.gif"></p>
+    <p align="justify">   Индекс 1 означает, что речь идет о перемещении по направлению силы
+        <i>Х<sub>1</sub></i>, а индекс [<i>Х<sub>1</sub>, Х<sub>2</sub>,..., Р</i>] показывает, что
+        перемещение определяется суммой всех сил, как заданных, так и неизвестных.</p>
+    <p>Аналогично можно записать:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image008-35.gif"> <img
+            src="http://www.toehelp.ru/theory/sopromat/image009-35.gif"></p>
+    <p align="justify">   Так как под величиной <img
+            src="http://www.toehelp.ru/theory/sopromat/image010-35.gif"> понимается взаимное
+        смещение точек, то <img src="http://www.toehelp.ru/theory/sopromat/image011-35.gif">
+        обозначает вертикальное смещение точки <i>В</i> относительно <i>С</i>, <img
+                src="http://www.toehelp.ru/theory/sopromat/image012-35.gif"> &#151; горизонтальное
+        взаимное смещение тех же точек, <img
+                src="http://www.toehelp.ru/theory/sopromat/image013-35.gif">есть взаимное угловое
+        смещение сечений <i>В</i> и <i>С</i>. Угловым смещением будет также в рассматриваемой
+        системе величина <img src="http://www.toehelp.ru/theory/sopromat/image014-34.gif">.</p>
+    <p align="justify">   В точках <i>A</i> и <i>D</i> смещения <img
+            src="http://www.toehelp.ru/theory/sopromat/image015-34.gif"> являются абсолютными. Но
+        абсолютные смещения можно рассматривать как смещения, взаимные с неподвижными отброшенными
+        опорами. Поэтому принятые обозначения приемлемы для всех сечений системы.</p>
+    <p>Пользуясь принципом независимости действия сил, раскроем выражения для перемещений <img
+            src="http://www.toehelp.ru/theory/sopromat/image016-33.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image017-33.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image018-31.gif"></p>
+    <p align="justify">   Аналогичным образом запишем и остальные пять уравнений: каждое из
+        слагаемых <img src="http://www.toehelp.ru/theory/sopromat/image019-31.gif">, входящих в
+        уравнение, обозначает перемещение в направлении силы с первым индексом под действием силы,
+        стоящей во втором индексе. Поскольку каждое перемещение пропорционально соответствующей
+        силе, величину<img src="http://www.toehelp.ru/theory/sopromat/image020-31.gif"> можно
+        записать в следующем виде:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image021-31.gif"></p>
+    <p align="justify">   Что касается перемещений <img
+            src="http://www.toehelp.ru/theory/sopromat/image022-31.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image023-31.gif"> и т. д., то под индексом
+        <i>Р</i> будем понимать не просто внешнюю силу <i>Р</i>, а вообще систему внешних сил,
+        которая может быть произвольной Поэтому величины <img
+                src="http://www.toehelp.ru/theory/sopromat/image024-31.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image025-31.gif">,... в уравнениях
+        оставим неизменными.</p>
+    <p>Теперь уравнения примут вид:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image026-30.gif"></p>
+    <p align="justify">   Эти уравнения являются окончательными и носят название <i>канонических
+        уравнений метода сил</i>. Число их равно степени статической неопределимости системы. В
+        некоторых случаях, как увидим далее, когда имеется возможность сразу указать значения
+        некоторых неизвестных, число совместно решаемых уравнений снижается. Остается теперь
+        выяснить, что представляют собой коэффициенты <img
+                src="http://www.toehelp.ru/theory/sopromat/image027-30.gif"> и как следует их
+        определять. Для этого обратимся к выражению (6.1).</p>
+    <p>Если <img src="http://www.toehelp.ru/theory/sopromat/image028-30.gif">, то</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image029-28.gif"></p>
+    <p align="justify">   Следовательно, коэффициент <img
+            src="http://www.toehelp.ru/theory/sopromat/image030-27.gif"> это есть перемещение по
+        направлению <i>i</i>-го силового фактора под действием единичного фактора, заменяющего
+        <i>k</i>-й фактор. Например, коэффициент <img
+                src="http://www.toehelp.ru/theory/sopromat/image031-26.gif"> уравнения представляет
+        собой взаимное горизонтальное смещение точек <i>B</i> и <i>С</i>, которое возникло бы в
+        раме, если бы к ней вместо всех сил была приложена только единичная сила в точке <i>А</i>
+        (рис. 5 а). Если, например, вместо сил <img
+                src="http://www.toehelp.ru/theory/sopromat/image032-25.gif"> приложив единичные
+        силы, а все прочие силы с эквивалентной системы снять (рис. 5 б), то угол поворота в сечении
+        <i>D</i> под действием этих сил будет <img
+                src="http://www.toehelp.ru/theory/sopromat/image033-25.gif">, горизонтальное
+        перемещение в точке <i>А</i> будет <img
+                src="http://www.toehelp.ru/theory/sopromat/image034-24.gif"> и т. д.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image035-24.gif"><br><br>
+        а) <img src="http://www.toehelp.ru/theory/sopromat/image036-23.gif">, б) <img
+            src="http://www.toehelp.ru/theory/sopromat/image037-22.gif"> и <img
+            src="http://www.toehelp.ru/theory/sopromat/image038-20.gif"><br>
+        <b>Рис.5.</b> Интерпретация коэффициентов уравнений метода сил:
+    </center>
+    <p> </p>
+    <p align="justify">   Весьма существенно отметить, что в проделанном выводе совершенно не
+        обусловливается то, каким образом возникают перемещения <img
+                src="http://www.toehelp.ru/theory/sopromat/image039-19.gif">. Хотя мы и
+        рассматриваем раму, работающую на изгиб, все сказанное с равным успехом может быть отнесено,
+        вообще, к любой системе, работающей на кручение, растяжение и изгиб или на то, другое и
+        третье совместно.</p>
+    <p align="justify">   Обратимся к интегралам Мора. Для того чтобы определить величину <img
+            src="http://www.toehelp.ru/theory/sopromat/image040-19.gif">, следует вместо внешних сил
+        рассматривать единичную силу, заменяющую <i>k</i>-й фактор. Поэтому внутренние моменты и
+        силы <img src="http://www.toehelp.ru/theory/sopromat/image041-19.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image042-19.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image043-19.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image044-18.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image045-18.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image046-18.gif"> в интегралах Мора
+        заменим на <img src="http://www.toehelp.ru/theory/sopromat/image047-18.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image048-18.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image049-16.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image050-16.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image051-16.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image052-16.gif">, понимая под ними
+        внутренние моменты и силы от единичного <i>k</i>-го фактора. В итоге получим:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image053-15.gif"></p>
+    <p align="justify">где <img src="http://www.toehelp.ru/theory/sopromat/image054-13.gif">,<img
+            src="http://www.toehelp.ru/theory/sopromat/image055-13.gif"> &#133; &#151; внутренние
+        моменты и силы, возникающие под действием <i>i</i>-го единичного фактора. Таким образом,
+        коэффициенты <img src="http://www.toehelp.ru/theory/sopromat/image056-12.gif"> получаются
+        как результат перемножения <i>i</i>-го и <i>k</i>-го внутренних единичных силовых факторов.
+        Индексы <i>i</i> и <i>k</i> непосредственно указывают, какие факторы должны быть перемножены
+        под знаком интегралов Мора. Если рама состоит из прямых участков и можно пользоваться
+        правилом Верещагина, то <img src="http://www.toehelp.ru/theory/sopromat/image057-12.gif">
+        представляет собой результат перемножения <i>i</i>-х единичных эпюр на <i>k</i>-е единичные
+        эпюры.</p>
+    <p>Очевидно, что</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image058-12.gif"></p>
+    <p align="justify">   Это следует, с одной стороны, непосредственно из выражений для <img
+            src="http://www.toehelp.ru/theory/sopromat/image059-12.gif">, а с другой стороны, из
+        теоремы о взаимности перемещений, поскольку перемещения <img
+                src="http://www.toehelp.ru/theory/sopromat/image060-12.gif">и <img
+                src="http://www.toehelp.ru/theory/sopromat/image061-12.gif"> возникают под действием
+        одной и той же силы, равной единице.</p>
+    <p align="justify">   Величины <img src="http://www.toehelp.ru/theory/sopromat/image062-12.gif">,
+        входящие в канонические уравнения, представляют собой перемещения в направлениях 1, 2,...,
+        возникающие под действием заданных внешних сил в эквивалентной системе. Они определяются
+        перемножением эпюры моментов заданных сил на соответствующие единичные эпюры.</p>
+    <p align="justify">   Пример Раскрыть статическую неопределимость и построить эпюру изгибающих
+        моментов для рамы, показанной на рис. 6.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image063-11.gif"><br><br>
+        <b>Рис.6.</b> Заданная расчетная схема
+    </center>
+    <p> </p>
+    <p align="justify">   Рама три раза статически неопределима. Выбираем основную систему,
+        отбрасывая левую заделку. Действие заделки заменяем двумя силами <img
+                src="http://www.toehelp.ru/theory/sopromat/image064-10.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image065-9.gif"> и моментом <img
+                src="http://www.toehelp.ru/theory/sopromat/image066-9.gif"> и определяем
+        эквивалентную систему (рис. 7).</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image067-9.gif"><br>
+        <b>Рис.7.</b> Динамика решения: от эквивалентной системы и силовой эпюры <i>Р</i>, включая
+        эпюры моментов от единичных сил: 1, 2, 3 в точках приложения неизвестных <img
+            src="http://www.toehelp.ru/theory/sopromat/image068-9.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image069-9.gif">,<img
+            src="http://www.toehelp.ru/theory/sopromat/image070-7.gif">
+    </center>
+    <p>Канонические уравнения (6.2) принимают для рассматриваемой системы такой вид:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image071-7.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image072-7.gif"></p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image073-7.gif"></p>
+    <p align="justify">   Основные перемещения в рассматриваемой раме определяются изгибом. Поэтому,
+        пренебрегая сдвигом и сжатием стержней, строим эпюры изгибающих моментов от заданной силы
+        <i>P</i> и от трех единичных силовых факторов (рис. 7).</p>
+    <p align="justify">   Определяем коэффициенты уравнений, считая, что жесткость на изгиб всех
+        участков рамы постоянна и равна <i>EJ</i>. Величина <img
+                src="http://www.toehelp.ru/theory/sopromat/image074-7.gif">определяется
+        перемножением первой единичной эпюры самой на себя. Для каждого участка берется,
+        следовательно, площадь эпюры и умножается на ординату этой же эпюры, проходящую через ее
+        центр тяжести:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image075-7.gif"></p>
+    <p align="justify">   Заметим, что величины <img
+            src="http://www.toehelp.ru/theory/sopromat/image076-7.gif"> при <img
+            src="http://www.toehelp.ru/theory/sopromat/image077-7.gif"> всегда положительны,
+        поскольку площади эпюр и ординаты имеют общий знак.</p>
+    <p>Определяем, далее, и остальные коэффициенты уравнений, перемножая эпюры с соответствующими
+        номерами:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image078-7.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image079-7.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image080-6.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image081-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image082-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image083-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image084-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image085-5.gif">.</p>
+    <p>Подставляем найденные коэффициенты в канонические уравнения. После сокращений получаем:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image086-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image087-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image088-5.gif"></p>
+    <p>Решая эти уравнения, находим:</p>
+    <p><img src="http://www.toehelp.ru/theory/sopromat/image089-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image090-5.gif">, <img
+            src="http://www.toehelp.ru/theory/sopromat/image091-5.gif"></p>
+    <p>Раскрытие статической неопределимости на этом заканчивается.</p>
+    <center>
+        <img src="http://www.toehelp.ru/theory/sopromat/image092-5.gif"><br><br>
+        <b>Рис.8.</b> Суммарная эпюра изгибающих моментов.
+    </center>
+    <p> </p>
+    <p align="justify">   Эпюра изгибающих моментов может быть получена наложением на эпюру моментов
+        заданных сил трех единичных эпюр, увеличенных соответственно в <img
+                src="http://www.toehelp.ru/theory/sopromat/image093-4.gif">, <img
+                src="http://www.toehelp.ru/theory/sopromat/image094-4.gif"> и <img
+                src="http://www.toehelp.ru/theory/sopromat/image095-4.gif"> раза Суммарная эпюра
+        изгибающих моментов представлена на рис. 8. Там же пунктиром показана форма изогнутой оси
+        рамы.</p>
+    <br>
+    <center></center>
+</td>
+<td class="line1bb" valign="top" width="160">
+    <noindex>
+        <!-- toehelp_left_160_600 -->
+    </noindex>
+</td>
+
+</body>
+</html>

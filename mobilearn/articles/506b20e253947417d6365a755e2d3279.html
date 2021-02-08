@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Кэширование с Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="keshirovanie-s-rails-obzor"> Кэширование с Rails: Обзор</h2>
+    <p>Это руководство является введением в ускорение вашего приложения Rails с помощью
+        кэширования.</p>
+    <p>Кэширование означает хранение контента, генерируемого в цикле запрос-ответ, и повторное
+        использование его при ответе на подобные запросы.</p>
+    <p>Кэширование часто является самым эффективным способом повысить производительность приложения.
+        При помощи кэширования, веб-сайты, работающие на одном сервере с одной базой данных, могут
+        выдержать нагрузку в несколько десятков тысяч одновременных пользователей.</p>
+    <p>Rails предоставляет набор функций кэширования из коробки. Это руководство научит вас областям
+        кэширования и целям каждой области. Освойте эти приемы и ваши Rails приложения смогут
+        обслужить миллионы просмотров без запредельного времени отклика сервера или счетов за
+        сервер.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>О кэшировании фрагмента и кэшировании матрешкой (Russian doll caching).
+        </li>
+        <li>Как управлять зависимостями кэширования.
+        </li>
+        <li>Об альтернативных хранилищах кэша.
+        </li>
+        <li>Об условной поддержке GET.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="osnovy-keshirovaniya"> Основы кэширования</h3>
+    <p>Это введение в три типа техники кэширования: кэширование страницы, экшна и фрагмента. По
+        умолчанию Rails предоставляет кэширование фрагмента. Чтобы использовать кэширование страницы
+        и экшна, нужно добавить <code>actionpack-page_caching</code> и <code>actionpack-action_caching</code>
+        в свой Gemfile.</p>
+    <p>По умолчанию кэширование включено только в среде production. Чтобы начать работать с
+        кэшированием локально, нужно включить кэширование в локальной среде, установив <code>config.action_controller.perform_caching</code>
+        в <code>true</code> в соответствующем файле <code>config/environments/*.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.action_controller.perform_caching = true
+</pre>
+    </div>
+    <div class="note"><p>Изменение значения <code>config.action_controller.perform_caching</code>
+        повлияет только на кэширование, предоставленное Action Controller.
+        Например, это не повлияет на низкоуровневое кэширование, которое мы рассмотрим .</p></div>
+    <h4 class="inside_page_header" id="keshirovanie-stranitsy"> Кэширование страницы</h4>
+    <p>Кэширование страницы это механизм Rails, позволяющий запросу на сгенерированную страницу быть
+        полностью обслуженным веб сервером (т.е. Apache или NGINX) в принципе, без прохождения через
+        весь стек Rails. Хотя это и очень быстро, но не может быть применено к каждой ситуации
+        (например, к страницам, требующим аутентификации). А так же, раз веб сервер получает файл
+        напрямую из файловой системы, необходимо реализовать прекращение кэша.</p>
+    <div class="info"><p>Кэширование страниц было убрано из Rails 4. Обратитесь к .</p></div>
+    <h4 class="inside_page_header" id="keshirovanie-ekshna"> Кэширование экшна</h4>
+    <p>Кэширование страниц нельзя использовать для экшнов, имеющих предварительные фильтры, -
+        например, для страниц, требующих аутентификации. И тут на помощь приходит кэширование экшна.
+        Кэширование экшна работает как кэширование страницы, за исключением того, что входящий веб
+        запрос затрагивает стек Rails, таким образом, до обслуживания кэша могут быть запущены
+        предварительные (before) фильтры. Это позволит использовать аутентификацию и другие
+        ограничения, и в то же время выводит результат из кэшированной копии.</p>
+    <div class="info"><p>Кэширование экшна было убрано из Rails 4. Обратитесь к . Также взгляните на
+        статью , как более предпочтительного способа.</p></div>
+    <h4 class="inside_page_header" id="keshirovanie-fragmenta"> Кэширование фрагмента</h4>
+    <p>Динамические веб приложения обычно создают страницы с рядом компонентов, не все из которых
+        имеют сходные характеристики кэширования. Когда различные части страниц нуждаются в
+        кэшировании и прекращаются по-разному, вы можете использовать Кэширование фрагмента.</p>
+    <p>Кэширование фрагмента позволяет фрагменту логики вьюхи быть обернутым в блок кэша и
+        обслуженным из хранилища кэша для последующего запроса.</p>
+    <p>Например, если хотите кэшировать каждый продукт на странице, можно использовать этот код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;% @products.each do |product| %&gt;
+  &lt;% cache product do %&gt;
+    &lt;%= render product %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Когда приложение получит самый первый запрос на эту страницу, Rails запишет новую
+        закэшированную запись с уникальным ключом. Ключ может выглядеть так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+views/products/1-201505056193031061005000/bea67108094918eeba42cd4a6e786901
+</pre>
+    </div>
+    <p>Число в середине — это <code>product_id</code>, с последующим значением временной метки в
+        атрибуте <code>updated_at</code> записи продукта. Rails использует значение временной метки,
+        чтобы убедиться, что он не отдает устаревшие данные. Если значение <code>updated_at</code>
+        изменится, будет сгенерирован новый ключ. Затем Rails запишет новый кэш с этим ключом, а
+        старый кэш, записанный со старым ключом, больше никогда не будет использован. Это называется
+        прекращением, основанным на ключе.</p>
+    <p>Фрагменты кэша также могут быть прекращены, если изменяется фрагмент вьюхи (например, если
+        изменяется HTML во вьюхе). Строка символов в конце ключа является дайджестом дерева шаблона.
+        Это md5 хеш, вычисленный на основе содержимого фрагмента вьюхи, которую вы кэшируете. Если
+        вы измените фрагмент вьюхи, md5 хеш изменится, прекращая существующий кэш.</p>
+    <div class="info"><p>Хранилища кэша, такие как Memcached, автоматически удалят старые файлы с
+        кэшем.</p></div>
+    <p>Если хотите кэшировать фрагмент по определенным условиям, можно использовать
+        <code>cache_if</code> or <code>cache_unless</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% cache_if admin?, product do %&gt;
+  &lt;%= render product %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="keshirovanie-kollektsii-rails-5-0"> Кэширование коллекции
+        (Rails 5.0)</h5>
+    <p>Хелпер <code>render</code> может также кэшировать отдельные шаблоны, отображающие коллекцию.
+        В рассмотренном ранее примере с <code>each</code> можно считать все кэши шаблонов за один
+        раз, а не по одному. Это делается автоматически, если шаблон, отображающий коллекцию,
+        включает вызов метода <code>cache</code>. Возьмем коллекцию, которая отображает <code>products/_product.html.erb</code>
+        партиал для каждого элемента:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render products
+</pre>
+    </div>
+    <p>Если <code>products/_product.html.erb</code> начинается с вызова <code>cache</code>,
+        например:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;% cache product do %&gt;
+  &lt;%= product.name %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Все закэшированные шаблоны из предыдущих отображений будут считаны за один раз с гораздо
+        большей скоростью. Больше информации о том, как сделать ваши шаблоны .</p>
+    <h4 class="inside_page_header" id="keshirovanie-matreshkoy"> Кэширование матрешкой</h4>
+    <p>Можно вкладывать кэшированные фрагменты в другие кэшированные фрагменты. Это называется
+        кэшированием матрешкой.</p>
+    <p>Преимуществом кэширования матрешкой является то, что если обновляется отдельный продукт,
+        другие внутренние фрагменты могут быть повторно использованы при перегенерации внешнего
+        фрагмента.</p>
+    <p>Как объяснялось в предыдущем разделе, кэш будет прекращен, если изменится значение <code>updated_at</code>
+        для записи, от которой напрямую зависит этот кэш. Однако, это не прекратит любой кэш, в
+        который вложен этот фрагмент.</p>
+    <p>Например, возьмем следующую вьюху:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% cache product do %&gt;
+  &lt;%= render product.games %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Которая, в свою очередь, рендерит эту вьюху:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;% cache game do %&gt;
+  &lt;%= render game %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>Если изменится любой атрибут game, у значения <code>updated_at</code> будет установлено
+        текущее время, тем самым прекращая. Однако, так как <code>updated_at</code> не изменится для
+        объекта product, этот кэш не будет прекращен и ваше приложение отдаст устаревшие данные.
+        Чтобы это починить, мы свяжем модели вместе с помощью метода <code>touch</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Product &lt; ActiveRecord::Base
+  has_many :games
+end
+class Game &lt; ActiveRecord::Base
+  belongs_to :product, touch: true
+end
+</pre>
+    </div>
+    <p>С помощью <code>touch</code>, установленного в true, любое действие, изменяющее <code>updated_at</code>
+        для записи game, будет также изменять его для связанного product, тем самым прекращая кэш.
+    </p>
+    <h4 class="inside_page_header" id="upravlenie-zavisimostyami"> Управление зависимостями</h4>
+    <p>Для того, чтобы корректно инвалидировать кэш, вам необходимо правильно определить зависимости
+        кэширования. Rails достаточно умен, чтобы справиться с общими случаями так, что вы не должны
+        будете ничего указывать. Однако, иногда, когда вы имеете дело с нестандартными хелперами
+        например, вы должны будете явно определить их.</p>
+    <h4 class="inside_page_header" id="neyavnye-zavisimosti"> Неявные зависимости</h4>
+    <p>Большинство зависимостей шаблонов могут быть вычислены из вызовов <code>render</code> в самом
+        шаблоне. Вот несколько примеров вызовов <code>render</code>, которые <code>ActionView::Digestor</code>
+        знает как понять:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render partial: "comments/comment", collection: commentable.comments
+render "comments/comments"
+render 'comments/comments'
+render('comments/comments')
+render "header" =&gt; render("comments/header")
+render(@topic)         =&gt; render("topics/topic")
+render(topics)         =&gt; render("topics/topic")
+render(message.topics) =&gt; render("topics/topic")
+</pre>
+    </div>
+    <p>С другой стороны, некоторые вызовы нужно изменить, чтобы кэширование работало верно.
+        Например, если вы передаете нестандартную коллекцию, вам нужно изменить:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render @project.documents.where(published: true)
+</pre>
+    </div>
+    <p>на:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+render partial: "documents/document", collection: @project.documents.where(published: true)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="yavnye-zavisimosti"> Явные зависимости</h4>
+    <p>Иногда у вас будут зависимости шаблонов, которые не получается определить совсем. Это обычно
+        для ситуаций, когда отображение происходит в хелперах. Вот пример:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%= render_sortable_todolists @project.todolists %&gt;
+</pre>
+    </div>
+    <p>Вам необходимо использовать специальный формат комментариев для вызова их извне:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%# Template Dependency: todolists/todolist %&gt;
+&lt;%= render_sortable_todolists @project.todolists %&gt;
+</pre>
+    </div>
+    <p>В некоторых случаях, например, при установке наследования в одной таблице (STI, single table
+        inheritance), вы можете иметь кучу явных зависимостей. Вместо написания каждого шаблона, вы
+        можете использовать знак звездочку, чтобы подходил любой шаблон из каталога:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%# Template Dependency: events/* %&gt;
+&lt;%= render_categorizable_events @person.events %&gt;
+</pre>
+    </div>
+    <p>Как и для кэширования коллекций, если партиал начинается не с явного вызова кэша, вы все-таки
+        можете извлечь выгоду кэширования коллекций, добавив специальный формат комментария в любом
+        месте шаблона, наподобие:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%# Template Collection: notification %&gt;
+&lt;% my_helper_that_calls_cache(some_arg, notification) do %&gt;
+  &lt;%= notification.name %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vneshnie-zavisimosti"> Внешние зависимости</h4>
+    <p>Если вы используете хелпер метод, например, внутри кэшируемого блока, и затем обновляете
+        хелпер, вам также нужно будет ударить кэш. Неважно как вы сделаете это, но md5 файла шаблона
+        должен измениться. Одна из рекомендаций, явно указать в комментарии, наподобие:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;%# Helper Dependency Updated: Jul 28, 2015 at 7pm %&gt;
+&lt;%= some_helper_method(person) %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="nizkourovnevoe-keshirovanie"> Низкоуровневое кэширование</h4>
+    <p>Иногда хочется закэшировать определенное значение или результат запроса вместо кэширования
+        фрагментов вьюх. Механизм кэширования Rails отлично работает для хранения информации
+        <strong>любого</strong> рода.</p>
+    <p>Наиболее эффективным способом реализации низкоуровневого кэширования является использование
+        метода <code>Rails.cache.fetch</code>. Этот метод и читает, и пишет в кэш. Если передать
+        только один аргумент, этот ключ извлекается и возвращается значение из кэша. Если передан
+        блок, результат этого блока будет закэширован, и возвращен его результат.</p>
+    <p>Рассмотрим следующий пример. В приложении есть модель <code>Product</code> с методом
+        экземпляра, ищущим цену продукта на конкурирующем сайте. Данные, возвращаемые этим методом
+        отлично подходят для низкоуровневого кэширования:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class Product &lt; ActiveRecord::Base
+  def competing_price
+    Rails.cache.fetch("#{cache_key}/competing_price", expires_in: 12.hours) do
+      Competitor::API.find_price(id)
+    end
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Отметьте, что в этом пример мы использовали метод <code>cache_key</code>,
+        таким образом результирующий ключ кэша будет выглядеть наподобие <code>products/233-20140225082222765838000/competing_price</code>.
+        <code>cache_key</code> генерирует строку на основе атрибутов <code>id</code> и <code>updated_at</code>
+        модели. Это обычное соглашение, имеющее преимущество невалидности кэша, когда изменяется
+        продукт. В основном при использовании низкоуровневого кэширования для информации на уровне
+        экземпляра модели, необходимо генерировать ключ кэша.</p></div>
+    <h4 class="inside_page_header" id="keshirovanie-sql"> Кэширование SQL</h4>
+    <p>Кэширование запроса - это особенность Rails, кэширующая результат выборки по каждому запросу.
+        Если Rails встретит тот же запрос (query) на протяжения текущего запроса (request), он
+        использует кэшированный результат, вместо того, чтобы снова сделать запрос к базе
+        данных.</p>
+    <p>Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  def index
+    # Запускаем поисковый запрос
+    @products = Product.all
+    ...
+    # Снова запускаем тот же запрос
+    @products = Product.all
+  end
+end
+</pre>
+    </div>
+    <p>Когда тот же запрос будет сделан, фактически он не дойдет до базы данных. В первый раз
+        возвращенный результат запроса сохраняется в кэше запроса (в памяти), а во второй раз он
+        извлекается из памяти.</p>
+    <p>Однако, важно отметить, что кэши запросов создаются в начале экшна и уничтожаются в конце
+        того же экшна, тем самым сохраняются только на протяжении этого экшна. Если вам хочется
+        сохранять результаты запроса на более постоянной основе, можно использовать низкоуровневое
+        кэширование.</p>
+    <h3 class="inside_page_header" id="hranilischa-kesha"> Хранилища кэша</h3>
+    <p>Rails предоставляет различные хранилища для кэшированных данных (кроме SQL кэширования и
+        кэширования страниц).</p>
+    <h4 class="inside_page_header" id="konfiguratsiya"> Конфигурация</h4>
+    <p>Можно настроить хранилище кэша по умолчанию своего приложения, установив конфигурационную
+        опцию <code>config.cache_store</code>. Другие параметры могут будут переданы как аргументы в
+        конструктор хранилища кэша.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = :memory_store, { size: 64.megabytes }
+</pre>
+    </div>
+    <div class="note"><p>Альтернативно можно вызвать <code>ActionController::Base.cache_store</code>
+        вне конфигурационного блока.</p></div>
+    <p>К кэшу можно получить доступ, вызвав <code>Rails.cache</code>.</p>
+    <h4 class="inside_page_header" id="activesupport-cache-store"> ActiveSupport::Cache::Store</h4>
+    <p>Этот класс представляет основу для взаимодействия с кэшем в Rails. Это абстрактный класс, и
+        он сам не может быть использован. Вместо него нужно использовать конкретную реализацию
+        класса, связанного с engine-ом хранилища. Rails поставляется с несколькими реализациями,
+        описанными ниже.</p>
+    <p>Главные вызываемые методы это <code>read</code>, <code>write</code>, <code>delete</code>,
+        <code>exist?</code> и <code>fetch</code>. Метод fetch принимает блок и либо возвращает
+        существующее значение из кэша, либо вычисляет блок и записывает результат в кэш, если
+        значение не существует.</p>
+    <p>Имеется несколько общих опций, используемых всеми реализациями кэша. Они могут быть переданы
+        в конструктор или в различные методы для взаимодействия с записями.</p>
+    <ul>
+        <li><p><code>:namespace</code> - Эта опция может быть использована для создания пространства
+            имен в хранилище кэша. Она особенно полезна, если приложение разделяет кэш с другим
+            приложением.</p></li>
+        <li><p><code>:compress</code> - Эта опция может быть использована для указания, что в кэше
+            должно быть использовано сжатие. Это особенно полезно для передачи огромных записей кэша
+            по медленной сети.</p></li>
+        <li><p><code>:compress_threshold</code> - Эта опция используется в сочетании с опцией <code>:compress</code>
+            для указания порога, до которого записи кэша не будут сжиматься. По умолчанию 16
+            килобайт.</p></li>
+        <li><p><code>:expires_in</code> - Эта опция устанавливает время прекращения в секундах для
+            записи кэша, когда она будет автоматически убрана из кэша.</p></li>
+        <li><p><code>:race_condition_ttl</code> - Эта опция используется в сочетании с опцией <code>:expires_in</code>.
+            Она предотвращает гонку условий при прекращении записи кэша, предотвращая несколько
+            процессов от одновременного пересоздания одной и той же записи (также известного как dog
+            pile effect). Эта опция устанавливает количество секунд, в течение которых прекращенная
+            запись кэша может использоваться, пока не будет пересоздана новая запись. Считается
+            хорошей практикой установить это значение, если используется опция
+            <code>:expires_in</code>.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="proizvolnye-hranilischa-kesha"> Произвольные хранилища
+        кэша</h4>
+    <p>Можно создать свое собственно хранилище кэша, просто расширив <code>ActiveSupport::Cache::Store</code>
+        и реализовав соответствующие методы. Таким образом можно применить несколько кэширующих
+        технологий в вашем приложении Rails.</p>
+    <p>Для использования произвольного хранилища кэша просто присвойте хранилищу кэша новый
+        экземпляр класса.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = MyCacheStore.new
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="activesupport-cache-memorystore">
+        ActiveSupport::Cache::MemoryStore</h4>
+    <p>Это хранилище кэша хранит записи в памяти в том же процессе Ruby. У хранилища кэша
+        ограниченный размер, определенный опцией <code>:size</code>, указанной в инициализаторе (по
+        умолчанию 32Mb). Когда кэш превышает выделенный размер, происходит очистка и самые ранние
+        используемые записи будут убраны.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = :memory_store, { size: 64.megabytes }
+</pre>
+    </div>
+    <p>Если запущено несколько серверных процессов Ruby on Rails (что бывает в случае использования
+        mongrel_cluster или Phusion Passenger), то экземпляры ваших серверов Rails не смогут
+        разделять данные кэша друг с другом. Это хранилище кэша не подходит для больших приложений.
+        Однако, оно замечательно работает с небольшими сайтами с низким трафиком, с несколькими
+        серверными процессами, или для сред development и test.</p>
+    <h4 class="inside_page_header" id="activesupport-cache-filestore">
+        ActiveSupport::Cache::FileStore</h4>
+    <p>Это хранилище кэша использует файловую систему для хранения записей. Путь к директории, в
+        которой будут храниться файлы, должен быть определен при инициализации кэша.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = :file_store, "/path/to/cache/directory"
+</pre>
+    </div>
+    <p>С этим хранилищем кэша несколько серверных процессов на одном хосте могут делиться кэшем.
+        Хранилище кэша подходит для сайтов с трафиком от низкого до среднего, обслуживающихся на
+        одном или двух хостах. Серверные процессы, запущенные на разных хостах, могут делиться кэшем
+        при использовании общей файловой системы, но эта настройка не рекомендована.</p>
+    <p>Так как кэш будет расти, пока не заполнится диск, рекомендуется периодически чистить старые
+        записи.</p>
+    <p>Это реализация хранилища кэша по умолчанию.</p>
+    <h4 class="inside_page_header" id="activesupport-cache-memcachestore">
+        ActiveSupport::Cache::MemCacheStore</h4>
+    <p>Это хранилище кэша использует сервер Danga's <code>memcached</code> для предоставления
+        централизованного кэша вашему приложению. Rails по умолчанию использует встроенный гем
+        <code>dalli</code>. Сейчас это наиболее популярное хранилище кэша для работающих веб-сайтов.
+        Оно представляет отдельный общий кластер кэша с очень высокими производительностью и
+        резервированием.</p>
+    <p>При инициализации кэша необходимо указать адреса для всех серверов memcached в вашем
+        кластере. Если ни один не определен, предполагается, что memcached запущен на localhost на
+        порте по умолчанию, но это не идеальная настройка для больших сайтов.</p>
+    <p>Методы <code>write</code> и <code>fetch</code> на кэше принимают две дополнительных опции,
+        дающие преимущества особенностей memcached. Можно определить <code>:raw</code> для отправки
+        значения на сервер без сериализации. Значение должно быть строкой или числом. Прямые
+        операции memcached, такие как <code>increment</code> и <code>decrement</code>, можно
+        использовать только на значениях raw. Также можно определить <code>:unless_exist</code>,
+        если не хотите, чтобы memcached перезаписал существующую запись.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = :mem_cache_store, "cache-1.example.com", "cache-2.example.com"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="activesupport-cache-nullstore">
+        ActiveSupport::Cache::NullStore</h4>
+    <p>Эта реализация хранилища кэша предполагает использование только в средах development или
+        test, и никогда ничего не хранит. Это может быть полезным при разработке, когда у вас
+        имеется код, взаимодействующий непосредственно с <code>Rails.cache</code>, но кэширование
+        может препятствовать способности видеть результат изменений в коде. С помощью этого
+        хранилища кэша все операции <code>fetch</code> и <code>read</code> приведут к отсутствующему
+        результату.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.cache_store = :null_store
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="klyuchi-kesha"> Ключи кэша</h3>
+    <p>Ключи, используемые в кэше могут быть любым объектом, отвечающим либо на
+        <code>cache_key</code>, либо на <code>to_param</code>. Можно реализовать метод <code>cache_key</code>
+        в своем классе, если необходимо создать произвольный класс. Active Record создает ключи,
+        основанные на имени класса и id записи.</p>
+    <p>Как ключи хэша можно использовать хэши и массивы.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Это правильный ключ кэша
+Rails.cache.read(site: "mysite", owners: [owner_1, owner_2])
+</pre>
+    </div>
+    <p>Ключи, используемые на <code>Rails.cache</code> не те же самые, что фактически используются
+        движком хранения. Они могут быть модифицированы пространством имен, или изменены в
+        соответствии с ограничениями технологии. Это значит, к примеру, что нельзя сохранить
+        значения с помощью <code>Rails.cache</code>, а затем попытаться вытащить их с помощью гема
+        <code>memcache-client</code>. Однако, также не стоит беспокоиться о превышения лимита
+        memcached или несоблюдении правил синтаксиса.</p>
+    <h3 class="inside_page_header" id="podderzhka-get-s-usloviem-conditional-get"> Поддержка GET с
+        условием (Conditional GET)</h3>
+    <p>GET с условием - это особенность спецификации HTTP, предоставляющая способ веб серверам
+        сказать браузерам, что отклик на запрос GET не изменился с последнего запроса и может быть
+        спокойно извлечен из кэша браузера.</p>
+    <p>Это работает с использованием заголовков HTTP_IF_NONE_MATCH и HTTP_IF_MODIFIED_SINCE для
+        передачи туда-обратно уникального идентификатора контента и временной метки, когда
+        содержимое было последний раз изменено. Если браузер делает запрос, в котором идентификатор
+        контента (etag) или временная метка последнего изменения соответствует версии сервера, то
+        серверу всего лишь нужно вернуть пустой отклик со статусом not modified.</p>
+    <p>Это обязанность сервера (т.е. наша) искать временную метку последнего изменения и заголовок
+        if-none-match, и определять, нужно ли отсылать полный отклик. С поддержкой conditional-get в
+        Rails это очень простая задача:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  def show
+    @product = Product.find(params[:id])
+    # Если запрос устарел в соответствии с заданной временной меткой или значением
+    # etag (т.е. нуждается в обработке снова), тогда запускаем этот блок
+    if stale?(last_modified: @product.updated_at.utc, etag: @product.cache_key)
+      respond_to do |wants|
+        # ... обычное создание отклика
+      end
+    end
+    # Если запрос свежий (т.е. не изменился), то не нужно ничего делать
+    # Рендер по умолчанию проверит это, используя параметры,
+    # использованные в предыдущем вызове stale?, и автоматически пошлет
+    # :not_modified. И на этом все.
+  end
+end
+</pre>
+    </div>
+    <p>Вместо хэша опций можно просто передать модель, Rails будет использовать методы <code>updated_at</code>
+        и <code>cache_key</code> для настройки <code>last_modified</code> и <code>etag</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  def show
+    @product = Product.find(params[:id])
+    if stale?(@product)
+      respond_to do |wants|
+        # ... обычное создание отклика
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Если отсутствует специальная обработка отклика и используется дефолтный механизм рендеринга
+        (т.е. вы не используете <code>respond_to</code> или вызываете сам <code>render</code>), то
+        можете использовать простой хелпер <code>fresh_when</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class ProductsController &lt; ApplicationController
+  # Это автоматически отошлет :not_modified, если запрос свежий,
+  # и отрендерит дефолтный шаблон (product.*), если он устарел.
+  def show
+    @product = Product.find(params[:id])
+    fresh_when last_modified: @product.published_at.utc, etag: @product
+  end
+end
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="ssylki"> Ссылки</h3>
+    <ul>
+        <li>
+        </li>
+        <li>
+        </li>
+    </ul>
+
+</body>
+</html>

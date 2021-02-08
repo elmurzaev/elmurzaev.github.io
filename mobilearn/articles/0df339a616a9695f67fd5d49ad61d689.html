@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Engine для начинающих</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="engine-dlya-nachinayuschih"> Engine для начинающих</h2>
+    <p>В этом руководстве вы узнаете об engine-ах, и как они могут быть использованы для
+        предоставления дополнительного функционала содержащим их приложениям с помощью понятного и
+        простого для понимания интерфейса.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Зачем нужен engine.
+        </li>
+        <li>Как создать engine.
+        </li>
+        <li>Встроенные особенности engine.
+        </li>
+        <li>Внедрение engine в приложение.
+        </li>
+        <li>Переопределение функционала engine из приложения.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="chto-takoe-engine"> Что такое engine?</h3>
+    <p>Engine можно рассматривать как миниатюрное приложение, предоставляющее функционал содержащим
+        их приложениям. Приложение Rails фактически всего лишь "прокачанный" engine с классом <code>Rails::Application</code>,
+        унаследовавшим большую часть своего поведения от <code>Rails::Engine</code>.</p>
+    <p>Следовательно, об engine и приложении можно говорить как примерно об одном и том же, с
+        небольшими различиями, как вы увидите в этом руководстве. Engine и приложение также
+        используют одинаковую структуру.</p>
+    <p>Engine также близок к плагину, они оба имеют одинаковую структуру директории <code>lib</code>
+        и оба создаются с помощью генератора <code>rails plugin new</code>. Разница в том, что
+        engine рассматривается Rails как "full plugin" (на что указывает опция <code>--full</code>,
+        передаваемая в команду генератора). Фактически, тут мы будем использовать опцию <code>--mountable</code>,
+        включающую все особенности <code>--full</code> и кое-что еще. Впрочем, в этом руководстве
+        эти "full plugins" будут называться просто "engine". Engine <strong>может</strong> быть
+        плагином, а плагин <strong>может</strong> быть engine-ом.</p>
+    <p>Engine, который будет создан в этом руководстве, называется "blorgh". Этот engine предоставит
+        функционал блога содержащим его приложениям, позволяя создавать новые статьи и комментарии.
+        Сначала мы поработаем отдельно с самим engine, а потом посмотрим, как внедрить его в
+        приложение.</p>
+    <p>Engine также может быть отделен от содержащих его приложений. Это означает, что приложение
+        может иметь маршрутный хелпер, такой как <code>articles_path</code>, и использовать engine,
+        также предоставляющий путь с именем <code>articles_path</code>, и они оба не будут
+        конфликтовать. Наряду с этим, контроллеры, модели и имена таблиц также выделены в
+        пространство имен. Вы узнаете, как это сделать, позже в этом руководстве.</p>
+    <p>Важно все время помнить, что приложение <strong>всегда</strong> должно иметь приоритет над
+        его engine-ами. Приложение - это объект, имеющий последнее слово в том, что происходит в его
+        среде. Engine должен только улучшать ее, но не изменять радикально.</p>
+    <p>Для демонстрации других engine-ов, посмотрите , engine, предоставляющий аутентификацию для
+        содержащих его приложений, или , engine, представляющий функционал форума. Также имеется ,
+        предоставляющий платформу электронной коммерции, и , CMS engine.</p>
+    <p>Наконец, engine не был бы возможен без работы James Adam, Piotr Sarnacki, Rails Core Team, и
+        ряда других людей. Если вы с ними встретитесь, не забудьте поблагодарить!</p>
+    <h3 class="inside_page_header" id="sozdanie-engine"> Создание engine</h3>
+    <p>Чтобы создать engine, необходимо запустить генератор плагинов и передать ему подходящие для
+        нужд опции. Для примера с "blorgh", нужно создать "монтируемый" engine, запустив в терминале
+        эту команду:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails plugin new blorgh --mountable
+</pre>
+    </div>
+    <p>Можно просмотреть полный список опций для генератора плагина, написав:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails plugin --help
+</pre>
+    </div>
+    <p>Опция <code>--mountable</code> сообщает генератору, что вы хотите создать "монтируемый" и
+        изолированный engine. Этот генератор представляет ту же структуру скелета, как и с опцией
+        <code>--full</code>. Опция <code>--full</code> сообщает генератору, что вы хотите создать
+        engine, включая скелет следующей структуры:</p>
+    <ul>
+        <li>Дерево директории <code>app</code>
+        </li>
+        <li>
+            <p>Файл <code>config/routes.rb</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.routes.draw do
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Файл <code>lib/blorgh/engine.rb</code>, идентичный по функции стандартному файлу
+                приложения Rails <code>config/application.rb</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class Engine &lt; ::Rails::Engine
+  end
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Опция <code>--mountable</code> добавит к опции <code>--full</code>:</p>
+    <ul>
+        <li>Файлы манифестов ресурсов (<code>application.js</code> и <code>application.css</code>)
+        </li>
+        <li>Пустой <code>ApplicationController</code> в пространстве имен
+        </li>
+        <li>Пустой <code>ApplicationHelper</code> в пространстве имен
+        </li>
+        <li>Шаблон макета вьюхи для engine
+        </li>
+        <li>
+            <p>Изоляцию в пространстве имен для <code>config/routes.rb</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Blorgh::Engine.routes.draw do
+end
+</pre>
+            </div>
+        </li>
+        <li>
+            <p>Изоляцию в пространстве имен для <code>lib/blorgh/engine.rb</code>:</p>
+            <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class Engine &lt; ::Rails::Engine
+    isolate_namespace Blorgh
+  end
+end
+</pre>
+            </div>
+        </li>
+    </ul>
+    <p>Кроме того, опция <code>--mountable</code> сообщает генератору смонтировать engine в пустом
+        тестовом приложении, расположенном в <code>test/dummy</code>, поместив следующую строку в
+        маршрутный файл пустого приложения <code>test/dummy/config/routes.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+mount Blorgh::Engine =&gt; "/blorgh"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="vnutri-engine"> Внутри Engine</h4>
+    <h5 class="inside_page_header" id="kritichnye-fayly"> Критичные файлы</h5>
+    <p>В корне директории нового engine есть файл <code>blorgh.gemspec</code>. Позже, когда вы
+        будете включать engine в приложение, это нужно будет сделать с помощью следующей строчки в
+        <code>Gemfile</code> приложения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'blorgh', path: 'engines/blorgh'
+</pre>
+    </div>
+    <p>Не забудьте запустить <code>bundle install</code>, как обычно. Если указать его как гем в
+        <code>Gemfile</code>, Bundler так его и загрузит, спарсив файл <code>blorgh.gemspec</code>,
+        и затребовав файл в директории <code>lib</code> по имени <code>lib/blorgh.rb</code>. Этот
+        файл требует файл <code>blorgh/engine.rb</code> (расположенный в
+        <code>lib/blorgh/engine.rb</code>) и определяет базовый модуль по имени <code>Blorgh</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require "blorgh/engine"
+module Blorgh
+end
+</pre>
+    </div>
+    <div class="info"><p>В некоторых engine этот файл используется для размещения глобальных
+        конфигурационных опций для engine. Это относительно хорошая идея, так что, если хотите
+        предложить конфигурационные опции, файл, в котором определен <code>module</code> вашего
+        engine, подходит для этого. Поместите методы в модуль и можно продолжать.</p></div>
+    <p><code>lib/blorgh/engine.rb</code> это основной класс для engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class Engine &lt; ::Rails::Engine
+    isolate_namespace Blorgh
+  end
+end
+</pre>
+    </div>
+    <p>Унаследованный от класса <code>Rails::Engine</code>, этот гем информирует Rails, что по
+        определенному пути есть engine, и должным образом монтирует engine в приложение, выполняя
+        задачи, такие как добавление директории <code>app</code> из engine к путям загрузки для
+        моделей, рассыльщиков, контроллеров и вьюх.</p>
+    <p>Метод <code>isolate_namespace</code> заслуживает особого внимания. Этот вызов ответственен за
+        изолирование контроллеров, моделей, маршрутов и прочего в их собственное пространство имен,
+        подальше от подобных компонентов приложения. Без этого есть вероятность, что компоненты
+        engine могут "просочиться" в приложение, вызвав нежелательные разрушения, или что важные
+        компоненты engine могут быть переопределены таким же образом названными вещами в приложении.
+        Один из примеров таких конфликтов - хелперы. Без вызова <code>isolate_namespace</code>,
+        хелперы engine будут включены в контроллеры приложения.</p>
+    <div class="note"><p><strong>Настойчиво</strong> рекомендуется оставить строку <code>isolate_namespace</code>
+        в определении класса <code>Engine</code>. Без этого созданные в engine классы
+        <strong>могут</strong> конфликтовать с приложением.</p></div>
+    <p>Эта изоляция в пространство имен означает, что модель, созданная с помощью <code>bin/rails g
+        model</code>, например <code>bin/rails g model article</code>, не будет называться <code>Article</code>,
+        а будет помещена в пространство имен и названа <code>Blorgh::Article</code>. Кроме того,
+        таблица для модели будет помещена в пространство имен, и станет <code>blorgh_articles</code>,
+        а не просто <code>articles</code>. Подобно пространству имен моделей, контроллер с именем
+        <code>ArticlesController</code> будет <code>Blorgh::ArticlesController</code>, и вьюхи для
+        этого контроллера будут не в <code>app/views/articles</code>, а в <code>app/views/blorgh/articles</code>.
+        Рассыльщики также помещены в пространство имен.</p>
+    <p>Наконец, маршруты также будут изолированы в engine. Это одна из наиболее важных частей
+        относительно пространства имен, и будет обсуждена позже в разделе этого руководства.</p>
+    <h5 class="inside_page_header" id="direktoriya-app"> Директория <code>app</code>
+    </h5>
+    <p>В директории <code>app</code> имеются стандартные директории <code>assets</code>, <code>controllers</code>,
+        <code>helpers</code>, <code>mailers</code>, <code>models</code> и <code>views</code>, с
+        которыми вы уже знакомы по приложению. Директории <code>helpers</code>, <code>mailers</code>
+        и <code>models</code> пустые, поэтому не описываются в этом разделе. Мы рассмотрим модели
+        позже, когда будем писать engine.</p>
+    <p>В директории <code>app/assets</code> имеются директории <code>images</code>, <code>javascripts</code>
+        и <code>stylesheets</code>, которые, опять же, должны быть знакомы по приложению. Имеется
+        одно отличие - каждая директория содержит поддиректорию с именем engine-а. Поскольку этот
+        engine будет помещен в пространство имен, его ресурсы также будут помещены.</p>
+    <p>В директории <code>app/controllers</code> имеется директория <code>blorgh</code>, содержащая
+        файл с именем <code>application_controller.rb</code>. Этот файл предоставит любой общий
+        функционал для контроллеров engine-а. Директория <code>blorgh</code> - то место, в котором
+        будут другие контроллеры engine-а. Помещая их в этой директории, вы предотвращаете их от
+        возможного конфликта с идентично названными контроллерами других engine-ов или даже
+        приложения.</p>
+    <div class="note"><p>Класс <code>ApplicationController</code> в engine называется так же, как и
+        в приложении Rails, чтобы было проще преобразовать ваше приложение в engine.</p></div>
+    <p>Наконец, директория <code>app/views</code> содержит папку <code>layouts</code>, содержащую
+        файл <code>blorgh/application.html.erb</code>. Этот файл позволяет определить макет для
+        engine. Если этот engine будет использоваться как автономный, следует поместить любые
+        настройки макета в этот файл, а не в файл
+        <code>app/views/layouts/application.html.erb</code> приложения.</p>
+    <p>Если не хотите навязывать макет пользователям engine, удалите этот файл и ссылайтесь на
+        другой макет в контроллерах вашего engine.</p>
+    <h5 class="inside_page_header" id="direktoriya-bin"> Директория <code>bin</code>
+    </h5>
+    <p>Эта директория содержит один файл, <code>bin/rails</code>, позволяющий использовать
+        подкоманды и генераторы <code>rails</code>, как вы это делаете для приложения. Это означает,
+        что можно создать новые контроллеры и модели для этого engine, просто запуская подобные
+        команды:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails g model
+</pre>
+    </div>
+    <p>Помните, что все созданное с помощью этих команд в engine, имеющим
+        <code>isolate_namespace</code> в классе <code>Engine</code>, будет помещено в пространство
+        имен.</p>
+    <h5 class="inside_page_header" id="test-directory"> Директория <code>test</code>
+    </h5>
+    <p>В директории <code>test</code> будут тесты для engine. Для тестирования engine, там будет
+        урезанная версия приложения Rails, вложенная в <code>test/dummy</code>. Это приложение
+        смонтирует в файле <code>test/dummy/config/routes.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Rails.application.routes.draw do
+  mount Blorgh::Engine =&gt; "/blorgh"
+end
+</pre>
+    </div>
+    <p>Эта строка монтирует engine по пути <code>/blorgh</code>, что делает его доступным в
+        приложении только по этому пути.</p>
+    <p>В директории test имеется директория <code>test/integration</code>, в которой должны быть
+        расположены интеграционные тесты для engine. Также могут быть созданы иные директории в
+        <code>test</code>. Для примера, можно создать директорию <code>test/models</code> для тестов
+        ваших моделей.</p>
+    <h3 class="inside_page_header" id="predostavlyaem-funktsional-engine"> Предоставляем функционал
+        engine</h3>
+    <p>Engine, раскрываемый в этом руководстве, предоставляет функционал отправки статей и
+        комментирования, и излагается подобно , с некоторыми новыми особенностями.</p>
+    <h4 class="inside_page_header" id="sozdaem-resurs-article"> Создаем ресурс Article</h4>
+    <p>Первыми вещами для создания блога являются модель <code>Article</code> и соответствующий
+        контроллер. Чтобы их создать быстро, воспользуемся генератором скаффолдов Rails.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold article title:string text:text
+</pre>
+    </div>
+    <p>Эта команда выведет такую информацию:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+invoke  active_record
+create    db/migrate/[timestamp]_create_blorgh_articles.rb
+create    app/models/blorgh/article.rb
+invoke    test_unit
+create      test/models/blorgh/article_test.rb
+create      test/fixtures/blorgh/articles.yml
+invoke  resource_route
+ route    resources :articles
+invoke  scaffold_controller
+create    app/controllers/blorgh/articles_controller.rb
+invoke    erb
+create      app/views/blorgh/articles
+create      app/views/blorgh/articles/index.html.erb
+create      app/views/blorgh/articles/edit.html.erb
+create      app/views/blorgh/articles/show.html.erb
+create      app/views/blorgh/articles/new.html.erb
+create      app/views/blorgh/articles/_form.html.erb
+invoke    test_unit
+create      test/controllers/blorgh/articles_controller_test.rb
+invoke    helper
+create      app/helpers/blorgh/articles_helper.rb
+invoke  assets
+invoke    js
+create      app/assets/javascripts/blorgh/articles.js
+invoke    css
+create      app/assets/stylesheets/blorgh/articles.css
+invoke  css
+create    app/assets/stylesheets/scaffold.css
+</pre>
+    </div>
+    <p>Первое, что сделает генератор скаффолда, - это вызовет генератор <code>active_record</code>,
+        который создаст миграцию и модель для ресурса. Отметьте, однако, что миграция называется
+        <code>create_blorgh_articles</code> вместо обычной <code>create_articles</code>. Это
+        происходит благодаря методу <code>isolate_namespace</code>, вызванному в определении класса
+        <code>Blorgh::Engine</code>. Модель также помещена в пространство имен, размещена в <code>app/models/blorgh/article.rb</code>,
+        а не в <code>app/models/article.rb</code>, благодаря вызову <code>isolate_namespace</code> в
+        классе <code>Engine</code>.</p>
+    <p>Далее для этой модели вызывается генератор <code>test_unit</code>, создающий тест модели в
+        <code>test/models/blorgh/article_test.rb</code> (а не в
+        <code>test/models/article_test.rb</code>) и фикстуру в <code>test/fixtures/blorgh/articles.yml</code>
+        (а не в <code>test/fixtures/articles.yml</code>).</p>
+    <p>После этого для ресурса вставляется строка в файл <code>config/routes.rb</code> engine-а. Эта
+        строка - просто <code>resources :articles</code>, файл <code>config/routes.rb</code>
+        engine-а стал таким:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Blorgh::Engine.routes.draw do
+  resources :articles
+end
+</pre>
+    </div>
+    <p>Отметьте, что маршруты отрисовываются в объекте <code>Blorgh::Engine</code>, а не в классе
+        <code>YourApp::Application</code>. Это так, поскольку маршруты engine ограничены самим
+        engine и могут быть смонтированы в определенной точке, как показано в разделе . Также по
+        этой причине маршруты engine изолированы от маршрутов приложения. Раздел руководства
+        описывает это подробнее.</p>
+    <p>Затем вызывается генератор <code>scaffold_controller</code>, создавая контроллер с именем
+        <code>Blorgh::ArticlesController</code> (в <code>app/controllers/blorgh/articles_controller.rb</code>)
+        и соответствующие вьюхи в <code>app/views/blorgh/articles</code>. Этот генератор также
+        создает тест для контроллера
+        (<code>test/controllers/blorgh/articles_controller_test.rb</code>) и хелпер (<code>app/helpers/blorgh/articles_helper.rb</code>).
+    </p>
+    <p>Все, что этот генератор создает, аккуратно помещается в пространство имен. Класс контроллера
+        определяется в модуле <code>Blorgh</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class ArticlesController &lt; ApplicationController
+    ...
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Класс <code>ApplicationController</code>, от которого тут происходит
+        наследование, является <code>Blorgh::ApplicationController</code>, а не <code>ApplicationController</code>
+        приложения.</p></div>
+    <p>Хелпер в <code>app/helpers/blorgh/articles_helper.rb</code> также имеет пространство имен:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  module ArticlesHelper
+    ...
+  end
+end
+</pre>
+    </div>
+    <p>Это помогает предотвратить конфликты с любым другим engine или приложением, которые также
+        могут иметь ресурс article.</p>
+    <p>Наконец, создаются два ресурсных файла,
+        <code>app/assets/javascripts/blorgh/articles.js</code> и <code>app/assets/stylesheets/blorgh/articles.css</code>.
+        Вы увидите, как их использовать немного позже.</p>
+    <p>Можно понаблюдать, что имеет engine на текущий момент, запустив <code>rake db:migrate</code>
+        в корне нашего engine, чтобы запустить миграцию, созданную генератором скаффолда, а затем
+        запустив <code>rails server</code> в <code>test/dummy</code>. Если открыть <code>http://localhost:3000/blorgh/articles</code>,
+        можно увидеть созданный скаффолд по умолчанию. Проверьте! Вы только что создали первые
+        функции вашего первого engine.</p>
+    <p>Также можно поиграть с консолью, <code>rails console</code> будет работать так же, как и для
+        приложения Rails. Помните: модель <code>Article</code> лежит в пространстве имен, поэтому,
+        чтобы к ней обратиться, следует вызвать ее как <code>Blorgh::Article</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&gt;&gt; Blorgh::Article.find(1)
+=&gt; #&lt;Blorgh::Article id: 1 ...&gt;
+</pre>
+    </div>
+    <p>Наконец нужно сделать так, чтобы ресурс <code>articles</code> этого engine был в корне
+        engine. Когда кто-либо перейдет в корень пути, в котором смонтирован engine, ему должен быть
+        показан перечень статей. Чтобы это произошло, следующая строчка должна быть вставлена в файл
+        <code>config/routes.rb</code> в engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+root to: "articles#index"
+</pre>
+    </div>
+    <p>Теперь пользователям нужно всего лишь перейти в корень engine, чтобы увидеть все статьи, без
+        посещения <code>/articles</code>. Это означает, что вместо <code>http://localhost:3000/blorgh/articles</code>,
+        теперь можно перейти на <code>http://localhost:3000/blorgh</code>.</p>
+    <h4 class="inside_page_header" id="sozdanie-resursa-kommentariev"> Создание ресурса
+        комментариев</h4>
+    <p>Теперь, когда engine может создавать новые статьи, необходимо добавить функционал
+        комментирования. Для этого необходимо создать модель комментария, контроллер комментария и
+        модифицировать скаффолд статей для отображения комментариев и позволения пользователям
+        создавать новые.</p>
+    <p>Из корня приложения запустите генератор моделей. Скажите ему создать модель
+        <code>Comment</code> с соответствующей таблицей, имеющей два столбца: числовой <code>article_id</code>
+        и текстовый <code>text</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model Comment article_id:integer text:text
+</pre>
+    </div>
+    <p>Это выдаст следующее:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+invoke  active_record
+create    db/migrate/[timestamp]_create_blorgh_comments.rb
+create    app/models/blorgh/comment.rb
+invoke    test_unit
+create      test/models/blorgh/comment_test.rb
+create      test/fixtures/blorgh/comments.yml
+</pre>
+    </div>
+    <p>Вызов этого генератора создаст только необходимые для модели файлы, поместит их в
+        пространство имен в директории <code>blorgh</code> и создаст класс модели по имени <code>Blorgh::Comment</code>.
+        Теперь запустите миграцию, чтобы создать таблицу blorgh_comments:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake db:migrate
+</pre>
+    </div>
+    <p>Чтобы отображать комментарии на статью, отредактируйте <code>app/views/blorgh/articles/show.html.erb</code>
+        и добавьте эту строку до ссылки "Edit":</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h3&gt;Comments&lt;/h3&gt;
+&lt;%= render @article.comments %&gt;
+</pre>
+    </div>
+    <p>Эта строчка требует, чтобы была связь <code>has_many</code> для комментариев, определенная в
+        модели <code>Blorgh::Article</code>, которой сейчас нет. Чтобы ее определить, откройте
+        <code>app/models/blorgh/article.rb</code> и добавьте эту строку в модель:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+has_many :comments
+</pre>
+    </div>
+    <p>Превратив модель в следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class Article &lt; ActiveRecord::Base
+    has_many :comments
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p>Поскольку <code>has_many</code> определена в классе внутри модуля <code>Blorgh</code>,
+        Rails знает, что вы хотите использовать модель <code>Blorgh::Comment</code> для этих
+        объектов, поэтому тут нет необходимости указывать это с использованием опции <code>:class_name</code>.
+    </p></div>
+    <p>Затем необходима форма для создания комментариев к статье. Чтобы ее добавить, поместите эту
+        строчку после вызова <code>render @article.comments</code> в <code>app/views/blorgh/articles/show.html.erb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= render "blorgh/comments/form" %&gt;
+</pre>
+    </div>
+    <p>Затем необходимо, чтобы существовал партиал, который рендерит эта строка. Создайте новую
+        директорию <code>app/views/blorgh/comments</code> и в ней новый файл по имени <code>_form.html.erb</code>,
+        содержащий следующий код для создания необходимого партиала:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h3&gt;New comment&lt;/h3&gt;
+&lt;%= form_for [@article, @article.comments.build] do |f| %&gt;
+  &lt;p&gt;
+    &lt;%= f.label :text %&gt;&lt;br&gt;
+    &lt;%= f.text_area :text %&gt;
+  &lt;/p&gt;
+  &lt;%= f.submit %&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <p>При подтверждении этой формы, она попытается выполнить запрос <code>POST</code> по маршруту
+        <code>/articles/:article_id/comments</code> в engine. Сейчас этот маршрут не существует, но
+        может быть создан с помощью изменения строки <code>resources :articles</code> в <code>config/routes.rb</code>
+        на эти строки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+resources :articles do
+  resources :comments
+end
+</pre>
+    </div>
+    <p>Это создаст вложенный маршрут для комментариев, что и требует форма.</p>
+    <p>Теперь маршрут существует, но контроллер, на который ведет маршрут, нет. Для его создания
+        запустите команду из корня приложения:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails g controller comments
+</pre>
+    </div>
+    <p>Это создаст следующие вещи:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+create  app/controllers/blorgh/comments_controller.rb
+invoke  erb
+ exist    app/views/blorgh/comments
+invoke  test_unit
+create    test/controllers/blorgh/comments_controller_test.rb
+invoke  helper
+create    app/helpers/blorgh/comments_helper.rb
+invoke  assets
+invoke    js
+create      app/assets/javascripts/blorgh/comments.js
+invoke    css
+create      app/assets/stylesheets/blorgh/comments.css
+</pre>
+    </div>
+    <p>Форма сделает запрос <code>POST</code> к <code>/articles/:article_id/comments</code>, который
+        связан с экшном <code>create</code> в <code>Blorgh::CommentsController</code>. Этот экшн
+        нужно создать и поместить следующие строки в определение класса в <code>app/controllers/blorgh/comments_controller.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def create
+  @article = Article.find(params[:article_id])
+  @comment = @article.comments.create(comment_params)
+  flash[:notice] = "Comment has been created!"
+  redirect_to articles_path
+end
+private
+def comment_params
+  params.require(:comment).permit(:text)
+end
+</pre>
+    </div>
+    <p>Это последняя часть, требуемая для работы формы нового комментария. Однако, отображение
+        комментариев еще не закончено. Если создадите новый комментарий сейчас, то увидите эту
+        ошибку:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Missing partial blorgh/comments/_comment with {:handlers=&gt;[:erb, :builder], :formats=&gt;[:html], :locale=&gt;[:en, :en]}. Searched in:
+  * "/Users/ryan/Sites/side_projects/blorgh/test/dummy/app/views"
+  * "/Users/ryan/Sites/side_projects/blorgh/app/views"
+</pre>
+    </div>
+    <p>Engine не может найти партиал, требуемый для рендеринга комментариев. Rails сперва ищет его в
+        директории приложения (<code>test/dummy</code>) <code>app/views</code>, а затем в директории
+        engine <code>app/views</code>. Когда он не нашел его, выдал эту ошибку. Engine знает, что
+        нужно искать в <code>blorgh/comments/_comment</code>, поскольку объект модели, которую он
+        получает, класса <code>Blorgh::Comment</code>.</p>
+    <p>Сейчас этот партиал будет ответственен за рендеринг только текста комментария. Создайте новый
+        файл <code>app/views/blorgh/comments/_comment.html.erb</code> и поместите в него эту строку:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= comment_counter + 1 %&gt;. &lt;%= comment.text %&gt;
+</pre>
+    </div>
+    <p>Локальная переменная <code>comment_counter</code> дается нам вызовом <code>&lt;%= render
+        @article.comments %&gt;</code>, она определяется автоматически, и счетчик увеличивается с
+        итерацией для каждого комментария. Он используется в этом примере для отображения числа
+        рядом с каждым созданным комментарием.</p>
+    <p>Мы завершили функцию комментирования engine-а блога. Теперь настало время использовать его в
+        приложении.</p>
+    <h3 class="inside_page_header" id="vnedrenie-v-prilozhenie"> Внедрение в приложение</h3>
+    <p>Использовать engine в приложении очень просто. Этот раздел раскрывает, как монтировать engine
+        в приложение, требуемые начальные настройки, а также как присоединить engine к классу <code>User</code>,
+        представленному приложением, для обеспечения принадлежности статей и комментариев в engine.
+    </p>
+    <h4 class="inside_page_header" id="montirovanie-engine"> Монтирование Engine</h4>
+    <p>Сначала необходимо определить engine в <code>Gemfile</code> приложения. Если у вас нет под
+        рукой готового приложения для тестирования, создайте новое с использованием команды <code>rails
+            new</code> вне директории engine:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new unicorn
+</pre>
+    </div>
+    <p>Обычно определение engine в Gemfile выполняется как определение обычного повседневного
+        гема.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'devise'
+</pre>
+    </div>
+    <p>Однако, поскольку вы разрабатываете engine <code>blorgh</code> на своей локальной машине,
+        необходимо указать опцию <code>:path</code> в <code>Gemfile</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem 'blorgh', path: 'engines/blorgh'
+</pre>
+    </div>
+    <p>Затем запустите <code>bundle</code> для установки гема.</p>
+    <p>Как было сказано ранее, при помещении гема в <code>Gemfile</code>, он будет загружен вместе с
+        Rails, Он сначала затребует <code>lib/blorgh.rb</code> в engine, затем <code>lib/blorgh/engine.rb</code>,
+        который является файлом, определяющим основной функционал для engine.</p>
+    <p>Чтобы функционал engine был доступен в приложении, необходимо его смонтировать в файле <code>config/routes.rb</code>
+        приложения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+mount Blorgh::Engine, at: "/blog"
+</pre>
+    </div>
+    <p>Эта строка смонтирует engine в <code>/blog</code> приложения. Сделав его доступным в <code>http://localhost:3000/blog</code>,
+        когда приложение запущено с помощью <code>rails server</code>.</p>
+    <div class="note"><p>Другие engine, такие как Devise, управляют этим немного по другому,
+        позволяя указывать в маршрутах свои хелперы (такие как <code>devise_for</code>). Эти хелперы
+        делают примерно то же самое, монтируя части настраиваемого функционала engine на
+        предопределенные пути.</p></div>
+    <h4 class="inside_page_header" id="nastroyka-engine"> Настройка engine</h4>
+    <p>Engine содержит миграции для таблиц <code>blorgh_articles</code> и
+        <code>blorgh_comments</code>, которые необходимо создать в базе данных приложения, чтобы
+        модели engine могли делать корректные запросы к ним. Чтобы скопировать эти миграции в
+        приложение, используйте эту команду:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake blorgh:install:migrations
+</pre>
+    </div>
+    <p>Если имеется несколько engine-ов, из которых необходимо скопировать миграции, используйте
+        <code>railties:install:migrations</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake railties:install:migrations
+</pre>
+    </div>
+    <p>Эта команда при первом запуске скопирует все миграции из engine. При следующем запуске она
+        скопирует лишь те миграции, которые еще не были скопированы. Первый запуск этой команды
+        выдаст что-то подобное:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+Copied migration [timestamp_1]_create_blorgh_articles.blorgh.rb from blorgh
+Copied migration [timestamp_2]_create_blorgh_comments.blorgh.rb from blorgh
+</pre>
+    </div>
+    <p>Первая временная метка (<code>[timestamp_1]</code>) будет текущим временем, а вторая
+        временная метка (<code>[timestamp_2]</code>) будет текущим временем плюс секунда. Причиной
+        для этого является то, что миграции для engine выполняются после всех существующих миграций
+        приложения.</p>
+    <p>Для запуска этих миграций в контексте приложения просто выполните <code>rake
+        db:migrate</code>. При входе в engine по адресу <code>http://localhost:3000/blog</code>,
+        статей не будет, поскольку таблица, созданная в приложении, отличается от той, что была
+        создана в engine. Сходите, поиграйте с только что смонтированным engine. Он точно такой же,
+        как когда он был только engine-ом.</p>
+    <p>Если хотите выполнить миграции только от одного engine, можно определить <code>SCOPE</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rake db:migrate SCOPE=blorgh
+</pre>
+    </div>
+    <p>Это полезно, если хотите откатить миграции перед их удалением. Чтобы откатить все миграции от
+        engine blorgh, следует запустить такой код:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rake db:migrate SCOPE=blorgh VERSION=0
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ispolzovanie-klassa-predostavlennogo-prilozheniem">
+        Использование класса, предоставленного приложением</h4>
+    <h5 class="inside_page_header" id="ispolzovanie-modeli-predostavlennoy-prilozheniem">
+        Использование модели, предоставленной приложением</h5>
+    <p>При создании engine, может возникнуть желание использовать определенные классы приложения для
+        обеспечения связей между частями engine и частями приложения. В случае engine
+        <code>blorgh</code> есть смысл в том, чтобы статьи и комментарии имели авторов.</p>
+    <p>Типичное приложении имеет класс <code>User</code>, предоставляющий авторов статей и
+        комментариев. Но возможен случай, когда приложение называет этот класс по-другому, скажем
+        <code>Person</code>. По этой причине engine не должен быть жестко связанным с классом <code>User</code>.
+    </p>
+    <p>В нашем случае, для упрощения, в приложении будет класс с именем <code>User</code>,
+        представляющий пользователей приложения (мы сделаем его настраиваемым в дальнейшем). Он
+        может быть создан с помощью этой команды в приложении:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rails g model user name:string
+</pre>
+    </div>
+    <p>Далее должна быть запущена команда <code>rake db:migrate</code>, чтобы для дальнейшего
+        использовании в приложении создалась таблица <code>users</code>.</p>
+    <p>Также для упрощения, в форме статьи будет новое текстовое поле с именем
+        <code>author_name</code>, в которое пользователи смогут вписать свое имя. Затем engine
+        примет это имя и либо создаст новый объект <code>User</code> для него, либо найдет того, кто
+        уже имеет такое имя. Engine затем свяжет статью с найденным или созданным объектом <code>User</code>.
+    </p>
+    <p>Сначала нужно добавить текстовое поле <code>author_name</code> в партиал <code>app/views/blorgh/articles/_form.html.erb</code>
+        внутри engine. Добавьте этот код перед полем <code>title</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;div class="field"&gt;
+  &lt;%= f.label :author_name %&gt;&lt;br&gt;
+  &lt;%= f.text_field :author_name %&gt;
+&lt;/div&gt;
+</pre>
+    </div>
+    <p>Затем необходимо обновить метод <code>Blorgh::ArticleController#article_params</code> для
+        разрешения параметров новой формы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def article_params
+  params.require(:article).permit(:title, :text, :author_name)
+end
+</pre>
+    </div>
+    <p>В модели <code>Blorgh::Article</code> должен быть некоторый код, преобразующий поле <code>author_name</code>
+        в фактический объект <code>User</code> и привязывающий его как <code>author</code> статьи до
+        того, как статья будет сохранена. Это потребует настройки <code>attr_accessor</code> для
+        этого поля, таким образом, для него будут определены методы сеттера и геттера.</p>
+    <p>Для этого необходимо добавить <code>attr_accessor</code> для <code>author_name</code>, связь
+        для author и вызов <code>before_save</code> в <code>app/models/blorgh/article.rb</code>.
+        Связь <code>author</code> будет пока что жестко завязана на класс <code>User</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+attr_accessor :author_name
+belongs_to :author, class_name: "User"
+before_save :set_author
+private
+  def set_author
+    self.author = User.find_or_create_by(name: author_name)
+  end
+</pre>
+    </div>
+    <p>Представив объект связи <code>author</code> классом <code>User</code>, установлена связь
+        между engine и приложением. Должен быть способ связывания записей в таблице <code>blorgh_articles</code>
+        с записями в таблице <code>users</code>. Поскольку связь называется <code>author</code>,
+        столбец <code>author_id</code> должен быть добавлен в таблицу <code>blorgh_articles</code>.
+    </p>
+    <p>Для создания этого нового столбца запустите команду внутри engine:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails g migration add_author_id_to_blorgh_articles author_id:integer
+</pre>
+    </div>
+    <div class="note"><p>Благодаря имени миграции и определению столбца после него, Rails
+        автоматически узнает, что вы хотите добавить столбец в определенную таблицу и запишет это в
+        миграцию. Вам не нужно больше ничего делать.</p></div>
+    <p>Нужно запустить эту миграцию в приложении. Для этого, сперва ее нужно скопировать с помощью
+        команды:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake blorgh:install:migrations
+</pre>
+    </div>
+    <p>Отметьте, что сейчас будет скопирована только <em>одна</em> миграция. Это так, потому что
+        первые две миграции уже были скопированы при первом вызове этой команды.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+NOTE Migration [timestamp]_create_blorgh_articles.blorgh.rb from blorgh has been skipped. Migration with the same name already exists.
+NOTE Migration [timestamp]_create_blorgh_comments.blorgh.rb from blorgh has been skipped. Migration with the same name already exists.
+Copied migration [timestamp]_add_author_id_to_blorgh_articles.blorgh.rb from blorgh
+</pre>
+    </div>
+    <p>Запустите эту миграцию с помощью:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rake db:migrate
+</pre>
+    </div>
+    <p>Теперь, когда все на месте, в дальнейшем будет происходить связывание автора -
+        представленного записью в таблице <code>users</code> - со статьей, представленной таблицей
+        <code>blorgh_articles</code> из engine.</p>
+    <p>Наконец, на странице статьи должно отображаться имя автора. Добавьте нижеследующий код над
+        выводом "Title" в <code>app/views/blorgh/articles/show.html.erb</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;p&gt;
+  &lt;b&gt;Author:&lt;/b&gt;
+  &lt;%= @article.author.name %&gt;
+&lt;/p&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="ispolzovanie-kontrollera-predostavlennogo-prilozheniem">
+        Использование контроллера, предоставленного приложением</h5>
+    <p>Поскольку обычно контроллеры Rails имеют общий код для таких вещей, как переменные сессии для
+        аутентификации и доступа, по умолчанию они наследуются от <code>ApplicationController</code>.
+        Однако engine Rails помещен в пространство имен для запуска, независимого от основного
+        приложения, поэтому каждый engine получает <code>ApplicationController</code> в своем
+        пространстве имен. Это пространство имен предотвращает коллизии кода, но часто контроллерам
+        engine необходимо получить доступ к методам <code>ApplicationController</code> основного
+        приложения. Легче всего получить этот доступ, изменив <code>ApplicationController</code> в
+        пространстве имен engine, унаследовав его от <code>ApplicationController</code> основного
+        приложения. Для нашего Blorgh engine это может быть выполнено, изменив <code>app/controllers/blorgh/application_controller.rb</code>
+        подобным образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class ApplicationController &lt; ::ApplicationController
+  end
+end
+</pre>
+    </div>
+    <p>По умолчанию контроллеры engine наследуются от <code>Blorgh::ApplicationController</code>.
+        Поэтому после такого изменения они получат доступ к <code>ApplicationController</code>
+        основного приложения, как будто они являются частью основного приложения.</p>
+    <p>Это изменение требует, чтобы engine запускался из приложения Rails, в котором имеется <code>ApplicationController</code>.
+    </p>
+    <h4 class="inside_page_header" id="konfigurirovanie-engine"> Конфигурирование Engine</h4>
+    <p>Этот раздел раскрывает как сделать класс <code>User</code> конфигурируемым, а затем даны
+        общие советы по конфигурированию engine.</p>
+    <h5 class="inside_page_header" id="ustanovka-konfiguratsionnyh-nastroek-v-prilozhenii">
+        Установка конфигурационных настроек в приложении</h5>
+    <p>Следующим шагом нужно сделать настраиваемым для engine класс, представленный как
+        <code>User</code> в приложении. Это потому, как объяснялось ранее, что этот класс не всегда
+        будет <code>User</code>. Для этого у engine будет конфигурационная настройка по имени <code>author_class</code>,
+        используемая для определения, какой класс представляет пользователей в приложении.</p>
+    <p>Для определения этой конфигурационной настройки следует использовать
+        <code>mattr_accessor</code> в модуле <code>Blorgh</code>. Добавьте эту строку в <code>lib/blorgh.rb</code>
+        внутри engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+mattr_accessor :author_class
+</pre>
+    </div>
+    <p>Этот метод работает подобно его братьям <code>attr_accessor</code> и
+        <code>cattr_accessor</code>, но предоставляет методы сеттера и геттера для модуля с
+        определенным именем. Для его использования к нему следует обратиться с использованием <code>Blorgh.author_class</code>.
+    </p>
+    <p>Следующим шагом является переключение модели <code>Blorgh::Article</code> на эту новую
+        настройку. Измените <code>belongs_to</code> в этой модели (<code>app/models/blorgh/article.rb</code>),
+        на это:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+belongs_to :author, class_name: Blorgh.author_class
+</pre>
+    </div>
+    <p>Метод <code>set_author</code> в модели <code>Blorgh::Article</code> должен тоже использовать
+        тот класс:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+self.author = Blorgh.author_class.constantize.find_or_create_by(name: author_name)
+</pre>
+    </div>
+    <p>Для предотвращения вызова <code>constantize</code> на <code>author_class</code> каждый раз,
+        можно вместо этого переопределить метод геттера <code>author_class</code> внутри модуля
+        <code>Blorgh</code> в файле <code>lib/blorgh.rb</code>, чтобы он всегда вызывал <code>constantize</code>
+        на сохраненном значении до возврата значения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def self.author_class
+  @@author_class.constantize
+end
+</pre>
+    </div>
+    <p>Это позволит изменить написанный выше код для <code>set_author</code> так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+self.author = Blorgh.author_class.find_or_create_by(name: author_name)
+</pre>
+    </div>
+    <p>Результат стал более коротким и более очевидным в своем поведении. Метод
+        <code>author_class</code> должен всегда возвращать объект <code>Class</code>.</p>
+    <p>Поскольку мы изменили метод <code>author_class</code>, чтобы он возвращал <code>Class</code>
+        вместо <code>String</code>, мы также должны изменить определение <code>belongs_to</code> в
+        модели <code>Blorgh::Article</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+belongs_to :author, class_name: Blorgh.author_class.to_s
+</pre>
+    </div>
+    <p>Чтобы установить эту конфигурационную настройку в приложении, следует использовать
+        инициализатор. При использовании инициализатора, конфигурация установится до того, как
+        запустится приложение и вызовутся модели engine-а, которые могут зависеть от существования
+        этих конфигурационных настроек.</p>
+    <p>Создайте инициализатор <code>config/initializers/blorgh.rb</code> в приложении, в котором
+        установлен engine <code>blorgh</code>, и поместите в него такое содержимое:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Blorgh.author_class = "User"
+</pre>
+    </div>
+    <div class="warning"><p>Тут важно использовать строковую версию класса, а не сам класс. Если
+        использовать класс, Rails попытается загрузить этот класс и затем обратиться к
+        соответствующей таблице, что приведет к проблемам, если таблица еще не существует.
+        Следовательно, должна быть использована строка, а затем преобразована в класс с помощью
+        <code>constantize</code> позже в engine.</p></div>
+    <p>Попытайтесь создать новую статью. Вы увидите, что все работает так же, как и прежде, за
+        исключением того, что engine использует конфигурационную настройку в <code>config/initializers/blorgh.rb</code>,
+        чтобы узнать, какой класс использовать.</p>
+    <p>Нет каких-либо строгих ограничений, каким должен быть класс, есть только каким должно быть
+        API для класса. Engine просто требует, чтобы этот класс определял метод <code>find_or_create_by</code>,
+        возвращающий объект этого класса для связи со статьей при ее создании. Этот объект,
+        разумеется, должен иметь некоторый идентификатор, по которому на него можно сослаться.</p>
+    <h5 class="inside_page_header" id="konfiguratsiya-engine-obschego-haraktera"> Конфигурация
+        Engine общего характера</h5>
+    <p>Может случиться так, что вы захотите использовать для engine инициализаторы,
+        интернационализацию или другие конфигурационные опции. Эти вещи вполне возможны, поскольку
+        Rails engine имеет почти такой же функционал, как и приложение Rails. Фактически, функционал
+        приложения Rails это супер надстройка над тем, что предоставляет engine!</p>
+    <p>Если хотите использовать инициализатор - код, который должен выполниться до загрузки engine -
+        поместите его в папку <code>config/initializers</code>. Функционал этой директории
+        объясняется в руководства по конфигурированию, и работает абсолютно так же, как и директория
+        <code>config/initializers</code> в приложении. То же самое касается стандартных
+        инициализаторов.</p>
+    <p>Что касается локалей, просто поместите файлы локалей в директории <code>config/locales</code>,
+        так же, как это делается в приложении.</p>
+    <h3 class="inside_page_header" id="testirovanie-engine"> Тестирование engine</h3>
+    <p>В созданном engine есть небольшое пустое приложение в <code>test/dummy</code>. Это приложение
+        используется как точка монтирования для engine, чтобы максимально упростить тестирование
+        engine. Это приложение можно расширить, сгенерировав контроллеры, модели или вьюхи из этой
+        директории, и использовать их для тестирования своего engine.</p>
+    <p>Директорию <code>test</code> следует рассматривать как обычную среду тестирования Rails,
+        допускающую юнит, функциональные и интеграционные тесты.</p>
+    <h4 class="inside_page_header" id="funktsionalnye-testy"> Функциональные тесты</h4>
+    <p>Следует принять во внимание при написании функциональных тестов, что тесты будут запущены для
+        приложения - приложения <code>test/dummy</code> - а не для вашего engine. Это так благодаря
+        настройке тестового окружения; engine нуждается в приложении, как хосту для тестирования его
+        основного функционала, особенно контроллеров. Это означает, что если сделать обычный <code>GET</code>
+        к контроллеру в функциональном тесте для контроллера:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class FooControllerTest &lt; ActionController::TestCase
+    def test_index
+      get :index
+      ...
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Он не будет работать правильно. Это так, поскольку приложение не знает, как направить эти
+        запросы в engine, пока вы явно не скажете <strong>как</strong>. Для этого необходимо
+        установить значение переменной экземпляра <code>@routes</code> набором маршрутов engine в
+        коде setup:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module Blorgh
+  class FooControllerTest &lt; ActionController::TestCase
+    setup do
+      @routes = Engine.routes
+    end
+    def test_index
+      get :index
+      ...
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Это сообщит приложению, что вы все еще хотите выполнить запрос <code>GET</code> к экшну
+        <code>index</code> этого контроллера, но вы хотите использовать тут маршрут engine-а, а не
+        приложения.</p>
+    <p>Это также позволит убедиться в тестах, что хелперы URL engine-а работают так, как
+        ожидается.</p>
+    <h3 class="inside_page_header" id="uluchshenie-funktsionala-engine"> Улучшение функционала
+        engine</h3>
+    <p>Этот раздел объяснит, как добавить или переопределить MVC-функционал engine из основного
+        приложения Rails.</p>
+    <h4 class="inside_page_header" id="pereopredelenie-modeley-i-kontrollerov"> Переопределение
+        моделей и контроллеров</h4>
+    <p>Классы модели и контроллера engine могут быть расширены открытым изменением в основном
+        приложении Rails (так как классы модели и контроллера являются всего лишь классами Ruby,
+        наследующими специфичный функционал Rails). Открытое изменение класса Engine переопределяет
+        его для использования в основном приложении. Это обычно реализуется с помощью паттерна
+        декоратора.</p>
+    <p>Для простых изменений класса используйте <code>Class#class_eval</code>, а для сложных -
+        рассмотрите использование <code>ActiveSupport::Concern</code>.</p>
+    <h5 class="inside_page_header" id="zametka-o-dekoratorah-i-zagruzke-koda"> Заметка о декораторах
+        и загрузке кода</h5>
+    <p>Поскольку на эти декораторы не ссылается само приложение Rails, система автозагрузки Rails не
+        сработает и не загрузит ваши декораторы. Это означает, что их необходимо затребовать
+        самостоятельно.</p>
+    <p>Вот простой пример, как это сделать:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# lib/blorgh/engine.rb
+module Blorgh
+  class Engine &lt; ::Rails::Engine
+    isolate_namespace Blorgh
+    config.to_prepare do
+      Dir.glob(Rails.root + "app/decorators/**/*_decorator*.rb").each do |c|
+        require_dependency(c)
+      end
+    end
+  end
+end
+</pre>
+    </div>
+    <p>Это применимо не только к декораторам, а вообще ко всему, что добавляется в engine, и на что
+        не ссылается основное приложение.</p>
+    <h5 class="inside_page_header"
+        id="realizatsiya-patterna-quot-dekorator-quot-s-ispolzovaniem-class-class_eval"> Реализация
+        паттерна "Декоратор" с использованием Class#class_eval</h5>
+    <p><strong>Добавление</strong> <code>Article#time_since_created</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# MyApp/app/decorators/models/blorgh/article_decorator.rb
+Blorgh::Article.class_eval do
+  def time_since_created
+    Time.current - created_at
+  end
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Blorgh/app/models/article.rb
+class Article &lt; ActiveRecord::Base
+  has_many :comments
+end
+</pre>
+    </div>
+    <p><strong>Переопределение</strong> <code>Article#summary</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# MyApp/app/decorators/models/blorgh/article_decorator.rb
+Blorgh::Article.class_eval do
+  def summary
+    "#{title} - #{truncate(text)}"
+  end
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Blorgh/app/models/article.rb
+class Article &lt; ActiveRecord::Base
+  has_many :comments
+  def summary
+    "#{title}"
+  end
+end
+</pre>
+    </div>
+    <h5 class="inside_page_header"
+        id="realizatsiya-patterna-quot-dekorator-quot-s-ispolzovaniem-activesupport-concern">
+        Реализация паттерна "Декоратор" с использованием ActiveSupport::Concern</h5>
+    <p>Использование <code>Class#class_eval</code> хорошо подходит для простых корректировок, но для
+        более сложных изменений следует рассмотреть использование .
+        <code>ActiveSupport::Concern</code> управляет порядком загрузки взаимосвязанных зависимостей
+        во время выполнения, что позволяет существенно модулировать ваш код.</p>
+    <p><strong>Добавление</strong> <code>Article#time_since_created</code> и
+        <strong>Переопределение</strong> <code>Article#summary</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# MyApp/app/models/blorgh/article.rb
+class Blorgh::Article &lt; ActiveRecord::Base
+  include Blorgh::Concerns::Models::Article
+  def time_since_created
+    Time.current - created_at
+  end
+  def summary
+    "#{title} - #{truncate(text)}"
+  end
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Blorgh/app/models/article.rb
+class Article &lt; ActiveRecord::Base
+  include Blorgh::Concerns::Models::Article
+end
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Blorgh/lib/concerns/models/article.rb
+module Blorgh::Concerns::Models::Article
+  extend ActiveSupport::Concern
+  # 'included do' приводит к тому, что включенный код будет выполнен в
+  # контексте того, где он подключен (article.rb), вместо того, чтобы быть
+  # выполненным в контексте модуля (blorgh/concerns/models/article).
+  included do
+    attr_accessor :author_name
+    belongs_to :author, class_name: "User"
+    before_save :set_author
+    private
+    def set_author
+      self.author = User.find_or_create_by(name: author_name)
+    end
+  end
+  def summary
+    "#{title}"
+  end
+  module ClassMethods
+    def some_class_method
+      'some class method string'
+    end
+  end
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="pereopredelenie-vyuh"> Переопределение вьюх</h4>
+    <p>Когда Rails ищет вьюху для рендеринга, он сперва смотрит в директорию <code>app/views</code>
+        приложения. Если он не может найти там вьюху, он проверит директории <code>app/views</code>
+        всех engine-ов, имеющих эту директорию.</p>
+    <p>Когда приложение хочет отрендерить вьюху для экшна <code>index</code> в <code>Blorgh::ArticlesController</code>,
+        он сперва пытается найти путь <code>app/views/blorgh/articles/index.html.erb</code> внутри
+        приложения. Если не сможет найти, то будет искать внутри engine.</p>
+    <p>Можно переопределить эту вьюху в приложении, просто создав файл <code>app/views/blorgh/articles/index.html.erb</code>.
+        Можно полностью изменить то, что эта вьюха должна обычно выводить.</p>
+    <p>Попробуйте так сделать, создав новый файл
+        <code>app/views/blorgh/articles/index.html.erb</code> и поместив в него:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;Articles&lt;/h1&gt;
+&lt;%= link_to "New Article", new_article_path %&gt;
+&lt;% @articles.each do |article| %&gt;
+  &lt;h2&gt;&lt;%= article.title %&gt;&lt;/h2&gt;
+  &lt;small&gt;By &lt;%= article.author %&gt;&lt;/small&gt;
+  &lt;%= simple_format(article.text) %&gt;
+  &lt;hr&gt;
+&lt;% end %&gt;
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="routes"> Маршруты</h4>
+    <p>По умолчанию маршруты в engine изолированы от приложения. Это выполняется с помощью вызова
+        <code>isolate_namespace</code> в классе <code>Engine</code>. По сути это означает, что
+        приложение и его engine-ы могут иметь одинаково названные маршруты, и не будет никакого
+        конфликта.</p>
+    <p>Маршруты в engine отрисовываются в классе <code>Engine</code> в <code>config/routes.rb</code>,
+        подобно:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+Blorgh::Engine.routes.draw do
+  resources :articles
+end
+</pre>
+    </div>
+    <p>Имея подобные изолированные маршруты, если захотите сослаться на часть engine из приложения,
+        необходимо воспользоваться прокси методом маршрутов engine. Вызов обычных маршрутных
+        методов, таких как <code>articles_path</code>, может привести в нежелательное место, если и
+        приложение, и engine определяют такой хелпер.</p>
+    <p>Ссылка в следующем примере приведет на <code>articles_path</code> приложения, если шаблон был
+        отрендерен из приложения, или на <code>articles_path</code> engine-а, если был отрендерен в
+        engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to "Blog articles", articles_path %&gt;
+</pre>
+    </div>
+    <p>Чтобы этот маршрут всегда использовал маршрутный метод хелпера <code>articles_path</code>
+        engine-а, необходимо вызвать метод на маршрутном прокси методе, имеющем то же имя, что и
+        engine.</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to "Blog articles", blorgh.articles_path %&gt;
+</pre>
+    </div>
+    <p>Можно обратиться к приложению из engine подобным образом, используя хелпер
+        <code>main_app</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= link_to "Home", main_app.root_path %&gt;
+</pre>
+    </div>
+    <p>Если это использовать в engine, он <strong>всегда</strong> будет вести на корень приложения.
+        Если опустить вызов метода "маршрутного прокси" <code>main_app</code>, он потенциально может
+        вести на корень engine или приложения, в зависимости от того, где был вызван.</p>
+    <p>Если шаблон, рендерящийся из engine, попытается использовать один из методов маршрутного
+        хелпера приложения, это может привести к вызову неопределенного метода. Если вы с этим
+        столкнулись, убедитесь, что не пытаетесь вызвать из engine маршрутный метод приложения без
+        префикса <code>main_app</code>.</p>
+    <h4 class="inside_page_header" id="resursy-assets"> Ресурсы (assets)</h4>
+    <p>Ресурсы в engine работают так же, как и в полноценном приложении. Поскольку класс engine
+        наследуется от <code>Rails::Engine</code>, приложение будет знать, что следует искать
+        ресурсы в директориях engine <code>app/assets</code> и <code>lib/assets</code>.</p>
+    <p>Подобно остальным компонентам engine, ресурсы также будут помещены в пространство имен. Это
+        означает, что если имеется ресурс по имени <code>style.css</code>, он должен быть помещен в
+        <code>app/assets/stylesheets/[engine name]/style.css</code>, а не в <code>app/assets/stylesheets/style.css</code>.
+        Если этот ресурс не будет помещен в пространство имен, то есть вероятность, что в приложении
+        есть идентично названный ресурс, в этом случае ресурс приложения будет иметь преимущество, а
+        ресурс в engine будет проигнорирован.</p>
+    <p>Представим, что у вас есть ресурс <code>app/assets/stylesheets/blorgh/style.css</code> Чтобы
+        включить его в приложение, используйте <code>stylesheet_link_tag</code> и сошлитесь на
+        ресурс так, как он находится в engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+&lt;%= stylesheet_link_tag "blorgh/style.css" %&gt;
+</pre>
+    </div>
+    <p>Также можно определить эти ресурсы как зависимости для других ресурсов, используя выражения
+        Asset Pipeline в обрабатываемых файлах:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+/*
+ *= require blorgh/style
+*/
+</pre>
+    </div>
+    <div class="info"><p>Помните, что для использования языков, таких как Sass или CoffeeScript,
+        следует подключить соответствующую библиотеку в <code>.gemspec</code> вашего engine.</p>
+    </div>
+    <h4 class="inside_page_header" id="otdelnye-resursy-i-prekompilyatsiya"> Отдельные ресурсы и
+        прекомпиляция</h4>
+    <p>Бывают ситуации, когда ресурсы engine не требуются приложению. Например, скажем, вы создали
+        административный функционал, существующий только для engine. В этом случае приложению не
+        нужно требовать <code>admin.css</code> или <code>admin.js</code>. Только административному
+        макету гема необходимы эти ресурсы. Нет смысла, чтобы приложение включало <code>"blorg/admin.css"</code>
+        в свои таблицы стилей. В такой ситуации следует явно определить эти ресурсы для
+        прекомпиляции.
+        Это сообщит sprockets добавить ресурсы engine при вызове <code>rake assets:precompile</code>.
+    </p>
+    <p>Ресурсы для прекомпиляции можно определить в <code>engine.rb</code></p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+initializer "blorgh.assets.precompile" do |app|
+  app.config.assets.precompile `= %w(admin.css admin.js)
+end
+</pre>
+    </div>
+    <p>Более подробно читайте в .</p>
+    <h4 class="inside_page_header" id="zavisimosti-ot-drugih-gemov"> Зависимости от других
+        гемов</h4>
+    <p>Зависимости от гемов в engine должны быть определены в файле <code>.gemspec</code> в корне
+        engine. Причиной для этого является то, что engine может быть установлен как гем. Если
+        определить зависимости в <code>Gemfile</code>, они могут быть не распознаны при традиционной
+        установке гема, и быть не установленными, вызвав неработоспособность engine.</p>
+    <p>Для определения зависимости, которая должна быть установлена вместе с engine во время
+        традиционного <code>gem install</code>, определите ее в блоке
+        <code>Gem::Specification</code> в файле <code>.gemspec</code> в engine:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+s.add_dependency "moo"
+</pre>
+    </div>
+    <p>Для определения зависимости, которая должна быть установлена только при разработке
+        приложения, определите это так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+s.add_development_dependency "moo"
+</pre>
+    </div>
+    <p>Оба типа зависимостей будут установлены при запуске <code>bundle install</code> внутри
+        приложения. Зависимости development для гема будут использованы только когда будут запущены
+        тесты для engine.</p>
+    <p>Отметьте, что если вы захотите немедленно затребовать зависимости при затребовании engine,
+        следует их затребовать до инициализации engine. Например:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'other_engine/engine'
+require 'yet_another_engine/engine'
+module MyEngine
+  class Engine &lt; ::Rails::Engine
+  end
+end
+</pre>
+    </div>
+
+</body>
+</html>

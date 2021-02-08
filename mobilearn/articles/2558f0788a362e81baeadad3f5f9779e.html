@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Мера и вероятностная мера</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<body>
+
+
+
+
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<h2></h2>
+<h3></h3>
+<div class="lemma">
+    <b>Определение 14. </b>
+    Пусть <img align="bottom" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15"> &#151;
+    некоторое множество и
+    <img align="absmiddle" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14"> &#151; его подмножеств.
+    Функция <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img267.gif" width="145">
+    называется <i class="incide">мерой</i> на <img align="absmiddle" height="20"
+                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img268.gif"
+                                                   width="48">,
+    если она удовлетворяет условиям:
+    <p>(<img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif" width="11">1) для любого
+        множества <img align="absmiddle" height="16"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img214.gif" width="49"> его
+        мера неотрицательна: <img align="absmiddle" height="20"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img270.gif"
+                                  width="70">; </p>
+    <p>(<img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif" width="11">2) для любого
+        счётного набора попарно непересекающихся множеств
+        <img align="absmiddle" height="18"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img271.gif" width="141">
+        (т.е. такого, что <img align="absmiddle" height="20"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img272.gif"
+                               width="97"> при всех <img align="absmiddle" height="18"
+                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img87.gif"
+                                                         width="40">) мера их объединения равна
+        сумме их мер:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img273.gif" width="169">
+    </p>
+    (<i class="incide">&#171;счётная аддитивность&#187;</i> или <i class="incide">&#171;сигма-аддитивность&#187;</i>
+    меры).
+</div>
+<div class="example">
+    <b>Пример 14. </b>
+    <p>Пусть <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img274.gif" width="95">, <img
+            align="absmiddle" height="17"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img275.gif" width="57"> &#151;
+        множество всех
+        подмножеств <img align="bottom" height="14"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15">.
+        Зададим меру <img align="absmiddle" height="18"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif" width="11">
+        на <img align="absmiddle" height="15"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> так:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img276.gif" width="70">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img277.gif" width="77">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img278.gif" width="68">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img279.gif" width="94">,
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img280.gif" width="85">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img281.gif" width="92">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img282.gif" width="109">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img283.gif" width="71">.
+        Для краткости записи мы вместо <img align="absmiddle" height="20"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img284.gif"
+                                            width="52"> писали всюду <img align="absmiddle"
+                                                                          height="20"
+                                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img285.gif"
+                                                                          width="38">.
+    </p>
+</div>
+<div class="example">
+    <b>Пример 15. </b>
+    <p>Пусть <img align="absmiddle" height="14"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img286.gif" width="51">, <img
+            align="absmiddle" height="18"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img287.gif" width="56"> &#151;
+        множество всех
+        подмножеств натурального ряда. Зададим меру <img align="absmiddle" height="18"
+                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif"
+                                                         width="11"> на <img align="absmiddle"
+                                                                             height="15"
+                                                                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                                                             width="14"> так:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img288.gif" width="84"> &#151; число
+        элементов в множестве <img align="bottom" height="14"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                   width="15"> (или бесконечность, если
+        множество <img align="bottom" height="14"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> не
+        является конечным).
+    </p>
+</div>
+<div class="example">
+    <b>Пример 16</b>   <b>(мера Лебега). </b>
+    Когда мы говорили о геометрической вероятности, мы использовали
+    термин &#171;мера области <img align="absmiddle" height="14"
+                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                   width="15"> в <img align="absmiddle" height="14"
+                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img143.gif"
+                                                      width="28">&#187;, имея в виду &#171;длину&#187;
+    на прямой,
+    &#171;площадь&#187; на плоскости, &#171;объем&#187; в трёхмерном пространстве.
+    Являются ли все эти &#171;длины-площади-объемы&#187; настоящими мерами в смысле
+    ? Мы решим этот вопрос для прямой, оставляя плоскость
+    и пространство большей размерности читателю.
+</div>
+<div class="remark">
+    <b>Замечание 6. </b>
+    <p>Если вам уже расхотелось читать дальше, сообщаем: <i class="incide">мерой Лебега</i> в
+        задачниках и учебниках называют
+        как раз &#171;длину-площадь-объем&#187;, так что всё в порядке, дальнейшее до параграфа 2
+        можно смело пропустить.</p>
+</div>
+<div class="example">
+    Рассмотрим вещественную прямую с <img align="absmiddle" height="16"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                          width="12">-алгеброй .
+    Эта <img align="absmiddle" height="16"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебра, по
+    определению, есть наименьшая
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебра, содержащая любые интервалы.
+    Для каждого интервала <img align="absmiddle" height="20"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img289.gif"
+                               width="76"> число
+    <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img290.gif"
+         width="40"> назовём <i class="incide">длиной</i> интервала <img align="absmiddle"
+                                                                         height="20"
+                                                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img244.gif"
+                                                                         width="40">. <p>Мы не
+    станем доказывать следующее утверждение:</p>
+</div>
+<div class="lemma">
+    <b>Лемма 1. </b>
+    Существует единственная мера
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img291.gif"
+         width="11"> на <img align="absmiddle" height="20"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img292.gif"
+                             width="78">, значение которой на любом
+    интервале равно его длине: <img align="absmiddle" height="20"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img293.gif"
+                                    width="110">. Эта мера называется <i class="incide">мерой
+    Лебега.</i>
+</div>
+<div class="remark">
+    <b>Замечание 7.</b> 
+    Это утверждение является следствием теоремы Каратеодори
+    о продолжении меры с алгебры на <img align="absmiddle" height="16"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                         width="12">-алгебру,
+    применительно к <img align="absmiddle" height="20"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img292.gif" width="78">.
+    Пользуясь процедурой лебеговского продолжения (пополнения) меры, можно распространить меру <img
+        align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img291.gif"
+        width="11"> на более широкую
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебру, нежели борелевская, &#151;
+    на <img align="absmiddle" height="16"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif" width="12">-алгебру
+    измеримых по Лебегу множеств. Для этого достаточно
+    присвоить нулевую меру любым подмножествам борелевских множеств с нулевой мерой Лебега.
+</div>
+<div class="text">
+    Нам пригодится свойство, которым обладает любая мера.
+    Это свойство непрерывности меры иногда называют <i class="incide">аксиомой непрерывности</i>,
+    имея в виду, что
+    ею можно заменить (<img align="absmiddle" height="18"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif" width="11">2)
+    в .
+</div>
+<div class="lemma">
+    <b>Лемма 2</b>   <b>(непрерывность меры). </b>
+
+    Пусть дана убывающая последовательность <img align="absmiddle" height="17"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img294.gif"
+                                                 width="155">
+    вложенных друг в друга множеств из <img align="absmiddle" height="15"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                                            width="14"> такая, что <img align="absmiddle"
+                                                                        height="20"
+                                                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img295.gif"
+                                                                        width="86"> и
+    <img align="absmiddle" height="45" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img296.gif"
+         width="90">. Тогда <img align="absmiddle" height="29"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img297.gif"
+                                 width="145">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b>
+    <img class="leftt" height="168" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/nepr.gif"
+         width="167">
+    Обозначим через <img align="absmiddle" height="17"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img298.gif" width="24">
+    кольца: <img align="absmiddle" height="20"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img299.gif" width="125">.
+    Множества
+    <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+         width="17">, <img align="absmiddle" height="17"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img300.gif" width="22">, <img
+        align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img301.gif"
+        width="22">, <img align="absmiddle" height="17"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img302.gif" width="22">, <img
+        align="absmiddle" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img303.gif"
+        width="23"> попарно не пересекаются. Тогда из представлений
+    <p class="CENTER"><img align="absmiddle" height="53"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img304.gif" width="333">
+    </p>
+    <p>в силу аксиомы (<img align="absmiddle" height="18"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img269.gif" width="11">2)
+        следует, что
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="52"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img305.gif" width="433">
+    </p>
+    <p>Первая сумма <img align="absmiddle" height="45"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img306.gif" width="68"> в
+        силу условия <img align="absmiddle" height="20"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img295.gif" width="86">
+        есть сумма абсолютно сходящегося ряда (составленного из неотрицательных слагаемых).
+        Из сходимости этого ряда следует, что &#171;хвост&#187; ряда, равный <img align="absmiddle"
+                                                                                  height="45"
+                                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img307.gif"
+                                                                                  width="69">,
+        стремится к нулю при <img align="absmiddle" height="14"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img308.gif"
+                                  width="57">.
+        Поэтому
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="53"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img309.gif" width="368">
+    </p>
+    <p class="qed">QED</p>
+</div>
+<div class="text">В полезности этого свойства легко убедиться упражнениями.</div>
+<div class="exer">
+    <b>Упражнение 18. </b>
+    <p>Используя аксиому непрерывности меры для множеств <img align="absmiddle" height="20"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img310.gif"
+                                                              width="188">,
+        доказать, что мера Лебега одноточечного подмножества <img align="absmiddle" height="20"
+                                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img311.gif"
+                                                                  width="30"> вещественной прямой
+        равна нулю: <img align="absmiddle" height="20"
+                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img312.gif" width="70">.
+        Используя этот факт, доказать, что <img align="absmiddle" height="20"
+                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img313.gif"
+                                                width="69">,
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img314.gif" width="68">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img315.gif" width="70">, <img
+                align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img316.gif" width="121">. </p>
+</div>
+<div class="remark">
+    <b>Замечание. </b>
+    В отсутствие предположения <img align="absmiddle" height="20"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img295.gif"
+                                    width="86"> (или <img align="absmiddle" height="22"
+                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imgc2.gif"
+                                                          width="94"> для некоторого <img
+        align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imgc3.gif"
+        width="48">), заставляющего меры вложенных множеств
+    быть конечными, свойство <img align="absmiddle" height="29"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img297.gif"
+                                  width="145"> может не выполняться.
+    <p>Например, зададим меру на <img align="absmiddle" height="20"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img247.gif"
+                                      width="44"> так: <img align="absmiddle" height="22"
+                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imgc6.gif"
+                                                            width="77">, если <img align="bottom"
+                                                                                   height="14"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                                                                   width="17"> не
+        более чем счётно, иначе <img align="absmiddle" height="22"
+                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imgc7.gif"
+                                     width="86">. Тогда для множеств <img align="absmiddle"
+                                                                          height="20"
+                                                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img310.gif"
+                                                                          width="188"> имеем:
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="59"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/imgc9.gif" width="372">
+    </p>
+</div>
+<div class="text">И вот наконец мы в состоянии определить понятие вероятности.</div>
+<p></p>
+<h3></h3>
+<div class="lemma">
+    <b>Определение 15. </b>
+    Пусть <img align="bottom" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15"> &#151;
+    множество и <img align="bottom" height="15"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif" width="14"> &#151;
+    <img align="absmiddle" height="16" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+         width="12">-алгебра его подмножеств.
+    Мера <img align="absmiddle" height="18"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img317.gif" width="77"> называется <i
+        class="incide">нормированной,</i>
+    если <img align="absmiddle" height="20"
+              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img318.gif" width="69">.
+    Другое название нормированной меры &#151; <i class="incide">вероятность</i>
+    или <i class="incide">вероятностная мера</i>.
+</div>
+<div class="text">То же самое ещё раз и подробно:</div>
+<div class="lemma">
+    <b>Определение 16. </b>
+    Пусть <img align="bottom" height="14"
+               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15"> &#151;
+    пространство элементарных исходов,
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14"> &#151; <img align="absmiddle" height="16"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                 width="12">-алгебра его подмножеств (событий).
+    <i class="incide">Вероятностью</i> или <i class="incide">вероятностной мерой</i> на <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img268.gif"
+        width="48"> называется функция
+    <img align="absmiddle" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img319.gif"
+         width="80">, обладающая свойствами:
+    <p><b>(P1)</b> для любого события <img align="absmiddle" height="16"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img214.gif"
+                                           width="49"> выполняется неравенство
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img320.gif" width="72">;
+    </p>
+    <p><b>(P2)</b> для любого счётного набора попарно несовместных
+        событий <img align="absmiddle" height="18"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img271.gif" width="141"> имеет
+        место равенство
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img321.gif" width="177">
+    </p>
+    <p><b>(P3)</b> вероятность достоверного события равна единице:
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img102.gif" width="72">. </p>
+</div>
+<div class="text">
+    Свойства <b>(P1)</b> &#151; <b>(P3)</b> называют <i class="incide">аксиомами</i> вероятности.
+</div>
+<div class="lemma">
+    <b>Определение 17. </b>
+    Тройка <img align="absmiddle" height="20"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img322.gif" width="67">,
+    в которой <img align="bottom" height="14"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img61.gif" width="15"> &#151;
+    пространство элементарных исходов,
+    <img align="bottom" height="15" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+         width="14"> &#151; <img align="absmiddle" height="16"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img188.gif"
+                                 width="12">-алгебра его подмножеств и <img align="bottom"
+                                                                            height="14"
+                                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img323.gif"
+                                                                            width="13"> &#151;
+    вероятностная мера на <img align="bottom" height="15"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img212.gif"
+                               width="14">, называется
+    <i class="incide">вероятностным пространством.</i>
+</div>
+<div class="text">Докажем свойства вероятности, вытекающие из аксиом.
+    Ниже мы не будем всякий раз оговаривать, но будем иметь в виду, что имеем дело только с
+    событиями.
+</div>
+<div class="note">Свойство 0.  <img align="absmiddle" height="20"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img324.gif"
+                                    width="73">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> События <img align="absmiddle" height="17"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img325.gif"
+                                        width="58">, где <img align="absmiddle" height="17"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img326.gif"
+                                                              width="40">, попарно несовместны, и
+    их объединение есть также пустое множество. По аксиоме <b>(P2)</b>,
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img327.gif" width="224">
+    </p>
+    <p>Это возможно только в случае <img align="absmiddle" height="20"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img324.gif"
+                                         width="73">. </p>
+</div>
+<div class="text"> тем более верна
+    для конечного набора попарно несовместных событий.
+</div>
+<div class="note">Свойство 1.  Для любого конечного набора попарно несовместных
+    событий <img align="absmiddle" height="18"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img328.gif" width="117"> имеет
+    место равенство
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img329.gif" width="176">
+    </p>
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Положим <img align="absmiddle" height="17"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img325.gif"
+                                        width="58"> при любом <img align="absmiddle" height="15"
+                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img330.gif"
+                                                                   width="42">. Вероятности этих
+    событий,
+    по свойству 0, равны нулю. События <img align="absmiddle" height="18"
+                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img331.gif"
+                                            width="84">, <img align="absmiddle" height="17"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img78.gif"
+                                                              width="16">, <img align="absmiddle"
+                                                                                height="17"
+                                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img78.gif"
+                                                                                width="16">, <img
+        align="absmiddle" height="18" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img332.gif"
+        width="44">
+    попарно несовместны, и по ,
+    <p class="CENTER"><img align="absmiddle" height="67"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img333.gif" width="374">
+    </p>
+</div>
+<div class="text">Сразу несколько следствий можно получить из этого свойства.</div>
+<div class="note">Свойство 2.  Для любого события <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                       width="15"> выполнено: <img align="absmiddle"
+                                                                                   height="23"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img103.gif"
+                                                                                   width="131">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Поскольку <img align="bottom" height="17"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img334.gif"
+                                          width="84">, и события <img align="bottom" height="14"
+                                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                                      width="15"> и <img
+        align="bottom" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img83.gif"
+        width="15"> несовместны, из аксиомы <b>(P3)</b> и свойства 1 получим
+    <img align="absmiddle" height="23" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img335.gif"
+         width="192">.
+</div>
+<div class="note">Свойство 3.  Если <img align="absmiddle" height="17"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img91.gif"
+                                         width="53">, то <img align="absmiddle" height="20"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img336.gif"
+                                                              width="192">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Представим <img align="bottom" height="14"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img4.gif"
+                                           width="17"> в виде объединения двух
+    событий: <img align="absmiddle" height="20"
+                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img337.gif" width="129">. По
+    свойству 1,
+    <img align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img338.gif"
+         width="192">.
+</div>
+<div class="text">Сразу же заметим, что по выражение в правой части
+    равенства <img align="absmiddle" height="20"
+                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img338.gif" width="192">
+    больше либо равно <img align="absmiddle" height="20"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img60.gif" width="40">,
+    что доказывает следующее свойство <i class="incide">монотонности</i> вероятности.
+</div>
+<div class="note">Свойство 4.  Если <img align="absmiddle" height="17"
+                                         src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img91.gif"
+                                         width="53">, то <img align="absmiddle" height="20"
+                                                              src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img106.gif"
+                                                              width="102">.
+</div>
+<div class="note">Свойство 5.  Для любого события <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                                       width="15"> выполнено: <img align="absmiddle"
+                                                                                   height="20"
+                                                                                   src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img101.gif"
+                                                                                   width="104">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> <img align="absmiddle" height="20"
+                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img320.gif"
+                                width="72"> по . А так как <img align="absmiddle" height="17"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img63.gif"
+                                                                width="51">, то <img
+        align="absmiddle" height="20" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img339.gif"
+        width="133">.
+</div>
+<div class="note">Свойство 6.  Всегда <img align="absmiddle" height="20"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img105.gif"
+                                           width="287">.
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Имеем <img align="absmiddle" height="17"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img340.gif"
+                                      width="86">, поэтому <img align="absmiddle" height="20"
+                                                                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img341.gif"
+                                                                width="272"> по свойству 3
+    Но <img align="absmiddle" height="20"
+            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img343.gif" width="209">, причём <img
+        align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+        width="15"> и <img align="absmiddle" height="20"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img344.gif" width="93">
+    . Снова пользуясь свойством 1,
+    получим:
+    <p class="CENTER"><img align="absmiddle" height="29"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img345.gif" width="484">
+    </p>
+</div>
+<div class="text">Из этого свойства и следуют два полезных свойства.
+    Свойство 8 читатель докажет с помощью свойства 7.
+</div>
+<div class="note">Свойство 7.  Всегда <img align="absmiddle" height="20"
+                                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img347.gif"
+                                           width="195">.
+</div>
+<div class="note">Свойство 8.  Совершенно всегда <img align="absmiddle" height="45"
+                                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img348.gif"
+                                                      width="220">.
+</div>
+<div class="text">Следующее свойство называют <i class="incide">формулой включения и исключения.</i>
+    Она оказывается весьма полезной в случае, когда для вычисления
+    вероятности некоторого события <img align="bottom" height="14"
+                                        src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif"
+                                        width="15"> нельзя разбить это событие
+    на удобные попарно несовместные события, но удаётся разбить
+    событие <img align="bottom" height="14"
+                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img1.gif" width="15"> на простые
+    составляющие, которые, однако, совместны.
+</div>
+<div class="note">Свойство 9.  Для любого конечного набора событий
+    <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img197.gif"
+         width="23">, <img align="absmiddle" height="14"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img303.gif" width="23">,
+    <img align="absmiddle" height="17" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img184.gif"
+         width="24"> имеет место равенство:
+    <p class="center">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="100"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img349.gif" width="520"></td>
+            <td align="right" width="30">(2)</td>
+        </tr>
+    </table>
+</div>
+<div class="proof">
+    <b>Доказательство.</b> Воспользуемся методом математической
+    индукции. Базис индукции при <img align="bottom" height="14"
+                                      src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img50.gif"
+                                      width="45"> &#151; свойство 6.
+    Пусть свойство 9 верно при <img align="absmiddle" height="17"
+                                    src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img352.gif"
+                                    width="76">.
+    Докажем, что тогда оно верно при <img align="bottom" height="14"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img353.gif"
+                                          width="46">. По свойству 6,
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="70"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img354.gif" width="403"></td>
+            <td align="right" width="30">(3)</td>
+        </tr>
+    </table>
+    <p>По предположению индукции, первое слагаемое в правой части равно
+    </p>
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="105"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img355.gif" width="520"></td>
+            <td align="right" width="30">(4)</td>
+        </tr>
+    </table>
+    <p>Вычитаемое в правой части равно
+    </p>
+    <p class="CENTER">
+    </p>
+    <table width="600">
+        <tr>
+            <td><img align="absmiddle" height="105"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img356.gif" width="547"></td>
+            <td align="right" width="30">(5)</td>
+        </tr>
+    </table>
+</div>
+<div class="exer">
+    <b>Упражнение 19. </b>
+    Подставить , в
+    и довести до конца шаг индукции.
+</div>
+<p class="qed">QED</p>
+<div class="text">
+    Приведём пример задачи, в которой использование свойства 9 &#151; самый простой путь решения.
+    Это известная <i class="incide">&#171;задача о рассеянной секретарше&#187;.</i>
+</div>
+<div class="example">
+    <b>Пример 17. </b>
+    Есть <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+              width="13"> писем и <img align="bottom" height="14"
+                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                       width="13"> подписанных конвертов. Письма раскладываются
+    в конверты наудачу по одному. Найти вероятность того, что хотя бы одно
+    письмо попадет в предназначенный ему конверт, и предел этой вероятности
+    при <img align="bottom" height="14" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img308.gif"
+             width="57">.
+    <p><b>Решение.</b> Пусть событие <img align="absmiddle" height="17"
+                                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img89.gif"
+                                          width="21">, <img align="absmiddle" height="18"
+                                                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img357.gif"
+                                                            width="90">,
+        означает, что <img align="bottom" height="14"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif" width="8">-е
+        письмо попало в свой конверт.
+        Тогда
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="29"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img358.gif" width="546">
+    </p>
+    <p>Так как события <img align="absmiddle" height="17"
+                            src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img197.gif" width="23">,
+        <img align="absmiddle" height="14"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img303.gif" width="23">, <img
+                align="absmiddle" height="17"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img184.gif" width="24"> совместны,
+        придётся использовать
+        формулу .
+        По
+        вычислим вероятности всех событий <img align="absmiddle" height="17"
+                                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img89.gif"
+                                               width="21"> и их пересечений.
+        Элементарными исходами будут всевозможные <img align="bottom" height="14"
+                                                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                       width="13"> писем по <img align="bottom"
+                                                                                 height="14"
+                                                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif"
+                                                                                 width="13">
+        конвертам.
+        Их общее число есть <img align="absmiddle" height="20"
+                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img359.gif"
+                                 width="63">,
+        и событию <img align="absmiddle" height="17"
+                       src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img89.gif" width="21">
+        благоприятны <img align="absmiddle" height="20"
+                          src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img360.gif" width="61">
+        из них, а именно
+        любые перестановки всех писем, кроме <img align="bottom" height="14"
+                                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif"
+                                                  width="8">-го, лежащего в своём конверте. Поэтому
+        <img align="absmiddle" height="20"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img361.gif" width="206"> для всех <img
+                align="bottom" height="14"
+                src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img54.gif" width="8">.
+    </p>
+    <p>Совершенно так же получим, что при любых <img align="absmiddle" height="18"
+                                                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img362.gif"
+                                                     width="40">
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img363.gif" width="243">
+    </p>
+    <p>Вероятность пересечения любых трёх событий равна
+    </p>
+    <p class="CENTER"><img align="absmiddle" height="56"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img364.gif" width="322">
+    </p>Аналогично посчитаем вероятности пересечений любого другого числа событий,
+    в том числе <img align="absmiddle" height="20"
+                     src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img365.gif" width="153">
+    <p>Вычислим количество слагаемых в каждой сумме в формуле .
+        Например, в сумме по <img align="absmiddle" height="19"
+                                  src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img366.gif"
+                                  width="144"> ровно
+        <img align="absmiddle" height="22"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img367.gif" width="24"> слагаемых &#151;
+        ровно столько трёхэлементных множеств можно
+        образовать из <img align="bottom" height="14"
+                           src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img18.gif" width="13">
+        элементов, и каждое такое множество <img align="absmiddle" height="20"
+                                                 src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img368.gif"
+                                                 width="64"> встречается в индексах данной суммы
+        единожды.
+        Подставляя все вероятности в формулу , получим:</p>
+    <p class="center">
+        <img align="absmiddle" height="81"
+             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img369.gif" width="529"></p>
+</div>
+<div class="exer">
+    <b>Упражнение 20. </b>
+    Выписать разложение <img align="bottom" height="17"
+                             src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img370.gif"
+                             width="29"> в ряд Тейлора и убедиться в том, что
+    <img align="absmiddle" height="23" src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img371.gif"
+         width="134"> при <img align="absmiddle" height="14"
+                               src="http://www.nsu.ru/mmf/tvims/chernova/tv/lec/img308.gif"
+                               width="57">.
+</div>
+<p></p>
+
+
+<b> </b> 
+ <b> </b> 
+ <b> </b> 
+<p></p>
+<p>
+    <sup>1</sup> (28.06.1875 &#151; 26.07.1941, France)
+</p>
+<p>
+    <sup>2</sup> (13.09.1873 &#151; 2.02.1950, Germany)
+</p>
+<p>
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+</p>
+</body>
+
+</body>
+</html>

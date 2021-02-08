@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>19. Очереди</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Очередью называется динамическая структура данных, добавление компоненты в которую производится в один конец, а выборка осуществляется с другого конца. Очередь работает по принципу FIFO (First-In, First-Out) – «Поступивший первым, обслуживается первым».</span>
+</p>
+<p><span>Пример. Составить программу, которая формирует очередь, добавляет в нее произвольное количество компонент, а затем читает все компоненты.</span>
+</p>
+<p><span>Program QUEUE;</span></p>
+<p><span>uses Crt;</span></p>
+<p><span>type</span></p>
+<p><span>Alfa = String[10];</span></p>
+<p><span>PComp = ^Comp;</span></p>
+<p><span>Comp = record</span></p>
+<p><span>sD: Alfa;</span></p>
+<p><span>pNext: PComp;</span></p>
+<p><span>end;</span></p>
+<p><span>var</span></p>
+<p><span>pBegin, pEnd: PComp;</span></p>
+<p><span>sC: Alfa;</span></p>
+<p><span>Procedure CreateQueue(var pBegin,pEnd: PComp; var</span></p>
+<p><span>sC: Alfa);</span></p>
+<p><span>begin</span></p>
+<p><span>New(pBegin);</span></p>
+<p><span>pBegin^.pNext:= NIL;</span></p>
+<p><span>pBegin^.sD:= sC;</span></p>
+<p><span>pEnd:= pBegin;</span></p>
+<p><span>end;</span></p>
+<p><span>Procedure AddQueue(var pEnd: PComp; var sC:</span></p>
+<p><span>Alfa);</span></p>
+<p><span>var pAux: PComp;</span></p>
+<p><span>begin</span></p>
+<p><span>New(pAux);</span></p>
+<p><span>pAux^.pNext:= NIL;</span></p>
+<p><span>pEnd^.pNext:= pAux;</span></p>
+<p><span>pEnd:= pAux;</span></p>
+<p><span>pEnd^.sD:= sC;</span></p>
+<p><span>end;</span></p>
+<p><span>Procedure DelQueue(var pBegin: PComp; var sC:</span></p>
+<p><span>Alfa);</span></p>
+<p><span>begin</span></p>
+<p><span>sC:= pBegin^.sD;</span></p>
+<p><span>pBegin:= pBegin^.pNext;</span></p>
+<p><span>end;</span></p>
+<p><span>begin</span></p>
+<p><span>Clrscr;</span></p>
+<p><span>writeln( ВВЕДИ СТРОКУ );</span></p>
+<p><span>readln(sC);</span></p>
+<p><span>CreateQueue(pBegin, pEnd, sC);</span></p>
+<p><span>repeat</span></p>
+<p><span>writeln( ВВЕДИ СТРОКУ );</span></p>
+<p><span>readln(sC);</span></p>
+<p><span>AddQueue(pEnd, sC);</span></p>
+<p><span>until sC = 'END';</span></p>
+</body>
+</html>

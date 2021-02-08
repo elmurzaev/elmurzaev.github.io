@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.7. Оператор запроса описания подготовленного оператора</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;describe statement&gt; ::=
+  &lt;describe input statement&gt;
+| &lt;describe output statement&gt;
+&lt;describe input statement&gt; ::=
+   DESCRIBE INPUT &lt;SQL statement name&gt; &lt;using descriptor&gt;
+&lt;describe output statement&gt; ::=
+   DESCRIBE [OUTPUT] &lt;SQL statement name&gt; &lt;using descriptor&gt;
+&lt;using clause&gt; ::= &lt;using arguments&gt; | &lt;using descriptor&gt;
+&lt;using arguments&gt; ::=
+ { USING | INTO } &lt;argument&gt; [{&lt;comma&gt; &lt;argument&gt;}...]
+&lt;argument&gt; ::= &lt;target specification&gt;
+&lt;using descriptor&gt; ::=
+ { USING | INTO } SQL DESCRIPTOR &lt;descriptor name&gt;
+&lt;target specification&gt; ::=
+  &lt;parameter specification&gt;
+| &lt;variable specification&gt;
+&lt;parameter specification&gt; ::=
+  &lt;parameter name&gt; [&lt;indicator parameter&gt;]
+&lt;indicator parameter&gt; ::= [INDICATOR] &lt;parameter name&gt;
+&lt;variable specification&gt; ::=
+  &lt;embedded variable name&gt; [&lt;indicator variable&gt;]
+&lt;indicator variable&gt; ::= [INDICATOR] &lt;embedded variable name&gt;</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        При выполнении оператора DESCRIBE происходит заполнение указанного в операторе дескриптора
+        информацией, описывающей либо результат ранее подготовленного оператора SQL (если это
+        оператор выборки), либо количество и типы параметров подготовленного оператора. В &lt;using
+        descriptor&gt; здесь полагается писать USING SQL DESCRIPTOR.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

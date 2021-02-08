@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>17.4. Оператор установки дескриптора</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="document">
+    <h4></h4>
+    <pre>&lt;set descriptor statement&gt; ::=
+   SET DESCRIPTOR &lt;descriptor name&gt;
+  &lt;set descriptor information&gt;
+&lt;set descriptor information&gt; ::=
+  &lt;set count&gt;
+ ( VALUE &lt;item number&gt; &lt;set item information&gt;
+     [{&lt;comma&gt; &lt;set item information&gt;}...]
+&lt;set count&gt; ::= COUNT &lt;equals operator&gt; &lt;simple value specification 1&gt;
+&lt;set item information&gt; ::=
+  &lt;descriptor item name&gt;
+  &lt;equals operator&gt;
+  &lt;simple value specification 2&gt;
+&lt;simple target specification 1&gt; ::= &lt;simple target specification&gt;
+&lt;simple target specification 2&gt; ::=&lt;simple target specification&gt;
+&lt;item number&gt; ::= &lt;simple value specification&gt;</pre>
+    <p>
+        <i>Комментарий:</i>
+    </p>
+    <p>
+        Оператор SET DESCRIPTOR служит для заполнения элементов дескриптора с целью его
+        использования в разделе USING. За одно выполнение оператора можно поместить значение в поле
+        COUNT (число заполненных элементов), либо частично или полностью сформировать один элемент
+        дескриптора.
+    </p>
+    <p></p>
+    <center> || || <p>
+    </p>
+        <p></p>
+    </center>
+</div>
+
+</body>
+</html>

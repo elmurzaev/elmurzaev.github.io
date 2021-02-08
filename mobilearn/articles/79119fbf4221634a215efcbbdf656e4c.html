@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Создание и настройка генераторов Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="sozdanie-i-nastroyka-generatorov-i-shablonov-rails"> Создание
+        и настройка генераторов и шаблонов Rails</h2>
+    <p>Генераторы Rails - необходимый инструмент, если вы планируете улучшить свой рабочий процесс.
+        С помощью этого руководства вы изучите, как создавать генераторы и настраивать
+        существующие.</p>
+    <p>После прочтения этого руководства, вы узнаете:</p>
+    <ul>
+        <li>Как посмотреть, какие генераторы доступны в вашем приложении.
+        </li>
+        <li>Как создать генератор с использованием шаблонов.
+        </li>
+        <li>Как Rails ищет генераторы, чтобы вызвать их.
+        </li>
+        <li>Как Rails генерирует код Rails из шаблонов.
+        </li>
+        <li>Как настроить скаффолд, создавая новые генераторы.
+        </li>
+        <li>Как настроить скаффолд, изменяя шаблоны генератора.
+        </li>
+        <li>Как использовать фолбэки, чтобы избежать переопределения большого набора генераторов.
+        </li>
+        <li>Как создать шаблон приложения.
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="pervyy-kontakt"> Первый контакт</h3>
+    <p>При создании приложения с помощью команды <code>rails</code> фактически вы используете
+        генератор Rails. После этого можно получить список всех доступных генераторов, просто вызвав
+        <code>rails generate</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp
+$ cd myapp
+$ bin/rails generate
+</pre>
+    </div>
+    <p>Вы получите список всех генераторов, поставляющихся с Rails. Если необходимо подробное
+        описание, к примеру, генератора helper, можно просто сделать так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate helper --help
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="sozdanie-svoego-generatora"> Создание своего генератора</h3>
+    <p>Начиная с Rails 3.0, генераторы создаются на основе . Thor представляет мощные опции для
+        парсинга и великолепный API для взаимодействия с файлами. Например, давайте создадим
+        генератор, создающий файл инициализатора с именем <code>initializer.rb</code> внутри <code>config/initializers</code>.
+    </p>
+    <p>Первым шагом является создание файла <code>lib/generators/initializer_generator.rb</code> со
+        следующим содержимым:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class InitializerGenerator &lt; Rails::Generators::Base
+  def create_initializer_file
+    create_file "config/initializers/initializer.rb", "# Add initialization content here"
+  end
+end
+</pre>
+    </div>
+    <div class="note"><p><code>create_file</code> - это метод, представленный
+        <code>Thor::Actions</code>. Документация по <code>create_file</code> и другим методам Thor
+        находится в </p></div>
+    <p>Наш новый генератор очень прост: он наследуется от <code>Rails::Generators::Base</code> и
+        содержит одно определение метода. Когда генератор вызывается, каждый публичный метод в
+        генераторе запускается в порядке, в котором он определен. Наконец, мы вызываем метод <code>create_file</code>,
+        который создаст файл в указанном месте с указанным содержимым. Если вы знакомы с Rails
+        Application Templates API, API генераторов покажется вам очень знакомым.</p>
+    <p>Чтобы вызвать наш новый генератор, нужно всего лишь выполнить:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate initializer
+</pre>
+    </div>
+    <p>Перед тем, как продолжить, давайте посмотрим на описание нашего нового генератора:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate initializer --help
+</pre>
+    </div>
+    <p>Rails обычно способен создавать хорошие описания, если генератор расположен в пространствах
+        имен, таких как <code>ActiveRecord::Generators::ModelGenerator</code>, но не в этом частном
+        случае. Эту проблему можно решить двумя способами. Первым является вызов <code>desc</code>
+        внутри нашего генератора:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class InitializerGenerator &lt; Rails::Generators::Base
+  desc "This generator creates an initializer file at config/initializers"
+  def create_initializer_file
+    create_file "config/initializers/initializer.rb", "# Add initialization content here"
+  end
+end
+</pre>
+    </div>
+    <p>Теперь можно просмотреть новое описание, вызвав <code>--help</code> на новом генераторе.
+        Вторым способом является добавление описания в файле <code>USAGE</code> в той же директории,
+        что и наш генератор. Мы это сделаем на следующем этапе.</p>
+    <h3 class="inside_page_header" id="sozdanie-generatorov-s-pomoschyu-generatorov"> Создание
+        генераторов с помощью генераторов</h3>
+    <p>У самих генераторов есть генератор:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate generator initializer
+      create  lib/generators/initializer
+      create  lib/generators/initializer/initializer_generator.rb
+      create  lib/generators/initializer/USAGE
+      create  lib/generators/initializer/templates
+</pre>
+    </div>
+    <p>Вот только что созданный генератор:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class InitializerGenerator &lt; Rails::Generators::NamedBase
+  source_root File.expand_path("../templates", __FILE__)
+end
+</pre>
+    </div>
+    <p>Сперва обратите внимание, что он унаследован от <code>Rails::Generators::NamedBase</code>
+        вместо <code>Rails::Generators::Base</code>. Это означает, что наш генератор ожидает как
+        минимум один аргумент, который будет именем инициализатора и будет доступным в нашем коде в
+        переменной <code>name</code>.</p>
+    <p>Это можно увидеть, если вызвать описание для генератора (не забудьте удалить файл старого
+        генератора):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate initializer --help
+Usage:
+  rails generate initializer NAME [options]
+</pre>
+    </div>
+    <p>Также можно увидеть, что в нашем новом генераторе есть метод класса <code>source_root</code>.
+        Этот метод указывает на место расположения шаблонов нашего генератора, если таковые имеются,
+        и по умолчанию он указывает на созданную директорию <code>lib/generators/initializer/templates</code>.
+    </p>
+    <p>Чтобы понять, что такое шаблон генератора, давайте создадим файл <code>lib/generators/initializer/templates/initializer.rb</code>
+        со следующим содержимым:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Add initialization content here
+</pre>
+    </div>
+    <p>А теперь изменим генератор, чтобы он копировал этот файл при вызове:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class InitializerGenerator &lt; Rails::Generators::NamedBase
+  source_root File.expand_path("../templates", __FILE__)
+  def copy_initializer_file
+    copy_file "initializer.rb", "config/initializers/#{file_name}.rb"
+  end
+end
+</pre>
+    </div>
+    <p>И запустим наш генератор:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate initializer core_extensions
+</pre>
+    </div>
+    <p>Теперь мы видим, что инициализатор с именем core_extensions был создан в <code>config/initializers/core_extensions.rb</code>
+        с содержимым нашего шаблона. Это означает, что <code>copy_file</code> копирует файл из
+        корневой директории исходников в заданный путь назначения. Метод <code>file_name</code>
+        автоматически создается, когда мы наследуем от <code>Rails::Generators::NamedBase</code>.
+    </p>
+    <p>Доступные для генераторов методы раскрываются в этого руководства.</p>
+    <h3 class="inside_page_header" id="poisk-generatorov"> Поиск генераторов</h3>
+    <p>При запуске <code>rails generate initializer core_extensions</code> Rails затребует эти файлы
+        в следующем порядке, пока один из них не будет найден:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+rails/generators/initializer/initializer_generator.rb
+generators/initializer/initializer_generator.rb
+rails/generators/initializer_generator.rb
+generators/initializer_generator.rb
+</pre>
+    </div>
+    <p>Если ни один не найден, вы получите сообщение об ошибке.</p>
+    <div class="info"><p>Вышеуказанный пример положит файлы в папку <code>lib</code> приложения,
+        поскольку сказано, что эта директория принадлежит <code>$LOAD_PATH</code>.</p></div>
+    <h3 class="inside_page_header" id="nastroyka-rabochego-protsessa"> Настройка рабочего
+        процесса</h3>
+    <p>Собственные генераторы Rails достаточно гибки, чтобы позволить вам настроить скаффолдинг. Они
+        могут быть настроены в <code>config/application.rb</code>, вот несколько настроек по
+        умолчанию:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :test_unit, fixture: true
+end
+</pre>
+    </div>
+    <p>Так как мы настраиваем наш рабочий процесс, давайте сперва посмотрим, как выглядит наш
+        скаффолд:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold User name:string
+      invoke  active_record
+      create    db/migrate/20130924151154_create_users.rb
+      create    app/models/user.rb
+      invoke    test_unit
+      create      test/models/user_test.rb
+      create      test/fixtures/users.yml
+      invoke  resource_route
+       route    resources :users
+      invoke  scaffold_controller
+      create    app/controllers/users_controller.rb
+      invoke    erb
+      create      app/views/users
+      create      app/views/users/index.html.erb
+      create      app/views/users/edit.html.erb
+      create      app/views/users/show.html.erb
+      create      app/views/users/new.html.erb
+      create      app/views/users/_form.html.erb
+      invoke    test_unit
+      create      test/controllers/users_controller_test.rb
+      invoke    helper
+      create      app/helpers/users_helper.rb
+      invoke    jbuilder
+      create      app/views/users/index.json.jbuilder
+      create      app/views/users/show.json.jbuilder
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/users.coffee
+      invoke    scss
+      create      app/assets/stylesheets/users.scss
+      invoke  scss
+      create    app/assets/stylesheets/scaffolds.scss
+</pre>
+    </div>
+    <p>Глядя на этот вывод, легко понять, как работают генераторы в Rails 3.0 и выше. Генератор
+        скаффолда фактически не генерирует ничего, он просто вызывает другие. Это позволяет нам
+        добавить/заменить/убрать любые из этих вызовов. Например, генератор скаффолда вызывает
+        генератор scaffold_controller, который вызывает генераторы erb, test_unit и helper.
+        Поскольку у каждого генератора одна функция, их просто использовать повторно, избегая
+        дублирования кода.</p>
+    <p>Нашей первой настройкой рабочего процесса будет прекращение генерации таблиц стилей,
+        JavaScript и фикстур для тестов скаффолда. Этого можно достичь, изменив конфигурацию
+        следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :test_unit, fixture: false
+  g.stylesheets     false
+  g.javascripts     false
+end
+</pre>
+    </div>
+    <p>Если мы создадим другой ресурс с помощью генератора скаффолда, мы увидим, что ни таблица
+        стилей, ни JavaScript, ни фикстуры более не будут созданы. Если мы захотим настраивать его
+        дальше, например использовать DataMapper и RSpec вместо Active Record и TestUnit, это
+        достигается всего лишь добавлением соответствующих гемов в приложение и настройкой ваших
+        генераторов.</p>
+    <p>Для демонстрации мы собираемся создать новый генератор хелперов, который просто добавляет
+        несколько методов-ридеров для переменных экземпляра. Сначала мы создадим генератор в
+        пространстве имен rails, так как тут rails ищет генераторы, используемые как хуки:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate generator rails/my_helper
+      create  lib/generators/rails/my_helper
+      create  lib/generators/rails/my_helper/my_helper_generator.rb
+      create  lib/generators/rails/my_helper/USAGE
+      create  lib/generators/rails/my_helper/templates
+</pre>
+    </div>
+    <p>Можно опробовать наш новый генератор, создав хелпер для продуктов:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate my_helper products
+      create  app/helpers/products_helper.rb
+</pre>
+    </div>
+    <p>И следующий хелпер будет создан в <code>app/helpers</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+module ProductsHelper
+  attr_reader :products, :product
+end
+</pre>
+    </div>
+    <p>Что, собственно, и ожидалось. Можно сообщить скаффолду использовать наш новый генератор
+        хелпера, снова отредактировав <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :test_unit, fixture: false
+  g.stylesheets     false
+  g.javascripts     false
+  g.helper          :my_helper
+end
+</pre>
+    </div>
+    <p>и увидев его в действии при вызове генератора:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold Article body:text
+      [...]
+      invoke    my_helper
+      create      app/helpers/articles_helper.rb
+</pre>
+    </div>
+    <p>Можно отметить в выводе, что был вызван наш новый генератор хелпера вместо генератора Rails
+        по умолчанию. Однако мы кое-что упустили, это тесты для нашего нового генератора, и чтобы их
+        сделать, мы воспользуемся старыми генераторами теста для хелперов.</p>
+    <p>Начиная с Rails 3.0, это просто, благодаря концепции хуков. Наш новый хелпер не должен быть
+        сфокусирован на какой-то определенный тестовый фреймворк, он просто представляет хук, и
+        тестовому фреймворку нужно всего-лишь реализовать этот хук, чтобы быть совместимым.</p>
+    <p>Для этого мы изменим генератор следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# lib/generators/rails/my_helper/my_helper_generator.rb
+class Rails::MyHelperGenerator &lt; Rails::Generators::NamedBase
+  def create_helper_file
+    create_file "app/helpers/#{file_name}_helper.rb", &lt;&lt;-FILE
+module #{class_name}Helper
+  attr_reader :#{plural_name}, :#{plural_name.singularize}
+end
+    FILE
+  end
+  hook_for :test_framework
+end
+</pre>
+    </div>
+    <p>Теперь, когда вызывается генератор хелпера, и как тестовый фреймворк настроен TestUnit, он
+        попытается вызвать <code>Rails::TestUnitGenerator</code> и
+        <code>TestUnit::MyHelperGenerator</code>. Поскольку ни один из них не определен, можно
+        сообщить нашему генератору вместо них вызывать
+        <code>TestUnit::Generators::HelperGenerator</code>, который определен, так как это генератор
+        Rails. Для этого нужно всего лишь добавить:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Search for :helper instead of :my_helper
+hook_for :test_framework, as: :helper
+</pre>
+    </div>
+    <p>Теперь можно снова запустить скаффолд для другого ресурса и увидеть, что он также генерирует
+        тесты!</p>
+    <h3 class="inside_page_header"
+        id="nastroyka-rabochego-protsessa-izmenyaya-shablony-generatorov"> Настройка рабочего
+        процесса, изменяя шаблоны генераторов</h3>
+    <p>На предыдущем шаге мы просто хотели добавить строчку в сгенерированный хелпер без добавления
+        какого-либо дополнительного функционала. Имеется более простой способ, чтобы сделать такое -
+        замена шаблонов для уже существующих генераторов, в нашем случае <code>Rails::Generators::HelperGenerator</code>.
+    </p>
+    <p>В Rails 3.0 и выше генераторы не просто ищут шаблоны в корневом пути, они также ищут по
+        другим путям. И одно из них — <code>lib/templates</code>. Поскольку мы хотим изменить <code>Rails::Generators::HelperGenerator</code>,
+        можно это осуществить, просто сделав копию шаблона в <code>lib/templates/rails/helper</code>
+        с именем <code>helper.rb</code>. Так давайте же создадим этот файл со следующим содержимым:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; html-script: true; gutter: false; toolbar: false">
+module &lt;%= class_name %&gt;Helper
+  attr_reader :&lt;%= plural_name %&gt;, :&lt;%= plural_name.singularize %&gt;
+end
+</pre>
+    </div>
+    <p>и отменим последнее изменение в <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :test_unit, fixture: false
+  g.stylesheets     false
+  g.javascripts     false
+end
+</pre>
+    </div>
+    <p>Если создадите другой ресурс, то увидите абсолютно тот же результат! Это полезно, если хотите
+        изменить шаблоны вашего скаффолда и/или макет, просто создав <code>edit.html.erb</code>,
+        <code>index.html.erb</code> и так далее в <code>lib/templates/erb/scaffold</code>.</p>
+    <p>Шаблоны скаффолда в Rails часто используют теги ERB; эти теги необходимо экранировать, чтобы
+        сгенерированный результат являлся валидным кодом ERB.</p>
+    <p>Например, в шаблоне необходим следующий экранированный тег ERB (обратите внимание на
+        дополнительный <code>%</code>)...</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%%= stylesheet_include_tag :application %&gt;
+</pre>
+    </div>
+    <p>...чтобы сгенерировать следующий результат:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+&lt;%= stylesheet_include_tag :application %&gt;
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="dobavlenie-folbekov-generatorov"> Добавление фолбэков
+        генераторов</h3>
+    <p>Еще одна особенность генераторов, которая очень полезна, это фолбэки. Например, представим,
+        что вы хотите добавить особенность над TestUnit, такую как . Так как TestUnit уже реализует
+        все генераторы, требуемые Rails, а shoulda всего лишь хочет переопределить часть из них, нет
+        необходимости для shoulda переопределять некоторые генераторы, она может просто сообщить
+        Rails использовать генератор <code>TestUnit</code>, если такой не найден в пространстве имен
+        <code>Shoulda</code>.</p>
+    <p>Можно с легкостью смоделировать это поведение, снова изменив наш
+        <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :shoulda, fixture: false
+  g.stylesheets     false
+  g.javascripts     false
+  # Добавим фолбэк!
+  g.fallbacks[:shoulda] = :test_unit
+end
+</pre>
+    </div>
+    <p>Теперь, если создать скаффолд Comment, вы увидите, что были вызваны генераторы shoulda, но в
+        итоге они всего лишь переуступили генераторам TestUnit:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold Comment body:text
+      invoke  active_record
+      create    db/migrate/20130924143118_create_comments.rb
+      create    app/models/comment.rb
+      invoke    shoulda
+      create      test/models/comment_test.rb
+      create      test/fixtures/comments.yml
+      invoke  resource_route
+       route    resources :comments
+      invoke  scaffold_controller
+      create    app/controllers/comments_controller.rb
+      invoke    erb
+      create      app/views/comments
+      create      app/views/comments/index.html.erb
+      create      app/views/comments/edit.html.erb
+      create      app/views/comments/show.html.erb
+      create      app/views/comments/new.html.erb
+      create      app/views/comments/_form.html.erb
+      invoke    my_helper
+      create      app/helpers/comments_helper.rb
+      invoke      shoulda
+      create        test/helpers/comments_helper_test.rb
+      invoke    jbuilder
+      create      app/views/comments/index.json.jbuilder
+      create      app/views/comments/show.json.jbuilder
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/comments.coffee
+      invoke    scss
+</pre>
+    </div>
+    <p>Фолбэки позволяют вашим генераторам иметь единственную ответственность, увеличить повторное
+        использование кода и уменьшить дублирование.</p>
+    <h3 class="inside_page_header" id="shablony-prilozheniya"> Шаблоны приложения</h3>
+    <p>Теперь, когда вы узнали, как генераторы используются <em>внутри</em> приложения, знаете ли
+        вы, что они используются и для <em>генерации</em> приложения тоже? Этот тип генераторов
+        называют "template". Далее идет краткий обзор Templates API. Подробную информацию смотрите в
+        .</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem "rspec-rails", group: "test"
+gem "cucumber-rails", group: "test"
+if yes?("Would you like to install Devise?")
+  gem "devise"
+  generate "devise:install"
+  model_name = ask("What would you like the user model to be called? [user]")
+  model_name = "user" if model_name.blank?
+  generate "devise", model_name
+end
+</pre>
+    </div>
+    <p>В вышеприведенном шаблоне мы определили, что приложение полагается на гемы
+        <code>rspec-rails</code> и <code>cucumber-rails</code>, поэтому они будут добавлены в группу
+        <code>test</code> в <code>Gemfile</code>. Затем мы зададим вопрос пользователю относительно
+        того, хочет ли он установить Devise. Если пользователь ответит "y" или "yes" на этот вопрос,
+        тогда шаблон добавит Devise в <code>Gemfile</code> вне какой-либо группы, а затем запустит
+        генератор <code>devise:install</code>. Затем этот шаблон возьмет пользовательский ввод и
+        запустит генератор <code>devise</code> с переданным ответом пользователя из последнего
+        вопроса.</p>
+    <p>Представим, что этот шаблон был в файле <code>template.rb</code>. Можно его использовать,
+        чтобы изменить результат команды <code>rails new</code> с помощью опции <code>-m</code> и
+        передачей имени файла:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new thud -m template.rb
+</pre>
+    </div>
+    <p>Эта команда создаст приложение <code>Thud</code>, а затем применит шаблон к сгенерированному
+        результату.</p>
+    <p>Шаблоны не обязательно должны храниться в локальной системе, опция <code>-m</code> также
+        поддерживает онлайн шаблоны:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new thud -m https://gist.github.com/radar/722911/raw/
+</pre>
+    </div>
+    <p>В то время как последний раздел этого руководства не раскрывает, как создавать замечательные
+        шаблоны, он познакомит вас с доступными методами, с помощью которых вы сможете создать их
+        самостоятельно. Абсолютно те же методы доступны и для генераторов.</p>
+    <h3 class="inside_page_header" id="generator-methods"> Методы генератора</h3>
+    <p>Следующие методы доступны как для генераторов, так и для шаблонов Rails.</p>
+    <div class="note"><p>Методы, представленные Thor не раскрываются в этом руководстве, а находятся
+        в </p></div>
+    <h4 class="inside_page_header" id="gem"><code>gem</code>
+    </h4>
+    <p>Указывает зависимость приложения от гема.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem "rspec", group: "test", version: "2.1.0"
+gem "devise", "1.1.5"
+</pre>
+    </div>
+    <p>Доступны следующие опции:</p>
+    <ul>
+        <li>
+            <code>:group</code> - Группа в <code>Gemfile</code>, где должен быть гем.
+        </li>
+        <li>
+            <code>:version</code> - Строка версии гема, которую нужно использовать. Также может быть
+            указана в качестве второго аргумента метода.
+        </li>
+        <li>
+            <code>:git</code> - URL репозитория git для этого гема.
+        </li>
+    </ul>
+    <p>Любые дополнительные опции, переданные в этот метод помещаются в конце строчки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem "devise", git: "git://github.com/plataformatec/devise", branch: "master"
+</pre>
+    </div>
+    <p>Вышеприведенный код поместит следующую строчку в <code>Gemfile</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem "devise", git: "git://github.com/plataformatec/devise", branch: "master"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="gem_group"><code>gem_group</code>
+    </h4>
+    <p>Оборачивает вхождения гемов в группу:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gem_group :development, :test do
+  gem "rspec-rails"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="add_source"><code>add_source</code>
+    </h4>
+    <p>Добавляет определенный источник в <code>Gemfile</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+add_source "http://gems.github.com"
+</pre>
+    </div>
+    <p>Этот метод также принимает блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+add_source "http://gems.github.com" do
+  gem "rspec-rails"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="inject_into_file"><code>inject_into_file</code>
+    </h4>
+    <p>Встраивает блок кода в определенную позицию вашего файла.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+inject_into_file 'name_of_file.rb', after: "#The code goes below this line. Don't forget the Line break at the end\n" do &lt;&lt;-'RUBY'
+  puts "Hello World"
+RUBY
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="gsub_file"><code>gsub_file</code>
+    </h4>
+    <p>Заменяет текст в файле.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+gsub_file 'name_of_file.rb', 'method.to_be_replaced', 'method.the_replacing_code'
+</pre>
+    </div>
+    <p>Этот метод можно сделать более точным с помощью регулярных выражений. Таким же образом можно
+        использовать <code>append_file</code> и <code>prepend_file</code>, чтобы поместить код в
+        начало или конец файла соответственно.</p>
+    <h4 class="inside_page_header" id="application"><code>application</code>
+    </h4>
+    <p>Добавляет строчку в <code>config/application.rb</code> непосредственно после определения
+        класса приложения.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+application "config.asset_host = 'http://example.com'"
+</pre>
+    </div>
+    <p>Также этот метод может принимать блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+application do
+  "config.asset_host = 'http://example.com'"
+end
+</pre>
+    </div>
+    <p>Доступные опции:</p>
+    <ul>
+        <li>
+            <code>:env</code> - Определяет среду для этой конфигурационной опции. Если хотите
+            использовать эту опцию с блочным синтаксисом, рекомендуемый синтаксис следующий:
+        </li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+application(nil, env: "development") do
+  "config.asset_host = 'http://localhost:3000'"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="git"><code>git</code>
+    </h4>
+    <p>Запускает определенную команду git:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+git :init
+git add: "."
+git commit: "-m First commit!"
+git add: "onefile.rb", rm: "badfile.cxx"
+</pre>
+    </div>
+    <p>Значения хэша будут аргументами или опциями, переданными в определенную команду git. Как
+        показано в последнем примере, одновременно могут быть определены несколько команд git, но не
+        гарантируется соответствие порядка их запуска порядку, в котором они определены.</p>
+    <h4 class="inside_page_header" id="vendor"><code>vendor</code>
+    </h4>
+    <p>Помещает файл, содержащий указанный код, в <code>vendor</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+vendor "sekrit.rb", '#top secret stuff'
+</pre>
+    </div>
+    <p>Этот метод также принимает блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+vendor "seeds.rb" do
+  "puts 'in your app, seeding your database'"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="lib"><code>lib</code>
+    </h4>
+    <p>Помещает файл, содержащий указанный код, в <code>lib</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+lib "special.rb", "p Rails.root"
+</pre>
+    </div>
+    <p>Этот метод также принимает блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+lib "super_special.rb" do
+  puts "Super special!"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rakefile"><code>rakefile</code>
+    </h4>
+    <p>Создает файл Rake в директории <code>lib/tasks</code> приложения.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+rakefile "test.rake", "hello there"
+</pre>
+    </div>
+    <p>Этот метод также принимает блок:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+rakefile "test.rake" do
+  %Q{
+    task rock: :environment do
+      puts "Rockin'"
+    end
+  }
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="initializer"><code>initializer</code>
+    </h4>
+    <p>Создает инициализатор в директории <code>config/initializers</code> приложения:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+initializer "begin.rb", "puts 'this is the beginning'"
+</pre>
+    </div>
+    <p>Этот метод также принимает блок и ожидает возврата строки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+initializer "begin.rb" do
+  "puts 'this is the beginning'"
+end
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="generate"><code>generate</code>
+    </h4>
+    <p>Запускает указанный генератор, где первый аргумент это имя генератора, а оставшиеся аргументы
+        передаются непосредственно в генератор.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+generate "scaffold", "forums title:string description:text"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rake"><code>rake</code>
+    </h4>
+    <p>Запускает указанный таск Rake.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+rake "db:migrate"
+</pre>
+    </div>
+    <p>Доступные опции:</p>
+    <ul>
+        <li>
+            <code>:env</code> - Указывает среду, в которой запускать таск rake.
+        </li>
+        <li>
+            <code>:sudo</code> - Запускать ли этот таск с помощью <code>sudo</code>. По умолчанию
+            <code>false</code>.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="capify"><code>capify!</code>
+    </h4>
+    <p>Запускает команду <code>capify</code> от Capistrano в корне приложения, которая создает
+        конфигурацию Capistrano.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+capify!
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="route"><code>route</code>
+    </h4>
+    <p>Добавляет текст в файл <code>config/routes.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+route "resources :people"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="readme"><code>readme</code>
+    </h4>
+    <p>Выводит содержимое файла из <code>source_path</code> шаблона, обычно README.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+readme "README"
+</pre>
+    </div>
+
+</body>
+</html>

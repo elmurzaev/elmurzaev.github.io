@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Заметки о релизе Ruby on Rails 4.0</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="zametki-o-relize-ruby-on-rails-4-0"> Заметки о релизе Ruby on
+        Rails 4.0</h2>
+    <p>Ключевые новинки в Rails 4.0:</p>
+    <ul>
+        <li>Ruby 2.0 предпочтителен; 1.9.3+ требуется
+        </li>
+        <li>Строгие параметры (Strong Parameters)
+        </li>
+        <li>Turbolinks
+        </li>
+        <li>Кэширование "матрешкой" (Russian Doll Caching)
+        </li>
+    </ul>
+    <p>Эти заметки о релизе покрывают только основные обновления. Чтобы узнать о различных багфиксах
+        и изменениях, обратитесь к логам изменений или к в главном репозитории Rails на GitHub.</p>
+    <h3 class="inside_page_header" id="obnovlenie-do-rails-4-0"> Обновление до Rails 4.0</h3>
+    <p>Если обновляете существующее приложение, было бы хорошо иметь перед этим покрытие тестами.
+        Также, до попытки обновиться до Rails 4.0, необходимо сначала обновиться до Rails 3.2 и
+        убедиться, что приложение все еще выполняется так, как нужно. Список вещей, которые нужно
+        выполнить при обновлении доступен в руководстве .</p>
+    <div class="todo"><p>Configuration changes in environment files</p></div>
+    <h3 class="inside_page_header" id="sozdanie-prilozheniya-rails-4-0"> Создание приложения Rails
+        4.0</h3>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+ Необходим установленный RubyGem 'rails'
+$ rails new myapp
+$ cd myapp
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="storonnie-gemy"> Сторонние гемы</h4>
+    <p>Сейчас Rails использует <code>Gemfile</code> в корне приложения, чтобы определить гемы,
+        требуемые для запуска вашего приложения. Этот <code>Gemfile</code> обрабатывается гемом ,
+        который затем устанавливает все зависимости. Он может даже установить все зависимости
+        локально в ваше приложение, и оно не будет зависеть от системных гемов.</p>
+    <p>Подробнее: - </p>
+    <h4 class="inside_page_header" id="zhivite-na-grani"> Живите на грани</h4>
+    <p><code>Bundler</code> и <code>Gemfile</code> замораживает ваше приложение Rails с помощью
+        новой отдельной команды <code>bundle</code>. Если хотите установить напрямую из репозитория
+        Git, передайте флажок <code>--edge</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new myapp --edge
+</pre>
+    </div>
+    <p>Если у вас есть локальная копия репозитория Rails, и вы хотите создать приложение с ее
+        использованием, передайте флажок <code>--dev</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ ruby /path/to/rails/railties/bin/rails new myapp --dev
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="osnovnye-osobennosti"> Основные особенности</h3>
+    <p></p>
+    <h4 class="inside_page_header" id="obnovlenie"> Обновление</h4>
+    <ul>
+        <li>
+            <strong>Ruby 1.9.3</strong> () - Предпочтителен Ruby 2.0; требуется 1.9.3+
+        </li>
+        <li>
+            <strong></strong> - Устаревшие особенности показывают предупреждения в Rails 4.0, и
+            будут убраны в Rails 4.1.
+        </li>
+        <li>
+            <strong>Кэширование страниц и экшнов ActionPack</strong> () - Кэширование страниц и
+            экшнов было извлечено в отдельный гем. Кэширование страниц и экшнов требовало слишком
+            много человеческого вмешательства (вручную прекращать кэш, когда обновляются лежащие в
+            основе объекты модели). Вместо этого используйте кэширование по принципу "русской
+            матрешки" (Russian doll caching).
+        </li>
+        <li>
+            <strong>Обсерверы ActiveRecord</strong> () - Обсерверы извлечены в отдельный гем.
+            Обсерверы требовались только для кэширования страниц и экшнов и могли привести к
+            спагетти-коду.
+        </li>
+        <li>
+            <strong>Хранилище сессии ActiveRecord</strong> () - Хранилище сессии ActiveRecord
+            извлечено в отдельный гем. Хранение сессий в SQL затратное. Используйте вместо него
+            сессии куки, сессии memcache или произвольные хранилища сессии.
+        </li>
+        <li>
+            <strong>Защита от массового назначения ActiveModel</strong> () - Защита от массового
+            назначения Rails 3 устарела. Вместо нее используйте строгие параметры (strong
+            parameters).
+        </li>
+        <li>
+            <strong>ActiveResource</strong> () - ActiveResource извлечен в отдельный гем.
+            ActiveResource не был широко используемым.
+        </li>
+        <li>
+            <strong>убраны vendor/plugins</strong> () - Для управления установленными гемами
+            используйте Gemfile.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="actionpack"> ActionPack</h4>
+    <ul>
+        <li>
+            <strong>Strong parameters</strong> () - Позволяет обновлять объекты модели только
+            разрешенными параметрами (<code>params.permit(:title, :text)</code>).
+        </li>
+        <li>
+            <strong>Routing concerns</strong> () - В маршрутном DSL, выделяет общие подмаршруты
+            (<code>comments</code> из <code>/posts/1/comments</code> and
+            <code>/videos/1/comments</code>).
+        </li>
+        <li>
+            <strong>ActionController::Live</strong> () - Потоковый JSON с помощью <code>response.stream</code>.
+        </li>
+        <li>
+            <strong>Декларативные ETags</strong> () - Добавляет на уровне контроллера дополнения к
+            etag, которые будут частью вычисления etag.
+        </li>
+        <li>
+            <strong></strong> () - Кэширует вложенные фрагменты вьюх. Каждый фрагмент прекращается
+            на основе набора зависимостей (ключа кэширования). Ключ кэширования - это обычно версия
+            шаблона и объект модели.
+        </li>
+        <li>
+            <strong>Turbolinks</strong> () - Обслуживает только первую страницу HTML. Когда
+            пользователь переходит на следующую страницу, использует pushState для обновления URL и
+            использует AJAX для обновления title и body.
+        </li>
+        <li>
+            <strong>Извлечение ActionView из ActionController</strong> () - ActionView был отделен
+            от ActionPack, и будет вынесен в отдельный гем в Rails 4.1.
+        </li>
+        <li>
+            <strong>Независимость от ActiveModel</strong> () - ActionPack больше не зависит от
+            ActiveModel.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="osnovnoe"> Основное</h4>
+    <ul>
+        <li>
+            <strong>ActiveModel::Model</strong> () - <code>ActiveModel::Model</code> - это миксин,
+            чтобы обычные объекты Ruby могли работать с ActionPack "из коробки" (например, <code>form_for</code>).
+        </li>
+        <li>
+            <strong>Новый API скоупов</strong> () - Скоупы должны быть всегда вызываемыми.
+        </li>
+        <li>
+            <strong>Выгрузка кэша схемы</strong> () - Чтобы улучшить время загрузки Rails, вместо
+            загрузки схемы непосредственно из базы данных, загружает схему из файла выгрузки.
+        </li>
+        <li>
+            <strong>Поддержка указания уровня изоляции транзакции</strong> () - Выбирайте, что более
+            важно - повторяемые чтения или улучшенное быстродействие (менее блокирующее).
+        </li>
+        <li>
+            <strong>Dalli</strong> () - Используется клиент Dalli в качестве хранилища сессии в
+            memcache.
+        </li>
+        <li>
+            <strong>start &amp; finish для уведомлений</strong> () - Инструменты Active Support
+            сообщают подписчикам о начале и завершении уведомлений.
+        </li>
+        <li>
+            <strong>Тредобезопасность по умолчанию</strong> () - Rails может быть запущен на
+            тредовых серверах приложений без дополнительных настроек. Заметка: Проверьте, что
+            используемые вами гемы тредобезопасны.
+        </li>
+    </ul>
+    <div class="note"><p>Убедитесь, что используемые вами гемы тредобезопасны.</p></div>
+    <ul>
+        <li>
+            <strong>Метод PATCH</strong> () - В Rails PATCH заменил PUT. PATCH используется для
+            частичного обновления ресурсов.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="bezopasnost"> Безопасность</h4>
+    <ul>
+        <li>
+            <strong>match не соответствует всем методам</strong> () - В маршрутном DSL, match
+            требует указания метода или методов HTTP.
+        </li>
+        <li>
+            <strong>Сущности html экранируются по умолчанию</strong> () - Строки, рендерящиеся в
+            erb, экранируются, если не обернуты в <code>raw</code>, или вызван
+            <code>html_safe</code>.
+        </li>
+        <li>
+            <strong>Новые заголовки безопасности</strong> () - Rails посылает следующие заголовки с
+            каждым запросом HTTP: <code>X-Frame-Options</code> (предотвращает кликджекинг, запрещая
+            браузеру встраивать страницу в фрейм), <code>X-XSS-Protection</code> (говорит браузеру
+            прерывать инъекцию скрипта) и <code>X-Content-Type-Options</code> (предотвращает
+            открытие браузером jpeg как exe).
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="izvlechenie-osobennostey-v-gemy"> Извлечение особенностей в
+        гемы</h3>
+    <p>В Rails 4.0 некоторые особенности были извлечены в гемы. Можно просто добавить извлеченный
+        гем в свой <code>Gemfile</code>, чтобы вернуть функциональность.</p>
+    <ul>
+        <li>Динамические и основанные на хэше методы поиска ()
+        </li>
+        <li>Защита от массового назначения в моделях Active Record (, )
+        </li>
+        <li>ActiveRecord::SessionStore (, )
+        </li>
+        <li>Обсерверы Active Record (, )
+        </li>
+        <li>Active Resource (, , )
+        </li>
+        <li>Кэширование экшна (, )
+        </li>
+        <li>Кэширование страницы (, )
+        </li>
+        <li>Sprockets ()
+        </li>
+        <li>Тесты производительности (, )
+        </li>
+    </ul>
+    <h3 class="inside_page_header" id="dokumentatsiya"> Документация</h3>
+    <ul>
+        <li><p>Руководства были переписаны на GitHub Flavored Markdown.</p></li>
+        <li><p>Руководства имеют адаптивный дизайн.</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="railties"> Railties</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p>Новые места для тестов <code>test/models</code>, <code>test/helpers</code>, <code>test/controllers</code>
+            и <code>test/mailers</code>. Также добавлены соответствующие rake-таски. ()</p></li>
+        <li><p>Исполняемые файлы приложения теперь находятся в директории <code>bin/</code>.
+            Запустите <code>rake rails:update:bin</code> чтобы получить <code>bin/bundle</code>,
+            <code>bin/rails</code> и <code>bin/rake</code>.</p></li>
+        <li><p>Тредобезопасность включена по умолчанию</p></li>
+        <li><p>Была убрана возможность использования произвольного билдера, передав
+            <code>--builder</code> (или <code>-b</code>) в <code>rails new</code>. Вместо нее
+            рассмотрите шаблоны приложения. ()</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li><p><code>config.threadsafe!</code> устарело в пользу <code>config.eager_load</code>,
+            которая предоставляет более тонкую настройку того, что будет лениво загружаться.</p>
+        </li>
+        <li><p><code>Rails::Plugin</code> больше нет. Вместо добавления плагинов в <code>vendor/plugins</code>,
+            используйте гемы, или bundler с путем, или зависимости git.</p></li>
+    </ul>
+    <h3 class="inside_page_header" id="action-mailer"> Action Mailer</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <h3 class="inside_page_header" id="active-model"> Active Model</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p>Добавлен <code>ActiveModel::ForbiddenAttributesProtection</code>, простой модуль для
+            защиты атрибутов от массового назначения, когда передаются неразрешенные атрибуты.</p>
+        </li>
+        <li><p>Добавлен <code>ActiveModel::Model</code>, примесь, чтобы объекты Ruby могли работать
+            с Action Pack "из коробки".</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <h3 class="inside_page_header" id="active-support"> Active Support</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li><p>Заменен устаревший гем <code>memcache-client</code> на <code>dalli</code> в <code>ActiveSupport::Cache::MemCacheStore</code>.
+        </p></li>
+        <li><p>Оптимизирован <code>ActiveSupport::Cache::Entry</code> для уменьшения расхода памяти
+            и процессора.</p></li>
+        <li><p>Словоизменения теперь могут быть определены для локали. <code>singularize</code> и
+            <code>pluralize</code> принимают локаль как дополнительный аргумент.</p></li>
+        <li><p><code>Object#try</code> теперь будет возвращать nil вместо вызова NoMethodError, если
+            вызывающий объект не реализует этот метод, но все еще можно получить старое поведение,
+            используя новый метод <code>Object#try!</code>.</p></li>
+        <li><p><code>String#to_date</code> теперь вызывает <code>ArgumentError: invalid date</code>
+            вместо <code>NoMethodError: undefined method 'div' for nil:NilClass</code> при получения
+            неверной даты. Это то же самое, что и <code>Date.parse</code>, и он принимает больше
+            неправильных дат, чем 3.x, такие как:</p></li>
+    </ul>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+  # ActiveSupport 3.x
+  "asdf".to_date # =&gt; NoMethodError: undefined method `div' for nil:NilClass
+  "333".to_date # =&gt; NoMethodError: undefined method `div' for nil:NilClass
+  # ActiveSupport 4
+  "asdf".to_date # =&gt; ArgumentError: invalid date
+  "333".to_date # =&gt; Fri, 29 Nov 2013
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li><p>Устарел метод <code>ActiveSupport::TestCase#pending</code>, используйте вместо него
+            <code>skip</code> из MiniTest.</p></li>
+        <li><p><code>ActiveSupport::Benchmarkable#silence</code> устарел из-за недостатков в
+            тредобезопасности. Он будет убран без замен в Rails 4.1.</p></li>
+        <li><p>Устарел <code>ActiveSupport::JSON::Variable</code>. Определяйте собственные методы
+            <code>#as_json</code> и <code>#encode_json</code> для собственных строковых литер JSON.
+        </p></li>
+        <li><p>Устарел метод совместимости <code>Module#local_constant_names</code>, используйте
+            вместо него <code>Module#local_constants</code> (который возвращает символы).</p></li>
+        <li><p>Устарел <code>BufferedLogger</code>. Используйте <code>ActiveSupport::Logger</code>
+            или <code>logger</code> из стандартной библиотеки Ruby.</p></li>
+        <li><p>Устарели <code>assert_present</code> и <code>assert_blank</code> в пользу <code>assert
+            object.blank?</code> и <code>assert object.present?</code></p></li>
+    </ul>
+    <h3 class="inside_page_header" id="action-pack"> Action Pack</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li>Изменена таблица стилей для страниц исключений для режима development. Также
+            дополнительно отображается строчка кода и фрагмент, который вызвал исключение на всех
+            страницах исключений.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <h3 class="inside_page_header" id="active-record"> Active Record</h3>
+    <p>Обратитесь к за полными изменениями.</p>
+    <h4 class="inside_page_header" id="znachimye-izmeneniya"> Значимые изменения</h4>
+    <ul>
+        <li>
+            <p>Улучшены способы написания миграций <code>change</code>, что делает старые методы
+                <code>up</code> &amp; <code>down</code> больше не нужными.</p>
+            <ul>
+                <li>Методы <code>drop_table</code> и <code>remove_column</code> теперь обратимые,
+                    если дана вся необходимая информация.
+                    Метод <code>remove_column</code> принимает несколько имен столбцов; вместо
+                    использования <code>remove_columns</code> (который необратимый).
+                    Метод <code>change_table</code> также обратимый, если его блок не вызывает
+                    <code>remove</code>, <code>change</code> или <code>change_default</code>
+                </li>
+                <li>Новый метод <code>reversible</code> делает возможным определить код для
+                    исполнения при выполнении или откате миграции.
+                    Смотрите
+                </li>
+                <li>Новый метод <code>revert</code> обратит всю миграцию или предоставленный блок.
+                    Если миграция откатывается, данная миграция / блок выполняется обычно.
+                    Смотрите
+                </li>
+            </ul>
+        </li>
+        <li><p>Добавлена поддержка массивов PostgreSQL. Для создания столбца array может быть
+            использован любой тип данных, с полной поддержкой миграций и выгрузкой схемы.</p></li>
+        <li><p>Добавлен <code>Relation#load</code> для явной загрузки записи и возврата
+            <code>self</code>.</p></li>
+        <li><p><code>Model.all</code> теперь возвращает <code>ActiveRecord::Relation</code>, а не
+            массив с записями. Используйте <code>Relation#to_a</code>, если вы действительно хотите
+            массив. В некоторых особенных случаях это может вызвать повреждения при обновлении.</p>
+        </li>
+        <li><p>Добавлен <code>ActiveRecord::Migration.check_pending!</code>, вызывающий ошибку, если
+            миграции ожидают выполнения.</p></li>
+        <li>
+            <p>Добавлена поддержка произвольного кодирования для <code>ActiveRecord::Store</code>.
+                Теперь можно установить собственное кодирование следующим образом:</p>
+            <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+store :settings, accessors: [ :color, :homepage ], coder: JSON
+</pre>
+            </div>
+        </li>
+        <li><p>Соединения <code>mysql</code> и <code>mysql2</code> будут по умолчанию устанавливать
+            <code>SQL_MODE=STRICT_ALL_TABLES</code>, чтобы избежать тихих потерь данных. Это может
+            быть отключено, определив <code>strict: false</code> в <code>database.yml</code>.</p>
+        </li>
+        <li><p>Убрана IdentityMap.</p></li>
+        <li><p>Убран автоматический запуск запросов EXPLAIN. Опция <code>active_record.auto_explain_threshold_in_seconds</code>
+            больше не используется и должна быть убрана.</p></li>
+        <li><p>Добавлены <code>ActiveRecord::NullRelation</code> и
+            <code>ActiveRecord::Relation#none</code>, реализующие паттерн нулевого объекта для
+            класса Relation.</p></li>
+        <li><p>Добавлен миграционный хелпер <code>create_join_table</code> для создания
+            соединительных таблиц HABTM.</p></li>
+        <li><p>Могут быть созданы записи PostgreSQL hstore.</p></li>
+    </ul>
+    <h4 class="inside_page_header" id="ustarevaniya"> Устаревания</h4>
+    <ul>
+        <li><p>Устарел старый API поиска, основанный на хэше. Это означает, что методы, ранее
+            принимающие "опции поиска", больше так не делают.</p></li>
+        <li>
+            <p>Устарели все динамические методы, кроме <code>find_by_...</code> и
+                <code>find_by_...!</code> устарели. Вот как можно переписать код:</p>
+            <ul>
+                <li>
+                    <code>find_all_by_...</code> может быть переписан с использованием <code>where(...)</code>.
+                </li>
+                <li>
+                    <code>find_last_by_...</code> может быть переписан с использованием <code>where(...).last</code>.
+                </li>
+                <li>
+                    <code>scoped_by_...</code> может быть переписан с использованием <code>where(...)</code>.
+                </li>
+                <li>
+                    <code>find_or_initialize_by_...</code> может быть переписан с использованием
+                    <code>find_or_initialize_by(...)</code>.
+                </li>
+                <li>
+                    <code>find_or_create_by_...</code> может быть переписан с использованием <code>find_or_create_by(...)</code>.
+                </li>
+                <li>
+                    <code>find_or_create_by_...!</code> может быть переписан с использованием <code>find_or_create_by!(...)</code>.
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+</body>
+</html>

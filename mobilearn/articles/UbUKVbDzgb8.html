@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>55. Истечение через большое отверстие</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<p><span>Отверстие считают малым, когда его вертикальные размеры d &lt; 0,1Н. Большим отверстием будем считать такое отверстие, для которого тот же d&gt; 0,1Н.</span>
+</p>
+<p><span>Рассматривая истечение через малое отверстие, практически пренебрегли различием скоростей в разных точках сечения струи. В этом случае поступить так же мы не сможем.</span>
+</p>
+<p><span>Задача та же: определить расход и скорости в сжатом сечении.</span></p>
+<p><span>Поэтому расход определяют следующим способом: выделяют бесконечно малую горизонтальную высоту dz. Таким образом, получается горизонтальная полоса с переменной длиной bz. Тогда, интегрировав по длине, можно найти элементарный расход</span>
+</p>
+<div class="fb2-image"><span><img alt="Гидравлика - i_181.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112202/1333222359/i_181.png"></span>
+</div>
+<div class="fb2-empty-line"> </div>
+<p><span>где Z – переменный напор по высоте отверстия, на такую глубину погружен верх выбранной полосы;</span>
+</p>
+<p><span>μ – коэффициент расхода через отверстие;</span></p>
+<p><span>b<sub>z</sub> – переменная длина (или ширина) полосы.</span></p>
+<p><span>Расход Q (1) можем определить, если μ = const и известна формула b<sub>z</sub>= f(z). В общем случае, расход определяют по формуле</span>
+</p>
+<div class="fb2-image"><span><img alt="Гидравлика - i_182.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112202/1333222359/i_182.png"></span>
+</div>
+<p><span>Если форма отверстия прямоугольная, то bz= b = const, интегрировав (2), получаем:</span>
+</p>
+<div class="fb2-image"><span><img alt="Гидравлика - i_183.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112202/1333222359/i_183.png"></span>
+</div>
+<p><span>где Н<sub>1</sub>, Н<sub>2</sub> – напоры на уровнях соответственно у верхней и у нижней кромок отверстия;</span>
+</p>
+<p><span>Нц – напор над центром отверстия;</span></p>
+<p><span>d – высота прямоугольника.</span></p>
+<p><span>Формула (3) имеет более упрощенный вид:</span></p>
+<div class="fb2-image"><span><img alt="Гидравлика - i_184.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112202/1333222359/i_184.png"></span>
+</div>
+<div class="fb2-empty-line"> </div>
+<p>
+    <span>В случае истечения через круглое отверстие пределами интегрирования в (2) служат Н<sub>1</sub>= Н<sub>ц</sub> – r; Н<sub>2</sub> = Н<sub>ц</sub> + r; Z = Н<sub>ц</sub> – rcosυ; d<sub>z</sub> = ρsinυdυ; b<sub>z</sub> = 2rυsinυ.</span>
+</p>
+<p><span>Избегая математического излишества, приведем конечную формулу:</span></p>
+<div class="fb2-image"><span><img alt="Гидравлика - i_185.png"
+                                  src="wwwTIPSlitmirTIPSme/BookBinary/112202/1333222359/i_185.png"></span>
+</div>
+<div class="fb2-empty-line"> </div>
+<p><span>Как видно из сравнений формул, особой разницы в формулах для расхода нет, только при больших и малых отверстиях коэффициенты расхода разные</span>
+</p>
+</body>
+</html>

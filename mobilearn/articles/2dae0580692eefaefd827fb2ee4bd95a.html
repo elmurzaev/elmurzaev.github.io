@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Процесс инициализации в Rails</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="protsess-initsializatsii-v-rails"> Процесс инициализации в
+        Rails</h2>
+    <p>Это руководство объясняет внутренние процессы инициализации в Rails, начиная с Rails 4. Это
+        достаточно углубленное руководство, оно рекомендовано для продвинутых разработчиков на
+        Rails.</p>
+    <p>После прочтения этого руководства вы узнаете:</p>
+    <ul>
+        <li>Как использовать <code>rails server</code>.
+        </li>
+        <li>График инициализации Rails.
+        </li>
+        <li>Когда различные файлы подключаются в процессе загрузки.
+        </li>
+        <li>Как определен и используется интерфейс Rails::Server.
+        </li>
+    </ul>
+    <p>Это руководство рассмотрит каждый вызов методов, требуемых для загрузки стека Ruby on Rails
+        для нового приложения на Rails 4, объяснив подробно каждую встреченную часть кода. Для целей
+        этого руководства мы сосредоточимся на том, что произойдет при запуске <code>rails
+            server</code> для загрузки вашего приложения.</p>
+    <div class="note"><p>Пути в этом руководстве указаны относительно Rails или приложения Rails,
+        если не оговорено иное.</p></div>
+    <div class="info"><p>Если желаете параллельно чтению просматривать , мы рекомендуем использовать
+        горячую клавишу <code>t</code>, чтобы открыть быстрый поиск файлов на GitHub.</p></div>
+    <h3 class="inside_page_header" id="poehali"> Поехали!</h3>
+    <p>Давайте загрузим и инициализируем приложение. Приложение Rails обычно стартует с помощью
+        запуска <code>rails console</code> или <code>rails server</code>.</p>
+    <h4 class="inside_page_header" id="railties-exe-rails"><code>railties/exe/rails</code>
+    </h4>
+    <p><code>rails</code> в команде <code>rails server</code> является исполняемым файлом ruby в
+        вашем пути загрузки. Этот исполняемый файл содержит следующие строчки:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+version = "&gt;= 0"
+load Gem.bin_path('railties', 'rails', version)
+</pre>
+    </div>
+    <p>Если попытаетесь запустить эту команду в консоли Rails, то увидите, что она загружает <code>railties/exe/rails</code>.
+        Часть файла <code>railties/exe/rails.rb</code> содержит следующий код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require "rails/cli"
+</pre>
+    </div>
+    <p>Файл <code>railties/lib/rails/cli</code>, в свою очередь, вызывает <code>Rails::AppLoader.exec_app</code>.
+    </p>
+    <h4 class="inside_page_header" id="railties-lib-rails-app_loader-rb"><code>railties/lib/rails/app_loader.rb</code>
+    </h4>
+    <p>Основной целью функции <code>exec_app</code> является запуск <code>bin/rails</code> вашего
+        приложения. Если в текущей директории нет <code>bin/rails</code>, она будет переходить на
+        уровень вверх, пока не найдет исполняемый файл <code>bin/rails</code>. Поэтому он может быть
+        вызван с помощью команды <code>rails</code> из любого места внутри вашего приложения.</p>
+    <p>Эквивалентом для <code>rails server</code> является запуск следующей команды:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ exec ruby bin/rails server
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="bin-rails"><code>bin/rails</code>
+    </h4>
+    <p>Этот файл содержит следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+#!/usr/bin/env ruby
+APP_PATH = File.expand_path('../../config/application',  __FILE__)
+require_relative '../config/boot'
+require 'rails/commands'
+</pre>
+    </div>
+    <p>Константа <code>APP_PATH</code> будет использована позже в <code>rails/commands</code>. Файл
+        <code>config/boot</code>, упомянутый тут, это файл <code>config/boot.rb</code> нашего
+        приложения, который ответственен за загрузку Bundler и его настройку.</p>
+    <h4 class="inside_page_header" id="config-boot-rb"><code>config/boot.rb</code>
+    </h4>
+    <p><code>config/boot.rb</code> содержит:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# Set up gems listed in the Gemfile.
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
+require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
+</pre>
+    </div>
+    <p>В стандартном приложении Rails имеется <code>Gemfile</code>, объявляющий все зависимости
+        приложения. <code>config/boot.rb</code> устанавливает <code>ENV['BUNDLE_GEMFILE']</code> как
+        расположение этого файла. Затем, если Gemfile существует, будет затребован <code>bundler/setup</code>.
+        Строка используется Bundler-ом для настройки путей загрузки для зависимостей вашего Gemfile.
+    </p>
+    <p>Стандартное Rails приложение зависит от нескольких гемов, а именно:</p>
+    <ul>
+        <li>actionmailer
+        </li>
+        <li>actionpack
+        </li>
+        <li>actionview
+        </li>
+        <li>activemodel
+        </li>
+        <li>activerecord
+        </li>
+        <li>activesupport
+        </li>
+        <li>activejob
+        </li>
+        <li>arel
+        </li>
+        <li>builder
+        </li>
+        <li>bundler
+        </li>
+        <li>erubis
+        </li>
+        <li>i18n
+        </li>
+        <li>mail
+        </li>
+        <li>mime-types
+        </li>
+        <li>rack
+        </li>
+        <li>rack-cache
+        </li>
+        <li>rack-mount
+        </li>
+        <li>rack-test
+        </li>
+        <li>rails
+        </li>
+        <li>railties
+        </li>
+        <li>rake
+        </li>
+        <li>sqlite3
+        </li>
+        <li>thor
+        </li>
+        <li>tzinfo
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="rails-commands-rb"><code>rails/commands.rb</code>
+    </h4>
+    <p>Как только завершится <code>config/boot.rb</code>, следующим файлом, который будет
+        затребован, является <code>rails/commands</code>, который помогает расширить псевдонимы. В
+        нашем случае, массив <code>ARGV</code> просто содержит <code>server</code>, который будет
+        передан дальше:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+ARGV &lt;&lt; '--help' if ARGV.empty?
+aliases = {
+  "g"  =&gt; "generate",
+  "d"  =&gt; "destroy",
+  "c"  =&gt; "console",
+  "s"  =&gt; "server",
+  "db" =&gt; "dbconsole",
+  "r"  =&gt; "runner"
+}
+command = ARGV.shift
+command = aliases[command] || command
+require 'rails/commands/commands_tasks'
+Rails::CommandsTasks.new(ARGV).run_command!(command)
+</pre>
+    </div>
+    <div class="info"><p>Как видите, пустой список ARGV приведет к показу помощи Rails.</p></div>
+    <p>Если бы мы использовали <code>s</code> вместо <code>server</code>, Rails использовал бы
+        определенные тут псевдонимы <code>aliases</code> для поиска соответствующей команды.</p>
+    <h4 class="inside_page_header" id="rails-commands-command_tasks-rb"><code>rails/commands/command_tasks.rb</code>
+    </h4>
+    <p>Если кто-то напишет неверную команду rails, в ответ <code>run_command</code> выдаст сообщение
+        об ошибке. Если команда правильная, будет вызван метод с тем же именем.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+COMMAND_WHITELIST = %w(plugin generate destroy console server dbconsole application runner new version help)
+def run_command!(command)
+  command = parse_command(command)
+  if COMMAND_WHITELIST.include?(command)
+    send(command)
+  else
+    write_error_message(command)
+  end
+end
+</pre>
+    </div>
+    <p>С помощью команды <code>server</code> Rails далее запустит следующий код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def set_application_directory!
+  Dir.chdir(File.expand_path('../../', APP_PATH)) unless File.exist?(File.expand_path("config.ru"))
+end
+def server
+  set_application_directory!
+  require_command!("server")
+  Rails::Server.new.tap do |server|
+    # We need to require application after the server sets environment,
+    # otherwise the --environment option given to the server won't propagate.
+    require APP_PATH
+    Dir.chdir(Rails.application.root)
+    server.start
+  end
+end
+def require_command!(command)
+  require "rails/commands/#{command}"
+end
+</pre>
+    </div>
+    <p>Этот файл изменит корень директории (путь на две директории выше <code>APP_PATH</code>,
+        указывающего на <code>config/application.rb</code>), но только если не найден файл <code>config.ru</code>.
+        Затем он затребует <code>rails/commands/server</code>, устанавливающий класс <code>Rails::Server</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'fileutils'
+require 'optparse'
+require 'action_dispatch'
+require 'rails'
+module Rails
+  class Server &lt; ::Rack::Server
+</pre>
+    </div>
+    <p><code>fileutils</code> и <code>optparse</code> - это стандартные библиотеки Ruby,
+        представляющие вспомогательные функции для работы с файлами и парсинга опций.</p>
+    <h4 class="inside_page_header" id="actionpack-lib-action_dispatch-rb"><code>actionpack/lib/action_dispatch.rb</code>
+    </h4>
+    <p>Action Dispatch - это компонент маршрутизации фреймворка Rails. Он добавляет такой
+        функционал, как роутинг, сессию и промежуточные программы.</p>
+    <h4 class="inside_page_header" id="rails-commands-server-rb">
+        <code>rails/commands/server.rb</code>
+    </h4>
+    <p>Класс <code>Rails::Server</code> определен в этом файле, как унаследованный от <code>Rack::Server</code>.
+        Когда вызывается <code>Rails::Server.new</code>, вызывается метод <code>initialize</code> в
+        <code>rails/commands/server.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def initialize(*)
+  super
+  set_environment
+end
+</pre>
+    </div>
+    <p>Сперва вызывается <code>super</code>, что вызывает метод <code>initialize</code> у <code>Rack::Server</code>.
+    </p>
+    <h4 class="inside_page_header" id="rack-lib-rack-server-rb"> Rack:
+        <code>lib/rack/server.rb</code>
+    </h4>
+    <p><code>Rack::Server</code> ответственен за представление обычного интерфейса сервера для всех
+        приложений, основанных на Rack, частью которых сейчас является Rails.</p>
+    <p>Метод <code>initialize</code> в <code>Rack::Server</code> просто устанавливает ряд
+        переменных:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def initialize(options = nil)
+  @options = options
+  @app = options[:app] if options &amp;&amp; options[:app]
+end
+</pre>
+    </div>
+    <p>В нашем случае, <code>options</code> будут <code>nil</code>, поэтому в этом методе ничего не
+        происходит.</p>
+    <p>После завершения <code>super</code> в <code>Rack::Server</code>, мы возвращаемся в <code>rails/commands/server.rb</code>.
+        Далее вызывается <code>set_environment</code> в контексте объекта <code>Rails::Server</code>,
+        и этот метод, на первый взгляд, не делает слишком многого:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def set_environment
+  ENV["RAILS_ENV"] ||= options[:environment]
+end
+</pre>
+    </div>
+    <p>Фактически, метод <code>options</code> отсюда делает достаточно много. Этот метод определен в
+        <code>Rack::Server</code> следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def options
+  @options ||= parse_options(ARGV)
+end
+</pre>
+    </div>
+    <p>Далее, <code>parse_options</code> определен следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def parse_options(args)
+  options = default_options
+  # Don't evaluate CGI ISINDEX parameters.
+  # http://www.meb.uni-bonn.de/docs/cgi/cl.html
+  args.clear if ENV.include?("REQUEST_METHOD")
+  options.merge! opt_parser.parse!(args)
+  options[:config] = ::File.expand_path(options[:config])
+  ENV["RACK_ENV"] = options[:environment]
+  options
+end
+</pre>
+    </div>
+    <p>И <code>default_options</code> установлены так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def default_options
+  environment  = ENV['RACK_ENV'] || 'development'
+  default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
+  {
+    :environment =&gt; environment,
+    :pid         =&gt; nil,
+    :Port        =&gt; 9292,
+    :Host        =&gt; default_host,
+    :AccessLog   =&gt; [],
+    :config      =&gt; "config.ru"
+  }
+end
+</pre>
+    </div>
+    <p>Ключа <code>REQUEST_METHOD</code> нет в <code>ENV</code>, поэтому можно пропустить следующую
+        строчку. Последующие строчки сливают опции из <code>opt_parser</code>, который также
+        определен в <code>Rack::Server</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def opt_parser
+  Options.new
+end
+</pre>
+    </div>
+    <p>Класс опций <strong>определен</strong> в <code>Rack::Server</code>, но переопределен в <code>Rails::Server</code>,
+        чтобы он мог принимать различные аргументы. Его метод <code>parse!</code> начинается со
+        следующего:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def parse!(args)
+  args, options = args.dup, {}
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: rails server [mongrel, thin, etc] [options]"
+    opts.on("-p", "--port=port", Integer,
+            "Runs Rails on the specified port.", "Default: 3000") { |v| options[:Port] = v }
+  ...
+</pre>
+    </div>
+    <p>Этот метод установит ключи для <code>options</code>, которые затем будут доступны Rails для
+        определения того, как должен быть запущен его сервер. После того, как
+        <code>initialize</code> будет закончен, мы вернемся обратно в <code>rails/server</code>, где
+        требуется <code>APP_PATH</code> (который был установлен ранее).</p>
+    <h4 class="inside_page_header" id="config-application"><code>config/application</code>
+    </h4>
+    <p>При выполнении <code>require APP_PATH</code> будет загружен
+        <code>config/application.rb</code> (напоминаем, что <code>APP_PATH</code> определен в <code>bin/rails</code>).
+        Этот файл находится в вашем приложении, и вы свободно можете изменять его под свои нужды.
+    </p>
+    <h4 class="inside_page_header" id="rails-server-start"><code>Rails::Server#start</code>
+    </h4>
+    <p>После загрузки <code>config/application</code> вызывается <code>server.start</code>. Этот
+        метод определен следующим образом:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def start
+  print_boot_information
+  trap(:INT) { exit }
+  create_tmp_directories
+  log_to_stdout if options[:log_stdout]
+  super
+  ...
+end
+private
+  def print_boot_information
+    ...
+    puts "=&gt; Run `rails server -h` for more startup options"
+    ...
+    puts "=&gt; Ctrl-C to shutdown server" unless options[:daemonize]
+  end
+  def create_tmp_directories
+    %w(cache pids sockets).each do |dir_to_make|
+      FileUtils.mkdir_p(File.join(Rails.root, 'tmp', dir_to_make))
+    end
+  end
+  def log_to_stdout
+    wrapped_app # touch the app so the logger is set up
+    console = ActiveSupport::Logger.new($stdout)
+    console.formatter = Rails.logger.formatter
+    console.level = Rails.logger.level
+    Rails.logger.extend(ActiveSupport::Logger.broadcast(console))
+  end
+</pre>
+    </div>
+    <p>Это то место, где происходит первый вывод на экран при инициализации Rails. Этот метод
+        создает ловушку (trap) для сигналов <code>INT</code>, поэтому, при нажатии
+        <code>CTRL-C</code>, сервер завершит процесс. Как видим дальше по коду, он создает
+        директории <code>tmp/cache</code>, <code>tmp/pids</code> и <code>tmp/sockets</code>. Затем
+        он вызывает <code>wrapped_app</code>, который ответственен за создание приложения Rack, а
+        затем создает и присваивает экземпляр <code>ActiveSupport::Logger</code>.</p>
+    <p>Метод <code>super</code> вызовет <code>Rack::Server.start</code>, определение которого
+        выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def start &amp;blk
+  if options[:warn]
+    $-w = true
+  end
+  if includes = options[:include]
+    $LOAD_PATH.unshift(*includes)
+  end
+  if library = options[:require]
+    require library
+  end
+  if options[:debug]
+    $DEBUG = true
+    require 'pp'
+    p options[:server]
+    pp wrapped_app
+    pp app
+  end
+  check_pid! if options[:pid]
+  # Touch the wrapped app, so that the config.ru is loaded before
+  # daemonization (i.e. before chdir, etc).
+  wrapped_app
+  daemonize_app if options[:daemonize]
+  write_pid if options[:pid]
+  trap(:INT) do
+    if server.respond_to?(:shutdown)
+      server.shutdown
+    else
+      exit
+    end
+  end
+  server.run wrapped_app, options, &amp;blk
+end
+</pre>
+    </div>
+    <p>Самой интересной частью для приложения Rails является последняя строчка,
+        <code>server.run</code>. Здесь мы снова сталкиваемся с методом <code>wrapped_app</code>, но
+        на этот раз мы собираемся копнуть глубже (несмотря на то, что он уже был запущен ранее, и
+        поэтому сейчас возвратится просто запомненный результат).</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+@wrapped_app ||= build_app app
+</pre>
+    </div>
+    <p>Метод <code>app</code> отсюда определен так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def app
+  @app ||= options[:builder] ? build_app_from_string : build_app_and_options_from_config
+end
+...
+private
+  def build_app_and_options_from_config
+    if !::File.exist? options[:config]
+      abort "configuration #{options[:config]} not found"
+    end
+    app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+    self.options.merge! options
+    app
+  end
+  def build_app_from_string
+    Rack::Builder.new_from_string(self.options[:builder])
+  end
+</pre>
+    </div>
+    <p>Значение по умолчанию <code>options[:config]</code> - это <code>config.ru</code>, содержащий
+        следующее:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+# This file is used by Rack-based servers to start the application.
+require ::File.expand_path('../config/environment',  __FILE__)
+run &lt;%= app_const %&gt;
+</pre>
+    </div>
+    <p>Метод <code>Rack::Builder.parse_file</code> принимает содержимое этого файла
+        <code>config.ru</code> и парсит его, используя следующий код:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+app = new_from_string cfgfile, config
+...
+def self.new_from_string(builder_script, file="(rackup)")
+  eval "Rack::Builder.new {\n" + builder_script + "\n}.to_app",
+    TOPLEVEL_BINDING, file, 0
+end
+</pre>
+    </div>
+    <p>Метод <code>initialize</code> из <code>Rack::Builder</code> принимает блок и выполняет его в
+        рамках экземпляра <code>Rack::Builder</code>. Это то место, в котором происходит большая
+        часть процесса инициализации Rails. Сперва запускается строчка <code>require</code> для
+        <code>config/environment.rb</code> в <code>config.ru</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require ::File.expand_path('../config/environment',  __FILE__)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-environment-rb"><code>config/environment.rb</code>
+    </h4>
+    <p>Этот файл является общим файлом, требуемым и <code>config.ru</code> (<code>rails
+        server</code>), и Passenger. Тут встречаются два способа, как можно запустить сервер; все,
+        что было до этой точки - была настройка Rack и Rails.</p>
+    <p>Этот файл начинается с затребования <code>config/application.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require File.expand_path('../application', __FILE__)
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="config-application-rb"><code>config/application.rb</code>
+    </h4>
+    <p>Этот файл требует <code>config/boot.rb</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require File.expand_path('../boot', __FILE__)
+</pre>
+    </div>
+    <p>Но только если он не был затребован ранее, что уже было сделано в случае с <code>rails
+        server</code>, но <strong>не делалось</strong> в случае с Passenger.</p>
+    <p>Дальше начинается веселье!</p>
+    <h3 class="inside_page_header" id="zagruzka-rails"> Загрузка Rails</h3>
+    <p>Следующей строчкой в <code>config/application.rb</code> является:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require 'rails/all'
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="railties-lib-rails-all-rb">
+        <code>railties/lib/rails/all.rb</code>
+    </h4>
+    <p>Этот файл ответственен за подключение всех отдельных фреймворков Rails:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+require "rails"
+%w(
+  active_record
+  action_controller
+  action_view
+  action_mailer
+  active_job
+  rails/test_unit
+  sprockets
+).each do |framework|
+  begin
+    require "#{framework}/railtie"
+  rescue LoadError
+  end
+end
+</pre>
+    </div>
+    <p>Это то место, где загружаются все фреймворки Rails и, поэтому, становятся доступны для
+        приложения. Мы не будем вдаваться в подробности, что именно происходит внутри каждого
+        фреймворка, но вы можете попробовать исследовать их самостоятельно.</p>
+    <p>Сейчас просто держите в памяти, что весь обычный функционал, такой как Rails engines, I18n и
+        конфигурация Rails, определен тут.</p>
+    <h4 class="inside_page_header" id="vozvraschaemsya-v-config-environment-rb"> Возвращаемся в
+        <code>config/environment.rb</code>
+    </h4>
+    <p>Оставшаяся часть <code>config/application.rb</code> определяет конфигурацию для <code>Rails::Application</code>,
+        которая будет единожды использована после того, как приложение полностью инициализируется.
+        Когда <code>config/application.rb</code> закончит загружать Rails и определит пространство
+        имен приложения, вы вернетесь в <code>config/environment.rb</code>. Здесь инициализируется
+        приложение с помощью <code>Rails.application.initialize!</code>, который определен в <code>rails/application.rb</code>
+    </p>
+    <h4 class="inside_page_header" id="railties-lib-rails-application-rb"><code>railties/lib/rails/application.rb</code>
+    </h4>
+    <p>Метод <code>initialize!</code> выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def initialize!(group=:default) #:nodoc:
+  raise "Application has been already initialized." if @initialized
+  run_initializers(group, self)
+  @initialized = true
+  self
+end
+</pre>
+    </div>
+    <p>Как видите, инициализировать приложение можно лишь единожды. Инициализаторы запускаются с
+        помощью метода <code>run_initializers</code>, который определен в <code>railties/lib/rails/initializable.rb</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def run_initializers(group=:default, *args)
+  return if instance_variable_defined?(:@ran)
+  initializers.tsort_each do |initializer|
+    initializer.run(*args) if initializer.belongs_to?(group)
+  end
+  @ran = true
+end
+</pre>
+    </div>
+    <p>Код <code>run_initializers</code> сам по себе является сложным. Тут Rails проходит всех
+        предков класса, ищет тех, кто отвечает на метод <code>initializers</code>. Затем он
+        сортирует предков по имени и запускает. Например, класс <code>Engine</code> делает
+        доступными все engine, предоставляя в нем метод <code>initializers</code>.</p>
+    <p>Класс <code>Rails::Application</code>, как определено в <code>railties/lib/rails/application.rb</code>,
+        определяет инициализаторы <code>bootstrap</code>, <code>railtie</code> и
+        <code>finisher</code>. Инициализаторы <code>bootstrap</code> подготавливает приложение
+        (такие как инициализатор логгера), в то время как инициализаторы <code>finisher</code>
+        (такие как создание стэка промежуточных программ) запускаются последними. Инициализаторы
+        <code>railtie</code> – это инициализаторы, которые определены самим
+        <code>Rails::Application</code> и запускаются между <code>bootstrap</code> и
+        <code>finisher</code>.</p>
+    <p>После того, как это закончится, мы вернемся в <code>Rack::Server</code>.</p>
+    <h4 class="inside_page_header" id="rack-lib-rack-server-rb"> Rack: lib/rack/server.rb</h4>
+    <p>В прошлый раз мы ушли отсюда, когда был вызван метод <code>app</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def app
+  @app ||= options[:builder] ? build_app_from_string : build_app_and_options_from_config
+end
+...
+private
+  def build_app_and_options_from_config
+    if !::File.exist? options[:config]
+      abort "configuration #{options[:config]} not found"
+    end
+    app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+    self.options.merge! options
+    app
+  end
+  def build_app_from_string
+    Rack::Builder.new_from_string(self.options[:builder])
+  end
+</pre>
+    </div>
+    <p>В этом месте <code>app</code> - это само приложение Rails (промежуточная программа,
+        middleware), и дальше происходит то, что Rack вызывает все представленные промежуточные
+        программы:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+def build_app(app)
+  middleware[options[:environment]].reverse_each do |middleware|
+    middleware = middleware.call(self) if middleware.respond_to?(:call)
+    next unless middleware
+    klass = middleware.shift
+    app = klass.new(app, *middleware)
+  end
+  app
+end
+</pre>
+    </div>
+    <p>Помните, что <code>build_app</code> был вызван (из <code>wrapped_app</code>) в последней
+        строчке <code>Server#start</code>? Вот как она выглядела:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+server.run wrapped_app, options, &amp;blk
+</pre>
+    </div>
+    <p>С этого момента реализация <code>server.run</code> будет зависеть от используемого вами
+        сервера. Например, при использовании Puma вот как выглядит метод <code>run</code>:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+...
+DEFAULT_OPTIONS = {
+  :Host =&gt; '0.0.0.0',
+  :Port =&gt; 8080,
+  :Threads =&gt; '0:16',
+  :Verbose =&gt; false
+}
+def self.run(app, options = {})
+  options  = DEFAULT_OPTIONS.merge(options)
+  if options[:Verbose]
+    app = Rack::CommonLogger.new(app, STDOUT)
+  end
+  if options[:environment]
+    ENV['RACK_ENV'] = options[:environment].to_s
+  end
+  server   = ::Puma::Server.new(app)
+  min, max = options[:Threads].split(':', 2)
+  puts "Puma #{::Puma::Const::PUMA_VERSION} starting..."
+  puts "* Min threads: #{min}, max threads: #{max}"
+  puts "* Environment: #{ENV['RACK_ENV']}"
+  puts "* Listening on tcp://#{options[:Host]}:#{options[:Port]}"
+  server.add_tcp_listener options[:Host], options[:Port]
+  server.min_threads = min
+  server.max_threads = max
+  yield server if block_given?
+  begin
+    server.run.join
+  rescue Interrupt
+    puts "* Gracefully stopping, waiting for requests to finish"
+    server.stop(true)
+    puts "* Goodbye!"
+  end
+end
+</pre>
+    </div>
+    <p>Мы не будем погружаться в саму конфигурацию сервера, но это последняя часть нашего
+        путешествия в процесс инициализации Rails.</p>
+    <p>Надеемся, что этот поверхностный обзор помог вам понять, когда и как будет выполнен ваш код,
+        и в целом стать более хорошим разработчиком на Rails. Если вы хотите узнать больше, лучшим
+        источником для дальнейшего изучения будет являться сам исходный код Rails.</p>
+
+</body>
+</html>

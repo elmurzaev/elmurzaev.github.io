@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Лекция 14. Пакет java.util</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="left">
+    <p></p>
+    <p></p>
+    <center><h2>Лекция 14. Пакет java.util</h2></center>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Эта лекция посвящена пакету java.util, в котором содержится множество вспомогательных классов
+        и интерфейсов. Они настолько удобны, что прак­тически любая программа
+        использует эту библиотеку. Центральную часть в изложении занимает тема
+        контейнеров, или коллекций,— классов,
+        хранящих упорядоченные ссылки на ряд объектов. Они были существенно
+        переработаны в ходе создания версии Java2. Также рассматриваются классы для работы с датой,
+        для
+        генерации случайных чисел, обеспечения поддержки многих наци­ональных языков в
+        приложении и др.
+    </p>
+    <p>Работа
+        с датами и временем Класс Date
+    </p>
+    <p>Класс Date изначально предоставлял набор функций для работы с датой — для получения
+        текущего года, месяца и т.д. Однако сейчас все пе­речисленные методы не
+        рекомендованы к использованию и практически всю функциональность для этого
+        предоставляет класс Calendar.
+    </p>
+    <p>Существует несколько конструкторов класса Date, однако рекомен­довано
+        к использованию два:
+    </p>
+    <p>
+    </p>
+    <p>Date() и Date(long
+        date)
+    </p>
+    <p>
+    </p>
+    <p>Второй конструктор принимает в качестве параметра значение типа long, указывающее на
+        количество миллисекунд, прошедших с I января 1970 г., 00:00:00 по Гринвичу.
+        Первый конструктор создает экземпляр, со­ответствующий текущему моменту.
+        Фактически это эквивалентно второму варианту new Date(System.currentTimeMillis()). Можно уже
+        после созда­ния экземпляра класса Date использовать метод setTime(long time) для того, чтобы
+        задать нужное время.
+    </p>
+    <p>Для сравнения дат служат методы after(Date date) и before(Date date), которые
+        возвращают булевское значение, в зависимости от того, выпол­нено условие или
+        нет. Метод compareTo(Date anotherDate) возвращает значение типа int, которое равно -1,
+        если дата меньше сравниваемой, 1 — если больше и 0 - если даты равны. Метод toString()
+        возвращает строко­вое описание даты. Однако для более понятного и
+        удобного преобразова­ния даты в текст рекомендуется пользоваться классом SimpleDateFormat,
+        определенным в пакете java.text.
+    </p>
+    <p>Классы Calendar и GregorianCalendar
+    </p>
+    <p>Более развитые средства для работы с датами представляет класс Calendar. Calendar является
+        абстрактным классом. Для различных плат­форм реализуются
+        конкретные подклассы календаря. На данный момент существует реализация
+        Григорианского календаря - GregorianCalendar. Экземпляр этого класса получается путем вызова
+        статического метода getlnstance(), который возвращает экземпляр класса GregorianCalendar
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p> Подклассы класса Calendar должны
+        интерпретировать объект Date по-разному. В
+        будущем предполагается реализовать также лунный календарь, используемый в
+        некоторых странах.
+    </p>
+    <p>Calendar обеспечивает набор методов, позволяющих манипулировать различными
+        "частями" даты, т.е. получать и устанавливать дни, месяцы, недели и
+        т.д.
+    </p>
+    <p>Если при задании параметров календаря некоторые параметры упущены, то
+        для них будут использованы значения по умолчанию для начала отсчета, т.е.
+    </p>
+    <p>
+    </p>
+    <p>YEAR = 1970, MONTH
+        = JANUARY DATE = 1 и т.д.
+    </p>
+    <p>
+    </p>
+    <p>Для считывания и установки различных "частей" даты используются методы get(int
+        filed), set(int filed, int value), add(int field, int amount), roll(int field, inr
+        amount), переменная типа int с именем filed указывает на номер поля, с которым нужно
+        произвести операцию. Для удобства все эти поля определены в Calendar как статические
+        константы типа int.
+    </p>
+    <p>Рассмотрим подробнее порядок выполнения перечисленных методов.
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Метод setfint field,int value).
+    </p>
+    <p>Как уже говорилось, данный метод производит установку какого-либо поля
+        даты. На самом деле после вызова этого метода немедленного пересчета даты не
+        производится. Пересчет даты будет осуществлен толь­ко после вызова методов get(), getTime()
+        или getTimelnMillis(). Таким об­разом, последовательная установка нескольких полей не
+        вызовет ненуж­ных вычислений. Помимо этого, появляется еще один интересный
+        эффект. Рассмотрим следующий пример. Предположим, что дата установлена на
+        последний день августа. Необходимо перевести ее на последний день сен­тября.
+        Если бы внутреннее представление даты изменялось после вызова метода set, то при
+        последовательной установке полей мы получили бы вот такой эффект:
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) {
+    </p>
+    <p>SimpleDateFormat sdf = new SimpleDateFormat("yyyy
+    </p>
+    <p>MMMM dd
+        HH:mm:ss"); Calendar cal = Calendar.getlnstance();
+        cal.set(Calendar.YEAR,2002); cal.set(Calendar.MONTH,Calendar.AUGUST);
+        cal.set(Calendar.DAY_OF_MONTH,31);
+        System.out.printlnf Initialy set date:  " +
+    </p>
+    <p>sdf.format(cal.getTime()));
+        cal.set(Calendar.MONTH,Calendar.SEPTEMBER); System.out.println(" Date with
+        month changed : " +
+    </p>
+    <p>sdf.format(cal.getTime())); cal. set( Calendar.
+        DAY_OF_MONTH, 30); System.out.println(" Date with day changed : " +
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>sdf.format(cal.getTime()));
+    </p>
+    <p>
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Initialy set
+        date:   2002 August 31 22:57:47
+    </p>
+    <p>Date with month
+        changed : 2002 October 01 22:57:47
+    </p>
+    <p>Date with day
+        changed : 2002 October 30 22:57:47
+    </p>
+    <p>Как мы видим, в данном примере при изменении месяца
+        день меся­ца остался неизменным и было унаследовано его предыдущее значение. Но
+        поскольку в сентябре 30 дней, дата автоматически была переведена на 1 октября,
+        и когда было бы установлено 30 число, оно относилось бы уже к октябрю. В
+        следующем примере считывание даты не производится, со­ответственно, ее
+        вычисление не выполняется до тех пор, пока все поля не Установлены:
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) {
+    </p>
+    <p>SimpleDateFormat sdf = new
+        SimpleDateFormat("yyyy MMMM dd HH:mm:ss");
+    </p>
+    <p>Calendar cai = Calendar.getlnstance();
+    </p>
+    <p>cai.set(Calendar.YEAR,2002);
+    </p>
+    <p>cai. set(Calendar. MONTH, Calendar. AUGUST);
+    </p>
+    <p>cal.set(Calendar.DAY_OF_MONTH,31);
+    </p>
+    <p>System.out.println(" Initialy set date:      " +
+    </p>
+    <p>sdf.format(cal.getTime()));
+        cal.set(Calendar.MONTH,Calendar.SEPTEMBER); cal.set(Calendar.DAY_OF_MONTH,30);
+        System.out.println(" Date with day and
+        month changed :
+    </p>
+    <p>+ sdf.format(cal.getTime()));
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <table cellpadding="0" cellspacing="0" height="38" hspace="0" vspace="0" width="191">
+        <tr>
+            <td align="left" height="38" valign="top">
+                <p>2002 August 31 23:03:51 2002 September 30 23:03:51
+                </p>
+            </td>
+        </tr>
+    </table>
+    <p>Результатом будет: Initialy set date:
+    </p>
+    <p>Date with day
+        and month changed:
+    </p>
+    <p>
+    </p>
+    <p>Метод add (int field, int delta).
+    </p>
+    <p>Добавляет некоторое смещение к существующей величине поля. В принципе,
+        то же самое можно сделать с помощью set(f, get(f) + delta).
+    </p>
+    <p>В случае использования метода add следует помнить о двух правилах:
+    </p>
+    <p>1. Если величина поля изменения выходит за диапазон возможных значений
+        данного поля, то производится деление по модулю дан­ной величины, частное
+        суммируется со следующим по старшинст­ву полем.
+    </p>
+    <p>2.
+        Если изменяется одно из
+        полей, причем, после изменения млад­шее по отношению к изменяемому полю
+        принимает некоррект­ное значение, то оно изменяется на то, которое максимально
+        близко к "старому".
+    </p>
+    <p>
+    </p>
+    <p>public class Test {
+    </p>
+    <p>public Testo { }
+    </p>
+    <p>public static void main(String[] args) {
+    </p>
+    <p>SimpleDateFormat sdf = new SimpleDateFormat("yyyy
+    </p>
+    <p>MMMMdd HH:mm:ss"); Calendar cal = Calendar.getlnstance();
+    </p>
+    <p>cal.set(Calendar.YEAR,2002);
+    </p>
+    <p>cal.set(Calendar.MONTH.Calendar.AUGUST);
+    </p>
+    <p>cal.set(Calendar.DAY_OF_MONTH,31);
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>cal.set(Calendar.HOUR_OF_DAY19);
+    </p>
+    <p>cal.set(Calendar.MINUTE,30);
+    </p>
+    <p>cal.set(Calendar.SECOND,00);
+    </p>
+    <p>System.out.printlnfCurrent date:" + sdf.format(cal.getTime()));
+        cal.add(Calendar.SECOND,75);
+    </p>
+    <p>System. out.printlnfCurrent date:" + sdf.format(cal.getTime()));
+        cal.add(Calendar.MONTH, 1);
+    </p>
+    <p>System.
+        out.printlnfCurrent date:" + sdf.format(cal.getTime()));
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>
+    </p>
+    <p>Current date: 2002 August 31 19:30:00 Rule 1: 2002 August
+        31 19:31:15 Rule 2: 2002 September 30 19:31:15
+    </p>
+    <p>
+    </p>
+    <p>Метод rollfint field,int delta).
+    </p>
+    <p>Добавляет некоторое смещение к существующей величине поля и не
+        производит изменения старших полей. Рассмотрим приведенный ранее пример, но с
+        использованием метода roll.
+    </p>
+    <p>
+    </p>
+    <p>public class Test {
+    </p>
+    <p>public Test() { }
+    </p>
+    <p>public static void main(String[] args) {
+    </p>
+    <p>SimpleDateFormat
+        sdf = new SimpleDateFormatfyyyy
+    </p>
+    <p>MMMM dd HH:mm:ss"); Calendar cal = Calendar.getlnstance();
+        cal.set(Calendar.YEAR,2002); cal.set(Calendar.MONTH,Calendar.AUGUST);
+        cal.set(Calendar.DAY_OF_MONTH,31); cal.set(Calendar.HOUR_OF_DAY19);
+        cal.set(Calendar.MINUTE,30); cal.set(Calendar.SECOND,00);
+    </p>
+    <p>System.out.printlnfCurrent date:" + sdf.format(cal.getTime()));
+        cal.roll(Calendar.SECOND,75);
+    </p>
+    <p>System.out.println("Rule 1: " + sdf.format(cal.getTЎme())); cal. roll(Calendar. MONTH, 1 );
+    </p>
+    <p>System, out. printlnfRule 2: " + sdf.format(cal.getTime()));
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>
+    </p>
+    <p>Current date: 2002 August 31 19:30:00 Rule 1: 2002 August
+        31 19:30:15 Rule 2: 2002 September 30 19:30:15
+    </p>
+    <p>
+    </p>
+    <p>Как видно из результатов работы приведенного выше кода, действие пра­вила
+        1 изменилось по сравнению с методом add, а правило 2
+        действует так же.
+    </p>
+    <p>
+    </p>
+    <p>Класс TimeZone
+    </p>
+    <p>Класс TimeZone предназначен для
+        совместного использования с классами Calendar и DateFormat. Класс абстрактный, поэтому от
+        него порождать объекты нельзя. Вместо
+        этого определен статический метод getDefault(). который возвращает экземпляр наследника
+        TimeZone с на­стройками, взятыми из операционной системы, под управлением кото­рой
+        работает JVM. Для того, чтобы указать произвольные параметры, можно воспользоваться
+        статическим методом getTimeZone(String ID), в качестве параметра которому передается
+        наименование конкретного вре­менного
+        пояса, для которого необходимо получить объект TimeZone. На­бор полей,
+        определяющих возможный набор параметров для getTimeZone, нигде явно не описывается
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p> Вместо этого определен стати­ческий метод Stringf] getAvailablelds(), который возвращает
+        возможные значения для параметра getTimeZone. Так можно определить набор воз­можных
+        параметров для конкретного
+        временного пояса (рассчитывается относительно Гринвича) Stringf] getAvailablelds(int
+        offset).
+    </p>
+    <p>Рассмотрим пример, в котором на консоль последовательно выводятся:
+    </p>
+    <p>•
+        временная зона по
+        умолчанию;
+    </p>
+    <p>•
+        список всех возможных
+        временных зон;
+    </p>
+    <p>•
+        список временных зон,
+        которые совпадают с текущей временной зоной.
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static
+        void main(String[] args) {
+    </p>
+    <p>Test test = new
+        Test() ;
+    </p>
+    <p>TimeZone tz = TimeZone.getDefault();
+    </p>
+    <p>int rawOffset = tz.getRawOffset();
+    </p>
+    <p>System.out.println("Current
+        TimeZone" + tz.getDisplayNameO + tz.getlD()
+        + "\n\n");
+    </p>
+    <p>// Dispaly
+        all available TimeZones
+    </p>
+    <p>System.out.println("AII Available TimeZones
+        \n");
+    </p>
+    <p>String[] idArr = tz.getAvailablelDs();
+    </p>
+    <p>for(int cnt=0;cnt &lt; idArr.length;cnt++){
+    </p>
+    <p>tz = TimeZone.getTimeZone(idArr[cnt]);
+    </p>
+    <p>System.out.println(test.padr(tz.getDisplayName()
+        + tz.getlD(),64) + " raw offset=" + tz.getRawOffset()
+        + ";hour offset=(" + tz.getRawOffset()/
+        (1000 * 60 * 60 )
+        + ")");
+    </p>
+    <p>}
+    </p>
+    <p>// Dispaly all available TimeZones same as for Moscow System.out.println("\n\n TimeZones same
+        as for Moscow \n"); idArr = tz.getAvailablelDs(rawOffset); for(int cnt=0;cnt &lt;
+        idArr.length;cnt++){ tz = TimeZone.getTimeZone(idArr[cnt]);
+        System.out.println(test.padr(tz.getDisplayName()+ tz.getlD(),64) + " raw offsets" +
+        tz.getRawOffset() + ";hour offset=(" + tz.getRawOffset()/ (1000 * 60 * 60 ) + ")");
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>String padr(String str,int len){ if(len - str.lengthO
+        &gt; 0){
+    </p>
+    <p>char[] buf = new
+        char[len - str.length()];
+    </p>
+    <p>Arrays.fill(buf,' ');
+    </p>
+    <p>return str + new
+        String(buf); }else{
+    </p>
+    <p>return str.substring(0,len);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Current TimeZone Moscow Standard TimeEurope/Moscow
+        TimeZones same as for Moscow
+    </p>
+    <p>Eastern
+        African TimeAfrica/Addis_Aba raw offset=10800000;hour offset=(3) Eastern
+        African TimeAfrica/Asmera raw offset=10800000;hour offset=(3)
+    </p>
+    <p>Eastern African TimeAfrica/Dar_es_Sa raw offset^ 10800000;hour
+        offset=(3) Eastern African TimeAfnca/Djibouti raw offset=10800000
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p>hour
+        offset=(3) Eastern African TimeAfrica/Kampala raw offset=10800000;hour
+        offset=(3) Eastern African TimeAfrica/Khartoum raw offset=10800000;hour
+        offset=(3) Eastern African TimeAfrica/Mogadishu raw offset=10800000;hour
+        offset=(3) Eastern African TimeAfrica/Nairobi raw offset=10800000;hour
+        offset=(3) Arabia Standard TimeAsia/Aden raw offset=10800000;hour offset=(3)
+        Arabia Standard TimeAsia/Baghdad raw offset=10800000;hour offset=(3) Arabia
+        Standard TimeAsia/Bahrain raw offset=10800000;hour offset=(3) Arabia Standard
+        TimeAsia/Kuwait raw offset=10800000;hour offset=(3) Arabia Standard
+        TimeAsia/Qatar raw offset=10800000;hour offset=(3) Arabia Standard
+        TimeAsia/Riyadh raw offset= 10800000;hour offset=(3) Eastern African TimeEAT
+        raw offset=10800000;hour offset=(3) Moscow Standard TimeEurope/Moscow raw
+        offset=10800000;hour offset=(3) Eastern African Timelndian/Antananar raw
+        offset=10800000;hour offset=(3) Eastern African Timelndian/Comoro raw
+        offset=10800000;hour offset=(3) Eastern African Timelndian/Mayotte raw
+        offset=10800000;hour offset=(3)
+    </p>
+    <p>
+    </p>
+    <p>Класс SimpleTimeZone
+    </p>
+    <p>Класс SimpleTimeZone, как потомок TimeZone, реализует его абст­рактные методы и предназначен
+        для применения в
+        настройках, использу­ющих Григорианский календарь. В большинстве случаев нет
+        необходимо­сти создавать экземпляр данного класса с помощью конструктора. Вмес­то
+        этого лучше использовать статические методы, которые возвращают тип TimeZone, рассмотренные
+        в
+        предыдущем параграфе. Единственная, пожалуй, причина для использования
+        конструктора - необходимость за­дания нестандартных правил перехода на зимнее и
+        летнее время.
+    </p>
+    <p>В классе SimpleTimeZone определено три
+        конструктора. Рассмотрим наиболее полный с точки зрения функциональности
+        вариант, который, помимо временной зоны, задает летнее и зимнее время.
+    </p>
+    <p>public SimpleTimeZone(int rawOffset, String
+        ID, int startMonth, int startDay, int startDayOfWeek, int startTime, int
+        endMonth, int endDay, int endDayOfWeek, int endTime)
+    </p>
+    <p>rawOffset -
+        временное смещение относительно гринвича; Ю — идентификатор временной зоны (см.
+        пред.параграф); 8Тх111Мопт.г) - месяц перехода на
+        летнее время; 51аг10ау - день месяца перехода на летнее время*; 51агЮауОг\Л/еек - день
+        недели перехода на летнее время*; этагШте - время перехода
+        на летнее время (указывается в милли­секундах);
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>endMonth - месяц
+        окончания действия летнего времени; endDay - день окончания действия летнего
+        времени*; endDayGtWeek - день недели окончания действия летнего времени*;
+        endTime - время окончания действия летнего времени (указывается в
+        миллисекундах).
+    </p>
+    <p>Перевод часов на зимний и летний вариант исчисления времени оп­ределяется
+        специальным правительственным указом. Обычно переход на летнее время происходит
+        в 2 часа в последнее воскресенье марта, а переход на зимнее время - в 3 часа в
+        последнее воскресенье октября.
+    </p>
+    <p>Алгоритм расчета
+        таков:
+    </p>
+    <p>• если з1агЮау=1 и установлен день недели, то будет вычисляться первый
+        день недели ЭТ^ОауОАЛ/еек месяца зт.а11МопМ (например, первое воскресенье);
+    </p>
+    <p>• если 8т.аг10ау=-1 и установлен день недели, то будет вычисляться
+        последний день недели этагЮауОАЛ/еек месяца этагНМопШ (напри­мер, последнее
+        воскресенье);
+    </p>
+    <p>• если день недели зт.аг10ауОг\Л/еек установлен в 0, то будет вычис­ляться
+        число эт^Оау конкретного месяца startMonth;
+    </p>
+    <p>• для того, чтобы установить день недели после конкретного числа,
+        специфицируется отрицательное значение дня недели. Например, чтобы указать
+        первый понедельник после 23 февраля, использует­ся вот такой набор:
+    </p>
+    <p>startDayOfWeek=-MONDAY, зт.агт.Моп^РЕВЯиАРгт', эт.агЮау=23
+    </p>
+    <p>•   для того, чтобы указать последний день недели перед каким-либо числом,
+        указывается отрицательное значение этого числа и отри­цательное значение дня
+        недели. Например, для того, чтобы ука­зать последнюю субботу перед 23 февраля,
+        необходимо задать та­кой набор параметров:
+    </p>
+    <p>э1аг10ауОАЛ/еек=-5АТ№ОАт; startMonth=FEBRUARY йагтОау=-23;
+    </p>
+    <p>•   все вышеперечисленное относится также и к окончанию действия летнего
+        времени.
+    </p>
+    <p>Рассмотрим пример
+        получения текущей временной зоны с заданием Перехода на зимнее и летнее время
+        для России по умолчанию.
+    </p>
+    <p>public class Test { public Test()
+        { }
+    </p>
+    <p>public static ve-id main(String[] args) { Test
+        test = new Test() ;
+    </p>
+    <p>SimpleTimeZone stz = new
+        SimpleTimeZone( TimeZone.getDefault().getRawOffset()
+        ,TimeZone.getDefault().getlD() .Calendar.MARCH ,-1
+    </p>
+    <p>.Calendar.SUNDAY ,test.getTime(2,0,0,0) .Calendar.OCTOBER
+        ,-1
+    </p>
+    <p>,Calendar.SUNDAY ,test.getTime(3,0,0,0)
+    </p>
+    <p>);
+    </p>
+    <p>System.out.println(stz.toString()); }
+    </p>
+    <p>int getTime(int hour.int minjnt secjnt ms){
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>return hour * 3600000 + min * 60000
+        + sec * 1000 + ms;
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>java.util.SimpleTimeZone[id=Europe/Moscow,offset=10800000,dst
+        Savings=3600000,useDaylight=true,startYear=0,startMode=2,start
+        Month=2,startDay=-1 ,startDayOfWeek=1 ,startTime=7200000,
+        startTimeMode=0,endMode=2,endMonth=9,endDay=-1, endDayOfWeek=1,endTime=10800000,
+        endTimeMode=0]
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс Observer и класс Observable
+    </p>
+    <p>Интерфейс Observable определяет всего один метол-update (Observable о, Object arg), который
+        вызывается, когда обозрева­емый объект изменяется.
+    </p>
+    <p>Класс Observer предназначен для поддержки обозреваемого объекта в парадигме MVC
+        (model-view-controller), которая, как и другие проектные решения и шаблоны, описана в
+        специальной
+        литературе. Этот класс до-1" жен быть унаследован, если
+        возникает необходимость в том, чтобы отеле живать состояние какого-либо
+        объекта. Обозреваемый объект моЖеТ цметь несколько обозревателей.
+        Соответственно, они должны реализовать интерфейс Observable.
+    </p>
+    <p>После того, как в состоянии обозреваемого объекта что-то меняется, необходимо
+        вызвать метод notifyObservers, который, в свою очередь, вы­зывает методы update у каждого
+        обозревателя.
+    </p>
+    <p>Порядок, в котором вызываются методы update обозревателей, за­ранее не определен. Реализация
+        по умолчанию
+        подразумевает их вызов в порядке регистрации. Регистрация осуществляется с
+        помощью метода addObserver(Observer о). Удаление
+        обозревателя из списка выполняется с помощью deleteObserver(Observer о). Перед вызовом
+        notifyObservers необходимо вызвать
+        метод setChanged, который устанавливает признак того, что обозреваемый объект был
+        изменен.
+    </p>
+    <p>Рассмотрим пример организации взаимодействия классов:
+    </p>
+    <p>
+    </p>
+    <p>public class TestObservable extends java.util.Observable
+        { private String name = ""; public TestObservable(String name) { this.name
+        = name;
+    </p>
+    <p>}
+    </p>
+    <p>public void modifyO { setChanged();
+    </p>
+    <p>}
+    </p>
+    <p>public String getName() { return name;
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public class TestObserver implements java.util.Observer
+        { private String name = "";
+    </p>
+    <p>public TestObserver(String name) { this.name
+        = name;
+    </p>
+    <p>}
+    </p>
+    <p>public void updateQava.util.Observable
+        o,Object arg) { String str = "Called update of" + name; str += "
+        from " + ((TestObservable)o).getName(); str += " with argument"
+        + (String)arg; System.out.println(str);
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>}
+    </p>
+    <p>Курс
+    </p>
+    <p>секция
+    </p>
+    <p>
+        14                                                                                                           
+        Пакет
+        java.util
+    </p>
+    <p>
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test();
+    </p>
+    <p>TestObservable to = newTestObservable("Observable");
+    </p>
+    <p>TestObserver o1 = newTestObserver("Observer 1");
+    </p>
+    <p>TestObserver o2 = newTestObserver("Observer 2");
+    </p>
+    <p>to.addObserver(o1);
+    </p>
+    <p>to.addObserver(o2);
+    </p>
+    <p>to.modify();
+    </p>
+    <p>to.notifyObservers("Notify argument");
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>В результате работы на консоль будет выведено:
+    </p>
+    <p>
+    </p>
+    <p>Called update of Observer 2 from Observable with argument
+        Notify argument
+    </p>
+    <p>Called update of Observer 1 from Observable with
+        argument Notify argument
+    </p>
+    <p>
+    </p>
+    <p>На практике использовать Observer не всегда удобно,
+        так как в Java отсутствует
+        множественное наследование и Observer необходимо насле­довать
+        в самом начале построения иерархии классов. Как вариант, можно предложить
+        определить интерфейс, задающий функциональность, сход­ную с Observer, и реализовать его
+        в подходящем классе.
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Коллекции
+    </p>
+    <p>Зачастую в программе работа идет не с одним объектом, а с целой группой
+        более или менее однотипных экземпляров (например, автопарк организации). Проще
+        всего сделать это с помощью массивов. Однако, не­смотря на то, что это
+        достаточно эффективное решение для многих случа­ев, оно имеет некоторые
+        ограничения. Так, обращаться к элементу массива можно только по его номеру
+        (индексу). Также необходимо заранее задать длину массива и больше ее не менять.
+    </p>
+    <p>Массивы существовали в Java изначально. Кроме
+        того, было опредс лено два класса для организации более эффективной работы с
+        наборам11 объектов: Hashtable и Vector. В JDK 1.2 набор классов, поддерживаюши* работу с
+        коллекциями, был существенно
+        расширен.
+    </p>
+    <p>Существует несколько различных типов классов-коллекций. Все 0ни
+        разрабатывались, по возможности, в соответствии с единой логикой Л
+        определенными интерфейсами и там, где это возможно, работа с ними
+        унифицирована. Однако все коллекции отличаются внутренними меха­низмами
+        хранения, скоростью доступа к элементам, потребляемой памя­тью и другими
+        деталями. Например, в некоторых коллекциях объекты (также называемые элементами
+        коллекций), могут быть упорядочены, в некоторых - нет. В некоторых типах
+        коллекций допускается дублирова­ние ссылок на объект, в некоторых — нет. Далее
+        мы рассмотрим каждый из классов-коллекций
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>Классы, обеспечивающие манипулирование коллекциями объектов, объявлены в
+        пакете java.util.
+    </p>
+    <p>
+    </p>
+    <p>Интерфейсы
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс Collection
+    </p>
+    <p>Данный интерфейс является корнем всей иерархии классов-коллек­ций. Он
+        определяет базовую функциональность любой коллекции — на­бор методов, которые
+        позволяют добавлять, удалять, выбирать элементы коллекции. Классы, которые
+        реализуют интерфейс Collection, могут со­держать дубликаты и пустые (null) значения.
+    </p>
+    <p>AbstractCollection, как абстрактный класс, служит основой для со­здания конкретных классов
+        коллекций и содержит реализацию некото­рых методов, определенных в интерфейсе Collection.
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс Set
+    </p>
+    <p>Классы, которые реализуют этот интерфейс, не допускают наличия
+        Дубликатов. В коллекции этого типа разрешено наличие только одной ссылки типа null.
+        Интерфейс Set расширяет интерфейс Collection, та­ким образом, любой класс, имплементирующий
+        Set, реализует все ме­тоды,
+        определенные в Collection. Любой объект, добавляемый в Set, Должен
+        реализовать метод equals, чтобы его можно было сравнить с Другими.
+    </p>
+    <p>AbstractSet, являясь абстрактным классом, представляет собой ос­нову для реализации
+        различных вариантов интерфейса Set.
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс List
+    </p>
+    <p>Классы, реализующие этот интерфейс, содержат упорядоченную
+        по-^едовательность объектов (объекты хранятся в том порядке, в котором
+    </p>
+    <p></p>
+    <center><img height="506" src="http://kufas.ru/java.files/image042.png" width="456"></center>
+    они были добавлены). D JDK 1.2 был переделан класс Vector, так, что оц теперь реализует
+    интерфейс List. Интерфейс List расширяет интерфе^с Collection, и любой класс, имплементирующий
+    List, реализует все мето-ды, определенные в Collection, и в то же время вводятся новые методы
+    которые позволяют добавлять и
+    удалять элементы из списка. List также обеспечивает Listlterator, который позволяет перемещаться
+    как вперед так и назад по элементам
+    списка.
+    <p>AbstractList, как абстрактный класс, представляет собой основу ддя реализации
+        различных вариантов интерфейса List.
+    </p>
+    <p>Интерфейс Map
+    </p>
+    <p>Классы, которые реализуют этот интерфейс, хранят
+        неупорядочен­ный набор объектов парами ключ/значение. Каждый ключ должен быть
+        уникальным. Hashtable после модификации в JDK 1.2 реализует интер­фейс Map. Порядок
+        следования пар ключ/значение не определен.
+    </p>
+    <p>Интерфейс Map не расширяет интерфейс Collection.
+        AbstractMap, будучи абстрактным
+        классом, представляет собой основу для реализации различных вариантов
+        интерфейса Map.
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>
+    </p>
+    <p>Интерфейс SortedSet
+    </p>
+    <p>Этот интерфейс расширяет Set, требуя, чтобы содержимое набора было упорядочено. Такие
+        коллекции могут
+        содержать объекты, которые реализуют интерфейс Comparable, либо могут сравниваться с
+        использо­ванием внешнего Comparator.
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс SortedMap
+    </p>
+    <p>Этот интерфейс расширяет Map, требуя, чтобы содержимое коллек­ции было упорядочено по
+        значениям
+        ключей.
+    </p>
+    <p>
+    </p>
+    <p>Интерфейс Iterator
+    </p>
+    <p>В Java 1 для перебора элементов коллекции использовался интерфейс Enumeration. В Java 2 для
+        этих целей должны применяться объекты, кото­рые реализуют
+        интерфейс Iterator. Все классы, которые реализуют интер­фейс Collection, должны реализовать
+        метод iterator, который возвращает объект, реализующий интерфейс Iterator. Iterator весьма
+        похож на Enumeration,
+        с тем лишь отличием, что в
+        .нем определен метод remove, который позволяет удалить объект из коллекции, для которой
+        Iterator был создан.
+    </p>
+    <p>Таким образом, подводя итог, перечислим интерфейсы, используе­мые при
+        работе с коллекциями:
+    </p>
+    <p>
+    </p>
+    <p>java.util.Collection java. util. Set java.util.List java. util.
+        M ар java.util.SortedSet java.util.SortedMap java. util. Iterator
+    </p>
+    <p>Абстрактные
+        классы, используемые при работе с коллекциями
+    </p>
+    <p>
+    </p>
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="0" width="20"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <center><img height="495" src="http://kufas.ru/java.files/image043.png" width="420">
+                </center>
+            </td>
+        </tr>
+    </table>
+    java.util.AbstratctCollection - данный класс
+    реализует все методы, определенные в интерфейсе Collection, за исключением iterator и size, так
+    что для того,
+    чтобы создать немодифицируемую коллекцию, нужно переопределить эти методы. Для
+    реализации модифицируемой коллек­ции необходимо еще переопределить метод public void add(Object
+    о) (в противном случае при его вызове будет возбуждено
+    исключение UnsupportedOperationException).
+    <p>Необходимо также определить два конструктора без аргументов и с
+        аргументом Collection. Первый должен создавать пустую коллекцию, вто-
+    </p>
+    <p>- коллекцию на основе существующей. Данный класс расширяется кассами AbstractList и
+        AbstractSet.
+    </p>
+    <p>java.util.AbstratctList - этот класс
+        расширяет AbstractCollection и реализует
+        интерфейс List. Для создания немодифицируемого списка не­обходимо имплементировать
+        методы public Object get(int index) и public int size(). Для реализации
+        модифицируемого списка необходимо также реализовать метод public void set(int index.Object
+        element) (в противном
+        случае при его вызове будет возбуждено исключение UnsupportedOperationException).
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>В отличие от AbstractCollection, в этом случае нет необходимости реализовывать метод
+        iterator, так как он уже
+        реализован поверх методов доступа к элементам списка get, set, add, remove.
+    </p>
+    <p>java.util.AbstratctSet - данный класс
+        расширяет AbstractCollection и реализует
+        основную функциональность, определенную в интерфейсе Set. Следует отметить,
+        что этот класс не переопределяет функциональность, реализованную в классе
+        AbstractCollection.
+    </p>
+    <p>java.util.AbstratctMap - этот класс
+        расширяет основную функцио­нальность, определенную в интерфейсе Map. Для реализации
+        немодифи­цируемого класса, унаследованного от AbstractMap, достаточно опреде­лить метод
+        entrySet, который должен
+        возвращать объект, приводимый к типу AbstractSet. Этот набор (Set) не должен обеспечивать
+        методов для добавления и удаления элементов из
+        набора. Для реализации модифици­руемого класса Map необходимо также переопределить метод put
+        и доба­вить в итератор, возвращаемый entrySet().iterator(), поддержку
+        метода remove.
+    </p>
+    <p>java.util.AbstratctSequentialList - этот класс
+        расширяет AbstractList и является основой
+        для класса LinkedList. Основное отличие от AbstractList заключается в том,
+        что этот класс обеспечивает не только по­следовательный, но и произвольный
+        доступ к элементам списка, с помо­щью методов get(int index), set(int index, Object
+        element), set(int index, Object element), add(int index, Object element) и remove(int
+        index). Для того, чтобы
+        реализовать данный класс, необходимо переопределить мето­ды listlterator и size. Причем,
+        если
+        реализуется немодифицируемый спи-с°к, для итератора достаточно
+        реализовать методы hasNext, next, hasPrevious, previous и index. Для модифицируемого
+        списка необходимо Дополнительно реализовать метод set, а для списков
+        переменной длины е1Чеи add, и remove.
+    </p>
+    <p>Конкретные классы коллекций
+    </p>
+    <p>java.util.ArrayList - этот класс
+        расширяет AbstractList и весьма похож на
+        класс Vector. Он также динамически расширяется, как Vector, однако его методы
+        не являются синхронизированными, вследствие чего операции с ним выполняются
+        быстрее. Для того, чтобы воспользоваться синхрони­зированной версией ArrayList, можно
+        применить вот такую конструкцию:
+    </p>
+    <p>
+    </p>
+    <p>List I = Collections.synchronizedList(new
+        ArrayList(...)); public class Test {
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>public Test() {
+    </p>
+    <p>}
+    </p>
+    <p>public static void main(String[] args) { Testt
+        = newTest(); ArrayList al = new ArrayList(); al.addf'First element");
+        al.addf'Second element"); al.addf'Third element"); Iterator it = al.iterator();
+        while(it.hasNext()) {
+    </p>
+    <p>System.out.println((String)it.next());
+    </p>
+    <p>}
+    </p>
+    <p>System.out.println("\n");
+        al.add(2,"Insertion"); it = al.iterator(); while(it.hasNext()){
+    </p>
+    <p>System, out. println((String)it.next());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>
+    </p>
+    <p>First element Second element Third element
+    </p>
+    <p>Firts element Second element Insertion Third element
+    </p>
+    <p>java.util.LinkedList — представляет
+        собой реализацию интерфейса List. Он реализует все методы интерфейса List, помимо этого
+        добавляются еще новые методы, которые позволяют добавлять, удалять и
+        получать элементы в конце и начале списка. LinkedList является
+        двухсвязным списком и позволяет перемещаться как от начала в конец списка, так
+        и наоборот. LinkedList удобно использовать
+        для организации стека.
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test(); LinkedList II = new LinkedList();
+        ll.add("Element1"); H.addFirst("Element2");
+        H.addFirst("Element3"); H.addLast("Element4");
+        test.dumpList(ll); ll.remove(2); test.dumpList(ll);
+    </p>
+    <p>String element = (String)ll.getLast();
+    </p>
+    <p>ll.remove(element);
+    </p>
+    <p>test.dumpList(ll);
+    </p>
+    <p>}
+    </p>
+    <p>private void dumpList(List list){ Iterator
+        it = list.iterator(); System.out.println(); while(it.hasNext()){
+    </p>
+    <p>System.out.println((String)it.next());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Element3 Element2 Elementl Elements
+    </p>
+    <p>Element3 Element2
+    </p>
+    <p>Element4
+    </p>
+    <p>
+    </p>
+    <p>Element3 Element2
+    </p>
+    <p>
+    </p>
+    <p>Классы LinkedList
+        и ArrayList имеют схожую функциональность. Однако с точки зрения производительности он
+        отличаются. Так. в ArrayList заметно быстрей
+        (примерно на порядок) осуществляются опе­рации прохода по всему списку
+        (итерации) и получения данных. LinkedList почти на порядок
+        быстрее выполняет операции удаления и до­бавления новых элементов.
+    </p>
+    <p>Java.util.Hastable — расширяет абстрактный класс Dictionary. В JDK 1.2 класс Hashtable также
+        реализует
+        интерфейс Map. Hashtable предназначен для
+        хранения объектов в виде пар ключ/значение. Из самого названия сле­дует, что Hashtable
+        использует алгоритм
+        хэширования для увеличения ско­рости доступа к данным
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p> Для того, чтобы выяснить
+        принципы работы дан­ного алгоритма, рассмотрим несколько примеров.
+    </p>
+    <p>Предположим, имеется массив строк, содержащий названия городов. Для
+        того, чтобы найти элемент массива, содержащий название города, в общем случае требуется
+        просмотреть весь массив, а если необходимо най­ти все элементы массива, то для
+        поиска каждого, в среднем, потребуется просматривать половину массива. Такой
+        подход может оказаться приемле­мым только для небольших массивов.
+    </p>
+    <p>Как уже отмечалось ранее, для того, чтобы увеличить скорость поис­ка,
+        используется алгоритм хэширования. Каждый объект в Java унаследо­ван от Object. Как уже
+        отмечалось ранее. Object определено целое число, которое уникально идентифицирует экземпляр
+        класса Object и, соответст­венно,
+        все экземпляры классов, унаследованных от Object. Это число воз­вращает
+        метод hashCode(). Именно оно используется при сохранении ключа в Hashtable следующим
+        образом:
+        разделив длину массива, предназ­наченного для хранения ключей, на код, получаем
+        некое целое число, ко­торое служит индексом для хранения ключа в массиве array.length %
+        hashCode().
+    </p>
+    <p>Далее, если необходимо добавить новую пару ключ/значение, вычис­ляется
+        новый индекс, и если этот индекс совпадает с уже имеющимся, то создается список
+        ключей, на который указывает элемент массива ключей-Таким образом, при обратном
+        извлечении ключа необходимо вычислить индекс массива по тому же алгоритму и
+        получить его. Если ключ в массиве единственный, то используется значение
+        элемента массива, если хранится несколько ключей, то необходимо обойти список и
+        выбрать нужный.
+    </p>
+    <p>Есть несколько соображений, относящихся к производительности классов,
+        использующих для хранения данных алгоритм хэширования. В частности, размер
+        массива. Если массив окажется слишком мал, то свя­занные списки будут слишком
+        длинными и скорость поиска станет су­щественно снижаться, так как просмотр
+        элементов списка будет такой #е, как в обычном массиве. Чтобы этого избежать,
+        задается некий коэф­фициент заполнения. При заполнении элементов массива, в
+        котором хранятся ключи (или списки ключей) на эту величину, происходит уве­личение
+        массива и производится повторное реиндексирование. Таким образом, если массив
+        окажется слишком мал, то он будет быстро запол­няться и будет производиться
+        операция повторного индексирования, ко­торая отнимает достаточно много ресурсов
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p>
+        С другой стороны, если мас­сив сделать большим, то при необходимости
+        просмотреть последова­тельно все элементы коллекции, использующей алгоритм
+        хэширования, придется обрабатывать большое количество пустых элементов массива
+        ключей.
+    </p>
+    <p>Начальный размер массива и коэффициент загрузки коллекции задаются при
+        конструировании. Например:
+    </p>
+    <p>Hashtable ht = new Hashtable( 1000,0.60)
+    </p>
+    <p>Существует также конструктор без параметров, который
+        использует значения по умолчанию 101 для размера массива (в последней версии
+        значение уменьшено до 11) и 0.75 для коэффициента загрузки.
+    </p>
+    <p>Использование алгоритма хэширования позволяет гарантировать, что
+        скорость доступа к элементам коллекции такого типа будет увеличи­ваться не
+        линейно, а логарифмически. Таким образом, при частом поиске каких-либо значений
+        по ключу имеет смысл задействовать коллекции, применяющие алгоритм хэштрования.
+    </p>
+    <p>java.util.HashMap - этот класс расширяет AbstractMap и весьма по­хож на
+        класс Hashtable. HashMap предназначен для
+        хранения пар объек­тов ключ/значение. Как для ключей, так и для элементов
+        допускаются значения типа null. Порядок хранения элементов в этой коллекции не совпадает с
+        порядком их
+        добавления. Порядок элементов в коллекции также может меняться во времени. HashMap
+        обеспечивает постоянное время доступа для операций get и put.
+    </p>
+    <p>Итерация по всем элементам коллекции пропорциональна ее емкос­ти.
+        Поэтому имеет смысл не делать размер коллекций чрезмерно большим, если
+        достаточно часто придется осуществлять итерацию по элементам.
+    </p>
+    <p>Методы HashMap не являются
+        синхронизированными. Для того, чтобы обеспечить нормальную работу в
+        многопоточном варианте, следует использовать либо внешнюю синхронизацию
+        потоков, либо синхронизи­рованный вариант коллекции.
+    </p>
+    <p>public
+        class Test {
+    </p>
+    <p>private class TestObject{ String text = ""; public TestObject(String
+        text){ this.text = text;
+    </p>
+    <p>};
+    </p>
+    <p>public String getText(){
+        return this.text;
+    </p>
+    <p>}
+    </p>
+    <p>public void setText(String text){ this, text = text;
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Testt
+        = new Test() ; TestObject to = null; HashMap hm = new HashMapO;
+        hm.put("Key1",t.newTestObject("Value 1")); hm.put("Key2",t.
+        new TestObject(&amp;quot
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p>Value 2")); hm.put("Key3",t.newTestObject("Value
+        3")); to = (TestObject)hm.get("Key1");
+        System.out.println("Object value for Key1 = " +
+    </p>
+    <p>to.getText() + "\n"); System.out.println("lteration
+        over entrySet"); Map.Entry entry = null; Iterator it = hm.entrySet().iterator();
+        // Итератор для перебора всех точек входа в Map while(it.hasNext()){
+    </p>
+    <p>entry = (Map.Entry)it.next();
+    </p>
+    <p>System.out.println("For key = " + entry.
+        getKey() +
+    </p>
+    <p>" value =
+        " + ((TestObject)entry.getValue()).getText());
+    </p>
+    <p>}
+    </p>
+    <p>System.out.println();
+    </p>
+    <p>System.out.println("lteration over keySet");
+        String key = "";
+    </p>
+    <p>// Итератор для перебора всех ключей в Map it = hm.keySet().iterator(); while(it.hasNext()){
+        key = (String)it.next();
+    </p>
+    <p>System.out.println( "For key = " + key +
+        " value = " +
+    </p>
+    <p>((TestObject)hm.get(key)).getText());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Object value for Key1 = Value 1
+    </p>
+    <p>Iteration over entrySet For key = КеуЗ value = Value
+        3 For key = Key2 value = Value 2 For key = Key1 value = Value 1
+    </p>
+    <p>Iteration over keySet For key = КеуЗ value = Value
+        3 For key = Key2 value = Value 2 For key = Key1 value = Value 1
+    </p>
+    <p>java.util.TreeMap - расширяет класс AbstractMap
+        и реализует ин­терфейс SortedMap. TreeMap содержит ключи в порядке возрастания.
+        Используется либо натуральное сравнение ключей, либо должен быть реализован
+        интерфейс Comparable. Реализация алгоритма поиска обеспечивает логарифмическую зависимость
+        времени выполнения ос­новных операций (containsKey, get, put и remove). Запрещено
+        приме­нение
+        null значений для
+        ключей. При использовании дубликатов клю­чей ссылка на объект, сохраненный с
+        таким же ключом, будет утеряна. Например:
+    </p>
+    <p>
+    </p>
+    <p>public class Test {
+    </p>
+    <p>public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Testt
+        = new Test(); TreeMap tm = new TreeMap(); tm.putfkey","String Г); System. out.
+        p ri ntl n (tm. g et(" key")); tm.putfkey","String2");
+        System, out. println(tm.get("key"));
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Stringi String2
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Класс Collections
+    </p>
+    <p>Класс Collections является
+        классом-утилитой и содержит несколько вспомогательных методов для работы с
+        классами, обеспечивающими раз­личные интерфейсы коллекций. Например, для
+        сортировки элементов списков, для поиска элементов в упорядоченных коллекциях и
+        Т
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p>Д. Но, пожалуй, наиболее важным свойством этого класса является возмож­ность
+        получения синхронизированных вариантов классов-коллекций Например, для
+        получения синхронизированного варианта Map можно использовать следующий подход:
+    </p>
+    <p>
+    </p>
+    <p>HashMap hm = new
+        HashMap();
+    </p>
+    <p>
+    </p>
+    <p>Map syncMap = Collections.synchronizedMap(hm);
+    </p>
+    <p>Как уже отмечалось ранее, начиная с JDK 1.2, класс Vector реализует интерфейс
+        List. Рассмотрим пример сортировки элементов, содержащихся в классе Vector.
+    </p>
+    <p>
+    </p>
+    <p>public class Test {
+    </p>
+    <p>private class TestObject { private String
+        name = ""; public TestObject(String name) { this.name = name;
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>private class MyComparator implements Comparator {
+        public int compare(Object I,Object r) { String left = (String)l; String right =
+        (String)r; return -1 * left.compareTo(right);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public Test() {
+        }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test(); Vector v = new Vector(); v.addfbbbbb");
+        v.add("aaaaa"); v.addf'ccccc");
+    </p>
+    <p>System.out.printlnf'Default
+        elements order");
+    </p>
+    <p>test.dumpList(v);
+    </p>
+    <p>Collections.sort(v);
+    </p>
+    <p>System.out.println("
+        Default sorting order"); test.dumpList(v);
+    </p>
+    <p>System.out.printlnf'Reverse
+        sorting order with providing
+    </p>
+    <p>imlicit comparator"); Collections.sort(v,test.new
+        MyComparatorO); test.dumpList(v);
+    </p>
+    <p>}
+    </p>
+    <p>private void dumpList(List I) { Iterator it = l.iterator(); while(it.hasNext()) {
+    </p>
+    <p>System. out.println(it.next());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Класс Properties
+    </p>
+    <p>Класс Properties предназначен для хранения набора свойств (пара­метров). Методы
+    </p>
+    <p>String
+        getProperty(String key)
+    </p>
+    <p>String
+        getProperty(String key,String defaultValue)
+    </p>
+    <p>
+    </p>
+    <p>Позволяют получить свойство из набора.
+    </p>
+    <p>С помощью метода setProperty(String key, String value) это свойство Можцо установить.
+    </p>
+    <p>Метод load(lnputStream inStream) позволяет загрузить набор свойств из входного потока (потоки
+        данных подробно рассматриваются в Лекции 15). Как правило, это текстовый файл, в котором
+        хранятся пара­метры. Параметры — это строки, которые представляют собой пары Ключ/значение.
+        Предполагается, что по умолчанию используется коди­ровка ISO 8859-1. Каждая строка должна
+        оканчиваться символами \г,\п *ли \г\п.
+        Строки из файла будут считываться до тех пор, пока не будет до-
+    </p>
+    <p>Курс
+    </p>
+    <p>Программирование на Java
+    </p>
+    <p>пекиияЛ
+    </p>
+    <p>Пакет
+        java.util
+    </p>
+    <p>стигнут его конец. Строки, состоящие из одних пробелов, или начинаю­щиеся
+        со знаков
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p> или #, игнорируются, т.е. их можно трактовать как ком­ментарии.
+        Если строка оканчивается символом /, то следующая строк;, считается ее
+        продолжением. Первый символ с начала строки, отличный от пробела, считается
+        началом ключа. Первый встретившийся пробел двоеточие или знак равенства
+        считается окончанием ключа. Все символы окончания ключа при необходимости могут
+        быть включены в название ключа, но при этом перед ними должен стоять символ \.
+        После того, как встретился символ окончания ключа, все аналогичные символы
+        будут проигнорированы до начала значения. Оставшаяся часть строки интер­претируется
+        как значение. В строке, состоящей только из символов \t, \п, V&gt; \\. \"&gt; \'Л и \uxxxx,
+        они все распознаются и интерпретируются как оди­ночные символы. Если
+        встретится сочетание \ и символа конца строки, то следующая строка будет считаться
+        продолжением текущей, также будут проигнорированы все пробелы до начала
+        строки-продолжения.
+    </p>
+    <p>Метод save(OutputStream inStream,String header) сохраняет набор свойств в выходной поток в
+        виде, пригодном для
+        вторичной загрузки с помощью метода load. Символы,
+        считающиеся служебными, кодируются так, чтобы их можно было считать при
+        вторичной загрузке. Символы в национатьной кодировке будут приведены к виду \uxxxx. При
+        сохране­нии используется кодировка ISO 8859-1. Если указан header, то он будет помещен в
+        начало потока в виде комментария (т.е. с
+        символом # в нача­ле), далее будет следовать комментарий, в котором будет
+        указано время и дата сохранения свойств в потоке.
+    </p>
+    <p>В классе Properties определен еще метод
+        list(PrintWriter out), который практически идентичен save. Отличается лишь
+        заголовок, который изме­нить нельзя. Кроме того, строки усекаются по ширине.
+        Поэтому данный метод для сохранения Properties не годится.
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test(); Properties props = new PropertiesO; StringWriter sw - new
+        StringWriter(); sw.write("Key1 =Vlaue1 \n"); sw.write(" Key2 : Vlaue2
+        \r\n"); sw.write(" КеуЗ Vlaue3 \n "); InputStream is =
+    </p>
+    <p>new ByteArraylnputStream(sw.toString().getBytesO);
+    </p>
+    <p>try{
+    </p>
+    <p>props.load(is);
+    </p>
+    <p>}
+    </p>
+    <p>catch (lOException ex) { ex.printStackTrace();
+    </p>
+    <p>}
+    </p>
+    <p>props. I ist (Syste m. о ut);
+    </p>
+    <p>props. setProperty("Key1 "."Modified
+        Valuer); props.setProperty("Key4","Added Value4");
+        props.list(System.out);
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>-- listing properties --Key3=Vlaue3 Key2=Vlaue2
+        Key1=Vlaue1
+    </p>
+    <p>-- listing properties --Key4=Added Value4 Key3=Vlaue3
+        Key2=Vlaue2 Key1=Modified Valuel
+    </p>
+    <p>Интерфейс Comparator
+    </p>
+    <p>В коллекциях многие методы сортировки или сравнения требуют передачи в
+        качестве одного из параметров объекта, который реализует интерфейс Comparator. Этот
+        интерфейс определяет единственный метод compare(Object objl .Object obj2), который на
+        основании определенного пользователем алгоритма сравнивает объекты, переданные
+        в качестве параметров. Метод compare должен вернуть:
+    </p>
+    <p>-1 если objl &lt; obj2
+    </p>
+    <p>0
+        если obj 1 = obj2
+    </p>
+    <p>1
+        если obj 1 &gt; obj2
+    </p>
+    <p>Класс Arrays
+    </p>
+    <p>Статический класс Arrays обеспечивает набор
+        методов для выполне­ния операций над массивами, таких, как поиск, сортировка,
+        сравнение. В
+    </p>
+    <p>
+    </p>
+    <table align="left" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="0" width="469"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <center><img alt="Подпись:  " height="26"
+                             src="http://kufas.ru/java.files/image044.png" width="55"></center>
+            </td>
+        </tr>
+    </table>
+    <p>Arrays также определен статический метод public List aList(a[] arr), коцк рый
+        возвращает список фиксированного размера, основанный на массив^ Изменения в List можно
+        внести, изменив данные в массиве.
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test();
+    </p>
+    <p>String[] arr = {"String 1","String 4","String
+        2","String 3"}; test. dumpArray( arr); Arrays, sort(arr);
+        test.dumpArray(arr);
+    </p>
+    <p>int ind = Arrays.binarySearch(arr,"String 4");
+        System.out.println("\nlndex of \"String 4\" = " + ind);
+    </p>
+    <p>}
+    </p>
+    <p>void dumpArray(String arr[]){ System.out. println();
+        for(int cnt=0;cnt &lt; arr.length;cnt++) { System.out.println(arr[cnt]);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>Класс StringTokenizer
+    </p>
+    <p>Этот класс предназначен для разбора строки по лексемам (tokens). Строка, которую
+        необходимо разобрать, передается в качестве параметра конструктору StringTokenizer(String
+        str). Определено еще два перегружен­ных конструктора, которым дополнительно
+        можно передать строку-разде­литель лексем StringTokenizer(String str, String delim) и
+        признак возврата разделителя лексем StringTokenizer(String str, String delim, Boolean
+        returnDelims).
+    </p>
+    <p>Разделителем лексем по
+        умолчанию служит пробел.
+    </p>
+    <p>public class
+        Test {
+    </p>
+    <p>public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test test = new
+        Test();
+    </p>
+    <p>String toParse = "wordl ;word2;word3;word4";
+        StringTokenizer st = new StringTokenizer(toParse,";");
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>while(st.hasMoreTokens()){
+    </p>
+    <p>System.out.println(st.nextToken());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>wordl word 2 word3 word4
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Класс BitSet
+    </p>
+    <p>Класс BitSet предназначен для
+        работы с последовательностями битов. Каждый компонент этой коллекции может
+        принимать булево значение, которое обозначает, установлен бит или нет.
+        Содержимое BitSet может быть
+        модифицировано содержимым другого BitSet с использованием опе­раций AND, OR или XOR
+        (исключающее или).
+    </p>
+    <p>BitSet имеет текущий размер (количество установленных битов), может динамически
+        изменяться. По умолчанию все биты в наборе уста­навливаются в 0 (false). Установка и очистка
+        битов в BitSet осуществля­ется методами set(int index) и clear(int index).
+    </p>
+    <p>Метод int length() возвращает "логический" размер набора битов, int Size() возвращает
+        количество памяти, занимаемой битовой последова­тельностью BitSet.
+    </p>
+    <p>
+    </p>
+    <p>public class
+        Test {
+    </p>
+    <p>public Test() {
+        }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test(); BitSet bs1 =newBitSet(); BitSet bs2 = newBitSet();
+        bsl.set(O); bs1.set(2); bs1.set(4);
+    </p>
+    <p>System.out.println("Length = " + bs1
+        .length() + " size = "
+    </p>
+    <p>+ bs1 .sizeQ); System.out.println(bs1);
+    </p>
+    <p>bs2.set(1);
+    </p>
+    <p>bs2.set(2);
+    </p>
+    <p>bs1.and(bs2);
+    </p>
+    <p>System.out.println(bs1);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>
+    </p>
+    <p>Length = 5 size = 64
+    </p>
+    <p>{0, 2, 4}
+    </p>
+    <p>{2}
+    </p>
+    <p>
+    </p>
+    <p>Проанализировав первую строку вывода на консоль, можно сделать вывод,
+        что для внутреннего представления BitSet использует значения типа long.
+    </p>
+    <p>
+    </p>
+    <p>Класс Random
+    </p>
+    <p>Класс Random используется для
+        получения последовательности псевдослучайных чисел. В качестве
+        "зерна" применяется 48-битовое число. Если для инициализации Random задействовать одно и то
+        же число, будет получена та же самая последовательность псевдослучайных
+        чисел.
+    </p>
+    <p>В классе Random определено также
+        несколько методов, которые воз­вращают псевдослучайные величины для примитивных
+        типов Java.
+    </p>
+    <p>Дополнительно следует отметить наличие двух методов: double nextGaussian() - возвращает
+        случайное число в диапазоне от 0.0 до 1.0 распределенное
+        по нормальному закону, и void nextBytes(byte[] arr) - за­полняет массив arr случайными
+        величинами типа byte.
+    </p>
+    <p>Пример использования Random:
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test(); Random r = new Random(100); // Generating the same sequence
+        numbers for(int cnt=0;cnt&lt;9;cnt++){
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>System.out.print(r.nextlnt() + "");
+    </p>
+    <p>System.out.println(); r = new Random(100);
+        for(int cnt=0;cnt&lt;9;cnt++) {
+    </p>
+    <p>System.out.print(r.nextlnt() + " ");
+    </p>
+    <p>}
+    </p>
+    <p>System.out.println();
+    </p>
+    <p>// Generating sequence of bytes
+    </p>
+    <p>byte[] randArray = new byte[8];
+    </p>
+    <p>r.nextBytes(randArray);
+    </p>
+    <p>test.dumpArray(randArray);
+    </p>
+    <p>}
+    </p>
+    <p>void dumpArray(byte[] arr) {
+    </p>
+    <p>for(int cnt=0;cnt&lt; arr.length;cnt++) { System.out.print(arr[cnt]);
+    </p>
+    <p>}
+    </p>
+    <p>System.out.println();
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>-1193959466 -1139614796
+        837415749 -1220615319 -
+    </p>
+    <p>1429538713 118249332 -951589224 -1193959466 -1139614796
+    </p>
+    <p>837415749 -1220615319
+        -1429538713 118249332 -951589224
+    </p>
+    <p>81;-6;-107;77;118;17;93;-98;
+    </p>
+    <p>
+    </p>
+    <p>Локализация
+    </p>
+    <p>
+    </p>
+    <p>Класс Locale
+    </p>
+    <p>Класс Locale предназначен для
+        отображения определенного региона. Под регионом принято понимать не только
+        географическое положение, но также языковую и культурную среду. Например, помимо того, что
+        ука­зывается страна
+        Швейцария, можно указать также и язык - французский Или немецкий.
+    </p>
+    <p>Определено два варианта
+        конструкторов в классе Locale:
+    </p>
+    <p>
+    </p>
+    <p>Locale(String language, String country) Locale(String
+        language, String country, String variant)
+    </p>
+    <p>Первые два параметра в обоих конструкторах определяют язык и стра-
+        НУ&gt; Для которой определяется локаль, согласно кодировке ISO. Список под-
+        31— 3440                                                     481
+    </p>
+    <p>
+    </p>
+    <table align="left" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="0" width="470"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <center><img alt="Подпись:  " height="27"
+                             src="http://kufas.ru/java.files/image045.png" width="54"></center>
+            </td>
+        </tr>
+    </table>
+    <p>держиваемых стран и языков можно получить и с помощью вызова статиче
+        ских методов Locale.getlSOLanguages() Locale.getlSOCountries(), coot. ветственно. Во втором
+        варианте конструктора указан также строковый па­раметр
+        variant, в котором кодируется информация о платформе. Если здеСь необходимо
+        указать дополнительные параметры, то их требуется разделить символом
+        подчеркивания, причем, более важный параметр должен следо­вать первым.
+    </p>
+    <p>Пример использования:
+    </p>
+    <p>
+    </p>
+    <p>Locale I = new
+        Locale("ru","RU");
+    </p>
+    <p>Locale I = new
+        Localefen","US","WINDOWS");
+    </p>
+    <p>
+    </p>
+    <p>Статический метод getDefault() возвращает текущую локаль, скон­струированную на основе
+        настроек
+        операционной системы, под управле­нием которой функционирует JVM.
+    </p>
+    <p>Для наиболее часто использующихся локалей заданы константы. Например, Locale.US или
+        Locale.GERMAN.
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>После того как экземпляр класса Locale создан, с помощью различ­ных методов можно получить
+        дополнительную
+        информацию о локали.
+    </p>
+    <p>public class Test { public Test() { }
+    </p>
+    <p>public static void main(String[] args) { Test test = new
+        Test(); Locale I = Locale.getDefault(); System.out.printing.getCountry() +
+        "" +
+    </p>
+    <p>l.getDisplayCountry() + "" + l.getlS03Country());
+        System.out.printing.getLanguage() + "" +
+    </p>
+    <p>l.getDisplayLanguage() + "" + l.getlS03Language());
+        System.out.println(l.getVariant() + "" + l.getDisplayVariant()); I = new
+        Locale("ru","RU","WINDOWS");
+        System.out.printing.getCountry() + "" +
+    </p>
+    <p>l.getDisplayCountry() + "" + l.getlS03Country());
+        System.out.println(l.getLanguage() + "" +
+    </p>
+    <p>l.getDisplayLanguage() + "" + l.getlS03Language());
+        System.out.printing.getvariant() + "" + l.getDisplayVariantO);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>US United States USA en English eng
+    </p>
+    <p>
+    </p>
+    <p>RU Russia RUS ru Russian rus WINDOWS WINDOWS
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Класс ResourceBundle
+    </p>
+    <p>Абстрактный класс ResourceBundle предназначен для
+        хранения объектов, специфичных для локали. Например, когда необходимо полу­чить набор строк,
+        зависящих от локали, используют ResourceBundle.
+    </p>
+    <p>Применение ResourceBundle настоятельно
+        рекомендуется, если предполагается использовать программу в многоязыковой
+        среде. С помо­щью этого класса легко манипулировать наборами ресурсов, зависящих от локалей,
+        их можно
+        менять, добавлять новые и т.д.
+    </p>
+    <p>Набор ресурсов — это фактически набор классов, имеющих одно ба­зовое имя. Далее наименование
+        класса дополняется наименованием ло­кали, с которой связывается
+        этот класс. Например, если имя базового класса будет MyResources, то для английской локали
+        имя класса будет Myfмesources_en, для русской - MyResources_ru.
+        Помимо этого, может
+        добавляться идентификатор языка, если для данного региона определено несколько
+        языков. Например, MyResources_de_CH - так будет выгля­деть швейцарский вариант немецкого
+        языка. Кроме того, можно указать
+        дополнительный признак variant (см. описание Locale). Так, описанный раннее пример для
+        платформы UNIX будет выглядеть следующим обра­зом: MyResources_de_CH_UNIX.
+    </p>
+    <p>Загрузка объекта для нужной локали производится с помощью ста­тического
+        метода getBundle.:
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>
+    </p>
+    <p>ResourceBundle myResources =
+    </p>
+    <p>ResourceBundle.getBundlef'MyResources",
+        someLocale);
+    </p>
+    <p>На основе указанного базового имени (первый параметр), указанной Локали (второй параметр) и
+        локали по умолчанию (задается настройками ОС или JVM) генерируется
+        список возможных имен ресура. Причем, ука­занная локаль имеет более высокий приоритет, чем
+        локаль по умолчанию. Если
+        обозначить составляющие указанной локали (язык, страна, вариант) как 1, а локали по
+        умолчанию — 2, то список примет следующий вид:
+    </p>
+    <p>
+    </p>
+    <p>baseclass +
+        "_" + languagel + "_" + countryl + "_" + varianti
+    </p>
+    <p>baseclass +
+        "_" + language 1 + "_" + country 1 + "_" + variantl
+        +
+    </p>
+    <p>".properties" baseclass +
+        "_" + languagel + "_" + countryl baseclass + "_"
+        + languagel + "_" + countryl + ".properties" baseclass +
+        "_" + languagel baseclass + "_" + languagel + ".properties"
+        baseclass + "_" + Ianguage2 + "_" + country2 +
+        "_" + variant2 baseclass + "_" + Ianguage2 + "_" +
+        country2 + "_" + variant2 +
+    </p>
+    <p>".properties" baseclass + "_" + Ianguage2
+        + "_" + country2 baseclass + "_" + Ianguage2 +
+        "_" + country2 + ".properties" baseclass + "_" + Ianguage2
+        baseclass + "_" + Ianguage2 + ".properties" baseclass
+    </p>
+    <p>baseclass + ".properties"
+    </p>
+    <p>
+    </p>
+    <p>Например, если необходимо найти ResourceBundle
+        для локали fr_CH (Швейцарский французский), а локаль по умолчанию en_US, при этом название
+        базового класса ResourceBundle
+        MyResources, то порядок поиска подходящего ResourceBundle будет таков.
+    </p>
+    <p>MyResources_fr_CH
+    </p>
+    <p>MyResources_fr
+    </p>
+    <p>MyResources_en_US
+    </p>
+    <p>MyResourcesen
+    </p>
+    <p>MyResources
+    </p>
+    <p>
+    </p>
+    <p>Результатом работы getBundle будет загрузка
+        необходимого класса ресурсов в память, однако данные этого класса могут быть
+        сохранены на диске. Таким образом, если нужный класс не будет найден, то к требуемому
+        имени класса будет добавлено расширение ".properties" и будет предпри­нята попытка найти
+        файл с данными на диске.
+    </p>
+    <p>Следует помнить, что необходимо указывать полностью квалифици­рованное
+        имя класса ресурсов, т.е. имя пакета, имя класса. Кроме того, класс ресурсов
+        должен быть доступен в контексте его вызова (там, где вы­зывается getResourceBundle), то
+        есть не быть private и т.д.
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>Всегда должен создаваться базовый класс без суффиксов, т.е. если вы
+        создаете ресурсы с именем MyResource, должен быть в наличии класс MyResource. class.
+    </p>
+    <p>ResourceBundle хранит объекты в
+        виде пар ключ/значение. Как уже отмечалось ранее, класс ResourceBundle абстрактный,
+        поэтому при его наследовании необходимо переопределить методы:
+    </p>
+    <p>Enumeration
+        getKeys()
+    </p>
+    <p>protected
+        Object handleGetObject(String key)
+    </p>
+    <p>Первый метод должен возвращать список всех ключей, которые опре­делены в
+        ResourceBundle, второй должен возвращать объект, связанный с конкретным ключом.
+    </p>
+    <p>Рассмотрим пример использования ResourceBundle:
+    </p>
+    <p>public class
+        MyResource extends ResourceBundle {
+    </p>
+    <p>private Hashtable res = null; public MyResource() {
+    </p>
+    <p>res = new Hashtable();
+    </p>
+    <p>res. putfTestKey", "English Variant");
+    </p>
+    <p>}
+    </p>
+    <p>public Enumeration getKeys() { return res.keys();
+    </p>
+    <p>}
+    </p>
+    <p>protected Object handleGetObject(String key) throws
+        java.util.MissingResourceException { return res.get(key); }
+    </p>
+    <p>}
+    </p>
+    <p>public class MyResource_ru_RU extends
+        ResourceBundle { private Hashtable res = null; pub/ic MyResource_ru_RU() { res =
+        new Hashtable(); res.put("TestKey","Русский варинат");
+    </p>
+    <p>}
+    </p>
+    <p>public Enumeration getKeys() { return res.keys();
+    </p>
+    <p>}
+    </p>
+    <p>protected Object handleGetObject(String key) throws
+        java.util.MissingResourceException { return res.get(key);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public class Test { public Test() {
+    </p>
+    <p>}
+    </p>
+    <p>public static void main(String[] args) { Test test = new
+        Test();
+    </p>
+    <p>ResourceBundle rb = ResourceBundle.getBundle
+        ("experiment. MyResource",Locale.getDefault());
+    </p>
+    <p>System.out.println(rb.getString("TestKey"));
+    </p>
+    <p>rb = ResourceBundle.getBundle("experiment.MyResource",
+        new Locale("ru","RU"));
+        System.out.println(rb.getString("TestKey"));
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>English Variant Русский Вариант
+    </p>
+    <p>Кроме того, следует обратить внимание, что ResourceBundle может хранить не
+        только строковые значения. В нем можно хранить также дво­ичные данные, или
+        просто методы, реализующие нужную функциональ­ность, в зависимости от локали.
+    </p>
+    <p>public interface Behavior { public String
+        getBehavior(); public String getCapital(); }
+    </p>
+    <p>public class EnglishBehavior implements Behavior{
+        public EnglishBehavior() { }
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>public String getBehavior(){ return "English
+        behavior";
+    </p>
+    <p>}
+    </p>
+    <p>public String getCapital(){ return "London";
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public class RussianBehavior implements Behavior { public
+        RussianBehavior() { }
+    </p>
+    <p>public String
+        getBehavior(){
+    </p>
+    <p>return "Русский вариант поведения";
+    </p>
+    <p>}
+    </p>
+    <p>public String getCapital(){ return "Москва";
+    </p>
+    <p>public class MyResourceBundle_ru_RU extends
+        ResourceBundle { Hashtable bundle = null; public MyResourceBundle_ru_RU() { bundle
+        = new Hashtable();
+    </p>
+    <p>bundle.put("Bundle
+        description","Набор ресурсов для
+    </p>
+    <p>русской локали"); bundle.putf'Behavior",new
+        RussianBehavior());
+    </p>
+    <p>}
+    </p>
+    <p>public Enumeration getKeys() { return
+        bundle.keys();
+    </p>
+    <p>}
+    </p>
+    <p>protected Object handleGetObject(String key)
+        throws java.util.MissingResourceException { return
+        bundle.getf'key");
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>public class MyResourceBundle_en_EN { Hashtable
+        bundle = null; public MyResourceBundle_en_EN() { bundle = new
+        HashtableO;
+    </p>
+    <p>bundle.putf'Bundle
+        descnption'V'English resource set"); bundle.putf'Behavior",new
+        EnglishBehavior());
+    </p>
+    <p>}
+    </p>
+    <p>public Enumeration getKeys() { return
+        bundle.keys();
+    </p>
+    <p>}
+    </p>
+    <p>protected Object handleGetObject(String key)
+        throws java.util.MissingResourceException { return
+        bundle.getf'key");
+    </p>
+    <p>}
+    </p>
+    <p>public class MyResourceBundle extends
+        ResourceBundle { Hashtable bundle = null;
+        public MyResourceBundleO { bundle = new Hashtable();
+    </p>
+    <p>bundle.putf'Bundle description","Default
+        resource bundle") bundle.putf'Behavior",new EnglishBehaviorO);
+    </p>
+    <p>}
+    </p>
+    <p>public Enumeration getKeys() { return
+        bundle.keys();
+    </p>
+    <p>}
+    </p>
+    <p>protected Object handleGetObject(String key)
+        throws java.util.MissingResourceException { return bundle.get(key);
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public class Using { public Using() { }
+    </p>
+    <p>public static void main(String[] args) { Using
+        u - new Using(); ResourceBundle rb =
+    </p>
+    <p>ResourceBundle.getBundle("lecture.MyResourceBundle",
+        Locale.getDefaultO);
+    </p>
+    <p>System.out.println((String)rb.getObject("Bundle
+        description")); Behavior be = (Behavior)rb.getObject("Behavior");
+        System.out.println(be.getBehavior()); System.out.println(be.getCapital());
+    </p>
+    <p>rb = ResourceBundle.getBundle("lecture.MyResourceBundle",
+        new Locale("en","EN"));
+    </p>
+    <center>
+    </center>
+</div>
+<div class="left">
+    <p></p>
+    <p></p>
+    <p>System.out.println((String)rb.getObject("Bundle
+        description")); Behavior be = (Behavior)rb.getObject("Behavior");
+        System.out.println(be.getBehavior()); System, out. println(be.getCapital());
+    </p>
+    <p>}
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>
+    </p>
+    <p>Русский
+        набор ресурсов Русский вариант поведения Москва
+    </p>
+    <p>English resource bundle English behavior London
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Классы и81Не8оигсеВипй1е и РгорегиевНеБоигсеВиг^е
+    </p>
+    <p>У класса ResourceBundle
+        определено два прямых потомка ListResourceBundle и
+        PropertiesResourceBundle. PropertiesResourceBundie
+        хранит набор ресурсов в файле, который представляет собой набор строк.
+    </p>
+    <p>Алгоритм конструирования объекта, содержащего набор ресурсов, был описан
+        в предыдущем параграфе. Во всех случаях, когда в качестве последнего элемента
+        используется .properties, например, baseclass + "_" +
+        language 1 + "_" +
+        country 1 + ".properties", речь идет о создании flesourceBundle из файла с
+        наименованием baseclass + "_" + language 1 + "_" + country 1 и расширением properties.
+        Обычно класс peSOurceBundle помещают в пакет resources, а файл свойств - в каталог ^sources.
+        Тогда для того,
+        чтобы инстанциировать нужный класс, необ­ходимо указать полный путь к этому
+        классу (файлу):
+    </p>
+    <p>getBundlef'resources.MyResource", Locale. getDefaultO);
+    </p>
+    <p>ListResourceBundle хранит набор
+        ресурсов в виде коллекции и являет­ся абстрактным классом. Классы, которые
+        наследуют ListResourceBundle, должны обеспечить:
+    </p>
+    <p>•   переопределение метода Object[][] getContents(), который воз­вращает массив ресурсов;
+    </p>
+    <p>•   собственно двумерный массив, содержащий ресурсы. Рассмотрим пример:
+    </p>
+    <p>public class MyResource extends ListResourceBundle { Vector
+        v = new Vector(); Object[][] resources = { {"StringKey","String"},
+        {"DoubleKey",new Double(O.O)}, {"VectorKey",v},
+    </p>
+    <p>};
+    </p>
+    <p>public MyResource() { super();
+    </p>
+    <p>v.addf'Element 1"); v.addf'Element 2"); v.addfElement
+        3");
+    </p>
+    <p>}
+    </p>
+    <p>protected Object[][] getContents() { return
+        resources;
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>public class Test { public Test() {
+    </p>
+    <p>}
+    </p>
+    <p>public static void main(String[] args) { Test
+        test = new Test();
+    </p>
+    <p>ResourceBundle rb = ResourceBundle.getBundle
+        ("experiment.MyResource",Locale.getDefaultO);
+    </p>
+    <p>Vector v = (Vector)rb.getObject("VectorKey");
+        Iterator it = v.iterator(); while(it.hasNext()) {
+    </p>
+    <p>System.out.println(it.next());
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>Результатом будет:
+    </p>
+    <p>Element 1 Element
+        2 Element 3
+    </p>
+    <p>
+    </p>
+    <p>Создание ресурсов для локалей, отличных от локали по умолчанию,
+        осуществляется так же, как было показано для ResourceBundle.
+    </p>
+    <p>
+    </p>
+    <p>Заключение
+    </p>
+    <p>В этой лекции были рассмотрены вспомогательные классы пакета java.util. Как можно было
+        заметить, они относятся к самым разным зада­чам, а потому редкая программа
+        обходится без использования хотя бы од­ного класса этого пакета.
+    </p>
+    <p>Напомним кратко все основные классы и их особенности:
+    </p>
+    <p>•
+        Для работы с датой и
+        временем должны использоваться классы Date, Calendar. Класс Calendar абстрактный, существует
+        кон­кретная реализация этого класса GregorianCalendar.
+    </p>
+    <p>•
+        Класс Observer и интерфейс Observable реализуют парадигму
+        MVC и предназначены для
+        уведомления одного объекта об изме­нении состояния другого.
+    </p>
+    <p>•
+        Коллекции (Collections) не накладывают ограничений на порядок следования и дублирование
+        элементов.
+    </p>
+    <p>•
+        Списки (List) поддерживают
+        порядок элементов (управляются либо самими данными, либо внешними алгоритмами).
+    </p>
+    <p>•
+        Наборы (Set) не допускают
+        дублированных элементов.
+    </p>
+    <p>•
+        Карты (Maps) используют
+        уникальные ключи для поиска содер­жимого.
+    </p>
+    <p>•
+        Применение массивов делает
+        добавление, удаление и увеличение количества элементов затруднительным.
+    </p>
+    <p>•
+        Использование связанных
+        списков (LinkedList) обеспечивает хо­рошую производительность при вставке, удалении
+        элементов, но снижает скорость индексированного доступа к ним.
+    </p>
+    <p>•  Использование деревьев (Tree) облегчает вставку, удаление и уве­личение размера хранилища,
+        снижает
+        скорость индексированного доступа, но увеличивает скорость поиска.
+    </p>
+    <p>•  Применение хэширования облегчает вставку, удаление и увеличение размера
+        хранилища, снижает скорость индексированного доступа, но увеличивает скорость
+        поиска. Однако хэширование требует нали­чия уникальных ключей для запоминания
+        элементов данных.
+    </p>
+    <p>•  Класс Properties удобен для хранения
+        наборов параметров в виде пар ключ/значение. Параметры могут сохраняться в
+        потоки (файлы) и загружаться из них.
+    </p>
+    <p>• Реализация классом интерфейса Comparator позволяет
+        сравнивать экземпляры класса друг с другом и, соответственно, сортировать их,
+        например, в коллекциях.
+    </p>
+    <p>• Arrays является классом-утилитой и обеспечивает набор методов, реализующих
+        различные приемы работы с массивами. Не имеет конструктора.
+    </p>
+    <p>•   StringTokenizer - вспомогательный
+        класс, предназначенный для разбора строк на лексемы.
+    </p>
+    <p>•  При необходимости работать с сущностями, представленными в виде битовых
+        последовательностей, удобно использовать класс BitSet.
+    </p>
+    <p>•  Манипулировать ресурсами, которые различаются в зависимости от
+        локализации, удобно с помощью классов ResourceBundle, ListResourceBundle,
+        PropertiesResourceBundle. Собственно ло-каль задается с помощью класса Locale.
+    </p>
+    <p>КУРС___________ _______________________________ п
+    </p>
+    <p>11рограммирование на ja
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Вариант 1
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>Необходимо
+        написать метод, который возвращает случайное число в диапазоне от О до 100,
+        кратное 5. Из перечисленных вариантов выберите правильный.
+    </p>
+    <p>&#9633;       public int getRandom5()
+        {
+    </p>
+    <p>return (int)(Math.random()*20)
+        * 5;
+    </p>
+    <p>}
+    </p>
+    <p>&#9633;       public int getRandom5() {
+    </p>
+    <p>Math m = new Math()
+    </p>
+    <p>return (int)(m.random()*20) * 5;
+    </p>
+    <p>}
+    </p>
+    <p>&#9633;       public int getRandom5() {
+    </p>
+    <p>return (Math.random()*20)
+        * 5;
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>2.  
+        В JDK 1.2 введены новые классы и
+        интерфейсы, которые позволяют работать с наборами объектов. Отметьте те из них,
+        которые являются интерфейсами.
+    </p>
+    <p>
+    </p>
+    <table border="0" cellpadding="0" cellspacing="0" class="MsoNormalTable">
+        <tr>
+            <td width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java.util.List
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java.util.TreeMap
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java.
+                    util .AbstractList
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java.util.SortedMap
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java. util. Iterator
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" width="23">
+                <p>&#9633;
+                </p>
+            </td>
+            <td valign="top" width="119">
+                <p>java.util.Collections
+                </p>
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>3.   Какое значение будет выведено на консоль в
+        представленном фрагменте кода?
+    </p>
+    <p>String strl = "abc";
+        String str2 = "abc"; System.out.println(str1 == str2);
+    </p>
+    <p>&#9633;
+        true
+    </p>
+    <p>&#9633;
+        false
+    </p>
+    <p>
+        КуРС                                                                                              
+        Программирование
+        Haj^
+    </p>
+    <p>Вариант 2
+    </p>
+    <p>
+    </p>
+    <p>Вариант 3
+    </p>
+    <p>
+    </p>
+    <p>1.  
+        Какое из выражений относительно класса java.lang.Runtime является корректным?
+    </p>
+    <p>&#9633;
+        объект Runtime создается при помощи следующего кода. Runtime г = Runtime.getRuntimeO;
+    </p>
+    <p>&#9633;
+        метод дс(), определенный в
+        RuntimeQ, вызывает начало сборки мусора виртуальной машиной Java
+    </p>
+    <p>&#9633;
+        метод freeMemoryO, определенный в классе Runtime, освобождает неиспользуемую память
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>2.  
+        Какие высказывания относительно java.util. Vector и java.util.Hashtable можно считать
+        корректными?
+    </p>
+    <p>|~1   в Vector могут сохраняться ссылки как на объекты, так и на примитивные типы
+    </p>
+    <p>&#9633;       ссылки на объекты в Vector хранятся в порядке
+        их добавления
+    </p>
+    <p>[~|   в качестве
+        ключей для Hashtable должны передаваться
+        объекты типа String
+    </p>
+    <p>&#9633;
+        ссылки на объекты в Hashtable хранятся в порядке
+        их добавления
+    </p>
+    <p>&#9633;
+        и Hashtable, и Vector являются
+        синхронизированными, чтобы избежать ситуации, когда несколько потоков пытаются
+        получить доступ к одной и той же коллекции
+    </p>
+    <p>
+    </p>
+    <p>
+    </p>
+    <p>3.  
+        Будет ли переменная sb после выполнения кода в строке
+        2 указывать на тот же самый объект?
+    </p>
+    <p>1. StringBuffer sb = new StringBuffer("abc");
+    </p>
+    <p>2.
+        sb.appendf'x");
+    </p>
+    <p>
+    </p>
+    <p>&#9633;
+        да
+    </p>
+    <p>&#9633;
+        нет
+    </p>
+    <p>Необходимо
+        написать метод, который получает в качестве
+    </p>
+    <p>параметра
+        значение угла в градусах типа double
+    </p>
+    <p>и
+        вычисляет его косинус.
+    </p>
+    <p>Какой из приведенных вариантов
+        верен?
+    </p>
+    <p>Q   double getCos(double angle) { return Math.cos(angle);
+    </p>
+    <p>|"1   double
+        getCos(double angle) {
+    </p>
+    <p>return Math.cos(angle * Math.PI / 180);
+    </p>
+    <p>}
+    </p>
+    <p>&#9633;   double getCos(double angle) {
+    </p>
+    <p>return Math.cos(angle * PI / 180);
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>Приведенный
+        ниже пример кода вызывает ошибку компи­ляции
+    </p>
+    <p>double getCos(double angle) { return Math.cos(angle);
+    </p>
+    <p>}
+    </p>
+    <p>
+    </p>
+    <p>public static void showStatus(Boolean flag) {
+    </p>
+    <p>if(flag) { System.out.println( "FIRED")
+    </p>
+    <p>} else {
+    </p>
+    <p>System.out.println("NOT READY");
+    </p>
+    <p>}
+    </p>
+    <p>}
+    </p>
+    <p>Какое из перечисленных исправлений
+        решит проблему?
+    </p>
+    <p>&#9633;
+        заменить if(flag) { на if(flag.equals(true)
+    </p>
+    <p>&#9633;
+        заменить public static void showStatus(Boolean flag) { на public
+        static void showStatus(boolean flag) {
+    </p>
+    <p>&#9633;
+        заменить if(flag) { на if(flag.booleanValue())
+        {
+    </p>
+    <p>Какой из перечисленных ниже
+        классов имеет наибольшее сходство с классом Vector?
+    </p>
+    <p>&#9633;
+        AbstractCollection D   ArrayList
+    </p>
+    <p>&#9633;
+        Hashtable
+    </p>
+    <p>
+    </p>
+    <center>
+    </center>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Руководство по командной строке Rails и задачам Rake</title>
+	<meta charset="utf-8">
+	<link id="style" href="../style.css" rel="stylesheet"/>
+	
+	
+
+
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+
+
+
+<script type="text/javascript" src="../script.js"></script>
+</head>
+<body>
+
+
+
+
+
+
+<div class="span9 content pull-left">
+
+    <h2 class="inside_page_header" id="komandnaya-stroka-rails"> Командная строка Rails</h2>
+    <p>После прочтения этого руководства, вы узнаете</p>
+    <ul>
+        <li>Как создать приложение на Rails
+        </li>
+        <li>Как создать модели, контроллеры, миграции базы данных и юнит-тесты
+        </li>
+        <li>Как запустить сервер для разработки
+        </li>
+        <li>Как экспериментировать с объектами в интерактивной оболочке
+        </li>
+    </ul>
+    <div class="note"><p>Этот самоучитель предполагает, что вы обладаете знаниями основ Rails,
+        которые можно почерпнуть в .</p></div>
+    <h3 class="inside_page_header" id="osnovy-komandnoy-stroki"> Основы командной строки</h3>
+    <p>Имеется несколько команд, абсолютно критичных для повседневного использования в Rails. В
+        порядке возможной частоты использования, они следующие:</p>
+    <ul>
+        <li>
+            <code>rails console</code>
+        </li>
+        <li>
+            <code>rails server</code>
+        </li>
+        <li>
+            <code>rake</code>
+        </li>
+        <li>
+            <code>rails generate</code>
+        </li>
+        <li>
+            <code>rails dbconsole</code>
+        </li>
+        <li>
+            <code>rails new app_name</code>
+        </li>
+    </ul>
+    <p>Каждую команду можно запустить с <code>-h или --help</code> для отображения подробной
+        информации.</p>
+    <p>Давайте создадим простое приложение на Rails, чтобы рассмотреть все эти команды в
+        контексте.</p>
+    <h4 class="inside_page_header" id="rails-new"><code>rails new</code>
+    </h4>
+    <p>Сперва мы хотим создать новое приложение на Rails, запустив команду <code>rails new</code>
+        после установки Rails.</p>
+    <div class="info"><p>Гем rails можно установить, написав <code>gem install rails</code>, если
+        его еще нет.</p></div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ rails new commandsapp
+     create
+     create  README.rdoc
+     create  Rakefile
+     create  config.ru
+     create  .gitignore
+     create  Gemfile
+     create  app
+     ...
+     create  tmp/cache
+     ...
+        run  bundle install
+</pre>
+    </div>
+    <p>Rails создаст кучу всего с помощью такой маленькой команды! Теперь вы получили готовую
+        структуру директории Rails со всем кодом, необходимым для запуска нашего простого
+        приложения.</p>
+    <h4 class="inside_page_header" id="rails-server"><code>rails server</code>
+    </h4>
+    <p>Команда <code>rails server</code> запускает небольшой веб сервер, названный WEBrick,
+        поставляемый с Ruby. Его будем использовать всякий раз, когда захотим увидеть свою работу в
+        веб браузере.</p>
+    <p>Безо всякого принуждения, <code>rails server</code> запустит наше блестящее приложение на
+        Rails:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cd commandsapp
+$ bin/rails server
+=&gt; Booting WEBrick
+=&gt; Rails 5.0.0 application starting in development on http://localhost:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2013-08-07 02:00:01] INFO  WEBrick 1.3.1
+[2013-08-07 02:00:01] INFO  ruby 2.2.2 (2015-06-27) [x86_64-darwin11.2.0]
+[2013-08-07 02:00:01] INFO  WEBrick::HTTPServer#start: pid=69680 port=3000
+</pre>
+    </div>
+    <p>Всего лишь тремя командами мы развернули сервер Rails, прослушивающий порт 3000. Перейдите в
+        браузер и зайдите на , вы увидите простое приложение, запущенное на rails.</p>
+    <div class="info"><p>Для запуска сервера также можно использовать псевдоним "s": <code>rails
+        s</code>.</p></div>
+    <p>Сервер может быть запущен на другом порту, при использовании опции <code>-p</code>. Среда по
+        умолчанию может быть изменена с использованием <code>-e</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails server -e production -p 4000
+</pre>
+    </div>
+    <p>Опция <code>-b</code> привязывает Rails к определенному IP, по умолчанию это localhost.
+        Можете запустить сервер, как демона, передав опцию <code>-d</code>.</p>
+    <h4 class="inside_page_header" id="rails-generate"><code>rails generate</code>
+    </h4>
+    <p>Команда <code>rails generate</code> использует шаблоны для создания целой кучи вещей. Запуск
+        <code>rails generate</code> выдаст список доступных генераторов:</p>
+    <div class="info"><p>Также можно использовать псевдоним "g" для вызова команды
+        <code>generate</code>: <code>rails g</code>.</p></div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate
+Usage: rails generate GENERATOR [args] [options]
+...
+...
+Please choose a generator below.
+Rails:
+  assets
+  controller
+  generator
+  ...
+  ...
+</pre>
+    </div>
+    <div class="note"><p>Можно установить больше генераторов с помощью гемов генераторов, части
+        плагинов, которые вы, несомненно, установите, и даже можете создать свой собственный!</p>
+    </div>
+    <p>Использование генераторов поможет сэкономить много времени, написав за вас <strong>шаблонный
+        код</strong> - необходимый для работы приложения.</p>
+    <p>Давайте создадим свой собственный контроллер с помощью генератора контроллера. Какую же
+        команду использовать? Давайте спросим у генератора:</p>
+    <div class="info"><p>Все консольные утилиты Rails имеют текст помощи. Как и с большинством
+        утилит *nix, можно попробовать <code>--help</code> или <code>-h</code> в конце, например
+        <code>rails server --help</code>.</p></div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate controller
+Usage: rails generate controller NAME [action action] [options]
+...
+...
+Description:
+    ...
+    To create a controller within a module, specify the controller name as a
+    path like 'parent_module/controller_name'.
+    ...
+Example:
+    `rails generate controller CreditCards open debit credit close`
+    Credit card controller with URLs like /credit_cards/debit.
+        Controller: app/controllers/credit_cards_controller.rb
+        Test:       test/controllers/credit_cards_controller_test.rb
+        Views:      app/views/credit_cards/debit.html.erb [...]
+        Helper:     app/helpers/credit_cards_helper.rb
+</pre>
+    </div>
+    <p>Генератор контроллера ожидает параметры в форме <code>generate controller ControllerName
+        action1 action2</code>. Давайте создадим контроллер <code>Greetings</code> с экшном <strong>hello</strong>,
+        который скажет нам что-нибудь приятное.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate controller Greetings hello
+     create  app/controllers/greetings_controller.rb
+      route  get "greetings/hello"
+     invoke  erb
+     create    app/views/greetings
+     create    app/views/greetings/hello.html.erb
+     invoke  test_unit
+     create    test/controllers/greetings_controller_test.rb
+     invoke  helper
+     create    app/helpers/greetings_helper.rb
+     invoke  assets
+     invoke    coffee
+     create      app/assets/javascripts/greetings.coffee
+     invoke    scss
+     create      app/assets/stylesheets/greetings.scss
+</pre>
+    </div>
+    <p>Что создалось? Создался ряд директорий в нашем приложении, и создались файл контроллера, файл
+        вьюхи, файл функционального теста, хелпер для вьюхи, файл JavaScript и файл таблицы
+        стилей.</p>
+    <p>Давайте проверим наш контроллер и немного его изменим (в <code>app/controllers/greetings_controller.rb</code>):
+    </p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+class GreetingsController &lt; ApplicationController
+  def hello
+    @message = "Hello, how are you today?"
+  end
+end
+</pre>
+    </div>
+    <p>Затем вьюху для отображения нашего сообщения (в
+        <code>app/views/greetings/hello.html.erb</code>):</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&lt;h1&gt;A Greeting for You!&lt;/h1&gt;
+&lt;p&gt;&lt;%= @message %&gt;&lt;/p&gt;
+</pre>
+    </div>
+    <p>Запустим сервер с помощью <code>rails server</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails server
+=&gt; Booting WEBrick...
+</pre>
+    </div>
+    <p>URL должен быть .</p>
+    <div class="info"><p>В нормальном старом добром приложении на Rails, ваши URL будут создаваться
+        по образцу http://(host)/(controller)/(action), и URL, подобный такому
+        http://(host)/(controller), вызовет экшн <strong>index</strong> этого контроллера.</p></div>
+    <p>В Rails также есть генератор для моделей данных.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model
+Usage:
+  rails generate model NAME [field[:type][:index] field[:type][:index]] [options]
+...
+ActiveRecord options:
+      [--migration]            # Indicates when to generate migration
+                               # Default: true
+...
+Description:
+    Create rails files for model generator.
+</pre>
+    </div>
+    <div class="note"><p>Список доступных типов полей можно узнать в для метода column класса <code>TableDefinition</code>
+    </p></div>
+    <p>Но вместо создания модели непосредственно (что мы сделаем еще позже), давайте создадим каркас
+        (scaffold). <strong>Скаффолд</strong> в Rails - это полный набор из модели, миграции базы
+        данных для этой модели, контроллер для воздействия на нее, вьюхи для просмотра и обращения с
+        данными и тестовый набор для всего этого.</p>
+    <p>Давайте настроим простой ресурс, названный "HighScore", который будет отслеживать наши лучшие
+        результаты в видеоиграх, в которые мы играли.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate scaffold HighScore game:string score:integer
+    invoke  active_record
+    create    db/migrate/20130717151933_create_high_scores.rb
+    create    app/models/high_score.rb
+    invoke    test_unit
+    create      test/models/high_score_test.rb
+    create      test/fixtures/high_scores.yml
+    invoke  resource_route
+     route    resources :high_scores
+    invoke  scaffold_controller
+    create    app/controllers/high_scores_controller.rb
+    invoke    erb
+    create      app/views/high_scores
+    create      app/views/high_scores/index.html.erb
+    create      app/views/high_scores/edit.html.erb
+    create      app/views/high_scores/show.html.erb
+    create      app/views/high_scores/new.html.erb
+    create      app/views/high_scores/_form.html.erb
+    invoke    test_unit
+    create      test/controllers/high_scores_controller_test.rb
+    invoke    helper
+    create      app/helpers/high_scores_helper.rb
+    invoke    jbuilder
+    create      app/views/high_scores/index.json.jbuilder
+    create      app/views/high_scores/show.json.jbuilder
+    invoke  assets
+    invoke    coffee
+    create      app/assets/javascripts/high_scores.coffee
+    invoke    scss
+    create      app/assets/stylesheets/high_scores.scss
+    invoke  scss
+   identical    app/assets/stylesheets/scaffolds.scss
+</pre>
+    </div>
+    <p>Генератор проверил, что существуют директории для моделей, контроллеров, хелперов, макетов,
+        функциональных и юнит тестов, таблиц стилей, создал вьюхи, контроллер, модель и миграцию
+        базы данных для HighScore (создающую таблицу <code>high_scores</code> и поля), позаботился о
+        маршруте для <em>ресурса</em>, и создал новые тесты для всего этого.</p>
+    <p>Миграция требует, чтобы мы <strong>мигрировали ее</strong>, то есть запустили некоторый код
+        Ruby (находящийся в <code>20130717151933_create_high_scores.rb</code>), чтобы изменить схему
+        базы данных. Какой базы данных? Базы данных SQLite3, которую создаст Rails, когда мы
+        запустим команду <code>rake db:migrate</code>. Поговорим о Rake чуть позже.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake db:migrate
+==  CreateHighScores: migrating ===============================================
+-- create_table(:high_scores)
+   -&gt; 0.0017s
+==  CreateHighScores: migrated (0.0019s) ======================================
+</pre>
+    </div>
+    <div class="info"><p>Давайте поговорим о юнит тестах. Юнит тесты - это код, который тестирует и
+        делает утверждения о коде. В юнит тестировании мы берем часть кода, скажем, метод модели, и
+        тестируем его входы и выходы. Юнит тесты ваши друзья. Чем раньше вы смиритесь с фактом, что
+        качество жизни возрастет, когда станете тестировать свой код с помощью юнит тестов, тем
+        лучше. Серьезно. Посетите для более глубокого изучения юнит тестирования.</p></div>
+    <p>Давайте взглянем на интерфейс, который Rails создал для нас.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails server
+</pre>
+    </div>
+    <p>Перейдите в браузер и откройте , теперь мы можем создать новый рекорд (55,160 в Space
+        Invaders!)</p>
+    <h4 class="inside_page_header" id="rails-console"><code>rails console</code>
+    </h4>
+    <p>Команда <code>console</code> позволяет взаимодействовать с приложением на Rails из командной
+        строки. В своей основе <code>rails console</code> использует IRB, поэтому, если вы
+        когда-либо его использовали, то будете чувствовать себя уютно. Это полезно для тестирования
+        быстрых идей с кодом и правки данных на сервере не трогая веб-сайт.</p>
+    <div class="info"><p>Для вызова консоли также можно использовать псевдоним "c": <code>rails
+        c</code>.</p></div>
+    <p>Можно указать среду, в которой должна работать команда <code>console</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails console staging
+</pre>
+    </div>
+    <p>Если нужно протестировать некоторый код без изменения каких-либо данных, можно это сделать,
+        вызвав <code>rails console --sandbox</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails console --sandbox
+Loading development environment in sandbox (Rails 5.0.0)
+Any modifications you make will be rolled back on exit
+irb(main):001:0&gt;
+</pre>
+    </div>
+    <h5 class="inside_page_header" id="ob-ekty-app-i-helper"> Объекты app и helper</h5>
+    <p>Внутри <code>rails console</code> имеется доступ к экземплярам <code>app</code> и <code>helper</code>.
+    </p>
+    <p>С помощью метода <code>app</code> доступны хелперы url и path, а также можно делать запросы.
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&gt;&gt; app.root_path
+=&gt; "/"
+&gt;&gt; app.get _
+Started GET "/" for 127.0.0.1 at 2014-06-19 10:41:57 -0300
+...
+</pre>
+    </div>
+    <p>С помощью метода <code>helper</code> возможно получить доступ к хелперам Rails и вашего
+        приложения.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+&gt;&gt; helper.time_ago_in_words 30.days.ago
+=&gt; "about 1 month"
+&gt;&gt; helper.my_custom_helper
+=&gt; "my custom helper"
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rails-dbconsole"><code>rails dbconsole</code>
+    </h4>
+    <p><code>rails dbconsole</code> определяет, какая база данных используется, и перемещает вас в
+        такой интерфейс командной строки, в котором можно ее использовать (и также определяет
+        параметры командной строки, которые нужно передать!). Она поддерживает MySQL, PostgreSQL,
+        SQLite и SQLite3.</p>
+    <div class="info"><p>Для вызова консоли базы данных также можно использовать псевдоним "db":
+        <code>rails db</code>.</p></div>
+    <h4 class="inside_page_header" id="rails-runner"><code>rails runner</code>
+    </h4>
+    <p><code>rails runner</code> запускает код Ruby в контексте неинтерактивности Rails. Для
+        примера:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails runner "Model.long_running_method"
+</pre>
+    </div>
+    <div class="info"><p>Можно также использовать псевдоним "r" для вызова runner: <code>rails
+        r</code>.</p></div>
+    <p>Можно определить среду, в которой будет работать команда <code>runner</code>, используя
+        переключатель <code>-e</code>:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails runner -e staging "Model.long_running_method"
+</pre>
+    </div>
+    <p>С помощью runner даже можно запускать код ruby, написанный в файле.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails runner lib/code_to_be_run.rb
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="rails-destroy"><code>rails destroy</code>
+    </h4>
+    <p>Воспринимайте <code>destroy</code> как противоположность <code>generate</code>. Она выясняет,
+        что было создано, и отменяет это.</p>
+    <div class="info"><p>Также можно использовать псевдоним "d" для вызова команды destroy: <code>rails
+        d</code>.</p></div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails generate model Oops
+      invoke  active_record
+      create    db/migrate/20120528062523_create_oops.rb
+      create    app/models/oops.rb
+      invoke    test_unit
+      create      test/models/oops_test.rb
+      create      test/fixtures/oops.yml
+</pre>
+    </div>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rails destroy model Oops
+      invoke  active_record
+      remove    db/migrate/20120528062523_create_oops.rb
+      remove    app/models/oops.rb
+      invoke    test_unit
+      remove      test/models/oops_test.rb
+      remove      test/fixtures/oops.yml
+</pre>
+    </div>
+    <h3 class="inside_page_header" id="rake"> Rake</h3>
+    <p>Rake означает Ruby Make, отдельная утилита Ruby, заменяющая утилиту Unix "make", и
+        использующая файлы "Rakefile" и <code>.rake</code> для построения списка задач. В Rails Rake
+        используется для обычных административных задач, особенно таких, которые зависят друг от
+        друга.</p>
+    <p>Можно получить список доступных задач Rake, который часто зависит от вашей текущей
+        директории, написав <code>rake --tasks</code>. У каждой задачи есть описание, помогающее
+        найти то, что вам необходимо.</p>
+    <p>Чтобы получить полный бэктрейс для запущенной задачи rake, необходимо передать опцию <code>--trace</code>
+        в командную строку, например <code>rake db:create --trace</code>.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake --tasks
+rake about              # List versions of all Rails frameworks and the environment
+rake assets:clean       # Remove old compiled assets
+rake assets:clobber     # Remove compiled assets
+rake assets:precompile  # Compile all the assets named in config.assets.precompile
+rake db:create          # Create the database from config/database.yml for the current Rails.env
+...
+rake log:clear          # Truncates all `*.log` files in log/ to zero bytes (specify which logs with LOGS=test,development)
+rake middleware         # Prints out your Rack middleware stack
+...
+rake tmp:clear          # Clear cache and socket files from tmp/ (narrow w/ tmp:cache:clear, tmp:sockets:clear)
+rake tmp:create         # Creates tmp directories for cache, sockets, and pids
+</pre>
+    </div>
+    <div class="info"><p>Для получения списка задач также можно использовать <code>rake -T</code>.
+    </p></div>
+    <h4 class="inside_page_header" id="about"><code>about</code>
+    </h4>
+    <p><code>rake about</code> предоставляет информацию о номерах версий Ruby, RubyGems, Rails,
+        подкомпонентов Rails, папке вашего приложения, имени текущей среды Rails, адаптере базы
+        данных вашего приложения и версии схемы. Это полезно, когда нужно попросить помощь,
+        проверить патч безопасности, который может повлиять на вас, или просто хотите узнать
+        статистику о текущей инсталляции Rails.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake about
+About your application's environment
+Rails version             5.0.0
+Ruby version              2.2.2 (x86_64-linux)
+RubyGems version          2.4.6
+Rack version              1.6
+JavaScript Runtime        Node.js (V8)
+Middleware                Rack::Sendfile, ActionDispatch::Static, Rack::Lock, #&lt;ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x007ffd131a7c88&gt;, Rack::Runtime, Rack::MethodOverride, ActionDispatch::RequestId, Rails::Rack::Logger, ActionDispatch::ShowExceptions, ActionDispatch::DebugExceptions, ActionDispatch::RemoteIp, ActionDispatch::Reloader, ActionDispatch::Callbacks, ActiveRecord::Migration::CheckPending, ActiveRecord::ConnectionAdapters::ConnectionManagement, ActiveRecord::QueryCache, ActionDispatch::Cookies, ActionDispatch::Session::CookieStore, ActionDispatch::Flash, Rack::Head, Rack::ConditionalGet, Rack::ETag
+Application root          /home/foobar/commandsapp
+Environment               development
+Database adapter          sqlite3
+Database schema version   20110805173523
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="assets"><code>assets</code>
+    </h4>
+    <p>Можно предварительно компилировать ресурсы (ассеты) в <code>app/assets</code>, используя
+        <code>rake assets:precompile</code>, и удалять эти скомпилированные ресурсы, используя
+        <code>rake assets:clean</code>. Задача <code>assets:clean</code> позволяет откатывать
+        деплои, которые все еще могут быть связаны со старыми ресурсами, в то время как создаются
+        новые ресурсы.</p>
+    <p>Если хотите полностью очистить <code>public/assets</code>, можно использовать <code>rake
+        assets:clobber</code>.</p>
+    <h4 class="inside_page_header" id="db"><code>db</code>
+    </h4>
+    <p>Самыми распространенными задачами пространства имен Rake <code>db:</code> являются <code>migrate</code>
+        и <code>create</code>, но следует попробовать и остальные миграционные задачи rake
+        (<code>up</code>, <code>down</code>, <code>redo</code>, <code>reset</code>). <code>rake
+            db:version</code> полезна для решения проблем, показывая текущую версию базы данных.</p>
+    <p>Более подробно о миграциях написано в руководстве .</p>
+    <h4 class="inside_page_header" id="notes"><code>notes</code>
+    </h4>
+    <p><code>rake notes</code> ищет в вашем коде комментарии, начинающиеся с FIXME, OPTIMIZE или
+        TODO. Поиск выполняется в файлах с разрешениями <code>.builder</code>, <code>.rb</code>,
+        <code>.rake</code>, <code>.yml</code>, <code>.yaml</code>, <code>.ruby</code>,
+        <code>.css</code>, <code>.js</code> и <code>.erb</code> для аннотаций как по умолчанию, так
+        и произвольных.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake notes
+(in /home/foobar/commandsapp)
+app/controllers/admin/users_controller.rb:
+  * [ 20] [TODO] any other way to do this?
+  * [132] [FIXME] high priority for next deploy
+app/models/school.rb:
+  * [ 13] [OPTIMIZE] refactor this code to make it faster
+  * [ 17] [FIXME]
+</pre>
+    </div>
+    <p>Можно добавить поддержку для нового расширения файла с помощью опции <code>config.annotations.register_extensions</code>,
+        которая получает список расширений с соответствующим регулярным выражением.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+config.annotations.register_extensions("scss", "sass", "less") { |annotation| /\/\/\s*(#{annotation}):?\s*(.*)$/ }
+</pre>
+    </div>
+    <p>Если ищете определенную аннотацию, скажем FIXME, используйте <code>rake notes:fixme</code>.
+        Отметьте, что имя аннотации использовано в нижнем регистре.</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake notes:fixme
+(in /home/foobar/commandsapp)
+app/controllers/admin/users_controller.rb:
+  * [132] high priority for next deploy
+app/models/school.rb:
+  * [ 17]
+</pre>
+    </div>
+    <p>Также можно использовать произвольные аннотации в своем коде и выводить их, используя <code>rake
+        notes:custom</code>, определив аннотацию, используя переменную среды <code>ANNOTATION</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake notes:custom ANNOTATION=BUG
+(in /home/foobar/commandsapp)
+app/models/article.rb:
+  * [ 23] Have to fix this one before pushing!
+</pre>
+    </div>
+    <div class="note"><p>При использовании определенных и произвольных аннотаций, имя аннотации
+        (FIXME, BUG и т.д.) не отображается в строках результата.</p></div>
+    <p>По умолчанию <code>rake notes</code> будет искать в директориях <code>app</code>, <code>config</code>,
+        <code>db</code>, <code>lib</code> и <code>test</code>. Если желаете искать в иных
+        директориях, можно их предоставить как разделенный запятыми список в переменную среды <code>SOURCE_ANNOTATION_DIRECTORIES</code>.
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ export SOURCE_ANNOTATION_DIRECTORIES='spec,vendor'
+$ bin/rake notes
+(in /home/foobar/commandsapp)
+app/models/user.rb:
+  * [ 35] [FIXME] User should have a subscription at this point
+spec/models/user_spec.rb:
+  * [122] [TODO] Verify the user that has a subscription works
+</pre>
+    </div>
+    <h4 class="inside_page_header" id="routes"><code>routes</code>
+    </h4>
+    <p><code>rake routes</code> отобразит список всех определенных маршрутов, что полезно для
+        отслеживания проблем с роутингом в вашем приложении, или предоставления хорошего обзора URL
+        приложения, с которым вы пытаетесь ознакомиться.</p>
+    <h4 class="inside_page_header" id="test"><code>test</code>
+    </h4>
+    <div class="info"><p>Хорошее описание юнит-тестирования в Rails дано в .</p></div>
+    <p>Rails поставляется с набором тестов по имени <code>Minitest</code>. Rails сохраняет
+        стабильность в связи с использованием тестов. Задачи, доступные в пространстве имен <code>test:</code>,
+        помогают с запуском различных тестов, которые вы, несомненно, напишите.</p>
+    <h4 class="inside_page_header" id="tmp"><code>tmp</code>
+    </h4>
+    <p>Директория <code>Rails.root/tmp</code> является, как любая *nix директория /tmp, местом для
+        временных файлов, таких как файлы id процессов и кэшированные экшны.</p>
+    <p>Задачи пространства имен <code>tmp:</code> помогут очистить и создать директорию <code>Rails.root/tmp</code>:
+    </p>
+    <ul>
+        <li>
+            <code>rake tmp:cache:clear</code> очистит <code>tmp/cache</code>.
+        </li>
+        <li>
+            <code>rake tmp:sockets:clear</code> очистит <code>tmp/sockets</code>.
+        </li>
+        <li>
+            <code>rake tmp:clear</code> очистит все файлы кэша и сокетов.
+        </li>
+        <li>
+            <code>rake tmp:create</code> создает временные директории для кэша, сокетов и
+            идентификаторов процесса (pid).
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="prochee"> Прочее</h4>
+    <ul>
+        <li>
+            <code>rake stats</code> великолепно для обзора статистики вашего кода, отображает такие
+            вещи, как KLOCs (тысячи строк кода) и ваш код для тестирования показателей.
+        </li>
+        <li>
+            <code>rake secret</code> даст псевдо-случайный ключ для использования в качестве
+            секретного ключа сессии.
+        </li>
+        <li>
+            <code>rake time:zones:all</code> перечислит все временные зоны, о которых знает Rails.
+        </li>
+    </ul>
+    <h4 class="inside_page_header" id="polzovatelskie-zadachi-rake"> Пользовательские задачи
+        Rake</h4>
+    <p>Пользовательские задачи rake имеют расширение <code>.rake</code> и располагаются в<code>Rails.root/lib/tasks</code>.
+        Эти пользовательские задачи rake можно создать с помощью команды <code>bin/rails generate
+            task</code>.</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+desc "I am short, but comprehensive description for my cool task"
+task task_name: [:prerequisite_task, :another_task_we_depend_on] do
+  # Вся магия тут
+  # Разрешен любой код Ruby
+end
+</pre>
+    </div>
+    <p>Чтобы передать аргументы в ваш задачу rake:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+task :task_name, [:arg_1] =&gt; [:prerequisite_1, :prerequisite_2] do |task, args|
+  argument_1 = args.arg_1
+end
+</pre>
+    </div>
+    <p>Задачи можно группировать, помещая их в пространства имен:</p>
+    <div class="code_container">
+<pre class="brush: ruby; gutter: false; toolbar: false">
+namespace :db do
+  desc "This task does nothing"
+  task :nothing do
+    # Серьезно, ничего
+  end
+end
+</pre>
+    </div>
+    <p>Вызов задач выглядит так:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ bin/rake task_name
+$ bin/rake "task_name[value 1]" # весь аргумент в виде строки должен быть в кавычках
+$ bin/rake db:nothing
+</pre>
+    </div>
+    <div class="note"><p>Если необходимо взаимодействовать с моделями приложения, выполнять запросы
+        в базу данных и так далее, ваша задача должен зависеть от задачи <code>environment</code>,
+        который загрузит код вашего приложения.</p></div>
+    <h3 class="inside_page_header" id="prodvinutaya-komandnaya-stroka-rails"> Продвинутая командная
+        строка Rails</h3>
+    <p>Более продвинутое использование командной строки сфокусировано на полезных (даже иногда
+        удивляющих) опциях утилит, и подгонке утилит к вашим потребностям и особенностям рабочего
+        процесса. Сейчас мы перечислим трюки из рукава Rails.</p>
+    <h4 class="inside_page_header" id="rails-s-bazami-dannymi-i-scm"> Rails с базами данными и
+        SCM</h4>
+    <p>При создании нового приложения на Rails, можно выбрать, какой тип базы данных и какой тип
+        системы управления исходным кодом (SCM) собирается использовать ваше приложение. Это
+        сэкономит вам несколько минут и, конечно, несколько строк.</p>
+    <p>Давайте посмотрим, что могут сделать для нас опции <code>--git</code> и <code>--database=postgresql</code>:
+    </p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ mkdir gitapp
+$ cd gitapp
+$ git init
+Initialized empty Git repository in .git/
+$ rails new . --git --database=postgresql
+      exists
+      create  app/controllers
+      create  app/helpers
+...
+...
+      create  tmp/cache
+      create  tmp/pids
+      create  Rakefile
+add 'Rakefile'
+      create  README.rdoc
+add 'README.rdoc'
+      create  app/controllers/application_controller.rb
+add 'app/controllers/application_controller.rb'
+      create  app/helpers/application_helper.rb
+...
+      create  log/test.log
+add 'log/test.log'
+</pre>
+    </div>
+    <p>Мы создали директорию <strong>gitapp</strong> и инициализировали пустой репозиторий перед
+        тем, как Rails добавил бы созданные им файлы в наш репозиторий. Давайте взглянем, что он нам
+        поместил в конфигурацию базы данных:</p>
+    <div class="code_container">
+<pre class="brush: plain; gutter: false; toolbar: false">
+$ cat config/database.yml
+# PostgreSQL. Versions 8.2 and up are supported.
+#
+# Install the pg driver:
+#   gem install pg
+# On OS X with Homebrew:
+#   gem install pg -- --with-pg-config=/usr/local/bin/pg_config
+# On OS X with MacPorts:
+#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/pg_config
+# On Windows:
+#   gem install pg
+#       Choose the win32 build.
+#       Install PostgreSQL and put its /bin directory on your path.
+#
+# Configure Using Gemfile
+# gem 'pg'
+#
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: gitapp_development
+  pool: 5
+  username: gitapp
+  password:
+...
+...
+</pre>
+    </div>
+    <p>Это также создало несколько строк в нашей конфигурации database.yml, соответствующих нашему
+        выбору PostgreSQL как базы данных.</p>
+    <div class="note"><p>Единственная хитрость с использованием опции SCM состоит в том, что сначала
+        нужно создать директорию для приложения, затем инициализировать ваш SCM, и лишь затем можно
+        запустить команду <code>rails new</code> для создания основы вашего приложения.</p></div>
+
+</body>
+</html>

@@ -11,10 +11,12 @@
             display: flex;
             align-content: center;
             border-radius: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         div.search-container:hover {
             border: 1px solid transparent;
+            box-shadow: 0 1px 10px rgba(0, 0, 0, .1);
         }
 
         input.input-search {
@@ -65,30 +67,6 @@
             div.search-container:hover {
                 box-shadow: 0 1px 10px rgba(255, 255, 255, .1);
             }
-        }
-
-        @media (prefers-color-scheme: light) {
-
-            div.search-container {
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            div.search-container:hover {
-                box-shadow: 0 1px 10px rgba(0, 0, 0, .1);
-            }
-
-        }
-        
-        @media (prefers-color-scheme: no-preference) {
-
-            div.search-container {
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            div.search-container:hover {
-                box-shadow: 0 1px 10px rgba(0, 0, 0, .1);
-            }
-
         }
     </style>
     <script type="text/javascript">

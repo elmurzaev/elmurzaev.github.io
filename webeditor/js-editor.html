@@ -18,7 +18,10 @@
 <body style="margin: 0px 0px 0px 0px;">
 <script>
     editor = CodeMirror(document.body, {
-        value: "//write your JavaScript code",
+        value: 
+        "//write your JavaScript code\n" +
+        "//**function calls (eg. alert()) will get executed immediately" +
+        "//**you can define your own functions here and call them later",
         mode: "javascript",
         lineNumbers: true,
         fixedGutter: false,

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Input URL or Search</title>
     <link rel="shortcut icon" href="logo.png" type="image/png">
@@ -7,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark light">
     <style>
+        :root {
+            color-scheme: light dark;
+        }
         div.search-container {
             display: flex;
             align-content: center;
@@ -142,8 +146,11 @@
 
             <div class="search-container">
                 <img src="search.png" id="search-icon" draggable="false">
-                <input type="search" id="input-search" class="input-search" placeholder="" onkeypress="return keyScriptInputSearch(event)" minlength="1" maxlength="500">
+                <input type="search" id="input-search" class="input-search" placeholder=""
+                    onkeypress="return keyScriptInputSearch(event)" minlength="1" maxlength="500">
             </div>
         </center>
     </div>
-</body></html>
+</body>
+
+</html>

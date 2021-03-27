@@ -9,6 +9,17 @@
     padding: 1px;
 }
 
+@media(prefers-color-scheme: dark) {
+  .main_item, .category_item{
+    background-color: #323232;
+  }
+}
+@media(prefers-color-scheme: light) {
+  .main_item, .category_item{
+    background-color: white;
+  }
+}
+
 .main_item, .category_item{
   transition: 0.2s;
   min-height: 45px;
@@ -16,7 +27,6 @@
   height: auto;
   padding: 8px;
   width: 100%;
-  background-color: white;
   outline: none;
   border: none;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.2);

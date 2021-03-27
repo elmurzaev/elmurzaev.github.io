@@ -13,26 +13,32 @@
   .main_item, .category_item{
     background-color: #323232;
   }
+  .lection_item a, .lection_item a:hover{
+    color: white;
+  }
   .category_item:active{
     background-color: #484848;
-    padding: 10px;
   }
   .main_item:active{
     background-color: #484848;
-    padding: 14px;
+  }
+  .goog-te-gadget-simple{
+    color: white!important;
+    background-color: #484848!important;
   }
 }
 @media(prefers-color-scheme: light) {
   .main_item, .category_item{
     background-color: white;
   }
+  .lection_item a, .lection_item a:hover{
+    color: black;
+  }
   .category_item:active{
     background-color: #EEEEEE;
-    padding: 10px;
   }
   .main_item:active{
     background-color: #EEEEEE;
-    padding: 14px;
   }
 }
 
@@ -51,15 +57,22 @@
   margin-bottom: 8px;
 }
 
+.category_item:active{
+  padding: 10px;
+}
+
 .main_item {
   height: 52px;
   font-size: 1.3em;
   padding: 12px;
 }
 
+.main_item:active {
+  padding: 14px;
+}
+
 .lection_item a, .lection_item a:hover{
 	font-size: 16px;
-	color: black;
 }
 
 .goog-te-gadget-simple {

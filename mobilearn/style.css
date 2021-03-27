@@ -14,6 +14,9 @@
 }
 
 @media(prefers-color-scheme: dark) {
+  body {
+    background-color: ;
+  }
   .main_item, .category_item{
     background-color: #323232;
   }

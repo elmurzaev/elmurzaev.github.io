@@ -13,10 +13,26 @@
   .main_item, .category_item{
     background-color: #323232;
   }
+  .category_item:active{
+    background-color: #484848;
+    padding: 10px;
+  }
+  .main_item:active{
+    background-color: #484848;
+    padding: 14px;
+  }
 }
 @media(prefers-color-scheme: light) {
   .main_item, .category_item{
     background-color: white;
+  }
+  .category_item:active{
+    background-color: #EEEEEE;
+    padding: 10px;
+  }
+  .main_item:active{
+    background-color: #EEEEEE;
+    padding: 14px;
   }
 }
 
@@ -39,16 +55,6 @@
   height: 52px;
   font-size: 1.3em;
   padding: 12px;
-}
-
-.category_item:active{
-  background-color: #EEEEEE;
-  padding: 10px;
-}
-
-.main_item:active{
-  background-color: #EEEEEE;
-  padding: 14px;
 }
 
 .lection_item a, .lection_item a:hover{

@@ -33,25 +33,10 @@
     background-color: #282828 !important;
   }
 }
-@media (prefers-color-scheme: light) {
-  .main_item,
-  .category_item {
-    background-color: white;
-  }
-  .lection_item a,
-  .lection_item a:hover {
-    color: black;
-  }
-  .category_item:active {
-    background-color: #eeeeee;
-  }
-  .main_item:active {
-    background-color: #eeeeee;
-  }
-}
 
 .main_item,
 .category_item {
+  background-color: white;
   transition: 0.2s;
   min-height: 45px;
   font-size: 1.2em;
@@ -66,8 +51,10 @@
   margin-bottom: 8px;
 }
 
+.main_item:active,
 .category_item:active {
   padding: 10px;
+  background-color: #eeeeee;
 }
 
 .main_item {
@@ -83,6 +70,7 @@
 .lection_item a,
 .lection_item a:hover {
   font-size: 16px;
+  color: black;
 }
 
 .goog-te-gadget-simple {

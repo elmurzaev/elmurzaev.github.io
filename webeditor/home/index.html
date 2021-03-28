@@ -20,7 +20,7 @@
         box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
       }
 
-      input.input-search {
+      input {
         padding: 10px 0;
         margin: 0 10px;
         outline: none;
@@ -55,14 +55,15 @@
       @media (prefers-color-scheme: dark) {
         body {
           background-color: #383838;
-          color: white;
         }
         div.search-container {
           border: 1px solid rgba(255, 255, 255, 0.1);
-          color: white !important;
         }
         div.search-container:hover {
           box-shadow: 0 1px 10px rgba(255, 255, 255, 0.1);
+        }
+        input {
+          color: white;
         }
       }
     </style>
@@ -121,9 +122,6 @@
           </picture>
           <input
             type="search"
-            id="input-search"
-            class="input-search"
-            placeholder=""
             onkeypress="return keyScriptInputSearch(event)"
             minlength="1"
             maxlength="500"

@@ -1,23 +1,3 @@
-if (localStorage.nightMode == null) localStorage.nightMode = 'no'
-
-if (localStorage.nightMode == 'night') {
-	var style = document.getElementById('style')
-	style.href = style.href.replace('style', 'style-dark')
-}
-
-function enableNightMode() {
-	if (localStorage.nightMode !== 'night') {
-		var style = document.getElementById('style')
-		style.href = style.href.replace('style', 'style-dark')
-		localStorage.nightMode = 'night'
-		reload()
-	}
-}
-
-function disableNightMode() {
-	localStorage.nightMode = 'no'
-}
-
 window.onload = function () {
 	if (localStorage.fontSize !== null) initFontSize()
 }

@@ -16,7 +16,7 @@
   }
   .main_item,
   .category_item {
-    background-color: #222222;
+    background-color: #222222 !important;
   }
   .lection_item a,
   .lection_item a:hover {

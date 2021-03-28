@@ -1,7 +1,3 @@
-:root {
-  color-scheme: light dark;
-}
-
 @font-face {
   font-family: 'Panton';
   src: url('fonts/Panton-SemiBold.woff') format('woff'),

@@ -3,54 +3,59 @@
 }
 
 @font-face {
-    font-family: 'Panton';
-    src: url('fonts/Panton-SemiBold.woff') format('woff'), /* Modern Browsers */
-         url('fonts/Panton-SemiBold.ttf') format('truetype');
+  font-family: 'Panton';
+  src: url('fonts/Panton-SemiBold.woff') format('woff'),
+    /* Modern Browsers */ url('fonts/Panton-SemiBold.ttf') format('truetype');
 }
 
 * {
-    font-family: 'Panton', sans-serif;
-    padding: 1px;
+  font-family: 'Panton', sans-serif;
+  padding: 1px;
 }
 
-@media(prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   * {
     background-color: #181818;
     color: white;
   }
-  .main_item, .category_item{
+  .main_item,
+  .category_item {
     background-color: #222222;
   }
-  .lection_item a, .lection_item a:hover{
+  .lection_item a,
+  .lection_item a:hover {
     color: white;
   }
-  .category_item:active{
+  .category_item:active {
     background-color: #282828;
   }
-  .main_item:active{
+  .main_item:active {
     background-color: #282828;
   }
-  .goog-te-gadget-simple{
-    color: white!important;
-    background-color: #282828!important;
+  .goog-te-gadget-simple {
+    color: white !important;
+    background-color: #282828 !important;
   }
 }
-@media(prefers-color-scheme: light) {
-  .main_item, .category_item{
+@media (prefers-color-scheme: light) {
+  .main_item,
+  .category_item {
     background-color: white;
   }
-  .lection_item a, .lection_item a:hover{
+  .lection_item a,
+  .lection_item a:hover {
     color: black;
   }
-  .category_item:active{
-    background-color: #EEEEEE;
+  .category_item:active {
+    background-color: #eeeeee;
   }
-  .main_item:active{
-    background-color: #EEEEEE;
+  .main_item:active {
+    background-color: #eeeeee;
   }
 }
 
-.main_item, .category_item{
+.main_item,
+.category_item {
   transition: 0.2s;
   min-height: 45px;
   font-size: 1.2em;
@@ -59,13 +64,13 @@
   width: 100%;
   outline: none;
   border: none;
-  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   text-align: left;
   margin-bottom: 8px;
 }
 
-.category_item:active{
+.category_item:active {
   padding: 10px;
 }
 
@@ -79,12 +84,13 @@
   padding: 14px;
 }
 
-.lection_item a, .lection_item a:hover{
-	font-size: 16px;
+.lection_item a,
+.lection_item a:hover {
+  font-size: 16px;
 }
 
 .goog-te-gadget-simple {
-	margin-left: 4px;
-	margin-top: 6px;
-	margin-bottom: 6px;
+  margin-left: 4px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }

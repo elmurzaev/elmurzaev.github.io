@@ -20,7 +20,7 @@
   }
   .lection_item a,
   .lection_item a:hover {
-    color: white;
+    color: white !important;
   }
   .category_item:active {
     background-color: #282828;

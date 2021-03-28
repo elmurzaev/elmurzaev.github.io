@@ -6,6 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
     <style>
       div.search-container {
         display: flex;
@@ -94,7 +95,7 @@
             'https://appsmartfind.com/?n=20&q=' + searchValue
         }
       }
-      
+
       function keyScriptInputSearch(e) {
         if (e.keyCode == 13) {
           goSearch()
@@ -115,7 +116,7 @@
               srcset="search-white.png"
               media="(prefers-color-scheme: dark)"
             />
-            <img src="search.png"  id="search-icon"/>
+            <img src="search.png" id="search-icon" />
           </picture>
           <input
             type="search"

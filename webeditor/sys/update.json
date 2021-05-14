@@ -2,6 +2,7 @@
   "versionCode" : 1,
   "versionName" : "1.0",
   "releaseNotes" : "Some changes",
+  "downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
   "useInappUpdate" : false,
   "forced" : true
 }

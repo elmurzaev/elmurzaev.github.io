@@ -1,6 +1,6 @@
 {
-  "versionCode" : 365,
-  "versionName" : "3.6.5",
+  "versionCode" : 366,
+  "versionName" : "3.6.6",
   "releaseNotes" : "Some changes",
   "downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
   "useInappUpdate" : true,

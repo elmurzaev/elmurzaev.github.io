@@ -4,5 +4,5 @@
   "releaseNotes" : "Some changes",
   "downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
   "useInappUpdate" : true,
-  "isForced" : true
+  "isForced" : false
 }

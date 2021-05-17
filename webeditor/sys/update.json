@@ -4,6 +4,6 @@
   "releaseNotes" : "Some changes",
   "downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
   "fallbackUrl" : "https://play.google.com/store/apps/details?id=com.elmurzaev.webeditor",
-  "isForced" : false,
-  "isBeta" : true
+  "useInappUpdate" : true,
+  "isForced" : false
 }

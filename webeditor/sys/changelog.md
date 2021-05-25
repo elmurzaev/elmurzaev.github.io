@@ -1,4 +1,7 @@
 ## Changelog
+**V3.6.8**
+- Some changes
+
 **V3.6.7**
 - Removed Firebase Services
 

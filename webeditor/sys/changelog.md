@@ -2,6 +2,7 @@
 **V3.6.8**
 - Dark style for editor when dark mode is on
 - Upgrade html editor
+- No restrictions of functionality for free users (although even before there was only one limitation - changing home page), this means you only buy VIP if you want to disable ads & support this project
 - Other minor improvements
 
 **V3.6.7**

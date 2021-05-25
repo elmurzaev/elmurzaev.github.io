@@ -1,6 +1,8 @@
 ## Changelog
 **V3.6.8**
-- Some changes
+- Dark style for editor when dark mode is on
+- Upgrade html editor
+- Other minor improvements
 
 **V3.6.7**
 - Removed Firebase Services

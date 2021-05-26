@@ -3,6 +3,6 @@
   "versionName" : "3.6.9",
   "releaseNotes" : "Some changes",
   "downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
-  "useInappUpdate" : true,
+  "useInappUpdate" : false,
   "isForced" : false
 }

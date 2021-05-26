@@ -1,4 +1,8 @@
 ## Changelog
+**V3.6.9**
+- VIP no longer exists due to serious
+problems with integration
+
 **V3.6.8**
 - Dark style for editor when dark mode is on
 - Upgrade html editor

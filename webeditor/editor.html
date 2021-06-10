@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HTML Editor</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="Cache-Control: must-revalidate" name="http-equiv">
+    <link href="lib/codemirror.css" rel="stylesheet">
+    <link href="addon/dialog/dialog.css" rel="stylesheet">
+    <link href="theme/darcula.css" rel="stylesheet">
+    <script src="lib/codemirror.js"></script>
+    <script src="mode/htmlmixed.js"></script>
+    <script src="mode/css.js"></script>
+    <script src="mode/javascript.js"></script>
+    <script src="mode/xml.js"></script>
+    <script src="addon/active-line.js"></script>
+    <script src="addon/search/search.js"></script>
+    <script src="addon/search/searchcursor.js"></script>
+    <script src="addon/search/jump-to-line.js"></script>
+    <script src="addon/dialog/dialog.js"></script>
+</head>
+<body style="margin: 0 0 0 0;">
+<script>
+    editor = CodeMirror(document.body, {
+        mode: "text/html",
+        value: Client.getHtml(),
+        lineNumbers: true,
+        fixedGutter: false,
+        styleActiveLine: true,
+        spellcheck: false,
+        autocorrect: false,
+        autocapitalize: false
+    })
+    editor.setSize("100vw", "100vh")
+    editor.refresh = Client.hideProgress()
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        editor.setOption("theme", "darcula")
+    }
+    function apply() {
+        Client.apply(editor.getValue())
+    }
+</script>
+</body>
+</html>

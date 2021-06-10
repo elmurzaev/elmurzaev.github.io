@@ -1,8 +1,8 @@
 {
-  versionCode: 374,
-  versionName: "3.7.4",
-  releaseNotes: "Some changes",
-  downloadUrl: "market://details?id=com.elmuraev.webeditor",
-  useInappUpdate: false,
-  isForced: false
+  "versionCode": 374,
+  "versionName": "3.7.4",
+  "releaseNotes": "Some changes",
+  "downloadUrl": "market://details?id=com.elmuraev.webeditor",
+  "useInappUpdate": false,
+  "isForced": false
 }

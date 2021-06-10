@@ -1,9 +1,10 @@
 ### Changelog
 
 **v3.7.5**
-- Permanent VIP
+- VIP got cheaper
 - Updates check fix
 - Add this changelog
+- Move some resources to server
 
 **v3.7.4**
 - Fix VIP automatic refunds 

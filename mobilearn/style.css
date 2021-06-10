@@ -1,80 +1,85 @@
 @font-face {
-  font-family: 'Panton';
-  src: url('fonts/Panton-SemiBold.woff') format('woff'),
-    /* Modern Browsers */ url('fonts/Panton-SemiBold.ttf') format('truetype');
+    font-family: 'Panton';
+    src: url('fonts/Panton-SemiBold.woff') format('woff'),
+        /* Modern Browsers */ url('fonts/Panton-SemiBold.ttf') format('truetype');
 }
 
 * {
-  font-family: 'Panton', sans-serif;
-  padding: 1px;
+    font-family: 'Panton', sans-serif;
+    padding: 1px;
 }
 
 @media (prefers-color-scheme: dark) {
-  * {
-    background-color: #181818;
-    color: white;
-  }
-  .main_item,
-  .category_item {
-    background-color: #222222 !important;
-  }
-  .lection_item a,
-  .lection_item a:hover {
-    color: white !important;
-  }
-  .category_item:active {
-    background-color: #282828;
-  }
-  .main_item:active {
-    background-color: #282828;
-  }
-  .goog-te-gadget-simple {
-    color: white !important;
-    background-color: #282828 !important;
-  }
+    * {
+        background-color: #181818;
+        color: white;
+    }
+
+    .main_item,
+    .category_item {
+        background-color: #222222 !important;
+    }
+
+    .lection_item a,
+    .lection_item a:hover {
+        color: white !important;
+    }
+
+    .category_item:active {
+        background-color: #282828;
+    }
+
+    .main_item:active {
+        background-color: #282828;
+    }
+
+    .goog-te-gadget-simple {
+        color: white !important;
+        background-color: #282828 !important;
+    }
 }
 
 .main_item,
 .category_item {
-  background-color: white;
-  transition: 0.2s;
-  min-height: 45px;
-  font-size: 1.2em;
-  height: auto;
-  padding: 8px;
-  width: 100%;
-  outline: none;
-  border: none;
-  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  text-align: left;
-  margin-bottom: 8px;
+    background-color: white;
+    transition: 0.2s;
+    min-height: 45px;
+    font-size: 1.2em;
+    height: auto;
+    padding: 8px;
+    width: 100%;
+    outline: none;
+    border: none;
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    text-align: left;
+    margin-bottom: 8px;
 }
 
 .main_item:active,
 .category_item:active {
-  padding: 10px;
-  background-color: #eeeeee;
+    padding: 10px;
+    background-color: #eeeeee;
 }
 
 .main_item {
-  height: 52px;
-  font-size: 1.3em;
-  padding: 12px;
+    height: 52px;
+    font-size: 1.3em;
+    padding: 12px;
 }
 
 .main_item:active {
-  padding: 14px;
+    padding: 14px;
 }
 
 .lection_item a,
 .lection_item a:hover {
-  font-size: 16px;
-  color: black;
+    font-size: 16px;
+    color: black;
 }
 
 .goog-te-gadget-simple {
-  margin-left: 4px;
-  margin-top: 6px;
-  margin-bottom: 6px;
+    margin-left: 4px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }

@@ -1,6 +1,6 @@
 ### Changelog
 
-**v3.7.5**
+**v3.7.6**
 - VIP got cheaper
 - Updates check fix
 - Add this changelog

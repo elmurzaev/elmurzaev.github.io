@@ -1,7 +1,7 @@
 {
 	"versionCode" : 374,
 	"versionName" : "3.7.4",
-	"releaseNotes" : "Press back please, this is a test message!",
+	"releaseNotes" : "Some changes.",
 	"downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
 	"useInappUpdates" : false,
 	"isForced" : false

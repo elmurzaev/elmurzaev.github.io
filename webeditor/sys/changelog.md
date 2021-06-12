@@ -1,4 +1,6 @@
 ### Changelog
+**v3.7.7**
+- User-Agent manipulations available in settings
 
 **v3.7.6**
 - VIP got cheaper

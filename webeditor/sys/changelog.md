@@ -3,7 +3,6 @@
 - User-Agent manipulations available in settings
 
 **v3.7.6**
-- VIP got cheaper
 - Updates check fix
 - Add this changelog
 - Move some resources to server

@@ -1,7 +1,7 @@
 {
 	"versionCode" : 376,
-	"versionName" : "3.7.6",
-	"releaseNotes" : "Some changes.",
+	"versionName" : "3.7.7",
+	"releaseNotes" : "User-Agent manipulations available in settings",
 	"downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
 	"useInappUpdates" : false,
 	"isForced" : false

@@ -3,6 +3,6 @@
 	"versionName" : "3.7.7",
 	"releaseNotes" : "User-Agent manipulations available in settings",
 	"downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
-	"useInappUpdate" : true,
+	"useInappUpdate" : false,
 	"isForced" : false
 }

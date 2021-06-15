@@ -1,5 +1,9 @@
 ### Changelog
 **v3.7.7**
+- Bug fixes
+- CSS/JS file binder (Beta)
+
+**v3.7.7**
 - User-Agent manipulations available in settings
 
 **v3.7.6**

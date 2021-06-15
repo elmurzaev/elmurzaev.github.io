@@ -1,5 +1,5 @@
 ### Changelog
-**v3.7.7**
+**v3.7.8**
 - Bug fixes
 - CSS/JS file binder (Beta)
 

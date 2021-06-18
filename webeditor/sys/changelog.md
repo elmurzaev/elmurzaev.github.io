@@ -1,4 +1,7 @@
 ### Changelog
+**v3.7.9**
+- CSS/JS file binder is out of beta. 
+
 **v3.7.8**
 - Bug fixes
 - CSS/JS file binder (Beta, Unstable!)

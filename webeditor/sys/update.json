@@ -1,6 +1,6 @@
 {
-	"versionCode" : 379,
-	"versionName" : "3.7.9",
+	"versionCode" : 380,
+	"versionName" : "3.8.0",
 	"releaseNotes" : "Some improvements",
 	"downloadUrl" : "market://details?id=com.elmurzaev.webeditor",
 	"useInappUpdate" : false,

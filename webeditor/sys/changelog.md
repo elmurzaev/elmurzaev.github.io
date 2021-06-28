@@ -1,4 +1,8 @@
 ### Changelog
+**v3.8.3**
+- Search suggestions
+- Cookie manager
+
 **v3.8.1**
 - Some important changes
 - CSS/JS file binder bug fix

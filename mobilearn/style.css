@@ -1,10 +1,10 @@
 @font-face {
-    font-family: 'Default';
-    src: url('file:///android_res/font/default.ttf') format('truetype');
+    font-family: 'System';
+    src: url('file:///android_res/font/system.ttf') format('truetype');
 }
 
 * {
-    font-family: 'Default', sans-serif;
+    font-family: 'System', sans-serif;
     padding: 1px;
 }
 

@@ -1,11 +1,10 @@
 @font-face {
-    font-family: 'Panton';
-    src: url('fonts/Panton-SemiBold.woff') format('woff'),
-        /* Modern Browsers */ url('fonts/Panton-SemiBold.ttf') format('truetype');
+    font-family: 'lato';
+    src: url('fonts/lato.ttf') format('truetype');
 }
 
 * {
-    font-family: 'Panton', sans-serif;
+    font-family: 'lato', sans-serif;
     padding: 1px;
 }
 

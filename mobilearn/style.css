@@ -20,19 +20,13 @@
         background-color: #222222 !important;
     }
 
-    .lection_item a,
-    .lection_item a:hover {
+    .lection_item a, .lection_item a:hover {
         color: white !important;
     }
 
-    .category_item:active {
+    .main_item:active, .category_item:active {
         background-color: #282828;
     }
-
-    .main_item:active {
-        background-color: #282828;
-    }
-
     .goog-te-gadget-simple {
         color: white !important;
         background-color: #282828 !important;

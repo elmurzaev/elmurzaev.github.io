@@ -1,10 +1,7 @@
-@font-face {
-    font-family: 'Asap-Regular';
-    src: url('fonts/Asap-Regular.ttf') format('truetype');
-}
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
 
 * {
-    font-family: 'Asap-Regular', sans-serif;
+    font-family: 'Source Sans Pro', sans-serif;
     padding: 1px;
 }
 
